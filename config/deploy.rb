@@ -10,10 +10,10 @@ task :development do
   set :use_sudo,    false
   
   set :scm, :git
-  set :repository,  "git://github.com/yogo/yogo.git"
+  set :repository,  "git://github.com/yogo/VOEIS.git"
   set :shell, "/bin/bash"
   
-  set :branch, "apps/voeis-dev"
+  set :branch, "master"
   set :deploy_via, :remote_cache
   set :copy_exclude, [".git"]
   
@@ -35,10 +35,10 @@ task :production do
   set :use_sudo,    false
   
   set :scm, :git
-  set :repository,  "git://github.com/yogo/yogo.git"
+  set :repository,  "git://github.com/yogo/VOEIS.git"
   set :shell, "/bin/bash"
   
-  set :branch, "apps/voeis"
+  set :branch, "1-0-alpha"
   set :deploy_via, :remote_cache
   set :copy_exclude, [".git"]
   
