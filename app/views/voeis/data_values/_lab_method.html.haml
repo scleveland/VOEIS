@@ -1,0 +1,42 @@
+- content_for(:javascripts) do
+  :javascript
+    function createMethod(){ 
+    $.post("#{root_url + "lab_methods"}.json?lab_method[lab_name]=" +$("#lab_method_lab_name").val()+"&lab_method[lab_organization]=" + $("#lab_organization").val()+"&lab_method[lab_method_name]="+$("#lab_method_lab_method_name").val()+"&lab_method[lab_method_description]="+ $("#lab_method_lab_method_description").val() + "&lab_method[lab_method_link]="+ $("#lab_method_lab_method_link").val(),
+    function(data) {
+      $('#variable_lab_method').append($("<option></option>").attr("value",data['id']).text($("#lab_method_lab_method_name").val())); 
+      $('#variable_lab_method').val(data['id']);
+      dijit.byId("new_lab_method1").hide();
+    }
+    );
+    }
+    dojo.require("dijit.Tooltip");
+
+#new_lab_method1{:dojoType=>"dijit.Dialog", :title=>"New Lab Method"}
+  %h3 Create a new Lab Method:
+  = form_for (:lab_method) do |f|
+    = f.label("Lab Name:")
+    =clear_break
+    =f.text_field :lab_name, :size=> 50
+    =clear_break
+    = f.label("Lab Organization:")
+    =clear_break
+    =f.text_field :lab_organization, :size=> 50
+    =clear_break
+    = f.label("Lab Method Name:")
+    =clear_break
+    =f.text_field :lab_method_name, :size=> 50
+    = clear_break
+    = f.label("Lab Method Description:")
+    = clear_break
+    =f.text_field :lab_method_description, :size=> 50
+    =clear_break
+    = f.label("Lab Method Link:")
+    =clear_break
+    =f.text_field :lab_method_link, :size=> 50
+    =clear_break
+    %button{:id=> 'new_method_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createMethod();"}
+      Create Method
+
+
+
+

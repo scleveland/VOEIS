@@ -13,14 +13,17 @@ class LabMethodsController < ApplicationController
   
   # POST /lab_methods
   def create
-    if params[:lab_method].nil?
-      @lab_method = Voeis::LabMethod.new(:lab_name=> params[:lab_name], :lab_organization => params[:lab_organization], :lab_method_name => params[:lab_method_name], :lab_method_description => params[:lab_method_description])
-    else
+    # if params[:lab_method].nil?
+    #       @lab_method = Voeis::LabMethod.new(:lab_name=> params[:lab_name], :lab_organization => params[:lab_organization], :lab_method_name => params[:lab_method_name], :lab_method_description => params[:lab_method_description])
+    #     else
       @lab_method = Voeis::LabMethod.new(params[:lab_method])
-    end
+    # end
     respond_to do |format|
       if @lab_method.save
         flash[:notice] = 'Lab Method was successfully created.'
+        format.json do
+          render :json => @lab_method.as_json, :callback => params[:jsoncallback]
+        end
         format.html { (redirect_to(new_lab_method_c_v_path())) }
       else
         format.html { render :action => "new" }

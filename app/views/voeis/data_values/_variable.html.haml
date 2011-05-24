@@ -22,6 +22,7 @@
   = render(:partial => "data_type_cv")
   = render(:partial => "quality_control_level")
   = render(:partial => "general_category_cv")
+  = render(:partial => "lab_method")
   = form_for (:variable) do |f|
 
     -var_name_options = Array.new
@@ -60,7 +61,7 @@
     = f.select('sample_medium',  options_for_select(sample_medium_options, "Unknown"), :class => "sample_medium")
     =clear_break
   
-    %label{:id => "val_type", :onclick=>"dijit.byId('new_variable_name_1').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Value Type: 
+    %label{:id => "val_type", :onclick=>"dijit.byId('new_value_type_1').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Value Type: 
     %div{:dojoType=>"dijit.Tooltip", :connectId=> "val_type", :position=>"above"}
       This is the type of data that should be measured by this variable.<br>
       For example: <i>is this data that is colled from a logger.</i>
@@ -68,6 +69,16 @@
     -value_types.all(:order => [:term.asc]).each do |type|
       -value_type_options <<[type.term]
     = f.select('value_type',  options_for_select(value_type_options))
+    =clear_break
+    
+    %label{:id => "lab_method_label", :onclick=>"dijit.byId('new_lab_method1').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Lab or Collection Method: 
+    %div{:dojoType=>"dijit.Tooltip", :connectId=> "lab_method", :position=>"above"}
+      This is the type of data that should be measured by this variable.<br>
+      For example: <i>is this data that is colled from a logger.</i>
+    -lab_method_options = Array.new
+    -lab_methods.all(:order => [:lab_method_name.asc]).each do |method|
+      -lab_method_options <<[method.lab_method_name, method.id.to_s]
+    = f.select('lab_method',  options_for_select(lab_method_options))
     =clear_break
     
     %label{:id => "quality_control_label", :onclick=>"dijit.byId('new_quality_control_level').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Quality Control Level: 
