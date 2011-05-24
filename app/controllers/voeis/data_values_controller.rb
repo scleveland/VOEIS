@@ -1044,6 +1044,7 @@ class Voeis::DataValuesController < Voeis::BaseController
        
     
            @variable = Voeis::Variable.new
+           @lab_methods = Voeis::LabMethod.all
            @units = Voeis::Unit.all
            @time_units = Voeis::Unit.all(:units_type.like=>'%Time%')
            @variable_names = Voeis::VariableNameCV.all
