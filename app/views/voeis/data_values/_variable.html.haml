@@ -1,7 +1,7 @@
 - content_for(:javascripts) do
   :javascript
     function  createVariable(){ 
-    $.post("#{root_url + "variables"}.json?variable[variable_code]=" +$("#variable_variable_code").val()+"&variable[variable_name]=" + $("#variable_variable_name").val()+"&variable[speciation]="+$("#variable_speciation").val()+"&variable[variable_units_id]="+ $("#variable_variable_units_id").val() + "&variable[sample_medium]="+ $("#variable_sample_medium").val() + "&variable[quality_control]="+$("#variable_quality_control").val()+"&variable[is_regular]="+$("#variable_is_regular").val()+"&variable[time_support]="+$("#variable_time_support").val()+"&variable[time_units_id]="+$("#variable_time_units_id").val()+"&variable[data_type]="+$("#variable_data_type").val()+"&variable[general_category]="+$("#variable_general_category").val()+"&variable[no_data_value]="+$("#variable_no_data_value").val()+"&variable[detection_limit]="+$("#variable_detection_limit").val()+"&variable[value_type]="+$("#variable_value_type").val(),
+    $.post("#{root_url + "variables"}.json?variable[variable_code]=" +$("#variable_variable_code").val()+"&variable[variable_name]=" + $("#variable_variable_name").val()+"&variable[speciation]="+$("#variable_speciation").val()+"&variable[variable_units_id]="+ $("#variable_variable_units_id").val() + "&variable[sample_medium]="+ $("#variable_sample_medium").val() + "&variable[quality_control]="+$("#variable_quality_control").val()+"&variable[is_regular]="+$("#variable_is_regular").val()+"&variable[time_support]="+$("#variable_time_support").val()+"&variable[time_units_id]="+$("#variable_time_units_id").val()+"&variable[data_type]="+$("#variable_data_type").val()+"&variable[general_category]="+$("#variable_general_category").val()+"&variable[no_data_value]="+$("#variable_no_data_value").val()+"&variable[detection_limit]="+$("#variable_detection_limit").val()+"&variable[value_type]="+$("#variable_value_type").val()+"&variable[lab_method_id]="+$("#variable_lab_method_id").val(),
     function(data) {
     updated_var = data  
     update_text= data["variable_name"];
@@ -12,7 +12,21 @@
     );
     }
     dojo.require("dijit.Tooltip");
-    
+    dojo.require("dijit.form.Button");
+    dojo.require("dijit.Dialog");
+
+    function displayWait(txtContent) {
+        if (!txtContent) {
+            txtContent = "Please wait...";
+        }
+        txtContent = "<img src=\"loading.gif\" alt=\"\" /> " + txtContent;
+        var thisdialog = new dijit.Dialog({ title: "", content: txtContent });
+        dojo.body().appendChild(thisdialog.domNode);
+        //thisdialog.closeButtonNode.style.display='none';
+        thisdialog.titleBar.style.display='none';
+        thisdialog.startup();
+        thisdialog.show();
+    }
 
 #new_variable{:dojoType=>"dijit.Dialog", :title=>"New Variable"}
   = render(:partial => "variable_name_cv")
@@ -78,7 +92,7 @@
     -lab_method_options = Array.new
     -lab_methods.all(:order => [:lab_method_name.asc]).each do |method|
       -lab_method_options <<[method.lab_method_name, method.id.to_s]
-    = f.select('lab_method',  options_for_select(lab_method_options))
+    = f.select('lab_method_id',  options_for_select(lab_method_options))
     =clear_break
     
     %label{:id => "quality_control_label", :onclick=>"dijit.byId('new_quality_control_level').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Quality Control Level: 
