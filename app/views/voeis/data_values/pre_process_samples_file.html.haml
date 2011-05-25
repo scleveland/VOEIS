@@ -47,7 +47,7 @@ Form Progress:
       = select_tag('sample_type',  options_for_select(@sample_type_options, "Grab"))
       =clear_break
       Currently Selected Sample Medium:
-      = select_tag('sample_medium',  options_for_select(@sample_medium_options, "Surface Water"))
+      = select_tag('sample_medium',  options_for_select(@sample_medium_options, "Surface Water"), :onChange=>"$('#variable_sample_medium').val($('#sample_medium').val());")
       =clear_break
       
       %div{:dojoType=>"dijit.layout.TabContainer", :id => "timestamp_selection"}
