@@ -60,7 +60,8 @@ class Voeis::Variable
   property :general_category,  String,  :required => true, :default => 'Unknown', :length => 512
   property :no_data_value,     String,   :required => true, :default => "-9999"
   property :detection_limit,   Float,   :required => false
-
+  property :value_type,        String, :required => true, :default=>"Unknown"
+  property :lab_method_id,     Integer, :required => false
   
   property :his_id,            Integer, :required => false, :index => true
 
