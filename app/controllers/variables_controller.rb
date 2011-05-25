@@ -21,10 +21,17 @@ class VariablesController < InheritedResources::Base
   
   # POST /variables
   def create
-
-    @variable = Voeis::Variable.new(params[:variable])
-
-
+     @variable = Voeis::Variable.new(params[:variable])
+      if @variable.variable_code.nil? || @variable_code =="undefined"
+        @variable.variable_code = @variable.id.to_s+@variable.variable_name+@variable.speciation+Voeis::Unit.get(@variable.variable_units_id).units_name
+      end
+      if params[:variable][:detection_limit].empty?
+        @variable.detection_limit = nil
+      end
+      if params[:variable][:value_type].nil?
+        @variable.value_type = params[:variable][:quality_control]
+      end
+      debugger
     respond_to do |format|
       if @variable.save
         flash[:notice] = 'Variables was successfully created.'
