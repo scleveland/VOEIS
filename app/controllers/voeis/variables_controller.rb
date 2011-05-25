@@ -47,7 +47,6 @@ class Voeis::VariablesController < Voeis::BaseController
     if params[:variable][:value_type].nil?
       @variable.value_type = params[:variable][:quality_control]
     end
-    debugger
     if @variable.save  
       respond_to do |format|
         flash[:notice] = 'Variable was successfully created.'
