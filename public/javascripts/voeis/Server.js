@@ -24,6 +24,9 @@ dojo.declare("voeis.Server", null, {
     projectSitePath: function(projectId, siteId) {
         return [this.projectSitesPath(projectId), siteId].join("/");
     },
+    projectMetaTagsPath: function(projectId) {
+        return [this.projectPath(projectId), "meta_tags"].join("/");
+    },
 
     /** Stores **/
     projects: function() {
@@ -47,8 +50,13 @@ dojo.declare("voeis.Server", null, {
         var url = location.href;
         var baseURL = url.substring(0, url.indexOf('/', 14));
         return new dojo.data.ObjectStore({objectStore: new dojo.store.JsonRest({target:baseURL + '/variables'})});
+    },
+    globalMetaTagDataStore: function(){
+        var url = location.href;
+        var baseURL = url.substring(0, url.indexOf('/', 14));
+        return new dojo.data.ObjectStore({objectStore: new dojo.store.JsonRest({target:baseURL + '/meta_tags'})});
     }
-
+    
 });
 
 voeis.Server.DEFAULT = new voeis.Server();
