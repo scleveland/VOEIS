@@ -7,6 +7,8 @@
 #
 #
 Yogo::Application.routes.draw do
+  
+  #Project Namespace
   resources :projects do
     member do
       post :upload
@@ -19,6 +21,7 @@ Yogo::Application.routes.draw do
       get  :get_user_projects
     end
     resources :memberships
+    #Voeis Project Models scope
     scope :module => "voeis" do
       resources :sites do
         collection do
@@ -42,6 +45,7 @@ Yogo::Application.routes.draw do
       end
 
       resources :variables
+      resources :meta_tags
       resources :units
       resources :apivs do
         collection do
@@ -119,6 +123,7 @@ Yogo::Application.routes.draw do
     end
   end
 
+  #HIS namespace
   namespace :his do
     resources :data_type_c_vs
     resources :censor_code_c_vs
@@ -129,6 +134,7 @@ Yogo::Application.routes.draw do
     resources :data_values
   end
 
+  
   resources :users do
     collection do
       post :api_key_update
@@ -139,6 +145,7 @@ Yogo::Application.routes.draw do
     resources :memberships
   end
 
+  #Global Namespace
   resources :roles
   resources :sources
   resources :quality_control_levels
@@ -146,6 +153,7 @@ Yogo::Application.routes.draw do
   resources :campaigns
   resources :system_roles
   resources :variables
+  resources :meta_tags
   resources :memberships
   resources :settings
   resources :search
