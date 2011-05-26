@@ -26,32 +26,44 @@
     = javascript_include_tag("dojo/dojo.js")
 
     :javascript
-      dojo.require("dojo.parser");
-      
-      
-      dojo.require("dijit.layout.BorderContainer");
-      dojo.require("dijit.layout.ContentPane");
-      dojo.require("dijit.Toolbar");    
-      dojo.require("dijit.form.DropDownButton");
-      dojo.require("dijit.Menu");
-      dojo.require("dijit.MenuItem");
-      dojo.require("dijit.TooltipDialog");
-
-      dojo.require("dijit.form.TextBox");
-      dojo.require("dijit.form.CheckBox");
-      dojo.require("dijit.form.Button");
-      
-      dojo.require("yogo.ui.MenuLink");
-      dojo.require("yogo.maps.google");    
-      
-      yogo.maps.google.load();
-      
       dojo.addOnLoad(function(){
-        dojo.when(yogo.maps.google.load(), function() {
-          dojo.parser.parse();
+        dojo.require("dojo.parser");
+        dojo.require("dijit.layout.BorderContainer");
+        dojo.require("dijit.layout.ContentPane");
+        dojo.require("dijit.Toolbar");    
+        dojo.require("dijit.form.DropDownButton");
+        dojo.require("dijit.Menu");
+        dojo.require("dijit.MenuItem");
+        dojo.require("dijit.TooltipDialog");
+
+        dojo.require("dijit.form.TextBox");
+        dojo.require("dijit.form.CheckBox");
+        dojo.require("dijit.form.Button");
+      
+        dojo.require("yogo.ui.MenuLink");
+        dojo.require("yogo.maps.google");    
+      
+        yogo.maps.google.load();
+      
+        var hideLoader = function(){
+            dojo.fadeOut({
+                node:"preloader",
+                onEnd: function(){
+                    dojo.style("preloader", "display", "none");
+                }
+            }).play();
+        }
+      
+        dojo.addOnLoad(function(){
+          dojo.when(yogo.maps.google.load(), function() {
+            dojo.parser.parse();
+          });
+          hideLoader();
         });
       });
-
+      
+    
+    
     = yield(:javascripts)
 
     = include_visualization_api
@@ -89,7 +101,7 @@
 
     
   %body.typography.claro
-
+    #preloader
     #border_container{:dojoType => "dijit.layout.BorderContainer", :gutters => 'false'}
       #top{:dojoType => "dijit.Toolbar", :region => "top"}
         #datahubButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "datahub-icon-25"}
