@@ -95,6 +95,12 @@ namespace :db do
   end
 end
 
+namespace :docs do
+  task :generate do
+    run "cd #{current_path}; rake yard"
+  end
+end
+
 namespace :assets do
   task :setup do
     run "mkdir -p #{deploy_to}/#{shared_dir}/assets/files"
@@ -128,6 +134,7 @@ after "deploy:setup",       "assets:setup"
 # This happens every deploy
 after "deploy:update_code", "db:symlink"
 after "deploy:update_code", "assets:symlink"
+after "deploy:update_code", "docs:generate"
 
 #before "deploy:update_code", "jobs:stop"
 #after  "deploy:symlink",     "jobs:start"
