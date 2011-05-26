@@ -60,6 +60,7 @@ class Project
                           "voeis/meta_tag$retrieve",
                           "voeis/sensor_type$retrieve",
                           "voeis/sensor_value$retrieve",
+                          "voeis/meta_tag$retrieve",
                           "voeis/site$retrieve",
                           "voeis/site$update",
                           "voeis/unit$retrieve",
