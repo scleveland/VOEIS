@@ -1,0 +1,28 @@
+#new_metatag{:dojoType=>"dijit.Dialog", :title=>"New Meta Tag"}
+  %h3 Create a new Meta Tag:
+  = form_for(:meta_tag )do |f|
+    Tag Name: 
+    = f.text_area("name", :cols => 45, :rows => 1, :style => {:resize => "none"}, :class => "tag_name")
+    =clear_break
+    Tag Category: 
+    = f.text_area("category", :cols => 45, :rows => 1, :style => {:resize => "none"}, :class => "tag_category")
+    =clear_break
+    %button{:id=> 'new_metatag_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createMetaTag();"}
+      Create MetaTag
+  
+  :javascript  
+    function createMetaTag(){ 
+    $.post("#{root_url + "metatags"}"+"?name=" + $(".metatag_name").val()+"&category=" + $(".metatag_category").val()+"&value=" + $(".metatag_value").val(),
+    function(data) {
+    $('#variable_units_id').
+    append($("<option></option>").
+    attr("value",$(".data_type_term").val()).
+    text($(".data_type_term").val())); unit.units_name+':'+unit.units_type
+    $('#variable_data_type').val($(".data_type_term").val());
+    $(".data_type_term").val("");
+    $(".data_type_definition").val("");
+    $("#new_data_type").toggle()
+    }
+    );
+    }
+   
