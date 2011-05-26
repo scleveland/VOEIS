@@ -1,11 +1,4 @@
 GIT
-  remote: git://github.com/irjudson/dm-rest-adapter.git
-  revision: bcfa6031a9c8a93051e691fc4520f149bf35572e
-  specs:
-    dm-rest-adapter (1.1.0)
-      dm-serializer (~> 1.1.0)
-
-GIT
   remote: git://github.com/josevalim/inherited_resources.git
   revision: 5d988cfcfa632cc9c67fff4cb100594ea683482a
   ref: 5d988cfcfa632cc9c67fff4cb100594ea683482a
@@ -15,15 +8,13 @@ GIT
       responders (~> 0.6.0)
 
 GIT
-  remote: git://github.com/rheimbuch/rql-ruby.git
-  revision: 77e659b6df438bf9fae45401e36aa8c647cb7b49
-  branch: topic/voeis
+  remote: git://github.com/scleveland/chronic.git
+  revision: 837f2a41f7aa27f22309763be245a90626072ead
   specs:
-    rql (0.0.1)
-      execjs (~> 0.1.1)
+    aaronh-chronic (0.3.9)
 
 GIT
-  remote: git://github.com/robbielamb/delayed_job.git
+  remote: git://github.com/yogo/delayed_job.git
   revision: 6e81aa9b1dfccd92cb337243f0ce41b630820a50
   specs:
     delayed_job (1.7.0)
@@ -32,18 +23,27 @@ GIT
       dm-types (~> 1.1.0)
 
 GIT
-  remote: git://github.com/scleveland/chronic.git
-  revision: 837f2a41f7aa27f22309763be245a90626072ead
-  specs:
-    aaronh-chronic (0.3.9)
-
-GIT
   remote: git://github.com/yogo/dm-is-versioned.git
   revision: 7ae0937ced687881d91b80e6d65e0a5945694f95
   branch: voeis/patches
   specs:
     dm-is-versioned (1.1.0)
       dm-core (~> 1.1.0)
+
+GIT
+  remote: git://github.com/yogo/dm-rest-adapter.git
+  revision: bcfa6031a9c8a93051e691fc4520f149bf35572e
+  specs:
+    dm-rest-adapter (1.1.0)
+      dm-serializer (~> 1.1.0)
+
+GIT
+  remote: git://github.com/yogo/rql-ruby.git
+  revision: 77e659b6df438bf9fae45401e36aa8c647cb7b49
+  branch: topic/voeis
+  specs:
+    rql (0.0.1)
+      execjs (~> 0.1.1)
 
 GIT
   remote: git://github.com/yogo/yogo-project.git

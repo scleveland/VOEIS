@@ -3,7 +3,7 @@ source :rubygems
 DM_VERSION = "1.1.0"
 
 # Once the .freeze fix is integrated we can remove this again - IRJ
-gem "dm-rest-adapter",                          :git => "git://github.com/irjudson/dm-rest-adapter.git"
+gem "dm-rest-adapter",                          :git => "git://github.com/yogo/dm-rest-adapter.git"
 gem "yogo-framework"                            # The Yogo Framework
 gem "yogo-project",                             :git => "git://github.com/yogo/yogo-project.git"
 
@@ -43,12 +43,12 @@ gem 'i18n', "~> 0.4.0"
 
 gem 'exception_notification',      :require => 'exception_notifier'
 
-gem 'delayed_job',                 :git => 'git://github.com/robbielamb/delayed_job.git'
+gem 'delayed_job',                 :git => 'git://github.com/yogo/delayed_job.git'
 gem "cells", "~> 3.5.4"
 gem 'apotomo', "~> 1.1"
 gem 'aaronh-chronic',  :git =>"git://github.com/scleveland/chronic.git"
 
-gem 'rql', ">= 0.0.1",        :git => "git://github.com/rheimbuch/rql-ruby.git", :branch => "topic/voeis"
+gem 'rql', ">= 0.0.1",        :git => "git://github.com/yogo/rql-ruby.git", :branch => "topic/voeis"
 platforms(:ruby_18, :ruby_19) {
   gem "therubyracer", :require => "v8"
 }
