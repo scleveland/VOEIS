@@ -130,8 +130,8 @@
     =clear_break
     %b Time Related Meta-Data:
     #optional
-      %label This Is Measurement Regularly: 
-      = f.select :is_regular, options_for_select({"true"=>"true", "false"=>"false"})
+      %label This Is Measured Regularly: 
+      = f.select :is_regular, options_for_select({"true"=>"true", "false"=>"false"}, false)
       =clear_break
       %label Time Support:(0 indicates instantaneous time measurement) 
       = f.text_field :time_support, :value => 0, :size=>5
