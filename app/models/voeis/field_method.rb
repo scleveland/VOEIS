@@ -21,39 +21,42 @@ class Voeis::FieldMethod
   include Yogo::Versioned::DataMapper::Resource
 
   property :id,                 Serial
-  property :name,               String, :required =>true, :length => 512
+  property :method_name,        String, :required =>true, :length=> 512, :default=>"empty"
   property :method_description, Text,   :required => true
   property :method_link,        Text,   :required => false
+  property :his_id,             Integer,:required => false
   
+  timestamps :at
   yogo_versioned
-
-  property :his_id, Integer
+ 
+  has n, :variables, :model => "Voeis::Variable", :through => Resource
   
-  def self.load_from_his
-    his_field_methods = His::FieldMethod.all
-
-    his_field_methods.each do |his_fm|
-      if self.first(:his_id => his_fm.id).nil?
-        self.create(:his_id => his_fm.id,
-                    :method_description=> his_fm.method_description,
-                    :method_link=> his_fm.method_link)
-      end
-    end
-  end
-
-  def store_to_his(u_id)
-    field_methodto_store = self.first(:id => u_id)
-    if field_methodto_store.is_regular == true
-      reg = 1
-    else
-      reg =0
-    end
-    new_his_field_method = His::FieldMethod.new(:method_description => field_methodto_store.method_description,
-                                        :method_link=> field_methodto_store.method_link)
-    new_his_field_method.save
-    puts new_his_field_method.errors.inspect
-    field_methodto_store.his_id = new_his_field_method.id
-    field_methodto_store.save
-    new_his_field_method
-  end
+  
+  # def self.load_from_his
+  #     his_field_methods = His::FieldMethod.all
+  # 
+  #     his_field_methods.each do |his_fm|
+  #       if self.first(:his_id => his_fm.id).nil?
+  #         self.create(:his_id => his_fm.id,
+  #                     :method_description=> his_fm.method_description,
+  #                     :method_link=> his_fm.method_link)
+  #       end
+  #     end
+  #   end
+  # 
+  #   def store_to_his(u_id)
+  #     field_methodto_store = self.first(:id => u_id)
+  #     if field_methodto_store.is_regular == true
+  #       reg = 1
+  #     else
+  #       reg =0
+  #     end
+  #     new_his_field_method = His::FieldMethod.new(:method_description => field_methodto_store.method_description,
+  #                                         :method_link=> field_methodto_store.method_link)
+  #     new_his_field_method.save
+  #     puts new_his_field_method.errors.inspect
+  #     field_methodto_store.his_id = new_his_field_method.id
+  #     field_methodto_store.save
+  #     new_his_field_method
+  #   end
 end
