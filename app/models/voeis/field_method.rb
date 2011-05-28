@@ -21,6 +21,7 @@ class Voeis::FieldMethod
   include Yogo::Versioned::DataMapper::Resource
 
   property :id,                 Serial
+  property :name,               String, :required =>true, :length => 512
   property :method_description, Text,   :required => true
   property :method_link,        Text,   :required => false
   
