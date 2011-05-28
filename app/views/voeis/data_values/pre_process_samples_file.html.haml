@@ -266,9 +266,9 @@ Form Progress:
             $("#column#{col.to_s}").val("");
             dijit.byId("ignore_column#{col.to_s}").set("disabled", false);
             }
-            if($("#column"+column).val() == "batch"){
-            $("#column"+column).val().val("");
-            dijit.byId("batch_column"+column).set("disabled", false);
+            if($("#column#{col.to_s}").val() == "batch"){
+            $("#column#{col.to_s}").val().val("");
+            dijit.byId("batch_column#{col.to_s}").set("disabled", false);
             }
             dijit.byId('variable_dialog#{col.to_s}').hide();
             }
