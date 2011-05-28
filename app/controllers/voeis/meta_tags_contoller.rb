@@ -1,6 +1,6 @@
 require 'responders/rql'
 
-class MetaTagsController < Voeis::BaseController
+class Voeis::MetaTagsController < Voeis::BaseController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
   responders :rql
   defaults  :route_collection_name => 'meta_tags',
