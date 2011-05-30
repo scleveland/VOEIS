@@ -62,6 +62,7 @@ class Voeis::Variable
   property :detection_limit,   Float,   :required => false
   property :value_type,        String, :required => true, :default=>"Unknown"
   property :lab_method_id,     Integer, :required => false
+  property :field_method_id,     Integer, :required => false
   
   property :his_id,            Integer, :required => false, :index => true
 
@@ -80,7 +81,7 @@ class Voeis::Variable
   has n, :value_type_cvs,      :model => "Voeis::ValueTypeCV",      :through => Resource
   has n, :variable_name_cvs,   :model => "Voeis::VariableNameCV",   :through => Resource
   has 1, :lab_method,          :model => "Voeis::LabMethod", :through => Resource
-    has 1, :field_method,        :model => "Voeis::FieldMethod", :through => Resource
+  has 1, :field_method,        :model => "Voeis::FieldMethod", :through => Resource
   has n, :meta_tags, :model => 'Voeis::MetaTag', :through => Resource
   
   def self.load_from_his
