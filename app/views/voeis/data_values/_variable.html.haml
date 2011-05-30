@@ -95,6 +95,16 @@
     = f.select('lab_method_id',  options_for_select(lab_method_options))
     =clear_break
     
+    %label{:id => "field_method_label", :onclick=>"dijit.byId('new_field_method1').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Field Method: 
+    %div{:dojoType=>"dijit.Tooltip", :connectId=> "field_method", :position=>"above"}
+      This is the type of data that should be measured by this variable.<br>
+      For example: <i>is this data that is colled from a logger.</i>
+    -field_method_options = Array.new
+    -field_methods.all(:order => [:method_name.asc]).each do |method|
+      -field_method_options <<[method.method_name, method.id.to_s]
+    = f.select('field_method_id',  options_for_select(field_method_options))
+    =clear_break
+    
     %label{:id => "quality_control_label", :onclick=>"dijit.byId('new_quality_control_level').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Quality Control Level: 
     %div{:dojoType=>"dijit.Tooltip", :connectId=> "quality_control_label", :position=>"above"}
       This is the initial QA/QC classification that should be applied to this incoming data.<br>
