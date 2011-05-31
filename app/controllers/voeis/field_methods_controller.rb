@@ -19,11 +19,8 @@ class Voeis::FieldMethodsController < Voeis::BaseController
 
   def create
     parent.managed_repository do
-      # if params[:field_method].nil?
-      #   @field_method = Voeis::FieldMethod.new(:field_name=> params[:field_name], :field_organization => params[:field_organization], :field_method_name => params[:field_method_name], :field_method_description => params[:field_method_description])
-      # else
-        @field_method = Voeis::FieldMethod.new(params[:field_method])
-      # end
+      @field_method = Voeis::FieldMethod.new(params[:field_method])
+  
       respond_to do |format|
         if @field_method.save
           flash[:notice] = 'Field Method was successfully created.'
