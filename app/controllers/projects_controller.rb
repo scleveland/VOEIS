@@ -4,13 +4,23 @@ class ProjectsController < InheritedResources::Base
   responders :rql
   
   respond_to :html, :json
-  
+  # layout 'application', :except => [:index]
+  # layout 'split_map', :except=> [:show, :edit]
+  layout :choose_layout
+
+    def choose_layout
+      if action_name == 'index'
+        return 'split_map'
+      else
+        return 'application'
+      end
+    end
 
   def index
-    layout 'split_map'
     index! do
       logger.debug(request.env['QUERY_STRING'])
     end
+    
   end
   
    #export the results of search/browse to a csv file
