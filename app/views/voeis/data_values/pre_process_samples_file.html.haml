@@ -206,7 +206,8 @@ Form Progress:
             }
             dijit.byId('metatag_dialog#{col.to_s}').hide();
             }
-        
+          %button{:id=> "new_create_metatag_button#{col.to_s}",:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"dijit.byId('new_metatag').show();"}
+            Create MetaTag
         %div{:dojoType=>"dijit.Dialog", :id =>"variable_dialog"+col.to_s,  :class=>"var_tree"}
           Select A Voeis Variable By Clicking On It:
           

@@ -12,7 +12,7 @@
   
   :javascript  
     function createMetaTag(){ 
-    $.post("#{root_url + "metatags"}"+"?name=" + $(".metatag_name").val()+"&category=" + $(".metatag_category").val()+"&value=" + $(".metatag_value").val(),
+    $.post("#{root_url + "meta_tags"}"+"?name=" + $(".metatag_name").val()+"&category=" + $(".metatag_category").val()+"&value=" + $(".metatag_value").val(),
     function(data) {
     $('#variable_units_id').
     append($("<option></option>").
