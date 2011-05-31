@@ -99,6 +99,10 @@ namespace :docs do
   task :generate do
     run "cd #{current_path}; rake yard"
   end
+  
+  task :publish do
+    run "ln -nfs #{current_path}/docs #{current_path}/public/docs"
+  end
 end
 
 namespace :assets do
@@ -135,6 +139,7 @@ after "deploy:setup",       "assets:setup"
 after "deploy:update_code", "db:symlink"
 after "deploy:update_code", "assets:symlink"
 after "deploy:update_code", "docs:generate"
+after "deploy:update_code", "docs:publish"
 
 #before "deploy:update_code", "jobs:stop"
 #after  "deploy:symlink",     "jobs:start"
