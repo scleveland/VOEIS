@@ -51,6 +51,6 @@ Yogo::Application.configure do
 
       :email_prefix => "Project: epscor-sensor\nTracker: feedback\n",
       :sender_address => %{"Voeis Management" <voeis.mgmt@gmail.com>},
-      :exception_recipients => %w{ irjudson@gmail.com sean.b.cleveland@gmail.com rheimbuch@gmail.com}
+      :exception_recipients => %w{ sean.b.cleveland@gmail.com pol.llovet@gmail.com thomasheetderks@gmail.com}
 
 end
