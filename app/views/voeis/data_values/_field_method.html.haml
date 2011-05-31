@@ -1,10 +1,10 @@
 - content_for(:javascripts) do
   :javascript
     function createFieldMethod(){ 
-    $.post("#{root_url + "lab_methods"}.json?filed_method[method_name]=" +$("#field_method_method_name").val()+&field_method[method_description]="+$("#field_method_method_description").val() + "&field_method[method_link]="+ $("#field_method_method_link").val(),
+    $.post("#{root_url + "field_methods"}.json?field_method[method_name]=" +$("#field_method_method_name").val()+"&field_method[method_description]="+$("#field_method_method_description").val() + "&field_method[method_link]="+ $("#field_method_method_link").val(),
     function(data) {
-      $('#variable_field_method').append($("<option></option>").attr("value",data['id']).text($("#field_method_method_name").val())); 
-      $('#variable_field_method').val(data['id']);
+      $('#variable_field_method_id').append($("<option></option>").attr("value",data['id']).text($("#field_method_method_name").val())); 
+      $('#variable_field_method_id').val(data['id']);
       dijit.byId("new_field_method1").hide();
     }
     );
@@ -17,6 +17,8 @@
     = f.label("Field Method Name:")
     =clear_break
     =f.text_field :method_name, :size=> 50
+    =clear_break
+    = f.label("Field Method Description:")
     =clear_break
     =f.text_field :method_description, :size=> 50
     =clear_break
