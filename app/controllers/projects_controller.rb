@@ -4,9 +4,10 @@ class ProjectsController < InheritedResources::Base
   responders :rql
   
   respond_to :html, :json
-  layout 'split_map'
+  
 
   def index
+    layout 'split_map'
     index! do
       logger.debug(request.env['QUERY_STRING'])
     end
