@@ -95,7 +95,7 @@ namespace :db do
   end
   
   task :auto_upgrade do
-    run "cd #{current_path}; rake yogo:db:auto_upgrade RAILS_ENV=production"
+    run "cd #{current_path}; bundle exec rake yogo:db:auto_upgrade RAILS_ENV=production"
   end
 end
 
