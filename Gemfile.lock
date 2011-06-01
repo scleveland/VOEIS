@@ -100,6 +100,7 @@ GEM
     arel (2.0.9)
     backports (2.2.1)
     bcrypt-ruby (2.1.4)
+    bluecloth (2.1.0)
     builder (2.1.2)
     capistrano (2.6.0)
       highline
@@ -345,6 +346,7 @@ DEPENDENCIES
   aaronh-chronic!
   activerecord
   apotomo (~> 1.1)
+  bluecloth
   capistrano
   cells (~> 3.5.4)
   compass (>= 0.10.6)
