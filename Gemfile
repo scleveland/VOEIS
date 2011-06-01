@@ -49,6 +49,9 @@ gem 'apotomo', "~> 1.1"
 gem 'aaronh-chronic',  :git =>"git://github.com/scleveland/chronic.git"
 
 gem 'rql', ">= 0.0.1",        :git => "git://github.com/yogo/rql-ruby.git", :branch => "topic/voeis"
+
+gem "yard",          "0.6.3",            :require => nil
+
 platforms(:ruby_18, :ruby_19) {
   gem "therubyracer", :require => "v8"
 }
