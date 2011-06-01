@@ -346,7 +346,7 @@ DEPENDENCIES
   aaronh-chronic!
   activerecord
   apotomo (~> 1.1)
-  bluecloth
+  bluecloth (= 2.1.0)
   capistrano
   cells (~> 3.5.4)
   compass (>= 0.10.6)
