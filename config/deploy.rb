@@ -93,6 +93,10 @@ namespace :db do
   task :run_backup_task do
     run "cd #{current_path}; rake yogo:db:backup RAILS_ENV=production"
   end
+  
+  task :auto_upgrade do
+    run "cd #{current_path}; rake yogo:db:auto_upgrade RAILS_ENV=production"
+  end
 end
 
 namespace :docs do
@@ -101,7 +105,7 @@ namespace :docs do
   end
   
   task :publish do
-    run "ln -nfs #{current_path}/docs #{current_path}/public/docs"
+    run "ln -nfs #{current_path}/doc #{current_path}/public/doc"
   end
 end
 
@@ -140,6 +144,6 @@ after "deploy:update_code", "db:symlink"
 after "deploy:update_code", "assets:symlink"
 after "deploy:update_code", "docs:generate"
 after "deploy:update_code", "docs:publish"
-
+after "deploy:update_code", "db:auto_upgrade"
 #before "deploy:update_code", "jobs:stop"
 #after  "deploy:symlink",     "jobs:start"
