@@ -153,6 +153,18 @@
         -time_unit_options << [unit.units_name, unit.id.to_s]
       = f.select :time_units_id, options_for_select(time_unit_options, 103)
       =clear_break
+    #spatial
+      %label Spatial Offset Type: 
+      = select_tag :spatial_offset_type, options_for_select({"North"=>"north", "East"=>"east"})
+      =clear_break
+      %label Spatial Offset Value: 
+      = text_field_tag :value
+      =clear_break
+      %label Spatial Offset Units:
+      -offset_unit_options = Array.new
+      - @offset_units.all(:order => [:units_name]).each do |unit|
+        -offset_unit_options << [unit.units_name, unit.id.to_s]
+      = select_tag :units_id, options_for_select(offset_unit_options)
     =clear_break
     %button{:id=> 'new_variable_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createVariable();"}
       Create Variable
