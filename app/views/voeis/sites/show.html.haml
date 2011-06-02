@@ -32,10 +32,12 @@
     
 %h2
   #{resource.name}
-
+-i = 0
 %table{:id => "property-table"}
+
   - resource.properties.each do |prop|
-    %tr
+    -i=1-i
+    %tr{:class=>"row#{i}"}
       %td
         %b
           #{prop.name.to_s.capitalize}

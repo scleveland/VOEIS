@@ -101,7 +101,7 @@ end
 
 namespace :docs do
   task :generate do
-    run "cd #{current_path}; rake yard"
+    run "cd #{current_path}; bundle exec rake yard RAILS_ENV=production"
   end
   
   task :publish do
