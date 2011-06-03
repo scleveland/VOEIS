@@ -149,6 +149,7 @@ Yogo::Application.routes.draw do
   #Global Namespace
   resources :roles
   resources :sources
+  resources :spatial_offset_types
   resources :quality_control_levels
   resources :visits
   resources :campaigns
