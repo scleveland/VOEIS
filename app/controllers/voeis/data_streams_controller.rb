@@ -205,9 +205,9 @@ class Voeis::DataStreamsController < Voeis::BaseController
       @variable_hash = Hash.new
       i = 1
       if !data_stream.nil?
-         @variable_hash ['id'] = "All"
-         @variable_hash['name'] = "All"
-         @variable_array << @variable_hash
+         #@variable_hash ['id'] = "All"
+         #@variable_hash['name'] = "All"
+         #@variable_array << @variable_hash
          data_stream.data_stream_columns.sensor_types.each do |sensor|
            var = sensor.variables.first
            if !var.nil?
