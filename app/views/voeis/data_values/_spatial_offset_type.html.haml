@@ -1,0 +1,23 @@
+#new_spatial_offset_type{:dojoType=>"dijit.Dialog", :title=>"New Meta Tag"}
+  %h3 Create a new Meta Tag:
+  = form_for(:spatial_offset_type )do |f|
+    Spatial Offset Type Name: 
+    = f.text_area("type", :cols => 45, :rows => 1, :style => {:resize => "none"}, :class => "tag_name")
+    =clear_break
+    %button{:id=> 'new_spatiaL_offset_type_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createSpatialOffsetType();"}
+      Create Spatial Offset Type
+  
+  :javascript  
+    function createSpatialOffsetType(){ 
+    $.post("#{root_url + "spatial_offset_types"}"+"?spatial_offset_type[type]=" + $("#spatial_offset_type_type").val(),
+    function(data) {
+    dijit.byId('new_spatial_offset_type').hide();
+    $('#spatial_offset_type').
+    append($("<option></option>").
+    attr("value",$("#spatial_offset_type_type").val()).
+    text($("#spatial_offset_type_type").val())); 
+    $('#spatial_offset_type').val($("#spatial_offset_type_type").val());
+    $("#spatial_offset_type_type").val("");
+    }
+    );
+    }

@@ -38,6 +38,7 @@
   = render(:partial => "general_category_cv")
   = render(:partial => "lab_method")
   = render(:partial => "field_method")
+  = render(:partial => "spatial_offset_type")
   = form_for (:variable) do |f|
 
     -var_name_options = Array.new
@@ -149,20 +150,23 @@
       =clear_break
       %label Time Units:
       -time_unit_options = Array.new
-      - @time_units.all(:order => [:units_name]).each do |unit|
+      - time_units.all(:order => [:units_name]).each do |unit|
         -time_unit_options << [unit.units_name, unit.id.to_s]
       = f.select :time_units_id, options_for_select(time_unit_options, 103)
       =clear_break
     #spatial
-      %label Spatial Offset Type: 
-      = select_tag :spatial_offset_type, options_for_select({"North"=>"north", "East"=>"east"})
+      %label{:id => "spatial", :onclick=>"dijit.byId('new_spatial_offset_type').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Spatial Offset Type: 
+      -sot_options = Array.new
+      -spatial_offset_types.all(:order => [:type]).each do |sot|
+        -sot_options << [sot.type, sot.id.to_s]
+      = select_tag :spatial_offset_type, options_for_select(sot_options)
       =clear_break
       %label Spatial Offset Value: 
       = text_field_tag :value
       =clear_break
       %label Spatial Offset Units:
       -offset_unit_options = Array.new
-      - @offset_units.all(:order => [:units_name]).each do |unit|
+      - offset_units.all(:order => [:units_name]).each do |unit|
         -offset_unit_options << [unit.units_name, unit.id.to_s]
       = select_tag :units_id, options_for_select(offset_unit_options)
     =clear_break

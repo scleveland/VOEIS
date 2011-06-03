@@ -1048,6 +1048,7 @@ class Voeis::DataValuesController < Voeis::BaseController
            @field_methods = Voeis::FieldMethod.all
            @units = Voeis::Unit.all
            @offset_units = @units
+           @spatial_offset_types = Voeis::SpatialOffsetType.all
            @time_units = Voeis::Unit.all(:units_type.like=>'%Time%')
            @variable_names = Voeis::VariableNameCV.all
            @quality_control_levels = Voeis::QualityControlLevel.all
