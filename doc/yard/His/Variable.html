@@ -1,0 +1,305 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="Content-Type" content="text/html; charset=utf-8" />
+<title>Class: His::Variable</title>
+<link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '..';
+  if (relpath != '') relpath += '/';
+</script>
+<script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (V)</a> &raquo; 
+    <span class='title'>His</span>
+     &raquo; 
+    <span class="title">Variable</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  <a id="class_list_link" href="#">Class List</a>
+  <a id="method_list_link" href="#">Method List</a>
+  <a id ="file_list_link" href="#">File List</a>
+</div>
+
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><h1>Class: His::Variable
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName"><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></span>
+      
+        <ul class="fullTree">
+          <li><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></li>
+          
+            <li class="next">His::Variable</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+      <dt class="r2">Includes:</dt>
+      <dd class="r2">DataMapper::Resource</dd>
+      
+    
+  
+  
+  
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">app/models/his/variable.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>
+# Variables
+</p>
+<p>
+This is apart of &#8220;Variables&#8221; The Variables table lists the full
+descriptive information about what variables have been measured. The
+following rules and best practices should be followed when populating this
+table:
+</p>
+<ul>
+<li><p>
+The VariableID field is the primary key, must be a unique integer, and
+cannot be NULL.
+</p>
+</li>
+</ul>
+<p>
+This field should be implemented as an auto number/identity field.
+</p>
+<ul>
+<li><p>
+The VariableCode field must be unique and serves as an alternate key for
+this table.
+</p>
+</li>
+</ul>
+<p>
+Variable codes can be arbitrary, or they can use an organized system. 
+VaraibleCodes cannot contain any characters other than A-Z (case
+insensitive), 0-9, period ???.???, dash ???-???, and underscore ???_???.
+</p>
+<ul>
+<li><p>
+The VariableName field must reference a valid Term from the VariableNameCV
+</p>
+</li>
+</ul>
+<p>
+controlled vocabulary table.
+</p>
+<ul>
+<li><p>
+The Speciation field must reference a valid Term from the SpeciationCV
+controlled
+</p>
+</li>
+</ul>
+<p>
+vocabulary table.  A default value of ???Not Applicable??? is used where
+speciation does not apply.  If the speciation is unknown, a value of
+???Unknown??? can be used.
+</p>
+<ul>
+<li><p>
+The VariableUnitsID field must reference a valid UnitsID from the
+UnitsTable controlled
+</p>
+</li>
+</ul>
+<p>
+vocabulary table.
+</p>
+<ul>
+<li><p>
+Only terms from the SampleMediumCV table can be used to populate the
+</p>
+</li>
+</ul>
+<p>
+SampleMedium field.  A default value of ???Unknown??? is used where the
+sample medium is unknown.
+</p>
+<ul>
+<li><p>
+Only terms from the ValueTypeCV table can be used to populate the ValueType
+field.  A
+</p>
+</li>
+</ul>
+<p>
+default value of ???Unknown??? is used where the value type is unknown.
+</p>
+<ul>
+<li><p>
+The default for the TimeSupport field is 0.  This corresponds to
+instantaneous values.  If
+</p>
+</li>
+</ul>
+<p>
+the TimeSupport field is set to a value other than 0, an appropriate
+TimeUnitsID must be specified.  The TimeUnitsID field can only reference
+valid UnitsID values from the Units controlled vocabulary table.  If the
+TimeSupport field is set to 0, any time units can be used (i.e., seconds,
+minutes, hours, etc.), however a default value of 103 has been used, which
+corresponds with hours.
+</p>
+<ul>
+<li><p>
+Only terms from the DataTypeCV table can be used to populated the DataType
+field.  A
+</p>
+</li>
+</ul>
+<p>
+default value of ???Unknown??? can be used where the data type is unknown.
+</p>
+<ul>
+<li><p>
+Only terms from the GeneralCategoryCV table can be used to populate the
+</p>
+</li>
+</ul>
+<p>
+GeneralCategory field.  A default value of ???Unknown??? can be used where
+the general category is unknown.
+</p>
+<ul>
+<li><p>
+The NoDataValue should be set such that it will never conflict with a real
+observation
+</p>
+</li>
+</ul>
+<p>
+value.  For example a NoDataValue of -9999 is valid for water temperature
+because we would never expect to measure a water temperature of -9999.  The
+default value for this field is -9999.
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div>
+
+  
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#default_repository_name-class_method" title="default_repository_name (class method)">+ (Object) <strong>default_repository_name</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="default_repository_name-class_method">
+  
+    + (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>default_repository_name</strong> 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+44
+45
+46</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/his/variable.rb', line 44</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id default_repository_name'>default_repository_name</span>
+  <span class='symbol'>:his</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+    
+    <div id="footer">
+  Generated on Thu Jun  2 23:30:12 2011 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.6.3 (ruby-1.9.2).
+</div>
+
+  </body>
+</html>
