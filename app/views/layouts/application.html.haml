@@ -54,13 +54,14 @@
       }
       $(window).ready(function(){ 
           dojo.parser.parse();
+          hideLoader();
       });
 
       dojo.addOnLoad(function(){
          dojo.when(yogo.maps.google.load(), function() {
            dojo.parser.parse();
          });
-         hideLoader();
+         
       });
       
     = yield(:javascripts)
