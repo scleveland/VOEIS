@@ -49,6 +49,10 @@ form.bp
 
 // Base Body Styles
 body
+  height: 100%
+  width: 100%
+  margin: 0
+  padding: 0
   +blueprint-typography(true)
   +blueprint-debug
   +blueprint-interaction
@@ -59,6 +63,11 @@ body
     margin-bottom: 0.5em
   textarea
     resize:none
+
+  // Toolbar
+  .dijitToolbar
+    text-align: left
+      
   // Header (always blueprint layout)
   #header
     color: #8fdaf2
