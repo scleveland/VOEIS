@@ -69,6 +69,35 @@ class UserSessionsController < ApplicationController
       render :action => :new
     end
   end
+  
+  ##
+  # Logs a user in and returns their API key
+  #
+  # @example
+  #   https://voeis.msu.montana.edu/user_sessions/get_api_key.json?user_session[login]=mylogin&user_session[password]=mypassword
+  #
+  # @return [JSON String] api_key
+  # 
+  #
+  # @author Sean Cleveland
+  #
+  # @api public
+  def get_api_key
+    @api = Hash.new
+    if authenticate!
+      if current_user.api_key.nil?
+        current_user.generate_new_api_key!
+      end
+      @api = {:api_key => current_user.api_key}
+    else
+      @api = {:error => "The combination of login and password is invalid."}
+    end
+    respond_to do |format|
+      format.json do
+        render :json => @api.as_json, :callback => params[:jsoncallback]
+      end
+    end
+  end
 
   ##
   # Logs out a user
