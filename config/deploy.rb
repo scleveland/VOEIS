@@ -105,7 +105,7 @@ namespace :docs do
   end
   
   task :publish do
-    run "ln -nfs #{current_path}/doc #{current_path}/public/doc"
+    run "ln -nfs #{release_path}/doc #{release_path}/public/doc"
   end
 end
 
