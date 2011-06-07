@@ -29,15 +29,17 @@ For: Variable(
     =hidden_field_tag('end_date', end_date)
     =submit_tag("Export Results")
   #data_stream_results
+    -i=0
     %table
       %tr
         -column_array.each do |col|
           %th
             =col[0]
       -row_array.each do |row|
-        %tr
+        -i=1-i
+        %tr{:class=>"row#{i}"}
           -row.each do |col|
-            %td
+            %td{:class =>"search-results"}
               =col
       
 -# #pagination-links= pagination_links(@query, params[:page], 10)

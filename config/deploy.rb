@@ -105,7 +105,7 @@ namespace :docs do
   end
   
   task :publish do
-    run "ln -nfs #{current_path}/doc #{current_path}/public/doc"
+    run "ln -nfs #{release_path}/doc #{release_path}/public/doc"
   end
 end
 
@@ -142,8 +142,8 @@ after "deploy:setup",       "assets:setup"
 # This happens every deploy
 after "deploy:update_code", "db:symlink"
 after "deploy:update_code", "assets:symlink"
-after "deploy:update_code", "docs:generate"
+#after "deploy:update_code", "docs:generate"
 after "deploy:update_code", "docs:publish"
-after "deploy:update_code", "db:auto_upgrade"
+#after "deploy:update_code", "db:auto_upgrade"
 #before "deploy:update_code", "jobs:stop"
 #after  "deploy:symlink",     "jobs:start"

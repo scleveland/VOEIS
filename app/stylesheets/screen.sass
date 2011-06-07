@@ -234,7 +234,8 @@ body
     td.datasets
       vertical-align: top
       font-size: small
-      
+    td.search-results
+      text-align: center
   // Links
   a
     text-decoration: none
@@ -766,6 +767,17 @@ body
   display: block
   z-index: 99999
   
+#search-div-loader
+  width: 200px 
+  height: 100px 
+  margin:  0 
+  padding: 0
+  background-color: #fff
+  background-image: image-url('http://o.aolcdn.com/dojo/1.2/dojox/image/resources/images/loading.gif')
+  background-repeat: no-repeat
+  background-position: center
+  display: block
+  
 .inline-checkbox
   .label
     display: inline
@@ -780,3 +792,7 @@ body
 .row1
   background-color: lightblue
 
+.search-results
+  .td
+    text-align: center
+  

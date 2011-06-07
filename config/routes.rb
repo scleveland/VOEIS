@@ -71,6 +71,7 @@ Yogo::Application.routes.draw do
           get :get_project_site_data
           get :get_project_site_sensor_data_last_update
           get :get_project_variable_data
+          get :get_project_site_variable_data
           get :get_project_site_sensor_values_by_variable
           post :upload_logger_data
           post :create_project_sample
@@ -148,6 +149,7 @@ Yogo::Application.routes.draw do
   #Global Namespace
   resources :roles
   resources :sources
+  resources :spatial_offset_types
   resources :quality_control_levels
   resources :visits
   resources :campaigns
@@ -176,7 +178,13 @@ Yogo::Application.routes.draw do
     end
   end
   resources :voeis_mailer
-  resource :user_session,             :only => [ :show, :new, :create, :destroy ]
+  
+  resource :user_session do
+    collection do
+      get :get_api_key
+    end
+  end
+  # resource :user_session,   :only => [ :show, :new, :create, :destroy, :get_api_key ], :collection=>{:get_api_key => 'get'}
   match '/logout' => 'user_sessions#destroy', :as => :logout
   match '/login' => 'user_sessions#new', :as => :login
   match '/' => 'pages#show', :id => :home, :as => :root

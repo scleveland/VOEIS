@@ -13,6 +13,9 @@
                                             :current_variables=>@current_variables,
                                             :lab_methods=>@lab_methods,
                                             :field_methods=>@field_methods,
+                                            :spatial_offset_types => @spatial_offset_types,
+                                            :offset_units => @offset_units,
+                                            :time_units => @time_units,
                                             :project=>@project})
 = render(:partial => "source")
 = render(:partial => "metatags")
@@ -111,7 +114,7 @@ Form Progress:
               %span
                 Assign The Sample ID To This Column
             =clear_break
-            %button{:dojoType=>"dijit.form.Button", :id=>"metatag_select_button"+col.to_s,:onClick=>"dijit.byId('metatag_dialog#{col.to_s}').show();"}
+            %button{:dojoType=>"dijit.form.Button", :id=>"metatag_select_button"+col.to_s,:onClick=>"dijit.byId('MetaTaggrid#{col.to_s}').sort('name');dijit.byId('metatag_dialog#{col.to_s}').show();"}
               %span
                 Assign A Meta Tag
             =clear_break
@@ -149,7 +152,7 @@ Form Progress:
         %div{:dojoType=>"dijit.Dialog", :id =>"metatag_dialog"+col.to_s}
           Select A Voeis MetaTag By Clicking On It:
 
-          %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{nestedSorting:true, filter:true}",  :store=>"metatagDataStore", :clientSort=>"true", :style=>"width: 800px; height: 300px;", :rowSelector=>"20px", :jsId=>"MetaTaggrid"+col.to_s, :id=>"MetaTaggrid"+col.to_s}
+          %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{nestedSorting:true, filter:true}",  :store=>"metatagDataStore", :clientSort=>"true", :style=>"width: 800px; height: 300px;", :rowSelector=>"20px", :jsId=>"MetaTaggrid"+col.to_s, :class=>"metagrid", :id=>"MetaTaggrid"+col.to_s, :sortInfo=>"2"}
             %thead
               %tr
                 %th{:field=>"name", :width=>"100px", :filterable=>true}
@@ -208,6 +211,8 @@ Form Progress:
             }
           %button{:id=> "new_create_metatag_button#{col.to_s}",:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"dijit.byId('new_metatag').show();"}
             Create MetaTag
+          %button{:id=> "refresh_metatag_button#{col.to_s}",:dojoType=>"dijit.form.Button", :title=>'Refresh', :onClick=>"dijit.byId('MetaTaggrid#{col.to_s}').sort('name');"}
+            Refresh Tags
         %div{:dojoType=>"dijit.Dialog", :id =>"variable_dialog"+col.to_s,  :class=>"var_tree"}
           Select A Voeis Variable By Clicking On It:
           

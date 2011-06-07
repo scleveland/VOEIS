@@ -108,7 +108,7 @@ class Voeis::SamplesController < Voeis::BaseController
       @sites = Voeis::Site.all
         variable_opt_array = Array.new
         if @sites.all(:order => [:name.asc]).first.samples.count > 0
-          variable_opt_array << ["All", "All"]
+          #variable_opt_array << ["All", "All"]
           @sites.all(:order => [:name.asc]).first.samples.variables.each do |var|
             variable_opt_array << [var.variable_name+":"+var.data_type, var.id.to_s]
           end

@@ -1,0 +1,301 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="Content-Type" content="text/html; charset=utf-8" />
+<title>Class: Voeis::Unit</title>
+<link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '..';
+  if (relpath != '') relpath += '/';
+</script>
+<script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (U)</a> &raquo; 
+    <span class='title'>Voeis</span>
+     &raquo; 
+    <span class="title">Unit</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  <a id="class_list_link" href="#">Class List</a>
+  <a id="method_list_link" href="#">Method List</a>
+  <a id ="file_list_link" href="#">File List</a>
+</div>
+
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><h1>Class: Voeis::Unit
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName"><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></span>
+      
+        <ul class="fullTree">
+          <li><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></li>
+          
+            <li class="next">Voeis::Unit</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+      <dt class="r2">Includes:</dt>
+      <dd class="r2">DataMapper::Resource, <span class='object_link'><a href="../Facet/DataMapper/Resource.html" title="Facet::DataMapper::Resource (module)">Facet::DataMapper::Resource</a></span>, <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html" title="Yogo::Versioned::DataMapper::Resource (module)">Yogo::Versioned::DataMapper::Resource</a></span></dd>
+      
+    
+  
+  
+  
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">app/models/voeis/unit.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>
+Units
+</p>
+<p>
+The Units table gives the Units and UnitsType associated with variables,
+time support, and offsets.  This is a controlled vocabulary table. This
+table is pre-populated within the ODM.  Changes to this controlled
+vocabulary can be requested at <a
+href="http://water.usu.edu/cuahsi/odm">water.usu.edu/cuahsi/odm</a>/.
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#load_from_his-class_method" title="load_from_his (class method)">+ (Object) <strong>load_from_his</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>
+has n, :spatial_offsets,      :model => &#8220;Voeis:SpatialOffset&#8221;, 
+:through => Resource.
+</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#store_to_his-class_method" title="store_to_his (class method)">+ (Object) <strong>store_to_his</strong>(u_id) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html" title="Yogo::Versioned::DataMapper::Resource (module)">Yogo::Versioned::DataMapper::Resource</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#included-class_method" title="Yogo::Versioned::DataMapper::Resource.included (method)">included</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Facet/DataMapper/Resource.html" title="Facet::DataMapper::Resource (module)">Facet::DataMapper::Resource</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Facet/DataMapper/Resource.html#included-class_method" title="Facet::DataMapper::Resource.included (method)">included</a></span></p>
+
+  
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="load_from_his-class_method">
+  
+    + (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>load_from_his</strong> 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>
+has n, :spatial_offsets,      :model => &#8220;Voeis:SpatialOffset&#8221;, 
+:through => Resource
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+27
+28
+29
+30
+31
+32
+33
+34
+35</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/unit.rb', line 27</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id load_from_his'>load_from_his</span>
+  <span class='id his_units'>his_units</span> <span class='op'>=</span> <span class='const'>His</span><span class='op'>::</span><span class='const'>Unit</span><span class='period'>.</span><span class='id all'>all</span>
+  <span class='id his_units'>his_units</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id his_u'>his_u</span><span class='op'>|</span>
+    <span class='kw'>self</span><span class='period'>.</span><span class='id first_or_create'>first_or_create</span><span class='lparen'>(</span><span class='symbol'>:his_id</span> <span class='op'>=&gt;</span> <span class='id his_u'>his_u</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span>
+                         <span class='symbol'>:units_name</span> <span class='op'>=&gt;</span> <span class='id his_u'>his_u</span><span class='period'>.</span><span class='id units_name'>units_name</span><span class='comma'>,</span>
+                         <span class='symbol'>:units_type</span> <span class='op'>=&gt;</span> <span class='id his_u'>his_u</span><span class='period'>.</span><span class='id units_type'>units_type</span><span class='comma'>,</span>
+                         <span class='symbol'>:units_abbreviation</span> <span class='op'>=&gt;</span> <span class='id his_u'>his_u</span><span class='period'>.</span><span class='id units_abbreviation'>units_abbreviation</span><span class='rparen'>)</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="store_to_his-class_method">
+  
+    + (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>store_to_his</strong>(u_id) 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+37
+38
+39
+40
+41
+42
+43
+44</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/unit.rb', line 37</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id store_to_his'>store_to_his</span><span class='lparen'>(</span><span class='id u_id'>u_id</span><span class='rparen'>)</span>
+  <span class='id unit_to_store'>unit_to_store</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='id u_id'>u_id</span><span class='rparen'>)</span>
+  <span class='id new_his_unit'>new_his_unit</span> <span class='op'>=</span> <span class='const'>His</span><span class='op'>::</span><span class='const'>Units</span><span class='period'>.</span><span class='id create'>create</span><span class='lparen'>(</span><span class='symbol'>:units_name</span> <span class='op'>=&gt;</span> <span class='id unit_to_store'>unit_to_store</span><span class='period'>.</span><span class='id units_name'>units_name</span><span class='comma'>,</span>
+                                   <span class='symbol'>:units_type</span> <span class='op'>=&gt;</span> <span class='id unit_to_store'>unit_to_store</span><span class='period'>.</span><span class='id units_type'>units_type</span><span class='comma'>,</span>
+                                   <span class='symbol'>:units_abbreviation</span> <span class='op'>=&gt;</span> <span class='id unit_to_store'>unit_to_store</span><span class='period'>.</span><span class='id units_abbreviation'>units_abbreviation</span><span class='rparen'>)</span>
+  <span class='id unit_to_store'>unit_to_store</span><span class='period'>.</span><span class='id his_id'>his_id</span> <span class='op'>=</span> <span class='id new_his_unit'>new_his_unit</span><span class='period'>.</span><span class='id id'>id</span>
+  <span class='id unit_to_store'>unit_to_store</span><span class='period'>.</span><span class='id save'>save</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+    
+    <div id="footer">
+  Generated on Fri Jun  3 01:26:46 2011 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.6.3 (ruby-1.9.2).
+</div>
+
+  </body>
+</html>

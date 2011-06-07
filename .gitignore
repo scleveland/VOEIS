@@ -34,7 +34,6 @@ public/files/*
 public/uploads/*
 .bundle/*
 .yardoc/*
-doc/yard/*
 doc/yardstick/*
 yogo_assets/*
 public/stylesheets/compiled

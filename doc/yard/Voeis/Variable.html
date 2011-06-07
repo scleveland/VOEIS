@@ -1,0 +1,477 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="Content-Type" content="text/html; charset=utf-8" />
+<title>Class: Voeis::Variable</title>
+<link rel="stylesheet" href="../css/style.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '..';
+  if (relpath != '') relpath += '/';
+</script>
+<script type="text/javascript" charset="utf-8" src="../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../js/app.js"></script>
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../_index.html">Index (V)</a> &raquo; 
+    <span class='title'>Voeis</span>
+     &raquo; 
+    <span class="title">Variable</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  <a id="class_list_link" href="#">Class List</a>
+  <a id="method_list_link" href="#">Method List</a>
+  <a id ="file_list_link" href="#">File List</a>
+</div>
+
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><h1>Class: Voeis::Variable
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+    <dt class="r1">Inherits:</dt>
+    <dd class="r1">
+      <span class="inheritName"><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></span>
+      
+        <ul class="fullTree">
+          <li><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></li>
+          
+            <li class="next">Voeis::Variable</li>
+          
+        </ul>
+        <a href="#" class="inheritanceTree">show all</a>
+      
+      </dd>
+    
+  
+  
+    
+  
+    
+      <dt class="r2">Includes:</dt>
+      <dd class="r2">DataMapper::Resource, <span class='object_link'><a href="../Facet/DataMapper/Resource.html" title="Facet::DataMapper::Resource (module)">Facet::DataMapper::Resource</a></span>, <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html" title="Yogo::Versioned::DataMapper::Resource (module)">Yogo::Versioned::DataMapper::Resource</a></span></dd>
+      
+    
+  
+  
+  
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">app/models/voeis/variable.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+<h2>Overview</h2><div class="docstring">
+  <div class="discussion">
+    <p>
+-*- coding: utf-8 -*- Variables
+</p>
+<p>
+This is apart of &#8220;Variables&#8221; The Variables table lists the full
+descriptive information about what variables have been measured. The
+following rules and best practices should be followed when populating this
+table:
+</p>
+<ul>
+<li><p>
+The VariableID field is the primary key, must be a unique integer, and
+cannot be NULL.
+</p>
+</li>
+</ul>
+<p>
+This field should be implemented as an auto number/identity field.
+</p>
+<ul>
+<li><p>
+The VariableCode field must be unique and serves as an alternate key for
+this table.
+</p>
+</li>
+</ul>
+<p>
+Variable codes can be arbitrary, or they can use an organized system. 
+VaraibleCodes cannot contain any characters other than A-Z (case
+insensitive), 0-9, period “.”, dash “-“, and underscore “_”.
+</p>
+<ul>
+<li><p>
+The VariableName field must reference a valid Term from the VariableNameCV
+</p>
+</li>
+</ul>
+<p>
+controlled vocabulary table.
+</p>
+<ul>
+<li><p>
+The Speciation field must reference a valid Term from the SpeciationCV
+controlled
+</p>
+</li>
+</ul>
+<p>
+vocabulary table.  A default value of “Not Applicable” is used where
+speciation does not apply.  If the speciation is unknown, a value of
+“Unknown” can be used.
+</p>
+<ul>
+<li><p>
+The VariableUnitsID field must reference a valid UnitsID from the
+UnitsTable controlled
+</p>
+</li>
+</ul>
+<p>
+vocabulary table.
+</p>
+<ul>
+<li><p>
+Only terms from the SampleMediumCV table can be used to populate the
+</p>
+</li>
+</ul>
+<p>
+SampleMedium field.  A default value of “Unknown” is used where the sample
+medium is unknown.
+</p>
+<ul>
+<li><p>
+Only terms from the ValueTypeCV table can be used to populate the ValueType
+field.  A
+</p>
+</li>
+</ul>
+<p>
+default value of “Unknown” is used where the value type is unknown.
+</p>
+<ul>
+<li><p>
+The default for the TimeSupport field is 0.  This corresponds to
+instantaneous values.  If
+</p>
+</li>
+</ul>
+<p>
+the TimeSupport field is set to a value other than 0, an appropriate
+TimeUnitsID must be specified.  The TimeUnitsID field can only reference
+valid UnitsID values from the Units controlled vocabulary table.  If the
+TimeSupport field is set to 0, any time units can be used (i.e., seconds,
+minutes, hours, etc.), however a default value of 103 has been used, which
+corresponds with hours.
+</p>
+<ul>
+<li><p>
+Only terms from the DataTypeCV table can be used to populated the DataType
+field.  A
+</p>
+</li>
+</ul>
+<p>
+default value of “Unknown” can be used where the data type is unknown.
+</p>
+<ul>
+<li><p>
+Only terms from the GeneralCategoryCV table can be used to populate the
+</p>
+</li>
+</ul>
+<p>
+GeneralCategory field.  A default value of “Unknown” can be used where the
+general category is unknown.
+</p>
+<ul>
+<li><p>
+The NoDataValue should be set such that it will never conflict with a real
+observation
+</p>
+</li>
+</ul>
+<p>
+value.  For example a NoDataValue of -9999 is valid for water temperature
+because we would never expect to measure a water temperature of -9999.  The
+default value for this field is -9999.
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div>
+
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#load_from_his-class_method" title="load_from_his (class method)">+ (Object) <strong>load_from_his</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#store_to_his-instance_method" title="#store_to_his (instance method)">- (Object) <strong>store_to_his</strong>(u_id) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html" title="Yogo::Versioned::DataMapper::Resource (module)">Yogo::Versioned::DataMapper::Resource</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#included-class_method" title="Yogo::Versioned::DataMapper::Resource.included (method)">included</a></span></p>
+
+  
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Facet/DataMapper/Resource.html" title="Facet::DataMapper::Resource (module)">Facet::DataMapper::Resource</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Facet/DataMapper/Resource.html#included-class_method" title="Facet::DataMapper::Resource.included (method)">included</a></span></p>
+
+  
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="load_from_his-class_method">
+  
+    + (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>load_from_his</strong> 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/variable.rb', line 87</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id load_from_his'>load_from_his</span>
+  <span class='id his_variables'>his_variables</span> <span class='op'>=</span> <span class='id repository'>repository</span><span class='lparen'>(</span><span class='symbol'>:his</span><span class='rparen'>)</span><span class='lbrace'>{</span> <span class='const'>His</span><span class='op'>::</span><span class='const'>Variable</span><span class='period'>.</span><span class='id all'>all</span> <span class='rbrace'>}</span>
+
+  <span class='id his_variables'>his_variables</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id his_v'>his_v</span><span class='op'>|</span>
+    <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:his_id</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id id'>id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id nil?'>nil?</span>
+      <span class='kw'>self</span><span class='period'>.</span><span class='id create'>create</span><span class='lparen'>(</span><span class='symbol'>:his_id</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span>
+                  <span class='symbol'>:variable_name</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id variable_name'>variable_name</span><span class='comma'>,</span>
+                  <span class='symbol'>:variable_code</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id variable_code'>variable_code</span><span class='comma'>,</span>
+                  <span class='symbol'>:speciation</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id speciation'>speciation</span><span class='comma'>,</span>
+                  <span class='symbol'>:variable_units_id</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id variable_units_id'>variable_units_id</span><span class='comma'>,</span>
+                  <span class='symbol'>:sample_medium</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id sample_medium'>sample_medium</span><span class='comma'>,</span>
+                  <span class='symbol'>:value_type</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id value_type'>value_type</span><span class='comma'>,</span>
+                  <span class='symbol'>:is_regular</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id is_regular'>is_regular</span><span class='comma'>,</span>
+                  <span class='symbol'>:time_support</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id time_support'>time_support</span><span class='comma'>,</span>
+                  <span class='symbol'>:time_units_id</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id time_units_id'>time_units_id</span><span class='comma'>,</span>
+                  <span class='symbol'>:data_type</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id data_type'>data_type</span><span class='comma'>,</span>
+                  <span class='symbol'>:general_category</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id general_category'>general_category</span><span class='comma'>,</span>
+                  <span class='symbol'>:no_data_value</span> <span class='op'>=&gt;</span> <span class='id his_v'>his_v</span><span class='period'>.</span><span class='id no_data_value'>no_data_value</span><span class='rparen'>)</span>
+    <span class='kw'>end</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="store_to_his-instance_method">
+  
+    - (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>store_to_his</strong>(u_id) 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/variable.rb', line 109</span>
+
+<span class='kw'>def</span> <span class='id store_to_his'>store_to_his</span><span class='lparen'>(</span><span class='id u_id'>u_id</span><span class='rparen'>)</span>
+  <span class='id var_to_store'>var_to_store</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='id u_id'>u_id</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id is_regular'>is_regular</span> <span class='op'>==</span> <span class='kw'>true</span>
+    <span class='id reg'>reg</span> <span class='op'>=</span> <span class='int'>1</span>
+  <span class='kw'>else</span>
+    <span class='id reg'>reg</span> <span class='op'>=</span><span class='int'>0</span>
+  <span class='kw'>end</span>
+  <span class='id new_his_var'>new_his_var</span> <span class='op'>=</span> <span class='const'>His</span><span class='op'>::</span><span class='const'>Variable</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='symbol'>:variable_name</span> <span class='op'>=&gt;</span> <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id variable_name'>variable_name</span><span class='comma'>,</span>
+                                      <span class='symbol'>:variable_code</span> <span class='op'>=&gt;</span> <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id variable_code'>variable_code</span><span class='comma'>,</span>
+                                      <span class='symbol'>:speciation</span> <span class='op'>=&gt;</span> <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id speciation'>speciation</span><span class='comma'>,</span>
+                                      <span class='symbol'>:variable_units_id</span> <span class='op'>=&gt;</span> <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id variable_units_id'>variable_units_id</span><span class='comma'>,</span>
+                                      <span class='symbol'>:sample_medium</span> <span class='op'>=&gt;</span> <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id sample_medium'>sample_medium</span><span class='comma'>,</span>
+                                      <span class='symbol'>:value_type</span> <span class='op'>=&gt;</span> <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id value_type'>value_type</span><span class='comma'>,</span>
+                                      <span class='symbol'>:is_regular</span> <span class='op'>=&gt;</span> <span class='id reg'>reg</span><span class='comma'>,</span>
+                                      <span class='symbol'>:time_support</span> <span class='op'>=&gt;</span> <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id time_support'>time_support</span><span class='comma'>,</span>
+                                      <span class='symbol'>:time_units_id</span> <span class='op'>=&gt;</span> <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id time_units_id'>time_units_id</span><span class='comma'>,</span>
+                                      <span class='symbol'>:data_type</span> <span class='op'>=&gt;</span> <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id data_type'>data_type</span><span class='comma'>,</span>
+                                      <span class='symbol'>:general_category</span> <span class='op'>=&gt;</span> <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id general_category'>general_category</span><span class='comma'>,</span>
+                                      <span class='symbol'>:no_data_value</span> <span class='op'>=&gt;</span> <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id no_data_value'>no_data_value</span><span class='rparen'>)</span>
+  <span class='id new_his_var'>new_his_var</span><span class='period'>.</span><span class='id save'>save</span>
+  <span class='id puts'>puts</span> <span class='id new_his_var'>new_his_var</span><span class='period'>.</span><span class='id errors'>errors</span><span class='period'>.</span><span class='id inspect'>inspect</span>
+  <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id his_id'>his_id</span> <span class='op'>=</span> <span class='id new_his_var'>new_his_var</span><span class='period'>.</span><span class='id id'>id</span>
+  <span class='id var_to_store'>var_to_store</span><span class='period'>.</span><span class='id save'>save</span>
+  <span class='id new_his_var'>new_his_var</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+    
+    <div id="footer">
+  Generated on Fri Jun  3 01:26:46 2011 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.6.3 (ruby-1.9.2).
+</div>
+
+  </body>
+</html>
