@@ -166,8 +166,14 @@ class Project
     managed_repository{ Voeis::Site.all }
   end
   
+  #fetch all variables from the Projects
+  def variables
+    managed_repository{ Voeis::Variable.all}
+  end
+  
+    
   private
-
+  
   def destroy_cleanup
     memberships.destroy
   end
