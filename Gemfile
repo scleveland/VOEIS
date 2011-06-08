@@ -11,7 +11,7 @@ gem "dm-validations"                            # We're validating properties
 gem "dm-is-versioned",                          :git => "git://github.com/yogo/dm-is-versioned.git", :branch => "voeis/patches"
 gem "dm-types",        DM_VERSION               # To enable UUID types
 gem "dm-is-list",      DM_VERSION               # RBAC
-gem "dm-migrations",   DM_VERSION #:git => "git://github.com/datamapper/dm-migrations.git"
+gem "dm-migrations",   DM_VERSION 
 gem "dm-transactions", DM_VERSION
 gem "dm-aggregates",   DM_VERSION
 gem "dm-timestamps"
@@ -50,18 +50,13 @@ gem 'aaronh-chronic',  :git =>"git://github.com/scleveland/chronic.git"
 
 gem 'rql', ">= 0.0.1",        :git => "git://github.com/yogo/rql-ruby.git", :branch => "topic/voeis"
 
-gem "yard",         "0.6.3"
-gem "bluecloth",    "2.1.0"
-gem "yardstick"
-gem "rspec"
-
-platforms(:ruby_18, :ruby_19) {
+platforms(:ruby_19) {
   gem "therubyracer", :require => "v8"
 }
 platforms(:jruby) { gem "therubyrhino" }
 
 # Because in 1.9 fastercsv is default, but in 1.8...
-platforms(:ruby_18, :jruby) { gem "fastercsv" }
+platforms(:jruby) { gem "fastercsv" }
 
 group(:development, :test) do
   gem "dm-visualizer"
@@ -74,7 +69,7 @@ group(:development, :test) do
   gem "rspec"
   gem "rspec-core",                :require => "rspec/core"
   gem "rspec-expectations",        :require => "rspec/expectations"
-  gem "rspec-mocks",        "2.4.0",       :require => "rspec/mocks"
+  gem "rspec-mocks",               :require => "rspec/mocks"
   gem "rspec-rails"
   # YARD Documentation
   gem "yard",          "0.6.3",            :require => nil
@@ -83,10 +78,6 @@ group(:development, :test) do
   # TODO: We need to find out how to remove this
   gem "test-unit", "~> 1.2.1",     :require => nil # This is annoying that is is required.
   # Debugger requirements
-  platforms(:mri_19) { gem "ruby-debug19", :require => nil }
-  platforms(:mri_18) { gem "ruby-debug",   :require => nil }
+  platforms(:ruby_19) { gem "ruby-debug19", :require => nil }
 
-  platforms(:mri_18,:mri_19) {
-    gem "thin"
-  }
 end
