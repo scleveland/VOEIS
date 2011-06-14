@@ -147,8 +147,10 @@ class Project
   end
 
   def update_project_site_data_catalog
-    self.sites.each do |site|
-      site.update_site_data_catalog
+    self.managed_repository do
+      Voeis::Site.all.each do |site|
+        site.update_site_data_catalog
+      end
     end
   end
   # Ensure that our common Voeis models are ready to be persisted
