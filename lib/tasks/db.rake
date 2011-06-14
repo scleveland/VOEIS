@@ -193,5 +193,11 @@ namespace :yogo do
           end #end Managed Repo
         end #end Project.all
     end #end task
+    desc "Update the Site Data Catlogs for All Projects"
+    task :update_site_data_catalogs, :needs => [:environment] do
+        Project.all.each do |project|
+          project.update_project_site_data_catalog
+        end #end Project.all
+    end #end task
   end
 end

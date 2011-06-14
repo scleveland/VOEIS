@@ -145,6 +145,11 @@ class Project
                                      :comments  => site_to_store.comments)
   end
 
+  def update_project_site_data_catalog
+    self.sites.each do |site|
+      site.update_site_data_catalog
+    end
+  end
   # Ensure that our common Voeis models are ready to be persisted
   # in the Project#managed_repository.
   # @author Ryan Heimbuch

@@ -118,5 +118,23 @@ class Voeis::Site
     save
     new_his_site
   end
+  
+  def update_site_data_catalog
+    self.variables.each do |var|
+      entry = Voeis::SiteDataCatalog.first_or_create(:site_id => self.id, :variable_id => var.id)
+      if !var.sensor_types.empty?
+        entry.record_number = (self.sensor_values & var.sensor_types.first.sensor_values).count
+        if entry.record_number > 0
+          entry.starting_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).first(:order=>[:timestamp]).timestamp
+          entry.ending_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).last(:order=>[:timestamp]).timestamp
+        end #end if
+      else
+        entry.record_number = 0
+      end
+      entry.valid?
+      puts entry.errors.inspect()
+      entry.save
+    end #end each
+  end
 end
 
