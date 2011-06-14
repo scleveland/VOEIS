@@ -68,6 +68,7 @@ class Project
                           "voeis/lab_method$retrieve",
                           "voeis/sample$retrieve",
                           "voeis/sample_material$retrieve",
+                          "voeis/site_data_catalog$retrieve",
                           "voeis/apiv$retrieve",
                           "voeis/data_value$retrieve"] unless self.is_private?
       return base_permission if user.nil?
