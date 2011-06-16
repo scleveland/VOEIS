@@ -8,6 +8,16 @@ class Voeis::VariablesController < Voeis::BaseController
             :instance_name => 'variable',
             :resource_class => Voeis::Variable
 
+  def show
+    @project = parent
+    #@sites = Voeis::Site.all
+    @sites = parent.managed_repository{Voeis::Site.all}
+    #@site =  parent.managed_repository{Voeis::Site.get(params[:id])}
+    @site_variable_stats = parent.managed_repository{Voeis::SiteDataCatalog.all}
+    debugger
+    #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
+    @variable = parent.managed_repository{Voeis::Variable.get(params[:id])}
+  end
 
   # GET /variables/new
   def new
