@@ -24,28 +24,72 @@
       - if @project.managed_repository { Voeis::DataStream.all.count } > 0
         = link_to("Add Data", add_project_data_streams_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
       = link_to("Settings...", edit_project_path(@project), :dojoType => "yogo.ui.MenuLink")
-  #siteButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
-    %span Site
-    %div{:dojoType => "dijit.Menu"}                    
-      -if !current_user.nil? && current_user.projects.include?(@project)
-        = link_to("Edit Site", edit_project_site_path(@project,resource.id), :dojoType => "yogo.ui.MenuLink")
+  -##siteButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
+  -#  %span Site
+  -#  %div{:dojoType => "dijit.Menu"}                    
+  -#    -if !current_user.nil? && current_user.projects.include?(@project)
+  -#      = link_to("Edit Site", edit_project_site_path(@project,resource.id), :dojoType => "yogo.ui.MenuLink")
     
 %h2
-  #{resource.name}
--i = 0
-%table{:id => "property-table"}
+  #{@site.name}
 
-  - resource.properties.each do |prop|
+= link_to('Edit', edit_project_site_path(@project,@site.id), :class=>'icon icon-edit')
+&nbsp;&nbsp;&nbsp;
+= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
+%br
+%br
+
+-i = 0
+%table{:id => "property-table", :style=>'float:left;'}
+
+  - @site.properties.each do |prop|
     -i=1-i
     %tr{:class=>"row#{i}"}
       %td
         %b
           #{prop.name.to_s.capitalize}
       %td
-        #{resource[prop.name]}
-= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
+        #{@site[prop.name]}
 
-%br
+%table{:id=>'stats', :class=>'', :style=>'width:50%; padding:0; float:left; margin-left:50px;'}
+  %tr
+    %td
+      %h4{:style=>'margin-top:0;'}
+        Variable Data
+    %td
+      %h4{:style=>'margin-top:0;'}
+        Count
+    %td
+      %h4{:style=>'margin-top:0;'}
+        Start
+    %td
+      %h4{:style=>'margin-top:0;'}
+        End
+    
+  - @site.variables.each do |var|
+    - var_stats = @site_variable_stats.first(:variable_id=>var.id)
+    %tr
+      %td
+        %b
+          = link_to(var.variable_name, project_variable_path(@project,var.id)) 
+      - if !var_stats.nil?
+        %td
+          -#= 'ID = %s'%var.id
+          = var_stats.record_number
+        %td
+          = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
+        %td
+          = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
+      - else
+        %td
+          NA
+        %td
+          NA
+        %td
+          NA
+
+
+%br{:style=>'float:none; clear:both;'}
 %br
 #all_variables
   %h3
@@ -61,15 +105,16 @@
         - @label_array[0..-1].each do |label|
           - table.register_column(:string, label)
         - table.add_rows(@current_samples)
-- if @versions.count > 0
-  %h3
-    Versions
-    - @versions.each do |ver|
-      %table
-        - resource.properties.each do |prop|
-          %tr
-            %td
-              %b
-                #{prop.name.to_s.capitalize}
-            %td
-              #{ver[prop.name.to_s]}
+-# if @versions.count > 0
+-#  %h3
+-#    Versions
+    
+-# @versions.each do |ver|
+-#%table
+-#  - resource.properties.each do |prop|
+-#    %tr
+-#      %td
+-#        %b
+-#          #{prop.name.to_s.capitalize}
+-#      %td
+-#        #{ver[prop.name.to_s]}
