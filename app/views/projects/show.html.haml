@@ -65,18 +65,27 @@
     = render(:partial => 'overview_map', :locals => { :project => @project,
                                                       :sites => @sites,
                                                       :class_name => 'show-map' } )
+
     %h3 Sites:
-    %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{nestedSorting:true, filter:true}",  :store=>"Sitestore", :clientSort=>"true", :style=>"width: 600px; height: 250px;", :rowSelector=>"20px", :jsId=>"SiteDisplayGrid", :id=>"SiteDisplayGrid", :title=>"Sites"}
+    %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{nestedSorting:true, filter:true, indirectSelection: true}",  :store=>"Sitestore", :clientSort=>"true", :style=>"width: 600px; height: 250px;", :rowSelector=>"20px", :jsId=>"SiteDisplayGrid", :id=>"SiteDisplayGrid", :title=>"Sites"}
+      %script{:type => "dojo/method", :event => "onRowDblClick", :args => "evt"}
+        :plain
+          var item = this.getItem(evt.rowIndex);
+          window.location += '/sites/'+item.id;
+      %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
+        :plain
+          //WANT to POP map site marker with this event
+          //PRESENTLY BOTH single & double click fetch Site show page
+          //var map = dijit.byId(@project);
+          var item = this.getItem(idx);
+          window.location += '/sites/'+item.id;
       %thead
         %tr
-          %th{:field=>"name", :width=>"200px", :filterable=>true}
-            Name
-          %th{:field=>"code", :width=>"150px", :filterable=>true}
-            Code
-          %th{:field=>"latitude", :width=>"100px", :filterable=>true}
-            Lat
-          %th{:field=>"longitude", :width=>"100px", :filterable=>true}
-            Long
+          %th{:field=>"name", :width=>"200px", :filterable=>true} Name
+          %th{:field=>"code", :width=>"150px", :filterable=>true} Code
+          %th{:field=>"latitude", :width=>"100px", :filterable=>true} Lat
+          %th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
+
 -#.data-browser
 -##content-sidebar-left
 -#= render_cell(:site_browser, :display, :project => resource)
