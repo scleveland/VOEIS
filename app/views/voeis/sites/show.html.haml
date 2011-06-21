@@ -66,27 +66,32 @@
       %h4{:style=>'margin-top:0;'}
         End
     
-  - @site.variables.each do |var|
-    - var_stats = @site_variable_stats.first(:variable_id=>var.id)
+  - if @site_variable_stats.empty?
     %tr
-      %td
-        %b
-          = link_to(var.variable_name, project_variable_path(@project,var.id)) 
-      - if !var_stats.nil?
+      %td{:colspan=>"4"}
+        %em &nbsp;&nbsp;&nbsp; no data available
+  - else
+    - @site.variables.each do |var|
+      - var_stats = @site_variable_stats.first(:variable_id=>var.id)
+      %tr
         %td
-          -#= 'ID = %s'%var.id
-          = var_stats.record_number
-        %td
-          = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
-        %td
-          = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
-      - else
-        %td
-          NA
-        %td
-          NA
-        %td
-          NA
+          %b
+            = link_to(var.variable_name, project_variable_path(@project,var.id)) 
+        - if !var_stats.nil?
+          %td
+            -#= 'ID = %s'%var.id
+            = var_stats.record_number
+          %td
+            = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
+          %td
+            = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
+        - else
+          %td
+            NA
+          %td
+            NA
+          %td
+            NA
 
 
 %br{:style=>'float:none; clear:both;'}
@@ -105,6 +110,12 @@
         - @label_array[0..-1].each do |label|
           - table.register_column(:string, label)
         - table.add_rows(@current_samples)
+  - else
+    %br
+    %em &nbsp;&nbsp;&nbsp; no samples to show
+
+%br
+
 -# if @versions.count > 0
 -#  %h3
 -#    Versions
