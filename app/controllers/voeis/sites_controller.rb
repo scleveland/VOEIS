@@ -18,7 +18,7 @@ class Voeis::SitesController < Voeis::BaseController
   def show
     @site =  parent.managed_repository{Voeis::Site.get(params[:id])}
     @site_variable_stats = parent.managed_repository{Voeis::SiteDataCatalog.all(:site_id=>@site.id)}
-    debugger
+    # debugger
     #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
     @sites = parent.managed_repository{Voeis::Site.all}
     @label_array = Array["Sample Type","Lab Sample Code","Sample Medium","Site","Timestamp"]
