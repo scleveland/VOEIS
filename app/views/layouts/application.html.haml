@@ -40,9 +40,9 @@
       dojo.require("dijit.form.Button");
     
       dojo.require("yogo.ui.MenuLink");
-      dojo.require("yogo.maps.google");    
+      //dojo.require("yogo.maps.google");    
     
-      yogo.maps.google.load();
+      //yogo.maps.google.load();
     
       var hideLoader = function(){
           dojo.fadeOut({
@@ -58,10 +58,10 @@
       });
 
       dojo.addOnLoad(function(){
-         dojo.when(yogo.maps.google.load(), function() {
-           dojo.parser.parse();
-         });
-         
+         //dojo.when(yogo.maps.google.load(), function() {
+         //  dojo.parser.parse();
+         //});
+         //dojo.parser.parse();
       });
       
     = yield(:javascripts)

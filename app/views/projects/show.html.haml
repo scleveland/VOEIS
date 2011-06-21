@@ -1,19 +1,84 @@
 - content_for(:javascripts) do
+  :plain
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
   :javascript
     dojo.require("dijit.Dialog");
     dojo.require("dojox.grid.EnhancedGrid");
     dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
     dojo.require("dojox.grid.enhanced.plugins.Filter");
+    dojo.require("dojo.data.ItemFileReadStore");
     dojo.require("dijit.layout.TabContainer");
     dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
     dojo.require ("voeis.Server")
     var projectsDataStore = voeis.Server.DEFAULT.projectsDataStore();
     var projectStore = dojo.store.JsonRest({target: "#{root_url}projects.json?"});
-    var Sitestore = voeis.Server.DEFAULT.projectSitesDataStore('#{@project.id}');
-    var item = projectStore.get('id=#{@project.id}');
-    dojo.addOnLoad(function(){
-      dijit.byId('split_map').store.add(item.results[0][0]);
+    //var Sitestore = voeis.Server.DEFAULT.projectSitesDataStore('#{@project.id}');
+    //var item = projectStore.get('id=#{@project.id}');
+    //dojo.addOnLoad(function(){
+    //  dijit.byId('split_map').store.add(item.results[0][0]);
+    //});
+    
+    var pmap;
+    var pmarkers = [];
+    var site_data = [
+      #{@sites.map{|site| "        "+site.to_json}.join(",\n")}
+    ];
+    var psites_json = {
+        identifier: 'id',
+        label: 'name',
+        items: site_data };
+    function pmap_init() {
+      var map_opts = {
+        scaleControl: true, 
+        zoomControl: true, 
+        mapTypeControl: true, 
+        scrollwheel: true, 
+        mapTypeId: google.maps.MapTypeId.SATELLITE, 
+        center: new google.maps.LatLng(46.739861,-110.786133), 
+        zoom: 4};
+      pmap = new google.maps.Map(document.getElementById("#{@project.id}"), map_opts);
+      var bounds = new google.maps.LatLngBounds();
+      for(var i=0;i<site_data.length;i++) {
+        var item = site_data[i];
+        var point = new google.maps.LatLng(item.latitude, item.longitude);
+        var marker = new google.maps.Marker({map:pmap, position:point});
+        var link = '<a href="'+(window.location+'/sites/'+item.id)+'"><strong>'+item.name+'</strong></a>';
+        var name = '<strong>'+item.name+'</strong>';
+        marker.idx = i;
+        marker.info = '<p style="margin:0 15px;">'
+        marker.info += link+'<br/>(click for Site details)<br/>'
+        //marker.info += item.code+'<br/>Elevation: '+item.elevation_m+'<br/>'
+        //marker.info += item.county+', '+item.state+'</p>';
+        marker.info += '</p>';
+        marker.window = new google.maps.InfoWindow({content:marker.info});
+        marker.pop = function() {
+          for(var j=0;j<pmarkers.length;j++) 
+            pmarkers[j].window.close();
+          this.window.open(pmap,this);
+        };
+        marker.seltable = function() {
+          // click table
+          grid = dijit.byId('SiteDisplayGrid');
+          grid.selection.clear();
+          grid.selection.addToSelection(this.idx);
+        };
+        marker.click = function(){
+          this.pop();
+          this.seltable();
+        };
+        google.maps.event.addListener(marker, 'click', marker.click);
+        pmarkers.push(marker);
+        bounds.extend(point);
+      };
+      pmap.fitBounds(bounds);
+      
+    };
+    
+    $(window).ready(function(){ 
+      pmap_init();
     });
+    
+    
 
 - content_for(:toolbar) do
   #projectButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
@@ -51,6 +116,7 @@
     - if @project.managed_repository { !Voeis::DataValue.first.nil? }
       = link_to("Browse Sample Data", query_project_samples_path(@project), :class => 'button-link')
 = clear_break
+
 #overview
   %h4
     %a{:href=>"#"}
@@ -62,12 +128,15 @@
           = @project.description
         - else
           = link_to('[Add Project Description]', edit_project_path(@project))
-    = render(:partial => 'overview_map', :locals => { :project => @project,
-                                                      :sites => @sites,
-                                                      :class_name => 'show-map' } )
+    .show-map{:style=>'', :id=>@project.id}
+    -#= render(:partial => 'overview_map', :locals => { :project => @project,
+    -#                                                  :sites => @sites,
+    -#                                                  :class_name => 'show-map' } )
 
-    %h3 Sites:
-    %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{nestedSorting:true, filter:true, indirectSelection: true}",  :store=>"Sitestore", :clientSort=>"true", :style=>"width: 600px; height: 250px;", :rowSelector=>"20px", :jsId=>"SiteDisplayGrid", :id=>"SiteDisplayGrid", :title=>"Sites"}
+
+    %h3{:style=>'margin-top:10px;'} Sites:
+    #site_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"psites", :data=>"psites_json"}
+    %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{nestedSorting:true, filter:true, indirectSelection: true}",  :store=>"psites", :clientSort=>"true", :style=>"width: 600px; height: 250px;", :rowSelector=>"20px", :jsId=>"SiteDisplayGrid", :id=>"SiteDisplayGrid", :title=>"Sites"}
       %script{:type => "dojo/method", :event => "onRowDblClick", :args => "evt"}
         :plain
           var item = this.getItem(evt.rowIndex);
@@ -77,14 +146,20 @@
           //WANT to POP map site marker with this event
           //PRESENTLY BOTH single & double click fetch Site show page
           //var map = dijit.byId(@project);
+          //var map = getElementById('#{@project.id}');
           var item = this.getItem(idx);
-          window.location += '/sites/'+item.id;
+          //alert('TESTING: '+idx+' -- '+item.name+' = '+item.id);
+          //alert('>>> '+pmarkers[idx].test);
+          pmarkers[idx].pop();
       %thead
         %tr
           %th{:field=>"name", :width=>"200px", :filterable=>true} Name
           %th{:field=>"code", :width=>"150px", :filterable=>true} Code
           %th{:field=>"latitude", :width=>"100px", :filterable=>true} Lat
           %th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
+    %p{:style=>'font-size:10px;margin-top:5px;'}
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      (double-click above for Site details)
 
 -#.data-browser
 -##content-sidebar-left

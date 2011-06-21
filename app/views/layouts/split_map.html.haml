@@ -1,6 +1,14 @@
 - content_for(:javascripts) do
   :javascript
     dojo.require("voeis.maps.google.ProjectsMap");
+    dojo.require("yogo.maps.google");    
+    yogo.maps.google.load();
+
+    dojo.addOnLoad(function(){
+       dojo.when(yogo.maps.google.load(), function() {
+         dojo.parser.parse();
+       });
+    });
     
 - content_for(:content) do
   #main_split{:dojoType => "dijit.layout.BorderContainer", :design => "sidebar", :gutters => "false"}
