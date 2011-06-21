@@ -33,8 +33,9 @@
 %h2
   #{@variable.variable_name}
 
-= link_to('Edit', edit_project_variable_path(@project,@variable.id), :class=>'icon icon-edit')
-&nbsp;&nbsp;&nbsp;
+-#EDIT VARIABLE BUTTON
+-#= link_to('Edit', edit_project_variable_path(@project,@variable.id), :class=>'icon icon-edit')
+-#&nbsp;&nbsp;&nbsp;
 = link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
 %br
 %br
@@ -51,32 +52,33 @@
       %td
         #{@variable[prop.name]}
   
-  
-  - var_stats = @site_variable_stats.first(:variable_id=>@variable.id)
-  %tr{:class=>"row#{i+1}"}
-    %td
-      %b
-        Collected Data
-    %td
-      &nbsp;
-  %tr{:class=>"row#{i}"}
-    %td
-      %b
-        &nbsp;&nbsp; Count
-    %td
-      = var_stats.record_number
-  %tr{:class=>"row#{i+1}"}
-    %td
-      %b
-        &nbsp;&nbsp; Starting
-    %td
-      = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
-  %tr{:class=>"row#{i}"}
-    %td
-      %b
-        &nbsp;&nbsp; Ending
-    %td
-      = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
+-# COLLECTED DATA STATS
+-# COMMENTED OUT because lack of SITE ID to select
+-#  - var_stats = @site_variable_stats.first(:variable_id=>@variable.id)
+-#  %tr{:class=>"row#{i+1}"}
+-#    %td
+-#      %b
+-#        Collected Data
+-#    %td
+-#      &nbsp;
+-#  %tr{:class=>"row#{i}"}
+-#    %td
+-#      %b
+-#        &nbsp;&nbsp; Count
+-#    %td
+-#      = var_stats.record_number
+-#  %tr{:class=>"row#{i+1}"}
+-#    %td
+-#      %b
+-#        &nbsp;&nbsp; Starting
+-#    %td
+-#      = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
+-#  %tr{:class=>"row#{i}"}
+-#    %td
+-#      %b
+-#        &nbsp;&nbsp; Ending
+-#    %td
+-#      = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
 
 -#%table{:id=>'stats', :class=>'', :style=>'width:50%; padding:0; float:left; margin-left:50px;'}
 -#  %tr
