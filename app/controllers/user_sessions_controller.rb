@@ -74,7 +74,7 @@ class UserSessionsController < ApplicationController
   # Logs a user in and returns their API key
   #
   # @example
-  #   https://voeis.msu.montana.edu/user_sessions/get_api_key.json?user_session[login]=mylogin&user_session[password]=mypassword
+  #   https://voeis.msu.montana.edu/user_session/get_api_key.json?user_session[login]=mylogin&user_session[password]=mypassword
   #
   # @return [JSON String] api_key
   # 
