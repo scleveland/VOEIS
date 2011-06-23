@@ -148,8 +148,8 @@
 
 <span class='kw'>def</span> <span class='id display'>display</span>
   <span class='ivar'>@project</span> <span class='op'>=</span> <span class='ivar'>@opts</span><span class='lbracket'>[</span><span class='symbol'>:project</span><span class='rbracket'>]</span>
-  <span class='comment'>#@sites = @project.managed_repository{ Voeis::Site.all }
-</span>  <span class='id render'>render</span>
+  <span class='ivar'>@sites</span> <span class='op'>=</span> <span class='ivar'>@project</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id all'>all</span> <span class='rbrace'>}</span>
+  <span class='id render'>render</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -161,7 +161,7 @@
 </div>
     
     <div id="footer">
-  Generated on Fri Jun  3 01:26:46 2011 by 
+  Generated on Thu Jun 23 10:38:27 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>
