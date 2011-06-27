@@ -77,6 +77,8 @@
       body, html { width:100%; height:100%; margin:0; padding:0; overflow:hidden; }
       #border_container { width:100%; height:100% }
       
+      #main_container { margin:10px 0 10px 20px }
+      
       .datahub-icon-25 { 
         background-image: url('/images/datahub_icon_25.png');
         background-repeat: no-repeat;
@@ -108,6 +110,7 @@
           %span{:style => "font-weight:bold"}
             DataHub
           %div{:dojoType => "dijit.Menu"}
+            = link_to("Home", '/', :dojoType => "yogo.ui.MenuLink")
             = link_to("About", page_url(:about), :dojoType => "yogo.ui.MenuLink")
             = link_to("Help", page_url(:help), :dojoType => "yogo.ui.MenuLink")      
 
