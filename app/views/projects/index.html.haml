@@ -1,23 +1,47 @@
 - content_for(:javascripts) do
+  :plain
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
   :javascript
     dojo.require("dojox.grid.EnhancedGrid");
     dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+    dojo.require("dojo.data.ItemFileReadStore");
     dojo.require("voeis.Server");
     dojo.require("dijit.layout.TabContainer");
     dojo.require("voeis.ui.SitePane");
     dojo.require("voeis.ui.ProjectSitesGrid");
     
     projectsDataStore = voeis.Server.DEFAULT.projectsDataStore();
+    
+    var project_data = [
+      #{@projects.map{|proj| "        "+proj.to_json}.join(",\n")}
+    ];
+    var projects_json = {
+        identifier: 'id',
+        label: 'name',
+        items: project_data };
+    
+    var pcount = '#{@projects.length}';
+    
+    $(window).load(function(){ 
+      var loading = dijit.byId('loading_dialog');
+      var map = dijit.byId('split_map');
+      google.maps.event.addListener(map._map, 'center_changed', function(){
+        //alert('ZOOM CHANGED!');
+        //if(loading.css('display')!='none')
+        loading.hide();
+      });
+    });
 
 - content_for(:stylesheets) do
   = stylesheet_link_tag("/javascripts/dojox/grid/enhanced/resources/EnhancedGrid.css")
   = stylesheet_link_tag("/javascripts/dojox/grid/enhanced/resources/claro/EnhancedGrid.css")
 
+#proj_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"proj_store", :data=>"projects_json"}
 #tab_browser{:dojoType => "dijit.layout.TabContainer"}
   %table{:id => 'projects_table', :title => "Projects", :dojoType => "dojox.grid.EnhancedGrid", :store => "projectsDataStore", :plugins => "{indirectSelection: true}"}
     %thead
       %tr
-        %th{:field => "name", :width => "auto"} Project
+        %th{:field => "name", :width => "auto"} Project 
     %script{:type => "dojo/method", :event => "onRowDblClick", :args => "evt"}
       :plain
         var item = this.getItem(evt.rowIndex);
@@ -30,6 +54,8 @@
         var map = dijit.byId('split_map');
         var item = this.getItem(idx);
         map.store.add(item);
+        dijit.byId('loading_dialog').show();
+        //alert('CLICKed!! zoom: '+map._map.getZoom());
     %script{:type => "dojo/method", :event => "onDeselected", :args => "idx"}
       :plain
         console.log("deselected:");

@@ -15,6 +15,9 @@
     #right_tabs{:dojoType => "dijit.layout.TabContainer", :region => "right", :gutters => "false", :style => "padding:0;width:50%"}
       #map_pane{:dojoType => "dijit.layout.ContentPane", :title => "Sites Map"}
         %div{:id => "split_map", :dojoType => "voeis.maps.google.ProjectsMap", :markerIcon => "/images/site_marker_25.png", :style => "width:100%;height:100%;"}
+          #loading_dialog{:dojoType=>"dijit.Dialog", :disableCloseButton => true, :title=>"Loading..."}
+            #search-div-loader{:style=>"left:30%;top:30%;"}
+
     #content_pane{:dojoType => "dijit.layout.ContentPane", :region => "center", :gutters => "false", :style => "padding:0"}
       = content_for?(:content_pane) ? yield(:content_pane) : yield
 

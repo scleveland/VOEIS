@@ -23,6 +23,15 @@
     var site_data = [
       #{@sites.map{|site| "        "+site.to_json}.join(",\n")}
     ];
+    var site_stats = [
+      #{@sites_data.map{|site| "        "+site.to_json}.join(",\n")}
+    ];
+    for(var i=0;i<site_data.length;i++) {
+      site_data[i]['data_vars'] = site_stats[i].vars;
+      site_data[i]['data_count'] = site_stats[i].count;
+      site_data[i]['data_start'] = site_stats[i].first;
+      site_data[i]['data_end'] = site_stats[i].last;
+    };
     var psites_json = {
         identifier: 'id',
         label: 'name',
@@ -40,13 +49,19 @@
       var bounds = new google.maps.LatLngBounds();
       for(var i=0;i<site_data.length;i++) {
         var item = site_data[i];
+        var stats = site_stats[i];
         var point = new google.maps.LatLng(item.latitude, item.longitude);
         var marker = new google.maps.Marker({map:pmap, position:point});
         var link = '<a href="'+(window.location+'/sites/'+item.id)+'"><strong>'+item.name+'</strong></a>';
         var name = '<strong>'+item.name+'</strong>';
         marker.idx = i;
-        marker.info = '<p style="margin:0 15px;">'
-        marker.info += link+'<br/>(click for Site details)<br/>'
+        marker.info = '<p style="margin:0 15px;">';
+        marker.info += link+'<br/>(click for Site details)<br/>';
+        marker.info += '&nbsp;&nbsp; code: '+item.code+'<br/>';
+        marker.info += '&nbsp;&nbsp; Lat/Long: '+item.latitude+', '+item.longitude;
+        marker.info += '<br/>&nbsp;&nbsp; variables: '+stats.vars+' &mdash; ';
+        marker.info += 'data collected: '+stats.count+'<br/>';
+        marker.info += '&nbsp;&nbsp; starting: '+stats.first+' &mdash; ending: '+stats.last+'<br/>';
         //marker.info += item.code+'<br/>Elevation: '+item.elevation_m+'<br/>'
         //marker.info += item.county+', '+item.state+'</p>';
         marker.info += '</p>';
@@ -78,6 +93,7 @@
       pmap_init();
     });
     
+-#{@sites_data.each_with_index{|data,idx| "    site_data[%s].stats = %s;"%[idx,data.to_json]}.join("\n")}
     
 
 - content_for(:toolbar) do
@@ -119,8 +135,7 @@
 
 #overview
   %h4
-    %a{:href=>"#"}
-      Project Overview
+    Project Overview
   .overview-item
     #overview-text
       %p
@@ -143,20 +158,20 @@
           window.location += '/sites/'+item.id;
       %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
         :plain
-          //WANT to POP map site marker with this event
-          //PRESENTLY BOTH single & double click fetch Site show page
           //var map = dijit.byId(@project);
           //var map = getElementById('#{@project.id}');
-          var item = this.getItem(idx);
-          //alert('TESTING: '+idx+' -- '+item.name+' = '+item.id);
-          //alert('>>> '+pmarkers[idx].test);
+          //var item = this.getItem(idx);
           pmarkers[idx].pop();
       %thead
         %tr
-          %th{:field=>"name", :width=>"200px", :filterable=>true} Name
-          %th{:field=>"code", :width=>"150px", :filterable=>true} Code
-          %th{:field=>"latitude", :width=>"100px", :filterable=>true} Lat
-          %th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
+          %th{:field=>"name", :width=>"175px", :filterable=>true} Name
+          %th{:field=>"code", :width=>"100px", :filterable=>true} Code
+          %th{:field=>"data_vars", :width=>"50px", :filterable=>true} Vars
+          %th{:field=>"data_count", :width=>"60px", :filterable=>true} Data
+          %th{:field=>"data_start", :width=>"75px", :filterable=>true} Starting
+          %th{:field=>"data_end", :width=>"75px", :filterable=>true} Ending
+          -#%th{:field=>"latitude", :width=>"100px", :filterable=>true} Lat
+          -#%th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
     %p{:style=>'font-size:10px;margin-top:5px;'}
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       (double-click above for Site details)
@@ -176,8 +191,6 @@
 -# = render(:partial => 'data_table', :locals => { :data => @current_data, :labels => @label_array,:project => @project, :class_name => 'data-table' })  
   
 = clear_break
-
-
 
 #hidden-cells-and-partial
   -#=render_cell(:add_site, :display_form, :site => @site, :project => @project)

@@ -16,10 +16,16 @@ class ProjectsController < InheritedResources::Base
   end
 
   def index
+    ##
+    @projects = Project.all(:is_private=>false)
+    if !current_user.nil?
+      user_projects = current_user.projects.all(:is_private=>true)
+      #current_user.projects.all(:is_private=>true, :fields=>[:id, :name, :description]).map {|project| @user_projects << {"id" => project.id.to_s, "name" => project.name, "description" => project.description} }
+      @projects += user_projects
+    end
     index! do
       logger.debug(request.env['QUERY_STRING'])
     end
-    
   end
   
    #export the results of search/browse to a csv file
@@ -55,6 +61,22 @@ class ProjectsController < InheritedResources::Base
     end
     @site = @project.managed_repository{ Voeis::Site.new }
     @sites = @project.managed_repository{ Voeis::Site.all }
+    @sites_data = []
+    @sites.map{ |site| 
+      stats = @project.managed_repository{Voeis::SiteDataCatalog.all(:site_id=>site.id)}.aggregate(:record_number.sum, :starting_timestamp.min, :ending_timestamp.max)
+      stats.map!{ |x| 
+        if x.nil?
+          x = 'NA'
+        else
+          if x.class.to_s[0,4]=='Date'
+            x = x.strftime('%m/%d/%Y')
+          else
+            x = x
+          end
+        end
+      }
+      @sites_data << {:vars=>site.variables.count, :count=>stats[0], :first=>stats[1], :last=>stats[2]}
+    }
     @current_data = Array.new
     @items = Array.new
     @start_time = nil
