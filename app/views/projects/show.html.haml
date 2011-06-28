@@ -20,6 +20,10 @@
     
     var pmap;
     var pmarkers = [];
+    var icon_red = 'http://www.google.com/intl/en_us/mapfiles/ms/icons/red-dot.png';
+    var icon_blue = 'http://www.google.com/intl/en_us/mapfiles/ms/icons/blue-dot.png';
+    var icon_default = icon_red;
+    var icon_pop = icon_blue;
     var site_data = [
       #{@sites.map{|site| "        "+site.to_json}.join(",\n")}
     ];
@@ -51,24 +55,29 @@
         var item = site_data[i];
         var stats = site_stats[i];
         var point = new google.maps.LatLng(item.latitude, item.longitude);
-        var marker = new google.maps.Marker({map:pmap, position:point});
+        var marker = new google.maps.Marker({map:pmap, position:point, icon:icon_default});
         var link = '<a href="'+(window.location+'/sites/'+item.id)+'"><strong>'+item.name+'</strong></a>';
         var name = '<strong>'+item.name+'</strong>';
         marker.idx = i;
         marker.info = '<p style="margin:0 15px;">';
         marker.info += link+'<br/>(click for Site details)<br/>';
-        marker.info += '&nbsp;&nbsp; code: '+item.code+'<br/>';
-        marker.info += '&nbsp;&nbsp; Lat/Long: '+item.latitude+', '+item.longitude;
-        marker.info += '<br/>&nbsp;&nbsp; variables: '+stats.vars+' &mdash; ';
-        marker.info += 'data collected: '+stats.count+'<br/>';
-        marker.info += '&nbsp;&nbsp; starting: '+stats.first+' &mdash; ending: '+stats.last+'<br/>';
+        marker.info += '&nbsp;&nbsp; <strong>Code:</strong> '+item.code+'<br/>';
+        marker.info += '&nbsp;&nbsp; <strong>Lat/Long:</strong> '+item.latitude+', '+item.longitude;
+        marker.info += '<br/>&nbsp;&nbsp; <strong>Variables:</strong> '+stats.vars+' &mdash; ';
+        marker.info += '<strong>Data collected:</strong> '+stats.count+'<br/>';
+        marker.info += '&nbsp;&nbsp; <strong>Starting:</strong> '+stats.first;
+        marker.info += ' &mdash; <strong>Ending:</strong> '+stats.last+'<br/>';
         //marker.info += item.code+'<br/>Elevation: '+item.elevation_m+'<br/>'
         //marker.info += item.county+', '+item.state+'</p>';
         marker.info += '</p>';
         marker.window = new google.maps.InfoWindow({content:marker.info});
         marker.pop = function() {
-          for(var j=0;j<pmarkers.length;j++) 
+          // this.setIcon(); this.getIcon();
+          for(var j=0;j<pmarkers.length;j++) {
             pmarkers[j].window.close();
+            pmarkers[j].setIcon(icon_default);
+          };
+          this.setIcon(icon_pop);
           this.window.open(pmap,this);
         };
         marker.seltable = function() {
