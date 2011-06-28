@@ -52,7 +52,7 @@
     %tr
       %td{:colspan=>"2"}
         = f.submit("Save Site", :onclick => "$('#loader').toggle();")
-        = link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
+        = link_to('Cancel', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
 
   = clear_break
 
