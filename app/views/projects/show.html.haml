@@ -162,7 +162,7 @@
 
     %h3{:style=>'margin-top:10px;'} Sites:
     #site_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"psites", :data=>"psites_json"}
-    %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{nestedSorting:true, filter:true, indirectSelection: true}",  :store=>"psites", :clientSort=>"true", :style=>"width: 600px; height: 250px;", :rowSelector=>"20px", :jsId=>"SiteDisplayGrid", :id=>"SiteDisplayGrid", :title=>"Sites"}
+    %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{nestedSorting:true, filter:true, indirectSelection: true}",  :store=>"psites", :clientSort=>"true", :style=>"width: 650px; height: 250px;", :rowSelector=>"20px", :jsId=>"SiteDisplayGrid", :id=>"SiteDisplayGrid", :title=>"Sites"}
       %script{:type => "dojo/method", :event => "onRowDblClick", :args => "evt"}
         :plain
           var item = this.getItem(evt.rowIndex);
@@ -175,8 +175,8 @@
           pmarkers[item.idx].pop();
       %thead
         %tr
-          %th{:field=>"name", :width=>"175px", :filterable=>true} Name
-          %th{:field=>"code", :width=>"100px", :filterable=>true} Code
+          %th{:field=>"name", :width=>"190px", :filterable=>true} Name
+          %th{:field=>"code", :width=>"130px", :filterable=>true} Code
           %th{:field=>"data_vars", :width=>"50px", :filterable=>true} Vars
           %th{:field=>"data_count", :width=>"60px", :filterable=>true} Data
           %th{:field=>"data_start", :width=>"75px", :filterable=>true} Starting
