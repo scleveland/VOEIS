@@ -1,23 +1,60 @@
-%h2
-Editing: #{@site.name}
+:css
+  #form-table { width:600px; }
+  #form-table td { width:50%; }
+  .form-element { width:15em; }
+  #site_name { width:25em; }
+  #site_local_projection_id { width:20em; }
+  #site_pos_accuracy_m { width:20em; }
+  #site_comments { width:42em; }
+  
+%b EDITING: 
+%br
+%h2{:style=>"margin-top:0;"}
+  #{@site.name}
 
 = form_for(:site, resource, :url => project_site_path(@project, resource), :builder => YogoFormBuilder, :html => {:method => :put,:onsubmit => "return checkform();"} )do |f|
 
-  = f.text_field("name")
-  = f.text_field("code")
-  = f.text_field("latitude")
-  = f.text_field("longitude")
-  = f.text_field("elevation_m")         
-  = f.text_field("vertical_datum")      
-  = f.text_field("local_x")             
-  = f.text_field("local_y")             
-  = f.text_field("local_projection_id") 
-  = f.text_field("pos_accuracy_m")      
-  = f.text_field("county")     
-  = f.text_field("state")         
-  = f.text_area("comments")
-  = f.submit("Save Site", :onclick => "$('#loader').toggle();")
-  = link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
+  %table{:id=>"form-table"}
+    %tr
+      %td
+        = f.text_field("name")
+      %td
+        = f.text_field("code")
+    %tr
+      %td
+        = f.text_field("latitude")
+      %td
+        = f.text_field("longitude")
+    %tr
+      %td
+        = f.text_field("elevation_m")         
+      %td
+        = f.text_field("vertical_datum")      
+    %tr
+      %td 
+        = f.text_field("local_x")             
+      %td 
+        = f.text_field("local_y")             
+    %tr
+      %td{:colspan=>"2"}
+        = f.text_field("local_projection_id") 
+    %tr
+      %td{:colspan=>"2"}
+        = f.text_field("pos_accuracy_m")      
+    %tr
+      %td 
+        = f.text_field("state")         
+      %td 
+        = f.text_field("county")     
+    %tr
+      %td{:colspan=>"2"}
+        = f.text_area("comments")
+    %tr
+      %td{:colspan=>"2"}
+        = f.submit("Save Site", :onclick => "$('#loader').toggle();")
+        = link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
+
+  = clear_break
 
 :javascript  
   function checkform()
