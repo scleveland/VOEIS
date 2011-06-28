@@ -31,6 +31,7 @@
       #{@sites_data.map{|site| "        "+site.to_json}.join(",\n")}
     ];
     for(var i=0;i<site_data.length;i++) {
+      site_data[i]['idx'] = i;
       site_data[i]['data_vars'] = site_stats[i].vars;
       site_data[i]['data_count'] = site_stats[i].count;
       site_data[i]['data_start'] = site_stats[i].first;
@@ -59,6 +60,7 @@
         var link = '<a href="'+(window.location+'/sites/'+item.id)+'"><strong>'+item.name+'</strong></a>';
         var name = '<strong>'+item.name+'</strong>';
         marker.idx = i;
+        marker.id = item.id;
         marker.info = '<p style="margin:0 15px;">';
         marker.info += link+'<br/>(click for Site details)<br/>';
         marker.info += '&nbsp;&nbsp; <strong>Code:</strong> '+item.code+'<br/>';
@@ -82,9 +84,9 @@
         };
         marker.seltable = function() {
           // click table
-          grid = dijit.byId('SiteDisplayGrid');
+          var grid = dijit.byId('SiteDisplayGrid');
           grid.selection.clear();
-          grid.selection.addToSelection(this.idx);
+          grid.selection.addToSelection(site_data[this.idx]);
         };
         marker.click = function(){
           this.pop();
@@ -169,8 +171,8 @@
         :plain
           //var map = dijit.byId(@project);
           //var map = getElementById('#{@project.id}');
-          //var item = this.getItem(idx);
-          pmarkers[idx].pop();
+          var item = this.getItem(idx);
+          pmarkers[item.idx].pop();
       %thead
         %tr
           %th{:field=>"name", :width=>"175px", :filterable=>true} Name
