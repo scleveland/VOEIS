@@ -1,0 +1,7 @@
+= link_to "?","#", :onClick=>"dijit.byId('#{@id}').show();"
+
+%div{:dojoType=>"dijit.Dialog", :title =>"Help", :id=>@id}
+  =@text
+
+:javascript
+  dojo.require("dijit.Dialog");
