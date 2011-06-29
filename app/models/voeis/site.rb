@@ -40,6 +40,7 @@ class Voeis::Site
   property :local_x,             Float,   :required => false
   property :local_y,             Float,   :required => false
   property :local_projection_id, Integer, :required => false
+  property :local_projection,    String,  :required => false
   property :pos_accuracy_m,      Float,   :required => false
   property :state,               String,  :required => true
   property :county,              String,  :required => false
