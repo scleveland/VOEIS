@@ -178,7 +178,7 @@
 
       #bottom.claro{:dojoType => "dijit.layout.ContentPane", :region => "bottom", :gutters => "false", :style => "padding:0"}
         #footer
-          #yogo-brand
+          #yogo-brand{:style=>"display:inline;"}
             = link_to(image_tag("partners/uky.nobox.png", :alt => "University of Kentucky logo", :title => "University of Kentucky"), 'http://www.uky.edu') 
             = link_to(image_tag("partners/umt.black.gif", :alt => "The University of Montana logo", :title => "The University of Montana"), 'http://www.umt.edu') 
             = link_to(image_tag("partners/FLBS.png", :alt => "Flathead Lake Biological Station logo", :title => "Flathead Lake Biological Station"), 'http://www.umt.edu/FLBS/') 
@@ -189,3 +189,12 @@
             = link_to(image_tag("partners/murray.png", :alt => "Murray State University logo", :title => "Murray State University"), 'http://www.murraystate.edu') 
             = link_to(image_tag("partners/yerc.png", :alt => "Yellowstone Ecological Research Center logo", :title => "Yellowstone Ecological Research Center"), 'http://www.yellowstoneresearch.org')
             = link_to(image_tag("partners/yogo.png", :alt => "The Yogo Data Management Toolkit logo", :title => "The Yogo Data Management Toolkit"), 'http://yogo.msu.montana.edu/')
+          #supported-browsers{:style=>"display:inline;float:right;"}
+            Supported browsers:
+            %br
+            = link_to(image_tag("browser-icons/browsers-icon-firefox-30.jpg", :alt => "FireFox browser logo", :align => "left", :title=>"FireFox browser"), 'http://www.mozilla.com', {:target=>'_blank'})
+            = link_to(image_tag("browser-icons/browsers-icon-chrome-30.jpg", :alt => "Chrome browser logo", :align => "left", :title=>"Chrome browser"), 'http://www.google.com/chrome/', {:target=>'_blank'})
+            = link_to(image_tag("browser-icons/browsers-icon-safari-30.jpg", :alt => "Safari browser logo", :align => "left", :title=>"Safari browser"), 'http://www.apple.com/safari/download/', {:target=>'_blank'})
+            = link_to(image_tag("browser-icons/browsers-icon-opera-30.jpg", :alt => "Opera browser logo", :align => "left", :title=>"Opera browser"), 'http://www.opera.com/download/', {:target=>'_blank'})
+            %br
+            
