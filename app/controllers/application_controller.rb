@@ -10,6 +10,7 @@ class ApplicationController < ActionController::Base
   
   has_widgets do |root|
     root << widget(:feedback, 'feedback')
+    root << widget(:help_text)
   end
   
   # Check for local connections before anything else
