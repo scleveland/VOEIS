@@ -9,7 +9,11 @@ class Voeis::SitesController < Voeis::BaseController
             :collection_name => 'sites',
             :instance_name => 'site',
             :resource_class => Voeis::Site
-
+   
+  has_widgets do |root|
+    root << widget(:vertical_datum)
+  end
+  
   def new
     @project = parent
     @sites = Voeis::Site.all
