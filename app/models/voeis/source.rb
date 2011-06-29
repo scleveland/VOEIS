@@ -5,17 +5,17 @@ class Voeis::Source
 
 
   property :id,                 Serial
-  property :organization,       String,  :required => true                      , :format => /[^\t|\n|\r]/
-  property :source_description, String,  :required => true
-  property :source_link,        String
+  property :organization,       String,  :required => true                      , :format => /[^\t|\n|\r]/, :length => 512
+  property :source_description, Text,  :required => true
+  property :source_link,        String, :length => 512
   property :contact_name,       String,  :required => true, :default => "Unknown", :format => /[^\t|\n|\r]/
   property :phone,              String,  :required => true, :default => "Unknown", :format => /[^\t|\n|\r]/
-  property :email,              String,  :required => true, :default => "Unknown", :format => :email_address
-  property :address,            String,  :required => true, :default => "Unknown", :format => /[^\t|\n|\r]/
+  property :email,              String,  :required => true, :default => "Unknown", :format => :email_address, :length => 512
+  property :address,            String,  :required => true, :default => "Unknown", :format => /[^\t|\n|\r]/, :length => 512
   property :city,               String,  :required => true, :default => "Unknown", :format => /[^\t|\n|\r]/
   property :state,              String,  :required => true, :default => "Unknown", :format => /[^\t|\n|\r]/
   property :zip_code,           String,  :required => true, :default => "Unknown", :format => /[^\t|\n|\r]/
-  property :citation,           String,  :required => true, :default => "Unknown"
+  property :citation,           String,  :required => true, :default => "Unknown", :length => 512
   property :metadata_id,        Integer, :required => true, :default => 0
 
   timestamps :at
