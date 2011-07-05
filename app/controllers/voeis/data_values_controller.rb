@@ -1190,36 +1190,33 @@ class Voeis::DataValuesController < Voeis::BaseController
 
        if !data_stream.data_stream_columns.first(:name => "Timestamp").nil?
          @timestamp_col = data_stream.data_stream_columns.first(:name => "Timestamp").column_number
-      else
-        @timestamp_col = -1
-      end
-      @sample_col = data_stream.data_stream_columns.first(:name => "SampleID").column_number
+       else
+         @timestamp_col = -1
+       end
+       @sample_col = data_stream.data_stream_columns.first(:name => "SampleID").column_number
     end #end if 
       
      range = params[:row_size].to_i - 1
      #store all the Variables in the managed repository
      @col_vars = Array.new
      (0..range).each do |i|
-       if columns_array[i] != nil && ignore_array[i] != i && i != timestamp_col && i != sample_id_col && i != vertical_offset_col && ending_vertical_offset_col != i && meta_tag_array[i].to_i == -1
+       if columns_array[i] != nil && columns_array[i] != "ignore" && ignore_array[i] != i && i != timestamp_col && i != sample_id_col && i != vertical_offset_col && ending_vertical_offset_col != i && meta_tag_array[i].to_i == -1
          @var = Voeis::Variable.get(columns_array[i].to_i)
-         parent.managed_repository do
-           if !params["ignore"+i.to_s]            
-             variable = Voeis::Variable.first_or_create(
-                        :variable_code => @var.variable_code,
-                        :variable_name => @var.variable_name,
-                        :speciation =>  @var.speciation,
-                        :variable_units_id => @var.variable_units_id,
-                        :sample_medium =>  @var.sample_medium,
-                        :value_type => @var.value_type,
-                        :is_regular => @var.is_regular,
-                        :time_support => @var.time_support,
-                        :time_units_id => @var.time_units_id,
-                        :data_type => @var.data_type,
-                        :general_category => @var.general_category,
-                        :no_data_value => @var.no_data_value)
-              @col_vars[i] = variable
-              #site.variables << variable
-            end #end if
+         parent.managed_repository do 
+           variable = Voeis::Variable.first_or_create(
+                      :variable_code => @var.variable_code,
+                      :variable_name => @var.variable_name,
+                      :speciation =>  @var.speciation,
+                      :variable_units_id => @var.variable_units_id,
+                      :sample_medium =>  @var.sample_medium,
+                      :value_type => @var.value_type,
+                      :is_regular => @var.is_regular,
+                      :time_support => @var.time_support,
+                      :time_units_id => @var.time_units_id,
+                      :data_type => @var.data_type,
+                      :general_category => @var.general_category,
+                      :no_data_value => @var.no_data_value)
+            @col_vars[i] = variable
           end#managed repo
         end #end if
      end  #end i loop
@@ -1251,7 +1248,7 @@ class Voeis::DataValuesController < Voeis::BaseController
             end #data_stream_columns
            parent.managed_repository do
              #create sample
- 
+             @site = Voeis::Site.get(site.id)
              #calculate the correct local_offset
              sample_datetime = Chronic.parse(@csv_row[row][timestamp_col]).to_datetime
              if !params[:DST].nil?
@@ -1263,9 +1260,13 @@ class Voeis::DataValuesController < Voeis::BaseController
              end
              #if the timestamp is in UTC then don't apply the calculate utc_offset just use 0
              if params[:time_support] == "UTC"
-              sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,sample_datetime.day,sample_datetime.hour,sample_datetime.min, sample_datetime.sec, 0)
+               sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,
+                            sample_datetime.day,sample_datetime.hour,sample_datetime.min, 
+                            sample_datetime.sec, 0)
              else
-             sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,sample_datetime.day,sample_datetime.hour,sample_datetime.min, sample_datetime.sec, utc_offset/24.to_f)
+               sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,
+                            sample_datetime.day,sample_datetime.hour,sample_datetime.min,
+                            sample_datetime.sec, utc_offset/24.to_f)
              end
              
              @sample = Voeis::Sample.new(:sample_type =>   params[:sample_type],
@@ -1273,18 +1274,21 @@ class Voeis::DataValuesController < Voeis::BaseController
                                          :lab_sample_code => @csv_row[row][@sample_col],
                                          :lab_method_id => -1,
                                          :local_date_time => sampletime)           
-             @sample.valid?
-             puts @sample.errors.inspect()
-             
              @sample.save
-             site.samples << @sample
-             site.save
-             #@sample.sites << site
-             @col_vars.map{|var| @sample.variables << var}
-             @sample.save
+             @site.samples << @sample
+             @site.save
+             @col_vars.each do |var| 
+               if !var.nil?
+                 var.samples << @sample
+                 var.save
+               end
+             end
              
              (0..range).each do |i|
-               if columns_array[i] != "ignore" && sample_id_col != i && timestamp_col != i && @csv_row[row][i] != ""&& !params["ignore"+i.to_s] && columns_array[i] != nil && vertical_offset_col != i && ending_vertical_offset_col != i && meta_tag_array[i].to_i  == -1
+               puts i
+               if columns_array[i] != "ignore" && sample_id_col != i && timestamp_col != i &&
+                  columns_array[i] != nil && vertical_offset_col != i && 
+                  ending_vertical_offset_col != i && meta_tag_array[i].to_i == -1
 
                    new_data_val = Voeis::DataValue.new(:data_value => /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(@csv_row[row][i].to_s) ? @csv_row[row][i].to_f : -9999.0, 
                       :local_date_time => sampletime,
@@ -1295,23 +1299,19 @@ class Voeis::DataValuesController < Voeis::BaseController
                       :quality_control_level=>@col_vars[i].quality_control.to_i,
                       :string_value =>  @csv_row[row][i].blank? ? "Empty" : @csv_row[row][i],
                       :vertical_offset =>  vertical_offset_col == "" ? 0.0 : @csv_row[row][vertical_offset_col].to_i,
-                      :end_vertical_offset => end_vertical_offset_col == "" ? nil : @csv_row[row][end_vertical_offset_col].to_i) 
-                 new_data_val.valid?
-                 puts new_data_val.errors.inspect() 
+                      :end_vertical_offset => ending_vertical_offset_col == "" ? nil : @csv_row[row][ending_vertical_offset_col].to_i) 
                  new_data_val.save
-                 site.data_values << new_data_val
-                 site.save
+                 @site.data_values << new_data_val
+                 @site.save
                  new_data_val.variable << @col_vars[i]
                  new_data_val.source = @project_source
                  new_data_val.sample << @sample
                  row_meta_tag_array.map{|mtag| new_data_val.meta_tags << mtag}  #add meta_data
                  new_data_val.save
-                 if params[:save_template] == "yes"
-                   new_data_val.data_streams << data_stream
-                   new_data_val.save
-                   @sample.data_streams << data_stream
-                   @sample.save
-                 end
+                 new_data_val.data_streams << data_stream
+                 new_data_val.save
+                 @sample.data_streams << data_stream
+                 @sample.save
                 end #end if
                end #end i loop
               end #end if @csv_array.nil?
