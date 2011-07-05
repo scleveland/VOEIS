@@ -1174,11 +1174,23 @@ class Voeis::DataValuesController < Voeis::BaseController
             ending_vertical_offset_col = i-1
        end
      end
-     
-
+     if !params[:DST].nil?
+       utc_offset = params[:utc_offset].to_i + 1
+       dst = true
+     else
+      utc_offset = params[:utc_offset].to_i
+      dst = false
+     end
+     #if the timestamp is in UTC then don't apply the calculate utc_offset just use 0
+     if params[:time_support] == "UTC"
+       dstream_utc_offset = 0
+     else
+       dstream_utc_offset = utc_offset
+     end
+     debugger
      #use this when we decide to save templates and reuse them
      if params[:save_template] == "yes"
-       data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array)
+       data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array, dstream_utc_offset, dst)
      end
      @sample_col = params[:sample_id].to_i
        
@@ -1251,23 +1263,9 @@ class Voeis::DataValuesController < Voeis::BaseController
              @site = Voeis::Site.get(site.id)
              #calculate the correct local_offset
              sample_datetime = Chronic.parse(@csv_row[row][timestamp_col]).to_datetime
-             if !params[:DST].nil?
-               utc_offset = params[:utc_offset].to_i + 1
-               dst = true
-             else
-              utc_offset = params[:utc_offset].to_i
-              dst = false
-             end
-             #if the timestamp is in UTC then don't apply the calculate utc_offset just use 0
-             if params[:time_support] == "UTC"
-               sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,
-                            sample_datetime.day,sample_datetime.hour,sample_datetime.min, 
-                            sample_datetime.sec, 0)
-             else
-               sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,
-                            sample_datetime.day,sample_datetime.hour,sample_datetime.min,
-                            sample_datetime.sec, utc_offset/24.to_f)
-             end
+             sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,
+                          sample_datetime.day,sample_datetime.hour,sample_datetime.min,
+                          sample_datetime.sec, data_stream.utc_offset/24.to_f)
              
              @sample = Voeis::Sample.new(:sample_type =>   params[:sample_type],
                                          :material => params[:sample_medium],
@@ -1328,14 +1326,16 @@ class Voeis::DataValuesController < Voeis::BaseController
    
    
    #columns is an array of the columns that store the variable id
-   def create_sample_and_data_parsing_template(template_name, timestamp_col, sample_id_col, columns_array, ignore_array, site, datafile, start_line, row_size, vertical_offset_col, ending_vertical_offset_col, meta_tag_array)
+   def create_sample_and_data_parsing_template(template_name, timestamp_col, sample_id_col, columns_array, ignore_array, site, datafile, start_line, row_size, vertical_offset_col, ending_vertical_offset_col, meta_tag_array, utc_offset, dst)
       @data_stream
       parent.managed_repository do
         @data_stream = Voeis::DataStream.create(:name => template_name.to_s,
           :description => "NA",
           :filename => datafile,
           :start_line => start_line.to_i,
-          :type => "Sample")
+          :type => "Sample",
+          :utc_offset => utc_offset,
+          :DST => dst)
         #Add site association to data_stream
 
         @data_stream.sites << site
