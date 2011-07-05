@@ -47,6 +47,7 @@ class Voeis::DataValuesController < Voeis::BaseController
     @project = parent
     @data_templates = parent.managed_repository{Voeis::DataStream.all(:type => "Sample")}
     @general_categories = Voeis::GeneralCategoryCV.all
+    @sites = parent.managed_repository{Voeis::Site.all}
   end
 
   # Gather information necessary to store samples and data
@@ -1014,17 +1015,25 @@ class Voeis::DataValuesController < Voeis::BaseController
            
            
            
-           @site_offset = Hash.new
-           @sites = {"None"=>"None"}
-           parent.managed_repository{Voeis::Site.all}.each do |s|
-             @sites = @sites.merge({s.name => s.id})
-             @site_offset = @site_offset.merge({s.id => s.time_zone_offset})
-             if s.time_zone_offset.to_s == "unknown"
-               begin
-                 s.fetch_time_zone_offset
-               rescue
-                 #do nothing
-               end
+           # @site_offset = Hash.new
+           # @sites = {"None"=>"None"}
+           # parent.managed_repository{Voeis::Site.all}.each do |s|
+           #   @sites = @sites.merge({s.name => s.id})
+           #   @site_offset = @site_offset.merge({s.id => s.time_zone_offset})
+           #   if s.time_zone_offset.to_s == "unknown"
+           #     begin
+           #       s.fetch_time_zone_offset
+           #     rescue
+           #       #do nothing
+           #     end
+           #   end
+           # end
+           @site = parent.managed_repository{Voeis::Site.get(params[:site_id].to_i)}
+           if @site.time_zone_offset.to_s == "unknown"
+             begin
+               @site.fetch_time_zone_offset
+             rescue
+               #do nothing
              end
            end
            @utc_offset_options=Hash.new

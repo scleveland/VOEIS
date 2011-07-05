@@ -32,17 +32,21 @@ Form Progress:
   :query=>"{type:'general_category'}", :rootId=>"general_categoryid", :rootLabel=>"Variable General Categories",:childrenAttrs=>"children"}
   #column_panes
     %div{:dojoType=>"dijit.TitlePane", :title=>"Sample Information", :id=> "samplePane"}
-      Please Select the Information that will be associated with each sample created.
+      %h2 
+        Please Setup the Information that will be associated with each sample created.
+      Data Parsing Template Name:
+      =text_field_tag("template_name")
+      =check_box_tag("save_template", "yes", false)       
+      Save Parsing Template.
+      =clear_break
+
+      =clear_break
+      The Site to associate with all Samples: #{@site.name+'|'+@site.code}
+      -#=select_tag("site", options_for_select(@sites, "None"), :onChange=>"updateSite()")
+      =hidden_field_tag("site", @site.id)
       =clear_break
       %label{:id => "source_label", :onclick=>"dijit.byId('new_source').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Choose A Source:
       =select_tag("source", options_for_select(@sources, "None"), :onChange=>"updateSource()")
-      =clear_break
-      %label{:id=>"site_label"}
-        Choose A Site:
-      %div{:dojoType=>"dijit.Tooltip", :connectId=> "site_label", :position=>"above"}
-        Select the Site to associate all the data in this file with.
-      =select_tag("site", options_for_select(@sites, "None"), :onChange=>"updateSite()")
-      =clear_break
       =clear_break
       -#selectedSite
       -#  Currenlty Selected Site:  
@@ -312,8 +316,7 @@ Form Progress:
     Source to Associate with All Samples:
     %span{:id=>"source_span"}None
     %br
-    Site to Associate with All Samples:
-    %span{:id => "site_span", :class =>"var_spans"}None
+    Site to Associate with All Samples: #{@site.name+'|'+@site.code}
     =clear_break
     =clear_break
     %table
@@ -346,11 +349,7 @@ Form Progress:
             %td
               %span{:id => "var_td_"+prop.to_s+"_"+col.to_s, :onClick=>"editColumn(#{col})", :class=>"column_td"}None
   =clear_break
-  Data Parsing Template Name:
-  =text_field_tag("template_name")
-  =check_box_tag("save_template", "yes", false)       
-  Save Parsing Template.
-  =clear_break   
+  
   =submit_tag("Save Samples")
   = link_to('Cancel', project_path(@project), :class => 'icon icon-cancel')
 
