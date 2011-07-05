@@ -22,7 +22,9 @@ class Voeis::DataStream
   property :filename,    String,  :required => true, :length => 512
   property :start_line,  Integer, :required => true, :default => 0
   property :type,        String,  :required => true, :default => "Sensor"
-
+  property :utc_offset,  Integer, :required => false
+  property :DST,         Boolean, :required => false
+  
   yogo_versioned
 
   validates_uniqueness_of   :name
