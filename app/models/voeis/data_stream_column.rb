@@ -30,4 +30,5 @@ class Voeis::DataStreamColumn
   has n, :variables,    :model => 'Voeis::Variable', :through => Resource
   has n, :units,        :model => 'Voeis::Unit', :through=> Resource
   has n, :data_streams, :model => "Voeis::DataStream", :through => Resource
+  has 1, :meta_tag,     :model => "Voeis::MetaTag", :through => Resource
 end

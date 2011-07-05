@@ -74,6 +74,7 @@ Form Progress:
     - @columns.each do |col|
       =hidden_field_tag "tag_column"+col.to_s, "-1"
       =hidden_field_tag "column"+col.to_s, :onChange=>"updateVarSpans(#{col.to_s})";
+      =hidden_field_tag "ignore"+col.to_s;
       %div{:id => "Column"+col.to_s, :dojoType=>"dijit.TitlePane", :title=>"Column"+col.to_s, :open => "false", :class => "column_panes", :toggleable=>"false"}
         = "Header Information:"
         =clear_break
@@ -201,6 +202,7 @@ Form Progress:
             }
             if($("#column#{col.to_s}").val() == "ignore"){
             $("#column#{col.to_s}").val("");
+            $("#ignore#{col.to_s}").val(-1);
             dijit.byId("ignore_column#{col.to_s}").attr("disabled", false);
             }
             if($("#column#{col.to_s}").val() == "batch"){
@@ -245,6 +247,7 @@ Form Progress:
             dijit.byId("next#{col.to_s}").set("disabled", false);
             dijit.byId("Column#{col.to_s}").set("title", "Column#{col.to_s}: "+ item[0]["variable_name"] + ":" + item[0]["id"]);
             $("#column#{col}").val(item[0]["id"]);
+            $("#tag_column#{col}").val(-1);
             dijit.byId('variable_dialog#{col.to_s}').hide();
             dijit.byId("next#{col.to_s}").focus();
             dijit.byId("next#{col.to_s}").set("label","Next");
@@ -271,6 +274,7 @@ Form Progress:
             }
             if($("#column#{col.to_s}").val() == "ignore"){
             $("#column#{col.to_s}").val("");
+            $("#ignore#{col.to_s}").val(-1);
             dijit.byId("ignore_column#{col.to_s}").set("disabled", false);
             }
             if($("#column#{col.to_s}").val() == "batch"){
@@ -467,6 +471,7 @@ Form Progress:
   $("#var_span"+column).text("Batch Results");
   $("#var_td_variable_name_"+column).text("Batch Results");
   $("#column"+column).val("batch");
+  $("#tag_column"+column).val(#{@batch.id});
 
   $("#var_td_speciation_"+column).text("NA");
   $("#var_td_variable_units_id_"+column).text("NA");
@@ -505,6 +510,7 @@ Form Progress:
   }
   if($("#column"+column).val() == "ignore"){
   $("#column"+column).val().val("");
+  $("#ignore"+column).val(-1);
   dijit.byId("ignore_column"+column).set("disabled", false);
   }
   }
@@ -516,7 +522,9 @@ Form Progress:
   $("#var_span"+column).text("Ignore");
   $("#var_td_variable_name_"+column).text("Ignore");
   $("#column"+column).val("ignore");
-
+  $("#tag_column"+column).val(-1);
+  $("#ignore"+column).val(column);
+ 
   $("#var_td_speciation_"+column).text("NA");
   $("#var_td_variable_units_id_"+column).text("NA");
   $("#var_td_sample_medium_"+column).text("NA");
@@ -566,6 +574,7 @@ Form Progress:
   $("#var_td_variable_name_"+column).text("Sample ID");
   $("#sample_id_column").val(""+column);
   $("#column"+column).val("sample_id");
+  $("#tag_column"+column).val(-1);
 
   $("#var_td_speciation_"+column).text("NA");
   $("#var_td_variable_units_id_"+column).text("NA");
@@ -616,6 +625,7 @@ Form Progress:
   $("#var_td_variable_name_"+column).text("Timestamp");
   $("#timestamp_column").val(""+column);
   $("#column"+column).val("timestamp");
+  $("#tag_column"+column).val(-1);
   $("#var_td_speciation_"+column).text("NA");
   $("#var_td_variable_units_id_"+column).text("NA");
   $("#var_td_quality_control_"+column).text("NA");
@@ -641,6 +651,7 @@ Form Progress:
   }
   if($("#column"+column).val() == "ignore"){
   $("#column"+column).val().val("");
+  $("#ignore"+column).val(-1); 
   dijit.byId("ignore_column"+column).set("disabled", false);
   }
   if($("#starting_vertical_offset_column").val() == column){
@@ -665,6 +676,7 @@ Form Progress:
   $("#var_td_variable_name_"+column).text("Vertical Offset");
   $("#vertical_offset_column").val(""+column);
   $("#column"+column).val("vertical_offset");
+  $("#tag_column"+column).val(-1);
   $("#var_td_speciation_"+column).text("NA");
   $("#var_td_variable_units_id_"+column).text("NA");
   $("#var_td_sample_medium_"+column).text("NA");
@@ -714,6 +726,8 @@ Form Progress:
   $("#var_td_variable_name_"+column).text("Starting Vertical Offset");
   $("#starting_vertical_offset_column").val(""+column);
   $("#column"+column).val("starting_vertical_offset");
+  $("#tag_column"+column).val(-1);
+  
   $("#var_td_speciation_"+column).text("NA");
   $("#var_td_variable_units_id_"+column).text("NA");
   $("#var_td_sample_medium_"+column).text("NA");
@@ -740,6 +754,7 @@ Form Progress:
   if($("#column"+column).val() == "ignore"){
   $("#column"+column).val().val("");
   dijit.byId("ignore_column"+column).set("disabled", false);
+  $("#ignore"+column).val(-1);
   }
   if($("#ending_vertical_offset_column").val() == column){
   $("#ending_vertical_offset_column").val("");
@@ -759,6 +774,7 @@ Form Progress:
   $("#var_td_variable_name_"+column).text("Ending Vertical Offset");
   $("#ending_vertical_offset_column").val(""+column);
   $("#column"+column).val("ending_vertical_offset");
+  $("#tag_column"+column).val(-1);
   $("#var_td_speciation_"+column).text("NA");
   $("#var_td_variable_units_id_"+column).text("NA");
   $("#var_td_sample_medium_"+column).text("NA");
@@ -784,6 +800,7 @@ Form Progress:
   }
   if($("#column"+column).val() == "ignore"){
   $("#column"+column).val().val("");
+  $("#ignore"+column).val(-1);
   dijit.byId("ignore_column"+column).set("disabled", false);
   }
   if($("#vertical_offset_column").val() == column){

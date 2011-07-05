@@ -1058,6 +1058,7 @@ class Voeis::DataValuesController < Voeis::BaseController
            @speciations = Voeis::SpeciationCV.all
            @data_types = Voeis::DataTypeCV.all
            @general_categories = Voeis::GeneralCategoryCV.all
+           @batch = Voeis::MetaTag.first_or_create(:name => "Batch", :category =>"Chemistry")
     
            @label_array = Array["Variable Name","Variable Code","Unit Name","Speciation","Sample Medium","Value Type","Is Regular","Time Support","Time Unit ID","Data Type","General Cateogry"]
            @current_variables = Array.new     
@@ -1109,12 +1110,13 @@ class Voeis::DataValuesController < Voeis::BaseController
    #
    # @api public
    def store_samples_and_data_from_file
-     require 'chronic'
+     require 'chronic'  #for robust timestamp parsing
      data_stream =""
      timestamp_col =""
      sample_id_col = ""
      vertical_offset_col = ""
-     
+     starting_vertical_offset_col = ""
+     ending_vertical_offset_col = ""
      site = parent.managed_repository{Voeis::Site.first(:id => params[:site])}
      redirect_path =Hash.new
      @source = Voeis::Source.get(params[:source])
@@ -1155,23 +1157,28 @@ class Voeis::DataValuesController < Voeis::BaseController
      #create and save new DataStream
      columns_array = Array.new
      ignore_array = Array.new
+     meta_tag_array = Array.new
      (1..params[:row_size].to_i).each do |i|
        columns_array[i-1]  = params["column"+i.to_s]
        ignore_array[i-1] = params["ignore"+i.to_s]
+       meta_tag_array[i-1] = params["tag_column"+i.to_s]
        if params["column"+i.to_s] == "timestamp"
          timestamp_col = i-1
        elsif params["column"+i.to_s] == "sample_id"
          sample_id_col = i-1
        elsif params["column"+i.to_s] == "vertical_offset"
           vertical_offset_col = i-1
+       elsif params["column"+i.to_s] == "starting_vertical_offset"
+           vertical_offset_col = i-1
+       elsif params["column"+i.to_s] == "ending_vertical_offset"
+            ending_vertical_offset_col = i-1
        end
      end
      
 
      #use this when we decide to save templates and reuse them
      if params[:save_template] == "yes"
-       
-       data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size])
+       data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array)
      end
      @sample_col = params[:sample_id].to_i
        
@@ -1189,12 +1196,11 @@ class Voeis::DataValuesController < Voeis::BaseController
       @sample_col = data_stream.data_stream_columns.first(:name => "SampleID").column_number
     end #end if 
       
-     
      range = params[:row_size].to_i - 1
      #store all the Variables in the managed repository
      @col_vars = Array.new
      (0..range).each do |i|
-       if columns_array[i] != nil && columns_array[i] != "ignore" && i != timestamp_col && i != sample_id_col && i != vertical_offset_col
+       if columns_array[i] != nil && ignore_array[i] != i && i != timestamp_col && i != sample_id_col && i != vertical_offset_col && ending_vertical_offset_col != i && meta_tag_array[i].to_i == -1
          @var = Voeis::Variable.get(columns_array[i].to_i)
          parent.managed_repository do
            if !params["ignore"+i.to_s]            
@@ -1212,17 +1218,17 @@ class Voeis::DataValuesController < Voeis::BaseController
                         :general_category => @var.general_category,
                         :no_data_value => @var.no_data_value)
               @col_vars[i] = variable
+              #site.variables << variable
             end #end if
           end#managed repo
         end #end if
      end  #end i loop
- 
+     #site.save
      #create csv_row array
      @csv_row = Array.new
      csv_temp_data = CSV.read(params[:datafile])
      csv_size = csv_temp_data.length
      csv_data = CSV.read(params[:datafile])
-     
      
      i = params[:start_line].to_i
      csv_data[params[:start_line].to_i-1..-1].each do |row|
@@ -1231,9 +1237,22 @@ class Voeis::DataValuesController < Voeis::BaseController
      end#end row loop
          (params[:start_line].to_i-1..csv_size.to_i).each do |row|
            if !@csv_row[row].nil?
+           #create meta_tag_data
+            row_meta_tag_array = Array.new #store the current rows MetaTagData objects for association later
+            data_stream.data_stream_columns.all(:name=>"MetaTag").each do |col| 
+              @mtag = col.meta_tag
+              parent.managed_repository do
+                mdtag = Voeis::MetaTag.new(:name=>@mtag.name, :category=>@mtag.category)
+                mdtag.value = @csv_row[row][col.column_number]
+                
+                mdtag.save
+                row_meta_tag_array << mdtag
+              end #managed_repository
+            end #data_stream_columns
            parent.managed_repository do
              #create sample
  
+             #calculate the correct local_offset
              sample_datetime = Chronic.parse(@csv_row[row][timestamp_col]).to_datetime
              if !params[:DST].nil?
                utc_offset = params[:utc_offset].to_i + 1
@@ -1242,12 +1261,13 @@ class Voeis::DataValuesController < Voeis::BaseController
               utc_offset = params[:utc_offset].to_i
               dst = false
              end
-             
+             #if the timestamp is in UTC then don't apply the calculate utc_offset just use 0
              if params[:time_support] == "UTC"
               sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,sample_datetime.day,sample_datetime.hour,sample_datetime.min, sample_datetime.sec, 0)
              else
              sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,sample_datetime.day,sample_datetime.hour,sample_datetime.min, sample_datetime.sec, utc_offset/24.to_f)
              end
+             
              @sample = Voeis::Sample.new(:sample_type =>   params[:sample_type],
                                          :material => params[:sample_medium],
                                          :lab_sample_code => @csv_row[row][@sample_col],
@@ -1257,11 +1277,15 @@ class Voeis::DataValuesController < Voeis::BaseController
              puts @sample.errors.inspect()
              
              @sample.save
-             @sample.sites << site
+             site.samples << @sample
+             site.save
+             #@sample.sites << site
+             @col_vars.map{|var| @sample.variables << var}
              @sample.save
+             
              (0..range).each do |i|
-               if columns_array[i] != "ignore" && sample_id_col != i && timestamp_col != i && @csv_row[row][i] != ""&& !params["ignore"+i.to_s] && columns_array[i] != nil && vertical_offset_col != i
-                  
+               if columns_array[i] != "ignore" && sample_id_col != i && timestamp_col != i && @csv_row[row][i] != ""&& !params["ignore"+i.to_s] && columns_array[i] != nil && vertical_offset_col != i && ending_vertical_offset_col != i && meta_tag_array[i].to_i  == -1
+
                    new_data_val = Voeis::DataValue.new(:data_value => /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(@csv_row[row][i].to_s) ? @csv_row[row][i].to_f : -9999.0, 
                       :local_date_time => sampletime,
                       :utc_offset => utc_offset,
@@ -1270,17 +1294,17 @@ class Voeis::DataValuesController < Voeis::BaseController
                       :replicate => 0,
                       :quality_control_level=>@col_vars[i].quality_control.to_i,
                       :string_value =>  @csv_row[row][i].blank? ? "Empty" : @csv_row[row][i],
-                      :vertical_offset =>  vertical_offset_col == "" ? nil : @csv_row[row][vertical_offset_col].to_i) 
+                      :vertical_offset =>  vertical_offset_col == "" ? 0.0 : @csv_row[row][vertical_offset_col].to_i,
+                      :end_vertical_offset => end_vertical_offset_col == "" ? nil : @csv_row[row][end_vertical_offset_col].to_i) 
                  new_data_val.valid?
                  puts new_data_val.errors.inspect() 
                  new_data_val.save
                  site.data_values << new_data_val
                  site.save
                  new_data_val.variable << @col_vars[i]
-                 new_data_val.save
                  new_data_val.source = @project_source
-                 new_data_val.save
                  new_data_val.sample << @sample
+                 row_meta_tag_array.map{|mtag| new_data_val.meta_tags << mtag}  #add meta_data
                  new_data_val.save
                  if params[:save_template] == "yes"
                    new_data_val.data_streams << data_stream
@@ -1288,15 +1312,6 @@ class Voeis::DataValuesController < Voeis::BaseController
                    @sample.data_streams << data_stream
                    @sample.save
                  end
-                 @sample.variables << @col_vars[i]
-                 @sample.save
-                 samp_site = @sample.sites.first
-                 samp_site.variables << @col_vars[i]
-                 samp_site.save
-                 # @sample.sites.each do |samp_site|
-                 #                    samp_site.variables << @col_vars[i]
-                 #                    samp_site.save
-                 #                  end
                 end #end if
                end #end i loop
               end #end if @csv_array.nil?
@@ -1313,7 +1328,7 @@ class Voeis::DataValuesController < Voeis::BaseController
    
    
    #columns is an array of the columns that store the variable id
-   def create_sample_and_data_parsing_template(template_name, timestamp_col, sample_id_col, columns_array, ignore_array, site, datafile, start_line, row_size)
+   def create_sample_and_data_parsing_template(template_name, timestamp_col, sample_id_col, columns_array, ignore_array, site, datafile, start_line, row_size, vertical_offset_col, ending_vertical_offset_col, meta_tag_array)
       @data_stream
       parent.managed_repository do
         @data_stream = Voeis::DataStream.create(:name => template_name.to_s,
@@ -1325,15 +1340,13 @@ class Voeis::DataValuesController < Voeis::BaseController
 
         @data_stream.sites << site
        @data_stream.save
-      end
+      end #managed_repository
       @timestamp_col = -1
 
       range = row_size.to_i-1
       (0..range).each do |i|
         #create the Timestamp column
         if i == timestamp_col.to_i && timestamp_col != "None"
-          #puts params["column"+i.to_s]
-          @timestamp_col = timestamp_col.to_i
           parent.managed_repository do
             data_stream_column = Voeis::DataStreamColumn.create(
                                   :column_number => i,
@@ -1344,9 +1357,8 @@ class Voeis::DataValuesController < Voeis::BaseController
             data_stream_column.data_streams << @data_stream
 
             data_stream_column.save
-          end
+          end #managed_repository
         elsif i == sample_id_col.to_i
-          @sample_col = sample_id_col.to_i
            parent.managed_repository do
              data_stream_column = Voeis::DataStreamColumn.create(
                                    :column_number => i,
@@ -1356,8 +1368,55 @@ class Voeis::DataValuesController < Voeis::BaseController
                                    :original_var => "NA")
              data_stream_column.data_streams << @data_stream
              data_stream_column.save
-           end
-        elsif  columns_array[i] != nil#create other data_stream_columns and create sensor_types
+           end #managed_repository
+       elsif i == vertical_offset_col.to_i
+          parent.managed_repository do
+            data_stream_column = Voeis::DataStreamColumn.create(
+                                  :column_number => i,
+                                  :name => "VerticalOffset",
+                                  :type =>"VerticalOffset",
+                                  :unit => "NA",
+                                  :original_var => "NA")
+            data_stream_column.data_streams << @data_stream
+            data_stream_column.save
+          end #managed_repository
+        elsif i == ending_vertical_offset_col.to_i
+          parent.managed_repository do
+            data_stream_column = Voeis::DataStreamColumn.create(
+                                  :column_number => i,
+                                  :name => "EndingVerticalOffset",
+                                  :type =>"EndingVerticalOffset",
+                                  :unit => "NA",
+                                  :original_var => "NA")
+            data_stream_column.data_streams << @data_stream
+            data_stream_column.save
+          end #managed_repository
+        elsif  columns_array[i] == "ignore"
+          parent.managed_repository do
+            data_stream_column = Voeis::DataStreamColumn.create(
+                                  :column_number => i,
+                                  :name => "Ignore",
+                                  :type =>"Ignore",
+                                  :unit => "NA",
+                                  :original_var => "NA")
+            data_stream_column.data_streams << @data_stream
+            data_stream_column.save
+          end #managed_repository
+        elsif meta_tag_array[i].to_i != -1
+          @meta_tag = Voeis::MetaTag.get(meta_tag_array[i].to_i)
+          parent.managed_repository do
+            mtag = Voeis::MetaTag.first_or_create(:name => @meta_tag.name, :category=>@meta_tag.category)
+            data_stream_column = Voeis::DataStreamColumn.create(
+                                  :column_number => i,
+                                  :name => "MetaTag",
+                                  :type =>"MetaTag",
+                                  :unit => "NA",
+                                  :original_var => "NA")
+            data_stream_column.data_streams << @data_stream
+            data_stream_column.meta_tag = mtag
+            data_stream_column.save
+          end #managed_repository
+        elsif  columns_array[i] != nil#create other data_stream_columns and create variables
           #puts params["column"+i.to_s]
           var = Voeis::Variable.get(columns_array[i].to_i)
           parent.managed_repository do
@@ -1366,29 +1425,23 @@ class Voeis::DataValuesController < Voeis::BaseController
                                   :name =>         var.variable_code,
                                   :original_var => var.variable_name,
                                   :unit =>         "NA",
-                                  :type =>         "NA")
-            if !ignore_array[i].nil?            
-              variable = Voeis::Variable.first_or_create(
-                          :variable_code => var.variable_code,
-                          :variable_name => var.variable_name,
-                          :speciation =>  var.speciation,
-                          :variable_units_id => var.variable_units_id,
-                          :sample_medium =>  var.sample_medium,
-                          :value_type => var.value_type,
-                          :is_regular => var.is_regular,
-                          :time_support => var.time_support,
-                          :time_units_id => var.time_units_id,
-                          :data_type => var.data_type,
-                          :general_category => var.general_category,
-                          :no_data_value => var.no_data_value)
-              data_stream_column.variables << variable
-              data_stream_column.data_streams << @data_stream
-              data_stream_column.save
-            else
-              data_stream_column.name = "ignore"
-              data_stream_column.data_streams << @data_stream
-              data_stream_column.save
-            end #end if
+                                  :type =>         "NA")           
+            variable = Voeis::Variable.first_or_create(
+                        :variable_code => var.variable_code,
+                        :variable_name => var.variable_name,
+                        :speciation =>  var.speciation,
+                        :variable_units_id => var.variable_units_id,
+                        :sample_medium =>  var.sample_medium,
+                        :value_type => var.value_type,
+                        :is_regular => var.is_regular,
+                        :time_support => var.time_support,
+                        :time_units_id => var.time_units_id,
+                        :data_type => var.data_type,
+                        :general_category => var.general_category,
+                        :no_data_value => var.no_data_value)
+            data_stream_column.variables << variable
+            data_stream_column.data_streams << @data_stream
+            data_stream_column.save
           end #end managed repository
         end #end if
       end #end range.each
