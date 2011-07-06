@@ -976,6 +976,11 @@ class Voeis::DataValuesController < Voeis::BaseController
   #   
   # end
   
+  
+  # pre_process_samples_files
+  # This is the Sample Wizard Upload Second Step for describing how to parse a CSV file
+  # @author Sean Cleveland
+  # @api public
   def pre_process_samples_file
     
        require 'csv_helper'
@@ -1196,7 +1201,6 @@ class Voeis::DataValuesController < Voeis::BaseController
      else
        dstream_utc_offset = utc_offset
      end
-     debugger
      #use this when we decide to save templates and reuse them
      if params[:save_template] == "yes"
        data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array, dstream_utc_offset, dst)

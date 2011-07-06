@@ -20,7 +20,7 @@
 = render(:partial => "source")
 = render(:partial => "metatags")
 %h2
-  Setup File Parsing Options
+  %h2 Sample And Data Upload Wizard: Step 2 (File Parsing Instructions)
 Form Progress:
 
 =form_tag("store_samples_and_data_from_file", :method => :post) do
@@ -35,8 +35,8 @@ Form Progress:
       %h2 
         Please Setup the Information that will be associated with each sample created.
       Data Parsing Template Name:
-      =text_field_tag("template_name")
-      =check_box_tag("save_template", "yes", false)       
+      =text_field_tag("template_name", @data_template.nil? ? "SampleStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d") : @data_template.name, :size => 80 )
+      =check_box_tag("save_template", "yes", @data_template.nil? ? true : false)       
       Save Parsing Template.
       =clear_break
 
@@ -46,32 +46,33 @@ Form Progress:
       =hidden_field_tag("site", @site.id)
       =clear_break
       %label{:id => "source_label", :onclick=>"dijit.byId('new_source').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Choose A Source:
-      =select_tag("source", options_for_select(@sources, "None"), :onChange=>"updateSource()")
+      =select_tag("source", options_for_select(@sources, @data_template.nil? ? "None" : @data_template.samples.first.data_values.first.source.id.to_s), :onChange=>"updateSource()")
       =clear_break
       -#selectedSite
       -#  Currenlty Selected Site:  
       -#  %span{:id => "selected_site", :class=>"var_spans"}None
       -#=clear_break  
       Currently Selected Sample Type:
-      = select_tag('sample_type',  options_for_select(@sample_type_options, "Grab"))
+      = select_tag('sample_type',  options_for_select(@sample_type_options, @data_template.nil? ? "Grab" : @data_template.samples.first.sample_type))
       =clear_break
       Currently Selected Sample Medium:
-      = select_tag('sample_medium',  options_for_select(@sample_medium_options, "Surface Water"), :onChange=>"$('#variable_sample_medium').val($('#sample_medium').val());")
+      = select_tag('sample_medium',  options_for_select(@sample_medium_options, @data_template.nil? ? "Surface Water" : @data_template.samples.first.material), :onChange=>"$('#variable_sample_medium').val($('#sample_medium').val());")
       =clear_break
       
       %div{:dojoType=>"dijit.layout.TabContainer", :id => "timestamp_selection"}
         %div{:dojoType=>"dijit.layout.ContentPane", :title => "Time Support"}
           Indicate which format the timestamp is using:
           %br
-          %input{:type =>"radio", :id=>"utc", :name=>"time_support", :dojoType=>"dijit.form.RadioButton", :value=>"UTC", :onClick=>"utcUpdate();", :disabled=>true}
+          %input{:type =>"radio", :id=>"utc", :name=>"time_support", :dojoType=>"dijit.form.RadioButton", :value=>"UTC", :onClick=>"utcUpdate();", :checked=> @data_template.nil? ? false : @data_template.utc_offset == 0 ? true : false}
             UTC Date Time
-          %input{:type =>"radio", :id=>"local", :name=>"time_support", :dojoType=>"dijit.form.RadioButton", :value=>"Local", :checked=>true, :onClick=>"localUpdate();", :disabled=>true}
+          %input{:type =>"radio", :id=>"local", :name=>"time_support", :dojoType=>"dijit.form.RadioButton", :value=>"Local", :checked=> @data_template.nil? ? true : @data_template.utc_offset == 0 ? false : true, :onClick=>"localUpdate();"}
             Local Date Time
-          %input{:id=>"DST", :name=>"DST", :dojoType=>"dijit.form.CheckBox", :value=>"DST"}
+          %input{:id=>"DST", :name=>"DST", :dojoType=>"dijit.form.CheckBox", :value=>"DST", :checked=> @data_template.nil? ? false : @data_template.DST}
+
             Daylight Savings Time
           =clear_break
           UTC Offset:
-          =select_tag("utc_offset", options_for_select(@utc_offset_options), :disabled=>true)
+          =select_tag("utc_offset", options_for_select(@utc_offset_options, @data_template.nil? ? @site.time_zone_offset.to_i : @data_template.utc_offset))
       %button{:dojoType=>"dijit.form.Button", :title=>"Next", :id=>"next0", :disabled=>"disabled", :onclick=>"sampleButtonClick();" }
         Next
 
@@ -390,7 +391,7 @@ Form Progress:
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
   dojo.require("dijit.form.RadioButton");
   dojo.require("voeis.Server");
-  var current_site_offset ="";
+  var current_site_offset = #{@data_template.nil? ? @site.time_zone_offset : @data_template.utc_offset.nil? ? @site.time_zone_offset : @data_template.utc_offset};
   variableDataStore = voeis.Server.DEFAULT.globalVariablesDataStore();
   var my_store = dojo.data.ItemFileReadStore({data: variable_json_store});
   
