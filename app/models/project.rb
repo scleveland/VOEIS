@@ -61,6 +61,7 @@ class Project
                           "voeis/sensor_type$retrieve",
                           "voeis/sensor_value$retrieve",
                           "voeis/meta_tag$retrieve",
+                          "voeis/source$retrieve",
                           "voeis/site$retrieve",
                           "voeis/site$update",
                           "voeis/unit$retrieve",
@@ -162,6 +163,7 @@ class Project
   manage Voeis::MetaTag
   manage Voeis::SensorType
   manage Voeis::SensorValue
+  manage Voeis::Source
   manage Voeis::Unit
   manage Voeis::Variable
   manage Voeis::LabMethod
