@@ -1205,21 +1205,20 @@ class Voeis::DataValuesController < Voeis::BaseController
      if params[:save_template] == "yes"
        data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array, dstream_utc_offset, dst)
      end
-     @sample_col = params[:sample_id].to_i
-       
-    
-     #put this back in at a later time 
 
      if params[:save_template] == "yes"
        data_stream = parent.managed_repository{Voeis::DataStream.get(data_stream_id[:data_template_id])}
-
-       if !data_stream.data_stream_columns.first(:name => "Timestamp").nil?
-         @timestamp_col = data_stream.data_stream_columns.first(:name => "Timestamp").column_number
-       else
-         @timestamp_col = -1
-       end
+     else
+       data_stream = parent.managed_repository{Voeis::DataStream.get(params[:data_stream_id])}
+       
+     end
+     if !data_stream.data_stream_columns.first(:name => "Timestamp").nil?
+       @timestamp_col = data_stream.data_stream_columns.first(:name => "Timestamp").column_number
+     else
+       @timestamp_col = -1
+     end
        @sample_col = data_stream.data_stream_columns.first(:name => "SampleID").column_number
-    end #end if 
+ 
       
      range = params[:row_size].to_i - 1
      #store all the Variables in the managed repository
