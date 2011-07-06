@@ -20,7 +20,7 @@
 = render(:partial => "source")
 = render(:partial => "metatags")
 %h2
-  Setup File Parsing Options
+  %h2 Sample And Data Upload Wizard: Step 2 (File Parsing Instructions)
 Form Progress:
 
 =form_tag("store_samples_and_data_from_file", :method => :post) do
@@ -35,8 +35,8 @@ Form Progress:
       %h2 
         Please Setup the Information that will be associated with each sample created.
       Data Parsing Template Name:
-      =text_field_tag("template_name")
-      =check_box_tag("save_template", "yes", false)       
+      =text_field_tag("template_name", @data_template.nil? ? "SampleStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d") : @data_template.name, :size => 80 )
+      =check_box_tag("save_template", "yes", @data_template.nil? ? true : false)       
       Save Parsing Template.
       =clear_break
 
@@ -46,32 +46,40 @@ Form Progress:
       =hidden_field_tag("site", @site.id)
       =clear_break
       %label{:id => "source_label", :onclick=>"dijit.byId('new_source').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Choose A Source:
-      =select_tag("source", options_for_select(@sources, "None"), :onChange=>"updateSource()")
+      =select_tag("source", options_for_select(@sources, @data_template.nil? ? "None" : @data_template.samples.first.data_values.first.source.id.to_s), :onChange=>"updateSource()")
       =clear_break
+      =hidden_field_tag("data_stream_id", @data_template.nil? ? "" : @data_template.id.to_s)
+      -if !@data_template.nil? 
+        :javascript
+          dojo.addOnLoad(function(){
+          dijit.byId("next0").set("disabled", false);
+          updateProgressBar();
+          });
       -#selectedSite
       -#  Currenlty Selected Site:  
       -#  %span{:id => "selected_site", :class=>"var_spans"}None
       -#=clear_break  
       Currently Selected Sample Type:
-      = select_tag('sample_type',  options_for_select(@sample_type_options, "Grab"))
+      = select_tag('sample_type',  options_for_select(@sample_type_options, @data_template.nil? ? "Grab" : @data_template.samples.first.sample_type))
       =clear_break
       Currently Selected Sample Medium:
-      = select_tag('sample_medium',  options_for_select(@sample_medium_options, "Surface Water"), :onChange=>"$('#variable_sample_medium').val($('#sample_medium').val());")
+      = select_tag('sample_medium',  options_for_select(@sample_medium_options, @data_template.nil? ? "Surface Water" : @data_template.samples.first.material), :onChange=>"$('#variable_sample_medium').val($('#sample_medium').val());")
       =clear_break
       
       %div{:dojoType=>"dijit.layout.TabContainer", :id => "timestamp_selection"}
         %div{:dojoType=>"dijit.layout.ContentPane", :title => "Time Support"}
           Indicate which format the timestamp is using:
           %br
-          %input{:type =>"radio", :id=>"utc", :name=>"time_support", :dojoType=>"dijit.form.RadioButton", :value=>"UTC", :onClick=>"utcUpdate();", :disabled=>true}
+          %input{:type =>"radio", :id=>"utc", :name=>"time_support", :dojoType=>"dijit.form.RadioButton", :value=>"UTC", :onClick=>"utcUpdate();", :checked=> @data_template.nil? ? false : @data_template.utc_offset == 0 ? true : false}
             UTC Date Time
-          %input{:type =>"radio", :id=>"local", :name=>"time_support", :dojoType=>"dijit.form.RadioButton", :value=>"Local", :checked=>true, :onClick=>"localUpdate();", :disabled=>true}
+          %input{:type =>"radio", :id=>"local", :name=>"time_support", :dojoType=>"dijit.form.RadioButton", :value=>"Local", :checked=> @data_template.nil? ? true : @data_template.utc_offset == 0 ? false : true, :onClick=>"localUpdate();"}
             Local Date Time
-          %input{:id=>"DST", :name=>"DST", :dojoType=>"dijit.form.CheckBox", :value=>"DST"}
+          %input{:id=>"DST", :name=>"DST", :dojoType=>"dijit.form.CheckBox", :value=>"DST", :checked=> @data_template.nil? ? false : @data_template.DST}
+
             Daylight Savings Time
           =clear_break
           UTC Offset:
-          =select_tag("utc_offset", options_for_select(@utc_offset_options), :disabled=>true)
+          =select_tag("utc_offset", options_for_select(@utc_offset_options, @data_template.nil? ? @site.time_zone_offset.to_i : @data_template.utc_offset))
       %button{:dojoType=>"dijit.form.Button", :title=>"Next", :id=>"next0", :disabled=>"disabled", :onclick=>"sampleButtonClick();" }
         Next
 
@@ -79,6 +87,67 @@ Form Progress:
       =hidden_field_tag "tag_column"+col.to_s, "-1"
       =hidden_field_tag "column"+col.to_s, :onChange=>"updateVarSpans(#{col.to_s})";
       =hidden_field_tag "ignore"+col.to_s;
+      -if !@data_template.nil?
+        -if !(ds_col = @data_template.data_stream_columns.first(:column_number => col-1)).nil?
+          -if ds_col.name == "SampleID"
+            :javascript
+              dojo.addOnLoad(function(){
+              assignSample(#{col.to_s});
+              });
+          -elsif ds_col.name == "Timestamp"
+            :javascript
+              dojo.addOnLoad(function(){
+              assignTimestamp(#{col.to_s});
+              });
+          -elsif ds_col.name == "VerticalOffset"
+            :javascript
+              dojo.addOnLoad(function(){
+              assignVerticalOffset(#{col.to_s});
+              });
+          -elsif ds_col.name == "EndingVerticalOffset"
+            :javascript
+              dojo.addOnLoad(function(){
+              assignEndingVerticalOffset(#{col.to_s});
+              });
+          -elsif ds_col.name == "Ignore"
+            :javascript
+              dojo.addOnLoad(function(){
+              assignIgnore(#{col.to_s});
+              });
+          -elsif ds_col.name == "MetaTag"
+            -this_mtag = Voeis::MetaTag.first(:name=>ds_col.meta_tag.name, :category=>ds_col.meta_tag.category)
+            :javascript
+              dojo.addOnLoad(function(){
+              $("#var_span#{col.to_s}").text("Tag: #{this_mtag.name}");
+              $("#var_td_variable_name_#{col.to_s}").text("#{this_mtag.name}");
+              dijit.byId("Column#{col.to_s}").set("title", "Column#{col.to_s}:#{this_mtag.name}:#{this_mtag.category}:#{this_mtag.id.to_s}");
+              $("#column#{col}").val(#{this_mtag.id.to_s});
+              $("#tag_column#{col}").val(#{this_mtag.id.to_s});
+              updateProgressBar();
+              });
+          -else #this is a variable column 
+            -this_var = Voeis::Variable.first(:variable_code=>ds_col.variables.first.variable_code)
+            :javascript
+              dojo.addOnLoad(function(){
+              $("#var_span#{col.to_s}").text("Variable: #{this_var.variable_name}");
+              $("#var_td_variable_name_#{col.to_s}").text("#{this_var.variable_name}");
+              $("#var_td_speciation_#{col.to_s}").text("#{this_var.speciation}");
+              $("#var_td_quality_control_#{col.to_s}").text("#{this_var.quality_control}");
+              $("#var_td_variable_units_id_#{col.to_s}").text("#{this_var.variable_units_id}");
+              $("#var_td_sample_medium_#{col.to_s}").text("#{this_var.sample_medium}");
+              $("#var_td_value_type_#{col.to_s}").text("#{this_var.value_type}");
+              $("#var_td_data_type_#{col.to_s}").text("#{this_var.data_type}");
+              $("#var_td_general_category_#{col.to_s}").text("#{this_var.general_category}");
+              $("#var_td_no_data_value_#{col.to_s}").text("#{this_var.no_data_value}");
+              $("#var_td_detection_limit_#{col.to_s}").text("#{this_var.detection_limit}");
+              dijit.byId("Column#{col.to_s}").set("title", "Column#{col.to_s}: #{this_var.variable_name}:#{this_var.id.to_s}");
+              $("#column#{col}").val("#{this_var.id.to_s}");
+              updateProgressBar();
+              });
+          :javascript
+            dojo.addOnLoad(function(){
+            dijit.byId("next#{col.to_s}").set("disabled", false);
+            });
       %div{:id => "Column"+col.to_s, :dojoType=>"dijit.TitlePane", :title=>"Column"+col.to_s, :open => "false", :class => "column_panes", :toggleable=>"false"}
         = "Header Information:"
         =clear_break
@@ -390,7 +459,7 @@ Form Progress:
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
   dojo.require("dijit.form.RadioButton");
   dojo.require("voeis.Server");
-  var current_site_offset ="";
+  var current_site_offset = #{@data_template.nil? ? @site.time_zone_offset : @data_template.utc_offset.nil? ? @site.time_zone_offset : @data_template.utc_offset};
   variableDataStore = voeis.Server.DEFAULT.globalVariablesDataStore();
   var my_store = dojo.data.ItemFileReadStore({data: variable_json_store});
   
