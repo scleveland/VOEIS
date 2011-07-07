@@ -11,6 +11,7 @@ dojo.declare("yogo.maps.google.DataMap", yogo.maps.google.Map, {
     
     constructor: function() {
         this._markers = [];
+				this._markerhash = {};
         this.setStore(this.store || new dojo.store.Memory());
     },
     setStore: function(store) {
@@ -63,11 +64,37 @@ dojo.declare("yogo.maps.google.DataMap", yogo.maps.google.Map, {
         return new google.maps.LatLng(item.latitude, item.longitude);
     },
     markerFromItem: function(item) {
-        return new google.maps.Marker({
+        var marker = new google.maps.Marker({
             title: this.itemTitle(item),
             position: this.itemPosition(item),
             icon: this.markerIcon
         });
+        var link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/selected\', [\''+item.projectId()+'\', '+item.id+']);"><strong>';
+				var link2 = '</strong></a>';
+				marker.test = 'TESTING-1-2-3';
+				marker.projId = item.projectId();
+				marker.siteId = item.id;
+        marker.info = '<p style="margin:0 15px;">';
+        marker.info += link+this.itemTitle(item)+link2+'<br/>(click for '+link+'SITE DETAILS'+link2+')<br/>';
+        marker.info += '&nbsp;&nbsp; <strong>Code:</strong> '+item.code+'<br/>';
+        marker.info += '&nbsp;&nbsp; <strong>Site ID:</strong> '+item.id+'&nbsp;&nbsp;';
+        marker.info += '&nbsp;&nbsp; <strong>State:</strong> '+item.state+'<br/>';
+        marker.info += '&nbsp;&nbsp; <strong>Lat/Long:</strong> '+item.latitude+', '+item.longitude;
+        //marker.info += item.code+'<br/>Elevation: '+item.elevation_m+'<br/>'
+        //marker.info += item.county+', '+item.state;
+        marker.info += '</p>';
+        marker.window = new google.maps.InfoWindow({content:marker.info});
+        marker.popWin = function(map) {
+          	//this.setIcon(); this.getIcon();
+          	//alert('at POP! markers: '+map._map.getCenter().toString());
+						for(var i=0;i<map._markers.length;i++) {
+            		map._markers[i].window.close();
+            		//this._markers[i].setIcon(this.markerIcon);
+          	};
+          	//this.setIcon(icon_pop);
+          	marker.window.open(map._map, marker);
+        };
+				return marker
     },
     markerBounds: function(markers) {
         var currMarkers = markers || this._markers;
@@ -94,12 +121,28 @@ dojo.declare("yogo.maps.google.DataMap", yogo.maps.google.Map, {
     createMarkers: function() {
         return items.map(dojo.hitch(this, "markerFromItem"));
     },
+    createHashId: function(projId,siteId) {
+				return projId+'>>>'+siteId.toString();
+    },
+    generateHash: function(markers) {
+				var hash_markers = markers || this._markers;
+				var markerhash = {};
+				for(var i=0;i<hash_markers.length;i++) {
+						var marker = hash_markers[i];
+						var hashId = this.createHashId(marker.projId, marker.siteId);
+						markerhash[hashId] = marker;
+				};
+				this._markerhash = markerhash;
+				return markerhash;
+    },
+		markers: this._markers,
     updateMarkers: function(updateBounds) {
         console.log("getting items");
         var items = this.items();
         console.log("mapping items to markers");
         var newMarkers = this.createMarkers();
-        
+				var markerhash = this.generateHash(newMarkers);
+
         dojo.when(newMarkers, dojo.hitch(this, function(markers) {
             console.debug(markers);
             console.log("removing old markers");
@@ -116,10 +159,17 @@ dojo.declare("yogo.maps.google.DataMap", yogo.maps.google.Map, {
                 this._markers.push(marker);                
                 marker.setMap(this._map);
             }, this);
-            
+            this.generateHash();
+
             if(updateBounds) {
                 this.fitBounds();
             }
         }));
-    }
+    },
+		fetchMarker: function(projId,siteId) {
+				var hashId = this.createHashId(projId, siteId);
+				var marker = this._markerhash[hashId];
+				if(marker) return marker;
+				return false;
+		}
 });

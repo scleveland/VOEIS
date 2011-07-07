@@ -26,8 +26,7 @@
       var loading = dijit.byId('loading_dialog');
       var map = dijit.byId('split_map');
       google.maps.event.addListener(map._map, 'center_changed', function(){
-        //alert('ZOOM CHANGED!');
-        //if(loading.css('display')!='none')
+        //MAP ZOOM CHANGED!
         loading.hide();
       });
     });
@@ -37,8 +36,8 @@
   = stylesheet_link_tag("/javascripts/dojox/grid/enhanced/resources/claro/EnhancedGrid.css")
 
 #proj_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"proj_store", :data=>"projects_json"}
-#tab_browser{:dojoType => "dijit.layout.TabContainer"}
-  %table{:id => 'projects_table', :title => "Projects", :dojoType => "dojox.grid.EnhancedGrid", :store => "projectsDataStore", :plugins => "{indirectSelection: true}"}
+#tab_browser{:dojoType=>"dijit.layout.TabContainer"}
+  %table{:id=>'projects_table', :title=>"Projects", :dojoType=>"dojox.grid.EnhancedGrid", :store=>"projectsDataStore", :plugins=>"{indirectSelection: true}"}
     %thead
       %tr
         %th{:field => "name", :width => "auto"} Project 
@@ -53,23 +52,33 @@
         console.log(arguments);
         var map = dijit.byId('split_map');
         var item = this.getItem(idx);
+        var id = item.id;
+        var tab_browser = dijit.byId('right_tabs');    
+        var map_pane = dijit.byId('map_pane');
+        tab_browser.selectChild(map_pane);
         map.store.add(item);
         dijit.byId('loading_dialog').show();
-        //alert('CLICKed!! zoom: '+map._map.getZoom());
+        dojo.publish("voeis/project/browse", [id]);
     %script{:type => "dojo/method", :event => "onDeselected", :args => "idx"}
       :plain
         console.log("deselected:");
         console.log(arguments);
         var map = dijit.byId('split_map');
         var item = this.getItem(idx);
+        var tabs = dijit.byId('tab_browser');
+        var tab_browser = dijit.byId('right_tabs');    
+        var map_pane = dijit.byId('map_pane');
+        tab_browser.selectChild(map_pane);
         map.store.remove(item.id);
+        tabs.closeChild(dijit.byId(item.id));
+        dijit.byId('loading_dialog').show();
 
 :javascript
   (function(){
     var openSiteTab = function(tabs, projectId, siteId) {
       var sitePane = new voeis.ui.SitePane();
       tabs.addChild(sitePane);
-      sitePane.set({projectId: projectId, siteId: siteId});
+      sitePane.set({projectId:projectId, siteId:siteId});
       tabs.selectChild(sitePane);
     };
 

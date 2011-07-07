@@ -22,7 +22,11 @@ dojo.declare("voeis.ui.SitePane", dijit.layout.ContentPane, {
         this.set("title", "Loading...");
         this.set("href", this.server.projectSitePath(this.projectId, this.siteId));
         dojo.when(this.site(), dojo.hitch(this, function(site) {
-            this.set("title", site.name);
+          	var sitename = site.name.slice(0,12);
+						if(site.name.length>12) sitename+='...';
+						if(site.name.length>24) sitename+=site.name.slice(-12);
+						this.set("title", sitename);
+						//this.set("title", site.name);
         }));
     },
 

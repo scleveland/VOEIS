@@ -49,14 +49,31 @@ dojo.declare("voeis.maps.google.ProjectsMap", yogo.maps.google.DataMap, {
         marker._voeisSite = item;
 
         var markerClick = dojo.hitch(this, function(evt){
-            this._siteClick(item);
+            this._siteClick(item,marker);
         });
 
         google.maps.event.addListener(marker, 'click', markerClick);
         return marker;
     },
 
-    _siteClick: function(site) {
-        dojo.publish("voeis/project/site/selected", [site.projectId(), site.id]);
+		_siteClick: function(site,marker) {
+        //dojo.publish("voeis/project/site/selected", [site.projectId(), site.id]);
+				marker.popWin(this);
+        // click table
+        var grid = dijit.byId(site.projectId());
+	      var tabs = dijit.byId('tab_browser');
+	      tabs.selectChild(grid);
+        if(grid) {
+					var col = grid.layout.cells[1];
+	        grid.selection.clear();
+	        grid.selection.addToSelection(site);
+	        for(var i=0; i<grid.rowCount; i++)
+	          if(site.id==grid.getItem(i).id) {
+	            grid.scrollToRow(i);
+	            grid.focus.setFocusCell(col,i);
+	            grid.focus.focusGrid();
+	            break;
+	          };
+				};
     }
 });
