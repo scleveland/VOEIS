@@ -14,8 +14,9 @@ class Voeis::SitesController < Voeis::BaseController
     root << widget(:vertical_datum)
   end
   
+  @project = parent
+  
   def new
-    @project = parent
     @sites = Voeis::Site.all
   end
   
@@ -25,7 +26,8 @@ class Voeis::SitesController < Voeis::BaseController
     # debugger
     #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
     @sites = parent.managed_repository{Voeis::Site.all}
-    @label_array = Array["Sample Type","Lab Sample Code","Sample Medium","Site","Timestamp"]
+    @label_array = Array["Sample Type","Lab Sample Code","Sample Medium","Timestamp"]
+    @field_array = Array["sample_type","lab_sample_code","material","local_date_time"]
     @current_samples = Array.new
     @samples = @site.samples
     @samples.all(:order => [:lab_sample_code.asc]).each do |samp|
@@ -33,13 +35,11 @@ class Voeis::SitesController < Voeis::BaseController
        @temp_array=Array[samp.sample_type, samp.lab_sample_code, samp.material,samp.sites.first.name, samp.local_date_time.to_s]
        @current_samples << @temp_array
     end
-    @project = parent
     show!
   end
   
   def edit
     @site =  parent.managed_repository{Voeis::Site.get(params[:id])}
-    @project = parent
   end
   
   def update
