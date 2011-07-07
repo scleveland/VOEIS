@@ -1,0 +1,67 @@
+- content_for(:javascripts) do
+  :javascript
+    dojo.require("dijit.dijit");
+    dojo.require("dijit.Dialog");
+    dojo.require("dijit.form.Form");
+    dojo.require("dijit.form.Button");
+    dojo.require("dojox.form.Uploader");
+    dojo.require("dojox.grid.EnhancedGrid");
+    dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+    dojo.require("dojox.grid.enhanced.plugins.Filter");
+    dojo.require("dojo.data.ItemFileReadStore");
+    dojo.require("dijit.layout.TabContainer");
+    dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+    var site_data = [
+       #{@sites.map{|site| "        "+site.to_json}.join(",\n")}
+     ];
+     var psites_json = {
+         identifier: 'id',
+         label: 'name',
+         items: site_data };
+#upload
+  %h3 Data Logger Upload Wizard: Step 1
+  %h4{:style=>'margin-top:10px;'} Select A Site:
+  #site_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"psites", :data=>"psites_json"}
+  %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{filter:true}",  :store=>"psites", :clientSort=>"true", :style=>"width: 650px; height: 250px;", :rowSelector=>"20px", :jsId=>"SiteDisplayGrid", :id=>"SiteDisplayGrid", :title=>"Sites"}
+   
+    %thead
+      %tr
+        %th{:field=>"name", :width=>"190px", :filterable=>true} Name
+        %th{:field=>"code", :width=>"130px", :filterable=>true} Code
+        %th{:field=>"latitude", :width=>"100px", :filterable=>true} Lat
+        %th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
+    %script{:type=>"dojo/method", :event=>"onClick", :args=>"evt"}
+      var item = SiteDisplayGrid.selection.getSelected();
+      if (item.length < 1){
+      //do nothing
+      }
+      else{
+      $("#site_id").val(item[0]["id"]);
+      $("#site_span").text(""+item[0]["name"]);
+      }
+  = form_tag('pre_upload', :multipart => true) do
+    = hidden_field_tag(:site_id)
+    Site To Associate With Data And Sample:
+    %span{:id=>"site_span"}None
+    =clear_break
+    = 'File to upload:'
+    = file_field_tag(:datafile, :accept => "text/csv,text/comma-separated-values,application/vnd.ms-excel")
+    = hidden_field_tag( :project_id, :value =>@project.id)
+    = clear_break
+    = label_tag( :header_box, 'Check if logger file is from a Campbell Scientific Logger:')
+    = check_box_tag( :header_box, 'Campbell')
+    = clear_break
+    If this is not a Campbel Scientific Logger please indicate which line data begins on.
+    - opt_string = ""
+    - (1..50).each do |i|
+      - opt_string = opt_string + "<option value="+i.to_s+">"+i.to_s+"</option>"
+    = select_tag('start_line', opt_string.html_safe)
+    = clear_break
+    You can select a DataTemplate to apply to this CSV:
+    - template_string = '<option value="None">None</option>'
+    - @data_templates.each do |template|
+      -template_string = template_string + "<option value="+template.id.to_s+">"+template.name+"</option>"
+    = select_tag("data_template", template_string.html_safe)
+    = clear_break
+    = submit_tag("Upload Logger File", :onclick => "$('#loader').toggle();")
+    = link_to('Cancel', {:action => 'show', :controller => '/projects', :id=>@project.id }, :class => 'icon icon-cancel', :onclick => "$('#loader').toggle();")

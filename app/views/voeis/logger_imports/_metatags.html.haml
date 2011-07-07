@@ -1,0 +1,24 @@
+#new_metatag{:dojoType=>"dijit.Dialog", :title=>"New Meta Tag"}
+  %h3 Create a new Meta Tag:
+  = form_for(:meta_tag )do |f|
+    Tag Name: 
+    = f.text_area("name", :cols => 45, :rows => 1, :style => {:resize => "none"}, :class => "tag_name")
+    =clear_break
+    Tag Category: 
+    = f.text_area("category", :cols => 45, :rows => 1, :style => {:resize => "none"}, :class => "tag_category")
+    =clear_break
+    %button{:id=> 'new_metatag_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createMetaTag();"}
+      Create MetaTag
+  
+  :javascript  
+    function createMetaTag(){ 
+    $.post("#{root_url + "meta_tags"}"+"?meta_tag[name]=" + $("#meta_tag_name").val()+"&meta_tag[category]=" + $("#meta_tag_category").val()+"&meta_tag[value]=" + $("#meta_tag_value").val(),
+    function(data) {
+    dijit.byId('new_metatag').hide();
+    $("#meta_tag_category").val("");
+    $("#meta_tag_name").val("");
+    dijit.registry.byClass("dojox.grid.EnhancedGrid").forEach(function(grid){if(grid.class == "metagrid"){grid.sort();}});
+    }
+    );
+    }
+   

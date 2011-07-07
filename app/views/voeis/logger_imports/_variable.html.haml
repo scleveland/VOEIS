@@ -1,0 +1,176 @@
+- content_for(:javascripts) do
+  :javascript
+    function  createVariable(){ 
+    $.post("#{root_url + "variables"}.json?variable[variable_code]=" +$("#variable_variable_code").val()+"&variable[variable_name]=" + $("#variable_variable_name").val()+"&variable[speciation]="+$("#variable_speciation").val()+"&variable[variable_units_id]="+ $("#variable_variable_units_id").val() + "&variable[sample_medium]="+ $("#variable_sample_medium").val() + "&variable[quality_control]="+$("#variable_quality_control").val()+"&variable[is_regular]="+$("#variable_is_regular").val()+"&variable[time_support]="+$("#variable_time_support").val()+"&variable[time_units_id]="+$("#variable_time_units_id").val()+"&variable[data_type]="+$("#variable_data_type").val()+"&variable[general_category]="+$("#variable_general_category").val()+"&variable[no_data_value]="+$("#variable_no_data_value").val()+"&variable[detection_limit]="+$("#variable_detection_limit").val()+"&variable[value_type]="+$("#variable_value_type").val()+"&variable[lab_method_id]="+$("#variable_lab_method_id").val(),
+    function(data) {
+    updated_var = data  
+    update_text= data["variable_name"];
+    $("#"+current_id_to_update).val(data["id"]);
+    updateVarSpans(current_column);
+    dijit.byId("new_variable").hide();
+    }
+    );
+    }
+    dojo.require("dijit.Tooltip");
+    dojo.require("dijit.form.Button");
+    dojo.require("dijit.Dialog");
+
+    function displayWait(txtContent) {
+        if (!txtContent) {
+            txtContent = "Please wait...";
+        }
+        txtContent = "<img src=\"loading.gif\" alt=\"\" /> " + txtContent;
+        var thisdialog = new dijit.Dialog({ title: "", content: txtContent });
+        dojo.body().appendChild(thisdialog.domNode);
+        //thisdialog.closeButtonNode.style.display='none';
+        thisdialog.titleBar.style.display='none';
+        thisdialog.startup();
+        thisdialog.show();
+    }
+
+#new_variable{:dojoType=>"dijit.Dialog", :title=>"New Variable"}
+  = render(:partial => "variable_name_cv")
+  = render(:partial => "sample_medium_cv")
+  = render(:partial => "value_type_cv")
+  = render(:partial => "speciation_cv")
+  = render(:partial => "data_type_cv")
+  = render(:partial => "quality_control_level")
+  = render(:partial => "general_category_cv")
+  = render(:partial => "lab_method")
+  = render(:partial => "field_method")
+  = render(:partial => "spatial_offset_type")
+  = form_for (:variable) do |f|
+
+    -var_name_options = Array.new
+    %label{:id => "var_name", :onclick=>"dijit.byId('new_variable_name_1').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Variable Name: 
+    %div{:dojoType=>"dijit.Tooltip", :connectId=> "var_name", :position=>"above"}
+      This is the general Variable Name that will be associated with this measurement.
+    - variable_names.all(:order => [:term.asc]).each do |var_name|
+      -var_name_options <<[var_name.term]
+    = f.select('variable_name',  options_for_select(var_name_options), :class => "variable_name")
+  
+    =clear_break
+    %label{:id=>"var_units"} Variable Units: 
+    %div{:dojoType=>"dijit.Tooltip", :connectId=> "var_unit", :position=>"above"}
+      This will the Units associated with this measurement.
+    -unit_options = Array.new
+    -units.all(:order => [:units_name.asc]).each do |unit|
+      -unit_options <<[unit.units_name+':'+unit.units_type, unit.id.to_s]
+    = f.select('variable_units_id',  options_for_select(unit_options), :class=>"variable_units_id")
+    =clear_break
+  
+    -speciation_options = Array.new
+    %label{:id => "spec", :onclick=>"dijit.byId('new_speciation_1').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Speciation: 
+    %div{:dojoType=>"dijit.Tooltip", :connectId=> "spec", :position=>"above"}
+      This refers to the chemical form or compound of the material being measured. This is not required for all measurements.
+    - speciations.all(:order => [:term.asc]).each do |speciation|
+      -speciation_options <<[speciation.term]
+    = f.select('speciation',  options_for_select(speciation_options, "Not Applicable"), :class => "speciation")
+    =clear_break
+    
+    -sample_medium_options = Array.new
+    %label{:id => "samp_medium", :onclick=>"dijit.byId('new_sample_medium_1').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Sample Medium: 
+    %div{:dojoType=>"dijit.Tooltip", :connectId=> "samp_medium", :position=>"above"}
+      This the type of material that the measurment is being performed on.
+    - sample_mediums.all(:order => [:term.asc]).each do |sample_medium|
+      -sample_medium_options <<[sample_medium.term]
+    = f.select('sample_medium',  options_for_select(sample_medium_options, "Unknown"), :class => "sample_medium")
+    =clear_break
+  
+    %label{:id => "val_type", :onclick=>"dijit.byId('new_value_type_1').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Value Type: 
+    %div{:dojoType=>"dijit.Tooltip", :connectId=> "val_type", :position=>"above"}
+      This is the type of data that should be measured by this variable.<br>
+      For example: <i>is this data that is colled from a logger.</i>
+    -value_type_options = Array.new
+    -value_types.all(:order => [:term.asc]).each do |type|
+      -value_type_options <<[type.term]
+    = f.select('value_type',  options_for_select(value_type_options))
+    =clear_break
+    
+    %label{:id => "lab_method_label", :onclick=>"dijit.byId('new_lab_method1').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Lab or Collection Method: 
+    %div{:dojoType=>"dijit.Tooltip", :connectId=> "lab_method", :position=>"above"}
+      This is the type of data that should be measured by this variable.<br>
+      For example: <i>is this data that is colled from a logger.</i>
+    -lab_method_options = Array.new
+    -lab_methods.all(:order => [:lab_method_name.asc]).each do |method|
+      -lab_method_options <<[method.lab_method_name, method.id.to_s]
+    = f.select('lab_method_id',  options_for_select(lab_method_options))
+    =clear_break
+    
+    %label{:id => "field_method_label", :onclick=>"dijit.byId('new_field_method1').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Field Method: 
+    %div{:dojoType=>"dijit.Tooltip", :connectId=> "field_method", :position=>"above"}
+      This is the type of data that should be measured by this variable.<br>
+      For example: <i>is this data that is colled from a logger.</i>
+    -field_method_options = Array.new
+    -field_methods.all(:order => [:method_name.asc]).each do |method|
+      -field_method_options <<[method.method_name, method.id.to_s]
+    = f.select('field_method_id',  options_for_select(field_method_options))
+    =clear_break
+    
+    %label{:id => "quality_control_label", :onclick=>"dijit.byId('new_quality_control_level').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Quality Control Level: 
+    %div{:dojoType=>"dijit.Tooltip", :connectId=> "quality_control_label", :position=>"above"}
+      This is the initial QA/QC classification that should be applied to this incoming data.<br>
+      For example: <i>is this value derived from other measurements or is it a raw data measurement.</i>
+
+    -quality_control_level_options = Array.new
+    -quality_control_levels.all(:order => [:quality_control_level_code.asc]).each do |qa|
+      -quality_control_level_options <<[qa.quality_control_level_code+":"+qa.definition, qa.quality_control_level_code]
+    = f.select('quality_control',  options_for_select(quality_control_level_options))
+    =clear_break
+  
+    -data_type_options = Array.new
+    %label{:id => "spec", :onclick=>"dijit.byId('new_data_type_1').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Data Type:  
+    - data_types.all(:order => [:term.asc]).each do |data_type|
+      -data_type_options <<[data_type.term]
+    = f.select('data_type',  options_for_select(data_type_options), :class => "data_type")
+  
+    =clear_break
+    %label{:id => "spec", :onclick=>"dijit.byId('new_general_category_1').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}General Category:
+    -general_category_options = Array.new
+    - general_categories.all(:order => [:term.asc]).each do |data_type|
+      -general_category_options <<[data_type.term]
+    = f.select('general_category',  options_for_select(general_category_options), :class => "data_type")
+    =clear_break
+  
+    %label No Data Value: 
+    = f.text_field :no_data_value, :class=>"no_data_value"
+    =clear_break
+    
+    %label Detection Limit: 
+    = f.text_field :detection_limit, :class=>"detection_limit"
+    =clear_break
+    =clear_break
+    %b Time Related Meta-Data:
+    #optional
+      %label This Is Measured Regularly: 
+      = f.select :is_regular, options_for_select({"true"=>"true", "false"=>"false"}, false)
+      =clear_break
+      %label Time Support:(0 indicates instantaneous time measurement) 
+      = f.text_field :time_support, :value => 0, :size=>5
+      =clear_break
+      %label Time Units:
+      -time_unit_options = Array.new
+      - time_units.all(:order => [:units_name]).each do |unit|
+        -time_unit_options << [unit.units_name, unit.id.to_s]
+      = f.select :time_units_id, options_for_select(time_unit_options, 103)
+      =clear_break
+    #spatial
+      %label{:id => "spatial", :onclick=>"dijit.byId('new_spatial_offset_type').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Spatial Offset Type: 
+      -sot_options = Array.new
+      -spatial_offset_types.all(:order => [:type]).each do |sot|
+        -sot_options << [sot.type, sot.id.to_s]
+      = select_tag :spatial_offset_type, options_for_select(sot_options)
+      =clear_break
+      %label Spatial Offset Value: 
+      = text_field_tag :value
+      =clear_break
+      %label Spatial Offset Units:
+      -offset_unit_options = Array.new
+      - offset_units.all(:order => [:units_name]).each do |unit|
+        -offset_unit_options << [unit.units_name, unit.id.to_s]
+      = select_tag :units_id, options_for_select(offset_unit_options)
+    =clear_break
+    %button{:id=> 'new_variable_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createVariable();"}
+      Create Variable
+
+

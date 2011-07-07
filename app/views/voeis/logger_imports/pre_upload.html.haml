@@ -1,0 +1,3 @@
+#pre_upload
+  = render :partial => 'pre_upload', :locals => {:sites => @sites, :var_array => @var_array,
+  :opts_array=> @opts_array,:start_line => @start_line,:start_row => @start_row,:new_file => @new_file,:header_box => params[:header_box],:header_info => @header_info,:project_id => @project.id,:row_size => @row_size, :data_template => params[:data_template]}
