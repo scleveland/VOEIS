@@ -36,7 +36,7 @@ Form Progress:
         Please Setup the Information that will be associated with each sample created.
       Data Parsing Template Name:
       =text_field_tag("template_name", @data_template.nil? ? "SampleStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d") : @data_template.name, :size => 80 )
-      =check_box_tag("save_template", "yes", @data_template.nil? ? true : false)       
+      =check_box_tag("save_template", "yes", @data_template.nil? ? true : false, :disabled=> @data_template.nil? ? true : false)       
       Save Parsing Template.
       =clear_break
 
