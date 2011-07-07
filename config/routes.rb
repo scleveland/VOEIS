@@ -102,6 +102,17 @@ Yogo::Application.routes.draw do
       resources :sample_materials
       resources :lab_methods
       resources :sources
+      resources :logger_imports do
+        collection do
+          post :pre_upload
+          post :create_stream
+          post :upload
+          post :export
+          get  :pre_process_samples_file_upload
+          post :store_samples_and_data_from_file
+          post  :pre_process_samples_file
+        end
+      end
       resources :data_values do
         collection do
           get  :pre_process
