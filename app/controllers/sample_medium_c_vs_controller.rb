@@ -22,6 +22,9 @@ class SampleMediumCVsController < ApplicationController
       if @sample_medium.save
         flash[:notice] = 'Sample Medium was successfully created.'
         format.html { (redirect_to(new_sample_medium_c_v_path())) }
+        format.json do
+          render :json => @sample_medium.as_json, :callback => params[:jsoncallback]
+        end
       else
         format.html { render :action => "new" }
       end

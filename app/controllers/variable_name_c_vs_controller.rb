@@ -22,6 +22,9 @@ class VariableNameCVsController < ApplicationController
       if @variable_name.save
         flash[:notice] = 'Variable Name was successfully created.'
         format.html { (redirect_to(new_variable_name_c_v_path())) }
+        format.json do
+          render :json => @variable_name.as_json, :callback => params[:jsoncallback]
+        end
       else
         format.html { render :action => "new" }
       end

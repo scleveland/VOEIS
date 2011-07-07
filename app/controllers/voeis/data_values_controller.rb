@@ -1104,7 +1104,7 @@ class Voeis::DataValuesController < Voeis::BaseController
          end       
     
        else
-           redirect_to(:controller =>"voeis/data_values", :action => "pre_process_sample_file_upload", :params => {:id => params[:project_id]})
+           redirect_to(:controller =>"voeis/data_values", :action => "pre_process_samples_file_upload", :params => {:id => params[:project_id]})
          end
        
      end

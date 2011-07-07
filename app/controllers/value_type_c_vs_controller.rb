@@ -13,15 +13,14 @@ class ValueTypeCVsController < ApplicationController
   
   # POST /variables
   def create
-    if params[:value_type_c_v].nil?
-      @value_type = Voeis::ValueTypeCV.new(:term=> params[:term], :definition => params[:definition])
-    else
-      @value_type = Voeis::ValueTypeCV.new(params[:variable_name_c_v])
-    end
+    @value_type = Voeis::ValueTypeCV.new(params[:value_type_c_v])
     respond_to do |format|
       if @value_type.save
         flash[:notice] = 'Value Type was successfully created.'
         format.html { (redirect_to(new_value_type_c_v_path())) }
+        format.json do
+          render :json => @value_type.as_json, :callback => params[:jsoncallback]
+        end
       else
         format.html { render :action => "new" }
       end

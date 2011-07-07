@@ -22,6 +22,9 @@ class DataTypeCVsController < ApplicationController
       if @data_type.save
         flash[:notice] = 'Data Type was successfully created.'
         format.html { (redirect_to(new_data_type_c_v_path())) }
+        format.json do
+          render :json => @data_type.as_json, :callback => params[:jsoncallback]
+        end
       else
         format.html { render :action => "new" }
       end

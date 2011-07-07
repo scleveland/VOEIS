@@ -254,6 +254,7 @@ class Voeis::DataStreamsController < Voeis::BaseController
     @sites = ""
     @start_year=""
     @end_year =""
+   
     @units = Voeis::Unit.all
     parent.managed_repository do
       @sites = Voeis::Site.all
@@ -288,12 +289,13 @@ class Voeis::DataStreamsController < Voeis::BaseController
     puts 'Export:'+params[:export].to_s
     @start_date =  Date.civil(params[:range][:"start_date(1i)"].to_i,params[:range]      [:"start_date(2i)"].to_i,params[:range][:"start_date(3i)"].to_i)
     @end_date = Date.civil(params[:range][:"end_date(1i)"].to_i,params[:range]    [:"end_date(2i)"].to_i,params[:range][:"end_date(3i)"].to_i)
-
+    
     @start_date = @start_date.to_datetime
     @end_date = @end_date.to_datetime + 23.hour + 59.minute
     if !params[:variable].empty? && !params[:site].empty?
       @column_array = Array.new
       @row_array = Array.new
+      @value_array = Array.new
       site = parent.managed_repository{Voeis::Site.get(params[:site])}
       @site_name =site.name
       var_datastream = params[:variable].split(",")
@@ -320,19 +322,23 @@ class Voeis::DataStreamsController < Voeis::BaseController
             
             @column_array << [sensor.variables.first.variable_name, 'number']
           end
-          site.sensor_types.first.sensor_values(:timestamp.gte => @start_date.to_datetime, :timestamp.lte => @end_date.to_datetime).each do |sens_val|
+          @dvalues = site.sensor_types.first.sensor_values(:timestamp.gte => @start_date.to_datetime, :timestamp.lte => @end_date.to_datetime)
+          @dvalues.each do |sens_val|
             temp_array = Array.new
+            temp_hash = Hash.new
+            temp_hash["timestamp"] = sens_val.timestamp.to_datetime
+            temp_hash["vertical_offset"] =sens_val.timestamp.to_datetime
             temp_array << sens_val.timestamp.to_datetime
             temp_array << sens_val.vertical_offset
-            site.sensor_types.each do |sens|
-              val = sens.sensor_values.first(:timestamp.gte => sens_val.timestamp)
-              if !val.nil?
-                temp_array << val.value
-              else
-                temp_array << -9999.0
-              end
+            if !sens_val.nil?
+              temp_array << sens_val.value
+              temp_hash["value"] = sens_val.value
+            else
+              temp_array << -9999.0
+              temp_hash["value"] = "NA"
             end
             @row_array << temp_array
+            @value_array << temp_hash
           end
         elsif var_datastream[0] == "All"
           debugger
@@ -341,7 +347,8 @@ class Voeis::DataStreamsController < Voeis::BaseController
           datastream.data_stream_columns.sensor_types.all(:order => [:name.asc]).each do |sensor|
             @column_array << [sensor.variables.first.variable_name, 'number']
           end
-          site.sensor_types.first.sensor_values(:timestamp.gte => @start_date.to_datetime, :timestamp.lte => @end_date.to_datetime).each do |sens_val|
+          @dvalues = site.sensor_types.first.sensor_values(:timestamp.gte => @start_date.to_datetime, :timestamp.lte => @end_date.to_datetime)
+          @dvalues.each do |sens_val|
             temp_array = Array.new
             temp_array << sens_val.timestamp.to_datetime
             temp_array << sens_val.vertical_offset
@@ -367,13 +374,21 @@ class Voeis::DataStreamsController < Voeis::BaseController
             @column_array << ["Timestamp", 'datetime']
             @column_array << ["Vertical Offset", 'number']
             @column_array << [my_sensor.variables.first.variable_name, 'number']
-            my_sensor.sensor_values(:timestamp.gte => @start_date.to_datetime, :timestamp.lte => @end_date.to_datetime).each do |sens_val|
+            @dvalues = my_sensor.sensor_values(:timestamp.gte => @start_date.to_datetime, :timestamp.lte => @end_date.to_datetime).each do |sens_val|
               temp_array = Array.new
+              temp_hash = Hash.new
               temp_array << sens_val.timestamp.to_datetime
               temp_array << sens_val.vertical_offset
+              temp_hash["timestamp"] = sens_val.timestamp.to_datetime
+              temp_hash["vertical_offset"] =sens_val.timestamp.to_datetime
+              temp_hash["value"] = sens_val.value
               temp_array << sens_val.value
               @row_array << temp_array
+              @value_array << temp_hash
             end
+            # @value_hash{identifier: 'id',
+            # label: 'name',
+            # items: #{value_array.as_json} };}
           # elsif !sensor1.nil?
           #   @column_array << [sensor1.variables.first.variable_name, 'number']
           #   sensor.sensor_values.each do |sens_val|

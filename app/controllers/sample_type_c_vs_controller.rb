@@ -22,6 +22,9 @@ class SampleTypeCVsController < ApplicationController
       if @sample_type.save
         flash[:notice] = 'Sample Type was successfully created.'
         format.html { (redirect_to(new_sample_type_c_v_path())) }
+        format.json do
+          render :json => @sample_type.as_json, :callback => params[:jsoncallback]
+        end
       else
         format.html { render :action => "new" }
       end

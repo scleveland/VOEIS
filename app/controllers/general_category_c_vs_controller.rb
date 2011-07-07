@@ -22,6 +22,9 @@ class GeneralCategoryCVsController < ApplicationController
       if @general_category.save
         flash[:notice] = 'General Category was successfully created.'
         format.html { (redirect_to(new_general_category_c_v_path())) }
+        format.json do
+          render :json => @general_category.as_json, :callback => params[:jsoncallback]
+        end
       else
         format.html { render :action => "new" }
       end

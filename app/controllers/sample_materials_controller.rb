@@ -18,6 +18,9 @@ class SampleMaterialsController < ApplicationController
       if @sample_material.save
         flash[:notice] = 'Sample Material was successfully created.'
         format.html { (redirect_to(sample_material_path( @sample_material.id))) }
+        format.json do
+          render :json => @sample_material.as_json, :callback => params[:jsoncallback]
+        end
       else
         format.html { render :action => "new" }
       end
