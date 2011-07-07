@@ -7,12 +7,11 @@
     = f.label("Definition:")
     = clear_break
     = f.text_area("definition", :cols => 45, :rows => 6, :style => {:resize => "none"}, :class => "var_name_definition")
-    = f.submit("Save Variable Name", :class => "new-var-name-button")
-  %label{:id => "var_name_close", :onclick=>"$('#new_variable_name').toggle('explode');", :class => "icon icon-close", :onmouseover =>"this.style.cursor='hand'"}
-
+    =clear_break
+    %button{:id=> 'new_variable_name_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createVariableName();"}
+      Create Value Type
   :javascript  
-    $(function() {
-    $(".new-var-name-button").click(function() { 
+    function createVariableName() { 
       
     $.post("#{root_url + "variable_name_c_vs"}"+"?term=" + $(".var_name_term").val()+"&definition=" + $(".var_name_definition").val(),
     function(data) {
@@ -23,10 +22,7 @@
     $('#variable_variable_name').val($(".var_name_term").val());
     $(".var_name_term").val("");
     $(".var_name_definition").val("");
-    $("#new_variable_name").toggle();
-    return false;
+    dijit.byId("new_variable_name_1").hide();
     }
     );
-    return false;
-    });
-    });
+    }

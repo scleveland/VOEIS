@@ -8,14 +8,13 @@
     = clear_break
     = f.text_area("definition", :cols => 45, :rows => 6, :style => {:resize => "none"}, :class => "data_type_definition")
     =clear_break
-    = f.submit("Save Data Type", :class => "new-data-type-button")
-
+    %button{:id=> 'new_data_type_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createDataTypecv();"}
+      Create Data Type
   
   :javascript  
-    $(function() {
-    $(".new-data-type-button").click(function() { 
+    function createDataTypecv() { 
       
-    $.post("#{root_url + "data_type_c_vs"}"+"?term=" + $(".data_type_term").val()+"&definition=" + $(".data_type_definition").val(),
+    $.post("#{root_url + "data_type_c_vs"}.json?term=" + $(".data_type_term").val()+"&definition=" + $(".data_type_definition").val(),
     function(data) {
     $('#variable_data_type').
     append($("<option></option>").
@@ -24,11 +23,9 @@
     $('#variable_data_type').val($(".data_type_term").val());
     $(".data_type_term").val("");
     $(".data_type_definition").val("");
-    $("#new_data_type").toggle();
     dijit.byId('new_data_type_1').hide();
     return false;
     }
     );
-    return false;
-    });
-    });
+    }
+    

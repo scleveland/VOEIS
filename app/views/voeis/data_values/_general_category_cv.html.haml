@@ -4,17 +4,18 @@
     = f.label("Term:")
     = clear_break
     = f.text_area("term", :cols => 45, :rows => 2, :style => {:resize => "none"}, :class => "general_category_term")
+    =clear_break
     = f.label("Definition:")
     = clear_break
     = f.text_area("definition", :cols => 45, :rows => 6, :style => {:resize => "none"}, :class => "general_category_definition")
-    = f.submit("Save Speciation", :class => "new-general-category-button")
-  %label{:id => "general_category_close", :onclick=>"$('#new_general_category').toggle('explode');", :class => "icon icon-close", :onmouseover =>"this.style.cursor='hand'"}
+    =clear_break
+    %button{:id=> 'new_general_category_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createGeneralCategory();"}
+      Create General Category
   
   :javascript  
-    $(function() {
-    $(".new-general-category-button").click(function() { 
+    function createGeneralCategory() { 
       
-    $.post("#{root_url + "general_category_c_vs"}"+"?term=" + $(".general_category_term").val()+"&definition=" + $(".general_category_definition").val(),
+    $.post("#{root_url + "general_category_c_vs"}.json?general_category_c_v[term]=" + $(".general_category_term").val()+"&general_category_c_v[definition]=" + $(".general_category_definition").val(),
     function(data) {
     $('#variable_general_category').
     append($("<option></option>").
@@ -23,10 +24,7 @@
     $('#variable_general_category').val($(".general_category_term").val());
     $(".general_category_term").val("");
     $(".general_category_definition").val("");
-    $("#new_general_category").toggle();
-    return false;
+    dijit.byId("new_general_category_1").hide();
     }
     );
-    return false;
-    });
-    });
+    }
