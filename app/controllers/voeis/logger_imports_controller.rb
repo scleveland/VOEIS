@@ -360,8 +360,11 @@ class Voeis::LoggerImportsController < Voeis::BaseController
             File.open(@new_file, "wb"){ |f| f.write(params['datafile'].read)}
 
             @start_line = params[:start_line].to_i
+            if params[:header_box] == "Campbell"
+              @start_line = 4
+            end
             #get the first row that has information in the CSV file
-            @start_row = get_row(@new_file, params[:start_line].to_i)
+            @start_row = get_row(@new_file, @start_line)
             @row_size = @start_row.size-1
 
             @header_rows = @start_line < 2 ? -1 : @start_line -2
@@ -439,15 +442,6 @@ class Voeis::LoggerImportsController < Voeis::BaseController
               @current_variables << @temp_array
             end
 
-            @sample_type_options = Array.new
-            @sample_types.all(:order => [:term.asc]).each do |samp_type|
-              @sample_type_options <<[samp_type.term]  
-            end
-
-            @sample_medium_options = Array.new
-            @sample_mediums.all(:order => [:term.asc]).each do |mat|
-              @sample_medium_options << [mat.term]
-            end
             #parse csv file into array
             @csv_array = Array.new
             csv_data = CSV.read(@new_file)
@@ -506,7 +500,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
                                :zip_code => @source.zip_code,          
                                :citation => @source.citation,          
                                :metadata_id =>@source.metadata_id).nil?       
-           Voeis::Source.create(@source.attributes)
+           @project_source = Voeis::Source.create(@source.attributes)
          else
            @project_source = Voeis::Source.first(:organization => @source.organization,      
                                    :source_description => @source.source_description,
@@ -567,7 +561,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
       end
       #use this when we decide to save templates and reuse them
       if params[:save_template] == "yes"
-        data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array, dstream_utc_offset, dst, min_array, max_array, difference_array)
+        data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array, dstream_utc_offset, dst, @project_source, min_array, max_array, difference_array)
       end
 
       if params[:save_template] == "yes"
@@ -629,7 +623,6 @@ class Voeis::LoggerImportsController < Voeis::BaseController
                parent.managed_repository do
                  mdtag = Voeis::MetaTag.new(:name=>@mtag.name, :category=>@mtag.category)
                  mdtag.value = @csv_row[row][col.column_number]
-
                  mdtag.save
                  row_meta_tag_array << mdtag
                end #managed_repository
@@ -642,21 +635,6 @@ class Voeis::LoggerImportsController < Voeis::BaseController
               sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,
                            sample_datetime.day,sample_datetime.hour,sample_datetime.min,
                            sample_datetime.sec, data_stream.utc_offset/24.to_f)
-
-              @sample = Voeis::Sample.new(:sample_type =>   params[:sample_type],
-                                          :material => params[:sample_medium],
-                                          :lab_sample_code => @csv_row[row][@sample_col],
-                                          :lab_method_id => -1,
-                                          :local_date_time => sampletime)           
-              @sample.save
-              @site.samples << @sample
-              @site.save
-              @col_vars.each do |var| 
-                if !var.nil?
-                  var.samples << @sample
-                  var.save
-                end
-              end
 
               (0..range).each do |i|
                 puts i
@@ -679,13 +657,10 @@ class Voeis::LoggerImportsController < Voeis::BaseController
                   @site.save
                   new_data_val.variable << @col_vars[i]
                   new_data_val.source = @project_source
-                  new_data_val.sample << @sample
                   row_meta_tag_array.map{|mtag| new_data_val.meta_tags << mtag}  #add meta_data
                   new_data_val.save
                   new_data_val.data_streams << data_stream
                   new_data_val.save
-                  @sample.data_streams << data_stream
-                  @sample.save
                  end #end if
                 end #end i loop
                end #end if @csv_array.nil?
@@ -697,7 +672,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
     end# end def
     
     #columns is an array of the columns that store the variable id
-     def create_sample_and_data_parsing_template(template_name, timestamp_col, sample_id_col, columns_array, ignore_array, site, datafile, start_line, row_size, vertical_offset_col, ending_vertical_offset_col, meta_tag_array, utc_offset, dst, min_array, max_array, difference_array)
+     def create_sample_and_data_parsing_template(template_name, timestamp_col, sample_id_col, columns_array, ignore_array, site, datafile, start_line, row_size, vertical_offset_col, ending_vertical_offset_col, meta_tag_array, utc_offset, dst, source, min_array, max_array, difference_array)
         @data_stream
         parent.managed_repository do
           @data_stream = Voeis::DataStream.create(:name => template_name.to_s,
@@ -709,7 +684,8 @@ class Voeis::LoggerImportsController < Voeis::BaseController
             :DST => dst)
           #Add site association to data_stream
 
-          @data_stream.sites << site
+         @data_stream.sites << site
+         @data_stream.source = source
          @data_stream.save
         end #managed_repository
         @timestamp_col = -1
@@ -814,7 +790,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
               data_stream_column.data_streams << @data_stream
               data_stream_column.save
               sensor_type = Voeis::SensorType.create(
-                            :name => variable.variable_name+':':variable.id.to_s + ':' + site.name,
+                            :name => variable.variable_name + ':' + variable.id.to_s + ':' + site.name,
                             :min => min_array[i].to_f,
                             :max => max_array[i].to_f,
                             :difference => difference_array.to_f)
