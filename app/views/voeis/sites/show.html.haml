@@ -1,29 +1,38 @@
+:css
+  #content { margin:10px 50px }
+  #wrapper {
+    padding-bottom: 20px;
+    background-color: #ccb;
+    padding-top: 1px;
+  }
+  #wrapper img { margin-right:12px }
+  #wrapper p { margin:0 20px }
+
+  #form-table { width:600px; }
+  #form-table td { width:50%; }
+  .form-element { width:15em; }
+  #site_name { width:25em; }
+  #site_local_projection_id { width:20em; }
+  #site_pos_accuracy_m { width:20em; }
+  #site_comments { width:42em; }
+
+
 - content_for(:javascripts) do
   :javascript
     dojo.require("dijit.dijit");
     dojo.require("dijit.Declaration");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dijit.layout.TabContainer");
     dojo.require("dojox.layout.TableContainer");
     dojo.require("dijit.form.TextBox");
     
+    //$(window).ready(function(){ 
+    dojo.addOnLoad(function(){
+        dojo.parser.parse();
+        //hideLoader();
+    });
+    
 - content_for(:toolbar) do
-  #projectButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
-    %span Project
-    %div{:dojoType => "dijit.Menu"}                    
-      -if !current_user.nil? && current_user.projects.include?(@project)
-        = link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
-      - if @sites.count > 0
-        = link_to("Add Variable", new_project_variable_path(@project), :dojoType => "yogo.ui.MenuLink")
-        = link_to("Add Unit", new_project_unit_path(@project), :dojoType => "yogo.ui.MenuLink")
-        = link_to("Add Sample", new_project_sample_path(@project), :dojoType => "yogo.ui.MenuLink")
-        -#= link_to("Upload Sample Data", @project.id.to_s+"/data_values/pre_process_sample_file_upload", :dojoType => "yogo.ui.MenuLink")
-        = link_to("Add Data Stream", new_project_data_stream_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
-
-      - if @project.managed_repository { Voeis::Sample.all.count } > 0
-        = link_to("Add Sample Data", pre_process_project_data_values_path(@project), :dojoType => "yogo.ui.MenuLink")
-        = link_to("Add Field Data", new_field_measurement_project_sensor_values_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
-      - if @project.managed_repository { Voeis::DataStream.all.count } > 0
-        = link_to("Add Data", add_project_data_streams_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
-      = link_to("Settings...", edit_project_path(@project), :dojoType => "yogo.ui.MenuLink")
   -##siteButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
   -#  %span Site
   -#  %div{:dojoType => "dijit.Menu"}                    
@@ -33,86 +42,161 @@
 %h2
   #{@site.name}
 
-= link_to('Edit', edit_project_site_path(@project,@site.id), :class=>'icon icon-edit')
-&nbsp;&nbsp;&nbsp;
-= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
-%br
-%br
+-#-if !current_user.nil? && current_user.projects.include?(@project)
+-#  = link_to('Edit', edit_project_site_path(@project,@site.id), :class=>'icon icon-edit')
+-#  &nbsp;&nbsp;&nbsp;
+-#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
+-#%br
+-#%br
 
--i = 0
-%table{:id => "property-table", :style=>'float:left;'}
+-#tab_browser{:dojoType=>"dijit.layout.TabContainer"}
+-#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"margin-top:0;padding-top:0;"}
+#tab_browser{:style=>"margin-top:0;padding-top:0;width:700px;"}
+  #show{:dojoType=>"dijit.layout.ContentPane", :title=>@site.name, :style=>"margin-top:0;padding-top:0;"}
+    %table
+      %tr
+        %td{:style=>"width:200px;"}
+          %b SHOW DETAILS:
+        %td
+          -#= link_to('CANCEL', project_path(@project), :class => 'icon icon-cancel') 
+          = link_to('CANCEL', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
+          -if !current_user.nil? && current_user.projects.include?(@project)
+            &nbsp;&nbsp;&nbsp;
+            = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show').hide();$('#edit').show();") 
+    %br
 
-  - @site.properties.each do |prop|
-    -i=1-i
-    %tr{:class=>"row#{i}"}
-      %td
-        %b
-          #{prop.name.to_s.capitalize}
-      %td
-        #{@site[prop.name]}
+    %table{:id => "property-table", :style=>'width:80%;float:left;'}
+      - @site.properties.each do |prop|
+        %tr{:class=>"row#{cycle('1','0')}"}
+          %td
+            %b
+              #{prop.name.to_s.capitalize}
+          %td
+            #{@site[prop.name]}
 
-%table{:id=>'stats', :class=>'', :style=>'width:50%; padding:0; float:left; margin-left:50px;'}
-  %tr
-    %td
-      %h4{:style=>'margin-top:0;'}
-        Variable Data
-    %td
-      %h4{:style=>'margin-top:0;'}
-        Count
-    %td
-      %h4{:style=>'margin-top:0;'}
-        Start
-    %td
-      %h4{:style=>'margin-top:0;'}
-        End
-    
-  - if @site_variable_stats.empty?
-    %tr
-      %td{:colspan=>"4"}
-        %em &nbsp;&nbsp;&nbsp; no data available
-  - else
-    - @site.variables.each do |var|
-      - var_stats = @site_variable_stats.first(:variable_id=>var.id)
+    %table{:id=>'stats', :class=>'', :style=>'width:80%; padding:0; float:left; margin-left:10px;'}
       %tr
         %td
-          %b
-            = link_to(var.variable_name, project_variable_path(@project,var.id)) 
-        - if !var_stats.nil?
-          %td
-            -#= 'ID = %s'%var.id
-            = var_stats.record_number
-          %td
-            = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
-          %td
-            = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
-        - else
-          %td
-            NA
-          %td
-            NA
-          %td
-            NA
+          %h4{:style=>'margin-top:0;'}
+            Variable Data
+        %td
+          %h4{:style=>'margin-top:0;'}
+            Count
+        %td
+          %h4{:style=>'margin-top:0;'}
+            Start
+        %td
+          %h4{:style=>'margin-top:0;'}
+            End
+    
+      - if @site_variable_stats.empty?
+        %tr
+          %td{:colspan=>"4"}
+            %em &nbsp;&nbsp;&nbsp; no data available
+      - else
+        - @site.variables.each do |var|
+          - var_stats = @site_variable_stats.first(:variable_id=>var.id)
+          %tr
+            %td
+              %b
+                = link_to(var.variable_name, project_variable_path(@project,var.id)) 
+            - if !var_stats.nil?
+              %td
+                -#= 'ID = %s'%var.id
+                = var_stats.record_number
+              %td
+                = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
+              %td
+                = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
+            - else
+              %td
+                NA
+              %td
+                NA
+              %td
+                NA
+    
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    - if @site.samples.count>0
+      #all_variables
+        %h3
+          Existing Samples    
+        = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
+          = hidden_field_tag('column_array', @label_array.to_json)
+          = hidden_field_tag('row_array', @current_samples.to_json)
+          = hidden_field_tag('file_name', "project_samples")
+          = submit_tag("Export Samples")
+        %br
+        #variables_list
+          %table{:id=>"sample-table", :style=>'width:85%;float:left;'}
+            %tr
+              - @label_array.each do |label|
+                %th
+                  %b
+                    = label
+            - @site.samples.each do |samp|
+              %tr{:class=>"row#{cycle('1','0')}"}
+                - @field_array.each do |field|
+                  %td
+                    = samp[field].to_s
+                  
+            -#%em &nbsp;&nbsp;&nbsp; no samples to show
 
+  -if !current_user.nil? && current_user.projects.include?(@project)
+    #edit{:dojoType=>"dijit.layout.ContentPane", :title=>'EDIT', :style=>"margin-top:0;padding-top:0;display:none;"}
+      %table
+        %tr
+          %td{:style=>"width:200px;"}
+            %b EDITING:
+          %td
+            = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit').hide();$('#show').show();") 
+      %br
+
+      = form_for(:site, resource, :remote=>true, :url=>project_site_path(@project, resource), :builder=>YogoFormBuilder, :html=> {:method=>:put, :onsubmit=>"return checkform();"} )do |f|
+
+        %table{:id=>"form-table"}
+          %tr
+            %td
+              = f.text_field("name")
+            %td
+              = f.text_field("code")
+          %tr
+            %td
+              = f.text_field("latitude")
+            %td
+              = f.text_field("longitude")
+          %tr
+            %td
+              = f.text_field("elevation_m")         
+            %td
+              = f.text_field("vertical_datum")      
+          %tr
+            %td 
+              = f.text_field("local_x")             
+            %td 
+              = f.text_field("local_y")             
+          %tr
+            %td{:colspan=>"2"}
+              = f.text_field("local_projection_id") 
+          %tr
+            %td{:colspan=>"2"}
+              = f.text_field("pos_accuracy_m")      
+          %tr
+            %td 
+              = f.text_field("state")         
+            %td 
+              = f.text_field("county")     
+          %tr
+            %td{:colspan=>"2"}
+              = f.text_area("comments")
+          %tr
+            %td{:colspan=>"2"}
+              = f.submit("Save Site", :onclick => "$('#loader').toggle();")
+              = link_to('Cancel', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit').hide();$('#show').show();") 
+              -#= link_to('Cancel', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
 
 %br{:style=>'float:none; clear:both;'}
-%br
-#all_variables
-  %h3
-    Existing Samples    
-  = form_for("export", :url => {:controller => '/projects', :action => 'export'}) do 
-    = hidden_field_tag('column_array', @label_array.to_json)
-    = hidden_field_tag('row_array', @current_samples.to_json)
-    = hidden_field_tag('file_name', "project_samples")
-    = submit_tag("Export Samples")
-  #variables_list
-    - visualization("sample-table", 'table', :height => 200) do |table|
-      - if @label_array.length > 1
-        - @label_array[0..-1].each do |label|
-          - table.register_column(:string, label)
-        - table.add_rows(@current_samples)
-  - else
-    %br
-    %em &nbsp;&nbsp;&nbsp; no samples to show
 
 %br
 
