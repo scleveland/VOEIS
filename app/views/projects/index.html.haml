@@ -5,6 +5,7 @@
     dojo.require("dojox.grid.EnhancedGrid");
     dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
     dojo.require("dojo.data.ItemFileReadStore");
+    dojo.require("dojo.store.Memory");
     dojo.require("voeis.Server");
     dojo.require("dijit.layout.TabContainer");
     dojo.require("voeis.ui.SitePane");
@@ -26,7 +27,7 @@
       var loading = dijit.byId('loading_dialog');
       var map = dijit.byId('split_map');
       google.maps.event.addListener(map._map, 'center_changed', function(){
-        //MAP ZOOM CHANGED!
+        //MAP POSITION CHANGED!
         loading.hide();
       });
     });
@@ -43,26 +44,22 @@
         %th{:field => "name", :width => "auto"} Project 
     %script{:type => "dojo/method", :event => "onRowDblClick", :args => "evt"}
       :plain
-        var item = this.getItem(evt.rowIndex);
-        var id = item.id;
-        dojo.publish("voeis/project/browse", [id]);
+        // NO LONGER USED
+        //var item = this.getItem(evt.rowIndex);
+        //var id = item.id;
+        //dojo.publish("voeis/project/browse", [id]);
     %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
       :plain
         console.log("selected:");
         console.log(arguments);
-        var map = dijit.byId('split_map');
-        var item = this.getItem(idx);
-        var id = item.id;
-        var tab_browser = dijit.byId('right_tabs');    
-        var map_pane = dijit.byId('map_pane');
-        tab_browser.selectChild(map_pane);
-        map.store.add(item);
         dijit.byId('loading_dialog').show();
-        dojo.publish("voeis/project/browse", [id]);
+        var item = this.getItem(idx);
+        dojo.publish("voeis/project/browse", [item]);
     %script{:type => "dojo/method", :event => "onDeselected", :args => "idx"}
       :plain
         console.log("deselected:");
         console.log(arguments);
+        dijit.byId('loading_dialog').show();
         var map = dijit.byId('split_map');
         var item = this.getItem(idx);
         var tabs = dijit.byId('tab_browser');
@@ -71,7 +68,6 @@
         tab_browser.selectChild(map_pane);
         map.store.remove(item.id);
         tabs.closeChild(dijit.byId(item.id));
-        dijit.byId('loading_dialog').show();
 
 :javascript
   (function(){
@@ -97,20 +93,77 @@
       tabs.selectChild(sitesGrid);
     };
 
+    var popMapMarker = function(projectId, siteId) {
+      //set focus on grid
+      var grid = dijit.byId(projectId);
+      var tabs = dijit.byId('tab_browser');
+      if(false) {
+        tabs.selectChild(grid);
+        var col = grid.layout.cells[1];
+        grid.selection.clear();
+        for(var i=0; i<grid.rowCount; i++)
+          if(siteId==grid.getItem(i).id) {
+            grid.scrollToRow(i);
+            //grid.selection.addToSelection(i);
+            grid.focus.setFocusCell(col,i);
+            grid.focus.focusGrid();
+            break;
+          };
+      };
+      var map = dijit.byId('split_map');
+      var map_pane = dijit.byId('map_pane');
+      var tab_browser = dijit.byId('right_tabs');    
+      var marker = map.fetchMarker(projectId,siteId);
+      tab_browser.selectChild(map_pane);
+      if(marker) marker.popWin(map);
+    };
+    
+    //*** Function returns list of an objects properties
+    //***  delim: if included, returns a string joined by delim
+    //***  used for debugging
+    function obj_list(obj,delim) {
+      var list = [];
+      for(var x in obj)
+        list.push(x);
+      if(delim) list = list.join(delim);
+      return list;
+    };
+
+    dojo.subscribe("voeis/project/site/popped", function(projectId, siteId) {
+      console.log(arguments);
+      popMapMarker(projectId, siteId);
+    });
+
     dojo.subscribe("voeis/project/site/selected", function(projectId, siteId) {
       console.log(arguments);
       var tab_browser = dijit.byId('right_tabs');    
       openSiteTab(tab_browser, projectId, siteId);
     });
 
-    dojo.subscribe("voeis/project/browse", function(projectId) {
-      var tabs = dijit.byId('tab_browser');
+    dojo.subscribe("voeis/project/site/popped-selected", function(projectId, siteId) {
+      console.log(arguments);
+      popMapMarker(projectId, siteId);
+      var tab_browser = dijit.byId('right_tabs');    
+      openSiteTab(tab_browser, projectId, siteId);
+    });
+
+    dojo.subscribe("voeis/project/browse", function(project) {
       //openSitesGridTab(tabs, projectId);
-      var grid = voeis.ui.ProjectSitesGrid(projectId);
+      //###############
+      //var proj_store = new dojo.store.Memory();
+      //proj_store.add(project);
+      //var site_store = voeis.Server.DEFAULT.projectSitesDataStore(project.id);
+      var tabs = dijit.byId('tab_browser');
+      var tab_browser = dijit.byId('right_tabs');    
+      var map = dijit.byId('split_map');
+      var map_pane = dijit.byId('map_pane');
+      tab_browser.selectChild(map_pane);
+      map.store.add(project);
+      //map.setStore(proj_store);
+      var grid = voeis.ui.ProjectSitesGrid(project.id);
       tabs.addChild(grid);
       tabs.selectChild(grid);
     });
   })();
   
 
-      

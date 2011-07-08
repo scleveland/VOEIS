@@ -86,7 +86,6 @@ dojo.declare("yogo.maps.google.DataMap", yogo.maps.google.Map, {
         marker.window = new google.maps.InfoWindow({content:marker.info});
         marker.popWin = function(map) {
           	//this.setIcon(); this.getIcon();
-          	//alert('at POP! markers: '+map._map.getCenter().toString());
 						for(var i=0;i<map._markers.length;i++) {
             		map._markers[i].window.close();
             		//this._markers[i].setIcon(this.markerIcon);
