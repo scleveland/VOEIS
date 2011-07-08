@@ -1,12 +1,58 @@
-#content
-  %h3 The Virtual Observatory and Ecological Informatics System (VOEIS)
-  = form_for(:user_session, :url => user_session_path, :builder => YogoFormBuilder) do |f|
-    #login-image
-      = image_tag("Flathead.jpg", :alt => "Flathead Lake at sunset.", :align => "left",:width=>"550px")
-    #login-description
-      %p The Virtual Observatory and Ecological Informatics System (VOEIS) provides a framework for data acquisition, analysis, model integration, and display of data products from completed workflows including geospatially explicit models, graphs from statistical analyses, GIS displays of classified ecological attributes on the landscape, and 3-D visualization models of waterscape and landscape processes.
+:css
+  #head {
+    margin-left: 1em;
+    margin-top: 10px;
+    font-family: Georgia, serif;
+    font-size: 20pt;
+    font-style: italic;
+    color: #3A4491;
+  }
+  #head-voeis {
+    font-family: 'Arial Black', Gadget, sans-serif;
+    font-weight: bold;
+    font-style: normal;
+  }
+  #content { margin:10px 50px }
+  #wrapper {
+    background-color: #ccb;
+    padding-top: 1px;
+  }
+  #login-image img { margin-right:20px; }
+  #login-description { margin-right:30px; }
+  #links {
+    margin-left: 0;
+    list-style-type: none;
+    list-style-position: outside;
+    
+    
+  }
+  #links li {
+    list-style-position: inside;
+    margin-left: 0;
+    margin-bottom: 20px;
+    font-size: 12pt;
+    font-weight: normal;
+    
+  }
 
-      %br
-      %br
-      %h2
-        =link_to("Browse Public Projects in VOEIS", projects_path($project))
+#content
+  #wrapper
+    %h2{:id=>"head"} 
+      %span{:id=>"head-voeis"}
+        VOEIS &nbsp; 
+      The Virtual Observatory and Ecological Informatics System
+    
+    = form_for(:user_session, :url => user_session_path, :builder => YogoFormBuilder) do |f|
+      #login-image
+        = image_tag("Flathead.jpg", :alt => "Flathead Lake at sunset.", :align => "left",:width=>"550px")
+      #login-description
+        %p The Virtual Observatory and Ecological Informatics System (VOEIS, pronounced like VOICE) provides a framework for data acquisition, analysis, model integration, and display of data products from completed workflows including geospatially explicit models, graphs from statistical analyses, GIS displays of classified ecological attributes on the landscape, and 3-D visualization models of waterscape and landscape processes.
+        %br
+
+        %ul{:id=>"links", :style=>""}
+          %li
+            =link_to("Browse Public Projects in VOEIS", projects_path($project))
+          %li
+            =link_to("More about VOEIS", page_url(:about))
+          %li
+            =link_to("VOEIS data live at BlueWaterTaskForce.org", page_url(:bluewater))
