@@ -109,7 +109,7 @@ Yogo::Application.routes.draw do
           post :upload
           post :export
           get  :pre_process_samples_file_upload
-          post :store_samples_and_data_from_file
+          post :store_logger_data_from_file
           post  :pre_process_samples_file
         end
       end
