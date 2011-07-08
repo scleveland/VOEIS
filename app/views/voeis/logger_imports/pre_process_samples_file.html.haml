@@ -33,7 +33,7 @@ Form Progress:
   #column_panes
     %div{:dojoType=>"dijit.TitlePane", :title=>"Sample Information", :id=> "samplePane"}
       %h2 
-        Please Setup the Information that will be associated with each sample created.
+        Please Setup the Information that will be associated with data.
       Data Parsing Template Name:
       =text_field_tag("template_name", @data_template.nil? ? "SampleStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d") : @data_template.name, :size => 80 )
       =check_box_tag("save_template", "yes", @data_template.nil? ? true : false, :disabled=> @data_template.nil? ? true : false)       
@@ -48,7 +48,7 @@ Form Progress:
       =hidden_field_tag("site", @site.id)
       =clear_break
       %label{:id => "source_label", :onclick=>"dijit.byId('new_source').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Choose A Source:
-      =select_tag("source", options_for_select(@sources, @data_template.nil? ? "None" : @data_template.samples.first.data_values.first.source.id.to_s), :onChange=>"updateSource()")
+      =select_tag("source", options_for_select(@sources, @data_template.nil? ? "None" : @data_template.source.nil? ? "None" : @data_template.source.id.to_s), :onChange=>"updateSource()")
       =clear_break
       =hidden_field_tag("data_stream_id", @data_template.nil? ? "" : @data_template.id.to_s)
       -if !@data_template.nil? 
@@ -81,7 +81,7 @@ Form Progress:
             Daylight Savings Time
           =clear_break
           UTC Offset:
-          =select_tag("utc_offset", options_for_select(@utc_offset_options, @data_template.nil? ? @site.time_zone_offset.to_i : @data_template.utc_offset))
+          =select_tag("utc_offset", options_for_select(@utc_offset_options, @data_template.nil? ? @site.time_zone_offset.to_i : @data_template.utc_offset.nil? ? @site.time_zone_offset.to_i : @data_template.utc_offset.to_i))
       %button{:dojoType=>"dijit.form.Button", :title=>"Next", :id=>"next0", :disabled=>"disabled", :onclick=>"sampleButtonClick();" }
         Next
 

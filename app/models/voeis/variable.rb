@@ -84,6 +84,8 @@ class Voeis::Variable
   has 1, :lab_method,          :model => "Voeis::LabMethod", :through => Resource
   has 1, :field_method,        :model => "Voeis::FieldMethod", :through => Resource
   has n, :meta_tags, :model => 'Voeis::MetaTag', :through => Resource
+  has n, :spatial_offsets,      :model => "Voeis::SpatialOffset",    :through => Resource
+  
   
   def self.load_from_his
     his_variables = repository(:his){ His::Variable.all }

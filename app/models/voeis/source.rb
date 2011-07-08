@@ -22,7 +22,8 @@ class Voeis::Source
   
   yogo_versioned
   
-  has n, :samples,             :model => "Voeis::Sample",           :through => Resource
-  has n, :data_values,             :model => "Voeis::DataValue",           :through => Resource
-  has n, :sensor_values,             :model => "Voeis::SensorValue",           :through => Resource
+  has n, :samples,             :model => "Voeis::Sample",         :through => Resource
+  has n, :data_values,         :model => "Voeis::DataValue",      :through => Resource
+  has n, :sensor_values,       :model => "Voeis::SensorValue",    :through => Resource
+  has n, :data_streams,        :model => "Voeis::DataStream",     :through => Resource
 end
