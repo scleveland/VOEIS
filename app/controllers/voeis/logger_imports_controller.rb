@@ -361,7 +361,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
 
             @start_line = params[:start_line].to_i
             if params[:header_box] == "Campbell"
-              @start_line = 4
+              @start_line = 5
             end
             #get the first row that has information in the CSV file
             @start_row = get_row(@new_file, @start_line)
@@ -575,7 +575,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
       else
         @timestamp_col = -1
       end
-        @sample_col = data_stream.data_stream_columns.first(:name => "SampleID").column_number
+        #@sample_col = data_stream.data_stream_columns.first(:name => "SampleID").column_number
 
 
       range = params[:row_size].to_i - 1
@@ -631,6 +631,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
               #create sample
               @site = Voeis::Site.get(site.id)
               #calculate the correct local_offset
+              debugger
               sample_datetime = Chronic.parse(@csv_row[row][timestamp_col]).to_datetime
               sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,
                            sample_datetime.day,sample_datetime.hour,sample_datetime.min,
@@ -673,19 +674,21 @@ class Voeis::LoggerImportsController < Voeis::BaseController
     
     #columns is an array of the columns that store the variable id
      def create_sample_and_data_parsing_template(template_name, timestamp_col, sample_id_col, columns_array, ignore_array, site, datafile, start_line, row_size, vertical_offset_col, ending_vertical_offset_col, meta_tag_array, utc_offset, dst, source, min_array, max_array, difference_array)
-        @data_stream
+        @data_stream = ""
         parent.managed_repository do
+
           @data_stream = Voeis::DataStream.create(:name => template_name.to_s,
             :description => "NA",
             :filename => datafile,
             :start_line => start_line.to_i,
             :type => "Sensor",
             :utc_offset => utc_offset,
+            :source => source,
             :DST => dst)
           #Add site association to data_stream
 
          @data_stream.sites << site
-         @data_stream.source = source
+         #@data_stream.source = source
          @data_stream.save
         end #managed_repository
         @timestamp_col = -1
@@ -791,9 +794,9 @@ class Voeis::LoggerImportsController < Voeis::BaseController
               data_stream_column.save
               sensor_type = Voeis::SensorType.create(
                             :name => variable.variable_name + ':' + variable.id.to_s + ':' + site.name,
-                            :min => min_array[i].to_f,
-                            :max => max_array[i].to_f,
-                            :difference => difference_array.to_f)
+                            :min => min_array.nil? ? nil : min_array[i].to_f,
+                            :max => max_array.nil? ? nil : max_array[i].to_f,
+                            :difference => difference_array.nil? ? nil : difference_array.to_f)
               #Add sites and variable associations to senor_type
               #
               sensor_type.sites << site

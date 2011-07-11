@@ -87,7 +87,7 @@ Form Progress:
 
     - @columns.each do |col|
       =hidden_field_tag "tag_column"+col.to_s, "-1"
-      =hidden_field_tag "column"+col.to_s, :onChange=>"updateVarSpans(#{col.to_s})";
+      =hidden_field_tag "column"+col.to_s, "",:onChange=>"updateVarSpans(#{col.to_s})";
       =hidden_field_tag "ignore"+col.to_s;
       -if !@data_template.nil?
         -if !(ds_col = @data_template.data_stream_columns.first(:column_number => col-1)).nil?
