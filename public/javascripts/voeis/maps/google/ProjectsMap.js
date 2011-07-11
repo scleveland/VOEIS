@@ -62,18 +62,19 @@ dojo.declare("voeis.maps.google.ProjectsMap", yogo.maps.google.DataMap, {
         // click table
         var grid = dijit.byId(site.projectId());
 	      var tabs = dijit.byId('tab_browser');
-	      tabs.selectChild(grid);
         if(grid) {
+		      tabs.selectChild(grid);
 					var col = grid.layout.cells[1];
 	        grid.selection.clear();
-	        grid.selection.addToSelection(site);
 	        for(var i=0; i<grid.rowCount; i++)
 	          if(site.id==grid.getItem(i).id) {
 	            grid.scrollToRow(i);
 	            grid.focus.setFocusCell(col,i);
 	            grid.focus.focusGrid();
+		        	grid.selection.addToSelection(i);
 	            break;
 	          };
+        	//grid.selection.addToSelection(site);
 				};
     }
 });
