@@ -631,19 +631,17 @@ class Voeis::LoggerImportsController < Voeis::BaseController
               #create sample
               @site = Voeis::Site.get(site.id)
               #calculate the correct local_offset
-              debugger
               sample_datetime = Chronic.parse(@csv_row[row][timestamp_col]).to_datetime
               sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,
                            sample_datetime.day,sample_datetime.hour,sample_datetime.min,
                            sample_datetime.sec, data_stream.utc_offset/24.to_f)
 
               (0..range).each do |i|
-                puts i
                 if columns_array[i] != "ignore" && sample_id_col != i && timestamp_col != i &&
                    columns_array[i] != nil && vertical_offset_col != i && 
                    ending_vertical_offset_col != i && meta_tag_array[i].to_i == -1
 
-                    new_data_val = Voeis::DataValue.new(:data_value => /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(@csv_row[row][i].to_s) ? @csv_row[row][i].to_f : -9999.0, 
+                  new_data_val = Voeis::DataValue.new(:data_value => /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(@csv_row[row][i].to_s) ? @csv_row[row][i].to_f : -9999.0, 
                        :local_date_time => sampletime,
                        :utc_offset => utc_offset,
                        :observes_daylight_savings => dst,
@@ -654,12 +652,12 @@ class Voeis::LoggerImportsController < Voeis::BaseController
                        :vertical_offset =>  vertical_offset_col == "" ? 0.0 : @csv_row[row][vertical_offset_col].to_i,
                        :end_vertical_offset => ending_vertical_offset_col == "" ? nil : @csv_row[row][ending_vertical_offset_col].to_i) 
                   new_data_val.save
-                  @site.data_values << new_data_val
-                  @site.save
+                  new_data_val.site = @site
+                  # @site.data_values << new_data_val
+                  # @site.save
                   new_data_val.variable << @col_vars[i]
                   new_data_val.source = @project_source
                   row_meta_tag_array.map{|mtag| new_data_val.meta_tags << mtag}  #add meta_data
-                  new_data_val.save
                   new_data_val.data_streams << data_stream
                   new_data_val.save
                  end #end if
@@ -811,5 +809,74 @@ class Voeis::LoggerImportsController < Voeis::BaseController
         data_template_hash = Hash.new
         #return our Awesome new data_stream or template if you would be so kind
         data_template_hash = {:data_template_id => @data_stream.id}
+     end
+     
+     def field_measurement
+         @sites = parent.managed_repository{Voeis::Site.all}
+         @variables = Voeis::Variable.all
+         @var_properties = Array.new
+          Voeis::Variable.properties.each do |prop|
+   
+            @var_properties << prop.name
+          end
+          @var_properties.delete_if {|x| x.to_s == "id" || x.to_s == "his_id" || x.to_s == "time_units_id" || x.to_s == "is_regular" || x.to_s == "time_support" || x.to_s == "variable_code" || x.to_s == "created_at" || x.to_s == "updated_at" || x.to_s == "updated_by" || x.to_s == "updated_comment"}
+         @units = Voeis::Unit.all
+     end
+
+     def create_field_measurement
+       @var = Voeis::Variable.get(params[:variable].to_i)
+       units = Voeis::Unit.all
+       @unit = units.first(:id => @var.variable_units_id)
+       parent.managed_repository do
+         d_time = DateTime.parse("#{params[:time]["stamp(1i)"]}-#{params[:time]["stamp(2i)"]}-#{params[:time]["stamp(3i)"]}T#{params[:time]["stamp(4i)"]}:#{params[:time]["stamp(5i)"]}:00#{ActiveSupport::TimeZone[params[:time][:zone]].utc_offset/(60*60)}:00")
+         variable = Voeis::Variable.first_or_create(
+                     :variable_code => @var.variable_code,
+                     :variable_name => @var.variable_name,
+                     :speciation =>  @var.speciation,
+                     :variable_units_id => @var.variable_units_id,
+                     :sample_medium =>  @var.sample_medium,
+                     :value_type => @var.value_type,
+                     :is_regular => @var.is_regular,
+                     :time_support => @var.time_support,
+                     :time_units_id => @var.time_units_id,
+                     :data_type => @var.data_type,
+                     :general_category => @var.general_category,
+                     :no_data_value => @var.no_data_value)
+
+         unit = Voeis::Unit.first_or_create(:units_name => @unit.units_name,
+                                            :units_type => @unit.units_type,
+                                            :units_abbreviation => @unit.units_abbreviation)
+         variable.units << unit
+         variable.save
+         site = Voeis::Site.get(params[:site].to_i)
+         #create field measurments data_stream
+         data_stream = Voeis::DataStream.first_or_create(:name => "Field Measurements-"+site.code,
+                                                         :filename => "NA",
+                                                         :start_line => -1,
+                                                         :type => "Field Measurements")
+         data_stream_column = Voeis::DataStreamColumn.first_or_create(:name => "FieldMeasurementColumn_"+variable.variable_code+'_'+site.code , 
+                                                                      :type => "Na", 
+                                                                      :unit => variable.units.first.units_name,  
+                                                                      :original_var => variable.variable_name, 
+                                                                      :column_number => -1)
+         sensor_type = Voeis::SensorType.first_or_create(:name => "FieldMeasurement_"+variable.variable_code)
+         sensor_value = Voeis::SensorValue.new(:value => params[:sensor_value].to_f,
+                                                  :string_value => params[:sensor_value],
+                                                  :units => variable.units.first.units_name,    
+                                                  :timestamp => d_time,  
+                                                  :vertical_offset => params[:vertical_offset])
+         sensor_value.save
+         sensor_type.sensor_values << sensor_value
+         sensor_type.variables << variable
+         sensor_type.save
+         data_stream_column.sensor_types << sensor_type
+         data_stream_column.save
+         data_stream.data_stream_columns << data_stream_column
+         data_stream.save
+         site.data_streams << data_stream
+         site.save
+       end
+       flash[:notice] = "Field Measurement was saved successfully."
+       redirect_to new_field_measurement_project_sensor_values_path
      end
 end
