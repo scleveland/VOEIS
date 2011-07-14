@@ -1,7 +1,7 @@
 - content_for(:javascripts) do
   :javascript
     function  createVariable(){ 
-    $.post("#{root_url + "variables"}.json?variable[variable_code]=" +$("#variable_variable_code").val()+"&variable[variable_name]=" + $("#variable_variable_name").val()+"&variable[speciation]="+$("#variable_speciation").val()+"&variable[variable_units_id]="+ $("#variable_variable_units_id").val() + "&variable[sample_medium]="+ $("#variable_sample_medium").val() + "&variable[quality_control]="+$("#variable_quality_control").val()+"&variable[is_regular]="+$("#variable_is_regular").val()+"&variable[time_support]="+$("#variable_time_support").val()+"&variable[time_units_id]="+$("#variable_time_units_id").val()+"&variable[data_type]="+$("#variable_data_type").val()+"&variable[general_category]="+$("#variable_general_category").val()+"&variable[no_data_value]="+$("#variable_no_data_value").val()+"&variable[detection_limit]="+$("#variable_detection_limit").val()+"&variable[value_type]="+$("#variable_value_type").val()+"&variable[lab_method_id]="+$("#variable_lab_method_id").val(),
+    $.post("#{root_url + "variables"}.json?variable[variable_code]=" +$("#variable_variable_code").val()+"&variable[variable_name]=" + $("#variable_variable_name").val()+"&variable[speciation]="+$("#variable_speciation").val()+"&variable[variable_units_id]="+ $("#variable_variable_units_id").val() + "&variable[sample_medium]="+ $("#variable_sample_medium").val() + "&variable[quality_control]="+$("#variable_quality_control").val()+"&variable[is_regular]="+$("#variable_is_regular").val()+"&variable[time_support]="+$("#variable_time_support").val()+"&variable[time_units_id]="+$("#variable_time_units_id").val()+"&variable[data_type]="+$("#variable_data_type").val()+"&variable[general_category]="+$("#variable_general_category").val()+"&variable[no_data_value]="+$("#variable_no_data_value").val()+"&variable[detection_limit]="+$("#variable_detection_limit").val()+"&variable[value_type]="+$("#variable_value_type").val()+"&variable[lab_method_id]="+$("#variable_lab_method_id").val()+"&variable[field_method_id]="+$("#variable_field_method_id").val()+"&variable[spatial_offset_type]="+$("#variable_spatial_offset_type").val()+"&variable[spatial_units_id]="+$("#variable_spatial_units_id").val()+"&variable[spatial_offset_value]="+$("#variable_spatial_offset_value").val(),
     function(data) {
     updated_var = data  
     update_text= data["variable_name"];
@@ -158,17 +158,17 @@
       %label{:id => "spatial", :onclick=>"dijit.byId('new_spatial_offset_type').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Spatial Offset Type: 
       -sot_options = Array.new
       -spatial_offset_types.all(:order => [:type]).each do |sot|
-        -sot_options << [sot.type, sot.id.to_s]
-      = select_tag :spatial_offset_type, options_for_select(sot_options)
+        -sot_options << [sot.type, sot.type]
+      = f.select :spatial_offset_type, options_for_select(sot_options)
       =clear_break
       %label Spatial Offset Value: 
-      = text_field_tag :value
+      = f.text_field :spatial_offset_value
       =clear_break
       %label Spatial Offset Units:
       -offset_unit_options = Array.new
       - offset_units.all(:order => [:units_name]).each do |unit|
         -offset_unit_options << [unit.units_name, unit.id.to_s]
-      = select_tag :units_id, options_for_select(offset_unit_options)
+      = f.select :spatial_units_id, options_for_select(offset_unit_options)
     =clear_break
     %button{:id=> 'new_variable_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createVariable();"}
       Create Variable
