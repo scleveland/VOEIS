@@ -46,6 +46,7 @@ Yogo::Application.routes.draw do
 
       resources :variables
       resources :meta_tags
+      resources :spatial_offsets
       resources :units
       resources :apivs do
         collection do
@@ -108,6 +109,7 @@ Yogo::Application.routes.draw do
           post :create_stream
           post :upload
           post :export
+          get  :field_measurement
           get  :pre_process_samples_file_upload
           post :store_logger_data_from_file
           post  :pre_process_samples_file
