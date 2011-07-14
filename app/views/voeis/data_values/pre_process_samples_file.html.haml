@@ -52,7 +52,7 @@ Form Progress:
       -if !@data_template.nil? 
         :javascript
           dojo.addOnLoad(function(){
-          dijit.byId("next0").set("disabled", false);
+          dijit.registry.byClass("dijit.form.Button").forEach(function(btn){if(btn.attr("title") == "Next"){btn.set("disabled", false);}});
           updateProgressBar();
           });
       -#selectedSite
@@ -148,7 +148,7 @@ Form Progress:
             dojo.addOnLoad(function(){
             dijit.byId("next#{col.to_s}").set("disabled", false);
             });
-      %div{:id => "Column"+col.to_s, :dojoType=>"dijit.TitlePane", :title=>"Column"+col.to_s, :open => "false", :class => "column_panes", :toggleable=>"false"}
+      %div{:id => "Column"+col.to_s, :dojoType=>"dijit.TitlePane", :title=>"Column"+col.to_s, :open => "false", :class => "column_panes", :toggleable=> @data_template.nil? ? "false" : "true"}
         = "Header Information:"
         =clear_break
         -if @header_rows == -1
