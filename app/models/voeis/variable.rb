@@ -62,6 +62,7 @@ class Voeis::Variable
   property :detection_limit,   Float,   :required => false
   property :value_type,        String, :required => true, :default=>"Unknown"
   property :lab_method_id,     Integer, :required => false
+  property :lab_id,             Integer, :required => false
   property :field_method_id,     Integer, :required => false
   property :spatial_units_id,   Integer,  :required => false
   property :spatial_offset_type,   String,  :required => false, :length => 512
