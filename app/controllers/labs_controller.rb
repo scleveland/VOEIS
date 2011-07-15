@@ -1,26 +1,26 @@
-class LabMethodsController < ApplicationController
+class LabsController < ApplicationController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
 
-  # GET /lab_methods/new
+  # GET /labs/new
   def new
-    @lab_method = Voeis::LabMethod.new
+    @lab = Voeis::Lab.new
 
     respond_to do |format|
       format.html # new.html.erb
     end
   end
   
-  # POST /lab_methods
+  # POST /labs
   def create
-    @lab_method = Voeis::LabMethod.new(params[:lab_method])
+    @lab = Voeis::Lab.new(params[:lab])
     respond_to do |format|
-      if @lab_method.save
+      if @lab.save
         flash[:notice] = 'Lab Method was successfully created.'
         format.json do
-          render :json => @lab_method.as_json, :callback => params[:jsoncallback]
+          render :json => @lab.as_json, :callback => params[:jsoncallback]
         end
-        format.html { (redirect_to(new_lab_method_c_v_path())) }
+        format.html { (redirect_to(new_lab_c_v_path())) }
       else
         format.html { render :action => "new" }
       end

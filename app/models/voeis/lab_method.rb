@@ -23,8 +23,8 @@ class Voeis::LabMethod
   include Yogo::Versioned::DataMapper::Resource
   
   property :id,                     Serial
-  property :lab_name,               Text, :required => true, :default => 'Unknown', :format => /[^\t|\n|\r]/
-  property :lab_organization,       Text, :required => true, :default => 'Unknown', :format => /[^\t|\n|\r]/
+  #property :lab_name,               Text, :required => true, :default => 'Unknown', :format => /[^\t|\n|\r]/
+  #property :lab_organization,       Text, :required => true, :default => 'Unknown', :format => /[^\t|\n|\r]/
   property :lab_method_name,        Text, :required => true, :default => 'Unknown', :format => /[^\t|\n|\r]/
   property :lab_method_description, Text, :required => true, :default => 'Unknown'
   property :lab_method_link,        Text
