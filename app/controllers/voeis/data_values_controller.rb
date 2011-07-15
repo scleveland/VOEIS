@@ -1058,6 +1058,7 @@ class Voeis::DataValuesController < Voeis::BaseController
        
     
            @variable = Voeis::Variable.new
+           @labs = Voeis::Lab.all
            @lab_methods = Voeis::LabMethod.all
            @field_methods = Voeis::FieldMethod.all
            @units = Voeis::Unit.all
