@@ -54,8 +54,17 @@ class Voeis::VariablesController < Voeis::BaseController
     if params[:variable][:detection_limit].empty?
       @variable.detection_limit = nil
     end
-    if params[:variable][:value_type].nil?
-      @variable.value_type = params[:variable][:quality_control]
+    if params[:variable][:field_method_id].empty?
+      @variable.field_method_id = nil
+    end
+    if params[:variable][:lab_id].empty?
+      @variable.lab_id = nil
+    end
+    if params[:variable][:lab_method_id].empty?
+      @variable.lab_method_id = nil
+    end
+    if params[:variable][:spatial_offset_type].empty?
+      @variable.spatial_offset_type = nil
     end
     if @variable.save  
       respond_to do |format|
