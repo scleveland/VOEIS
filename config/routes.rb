@@ -47,6 +47,7 @@ Yogo::Application.routes.draw do
       resources :variables
       resources :meta_tags
       resources :spatial_offsets
+      resources :labs
       resources :units
       resources :apivs do
         collection do
@@ -182,6 +183,7 @@ Yogo::Application.routes.draw do
   resources :general_category_c_vs
   resources :sample_type_c_vs
   resources :lab_methods
+  resources :labs
   resources :sample_materials
   resources :field_methods
   resource  :password,                :only => [:show, :update, :edit]
