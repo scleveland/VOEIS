@@ -1240,7 +1240,16 @@ class Voeis::DataValuesController < Voeis::BaseController
                       :time_units_id => @var.time_units_id,
                       :data_type => @var.data_type,
                       :general_category => @var.general_category,
-                      :no_data_value => @var.no_data_value)
+                      :no_data_value => @var.no_data_value,
+                      :detection_limit => @var.detection_limit,
+                      :value_type => @var.value_type,
+                      :field_method_id => @var.field_method_id,
+                      :lab_id => @var.lab_id,
+                      :lab_method_id => @var.lab_method_id,
+                      :spatial_offset_type => @var.spatial_offset_type,
+                      :spatial_offset_value => @var.spatial_offset_value,
+                      :spatial_units_id => @var.spatial_units_id
+                      )
             @col_vars[i] = variable
           end#managed repo
         end #end if
@@ -1451,7 +1460,19 @@ class Voeis::DataValuesController < Voeis::BaseController
                         :time_units_id => var.time_units_id,
                         :data_type => var.data_type,
                         :general_category => var.general_category,
-                        :no_data_value => var.no_data_value)
+                        :no_data_value => var.no_data_value,
+                        :detection_limit => var.detection_limit,
+                        :value_type => var.value_type,
+                        :field_method_id => var.field_method_id,
+                        :lab_id => var.lab_id,
+                        :lab_method_id => var.lab_method_id,
+                        :spatial_offset_type => var.spatial_offset_type,
+                        :spatial_offset_value => var.spatial_offset_value,
+                        :spatial_units_id => var.spatial_units_id
+                        )
+
+                                              
+                        
             data_stream_column.variables << variable
             data_stream_column.data_streams << @data_stream
             data_stream_column.save
