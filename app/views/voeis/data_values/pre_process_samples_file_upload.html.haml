@@ -18,7 +18,11 @@
          identifier: 'id',
          label: 'name',
          items: site_data };
-
+    function enableButton(){
+      if ($("#site_id").val() != ""){
+        dijit.byId("upload_button").set("disabled", false);
+      }
+    }
 #upload
   %h2 Sample And Data Upload Wizard: Step 1
   
@@ -40,6 +44,9 @@
       else{
       $("#site_id").val(item[0]["id"]);
       $("#site_span").text(""+item[0]["name"]);
+      if ($("#datafile").val() != ""){
+      dijit.byId("upload_button").set("disabled", false); 
+      };
       }
   =clear_break
   =clear_break
@@ -49,7 +56,7 @@
     %span{:id=>"site_span"}None
     =clear_break
     = 'File to upload:'
-    = file_field_tag(:datafile, :accept => "text/csv,text/comma-separated-values,application/vnd.ms-excel")
+    = file_field_tag(:datafile, :accept => "text/csv,text/comma-separated-values,application/vnd.ms-excel", :onChange=>"enableButton();")
     = hidden_field_tag( :project_id, :value =>@project.id)
     =clear_break
     Please indicate which line data begins on.
@@ -64,7 +71,6 @@
       - template_string = template_string + "<option value="+template.id.to_s+">"+template.name+"</option>"
     = select_tag("data_template_id", template_string.html_safe)
     =clear_break
-    = submit_tag("Upload File", :onclick => "$('#loader').toggle();")
-    = link_to('Cancel', {:action => 'show', :controller => '/projects', :id=>@project.id }, :class => 'icon icon-cancel', :onclick => "$('#loader').toggle();")
-
+    %button{:id=> 'upload_button',:dojoType=>"dijit.form.Button", :title=>'Upload', :disabled=>true, :type=>"submit"}
+      Upload File
     
