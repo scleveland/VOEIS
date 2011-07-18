@@ -4,7 +4,7 @@ class Voeis::MetaTag
   include Yogo::Versioned::DataMapper::Resource
   
   property :id,       Serial
-  property :value,    Text,   :required => true, :required => false
+  property :value,    Text,   :required => false
   property :name,     String, :required => true, :length => 512, :index => true
   property :category, String, :required => true, :length => 512, :index => true
 
