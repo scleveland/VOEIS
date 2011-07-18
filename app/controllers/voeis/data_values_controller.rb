@@ -1204,7 +1204,7 @@ class Voeis::DataValuesController < Voeis::BaseController
      end
      #use this when we decide to save templates and reuse them
      if params[:save_template] == "true"
-       data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array, dstream_utc_offset, dst)
+       data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array, dstream_utc_offset, dst, @project_source)
      end
 
      if params[:save_template] == "true"
@@ -1351,7 +1351,7 @@ class Voeis::DataValuesController < Voeis::BaseController
    
    
    #columns is an array of the columns that store the variable id
-   def create_sample_and_data_parsing_template(template_name, timestamp_col, sample_id_col, columns_array, ignore_array, site, datafile, start_line, row_size, vertical_offset_col, ending_vertical_offset_col, meta_tag_array, utc_offset, dst)
+   def create_sample_and_data_parsing_template(template_name, timestamp_col, sample_id_col, columns_array, ignore_array, site, datafile, start_line, row_size, vertical_offset_col, ending_vertical_offset_col, meta_tag_array, utc_offset, dst,source)
       parent.managed_repository do
         debugger
         @data_stream = Voeis::DataStream.create(:name => template_name.to_s,
@@ -1359,6 +1359,7 @@ class Voeis::DataValuesController < Voeis::BaseController
           :filename => datafile,
           :start_line => start_line.to_i,
           :type => "Sample",
+          :source => source,
           :utc_offset => utc_offset,
           :DST => dst)
         #Add site association to data_stream
