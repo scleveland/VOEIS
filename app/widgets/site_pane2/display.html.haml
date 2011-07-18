@@ -57,6 +57,9 @@
         -if @auth
           &nbsp;&nbsp;&nbsp;
           = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show-site00').hide();$('#edit-site00').show();") 
+        %br
+        &nbsp;&nbsp;&nbsp;
+        = link_to('TEST', 'javascript:', :class=>'icon icon-edit', :onclick=>"alert('EDIT>>> '+self.editMode);") 
   %br
 
   %table{:id=>"site00-property-table", :style=>'width:80%;'}
