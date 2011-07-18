@@ -24,7 +24,7 @@
   %h2 Sample And Data Upload Wizard: Step 2 (File Parsing Instructions)
 Form Progress:
 
-=form_tag("store_samples_and_data_from_file", :method => :post) do
+=form_tag({:action=>"store_samples_and_data_from_file", :method => :post}, {:onSubmit => 'return validate();'}) do
   %div{:dojoType=>"dijit.ProgressBar", :jsId=>"jsProgress", :id=>"downloadProgress", :maximum=>"10"}
   
   %div{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"variableStore", :url=>"#{root_url+"projects/"+@project.id+"/apivs/dojo_variables_for_tree.json?"}"}
@@ -419,8 +419,8 @@ Form Progress:
             %td
               %span{:id => "var_td_"+prop.to_s+"_"+col.to_s, :onClick=>"editColumn(#{col})", :class=>"column_td"}None
   =clear_break
-  
-  =submit_tag("Save Samples")
+  %button{:dojoType=>"dijit.form.Button", :title=>"Save", :type=>"submit",:id=>"save_samples_button", :disabled=>true}
+    Save Samples
   = link_to('Cancel', project_path(@project), :class => 'icon icon-cancel')
 
 
@@ -891,6 +891,10 @@ Form Progress:
   maximum: #{@columns.length + 1},
   progress: ++i
   });
+  if (jsProgress.progress == jsProgress.maximum){
+    dijit.byId("save_samples_button").set("disabled",false);
+    dijit.byId("save_samples_button").focus();
+  }
   }
 
   function editColumn(column){
@@ -949,4 +953,29 @@ Form Progress:
     dijit.byId("next"+column).set("disabled", false);
     dijit.byId("next"+column).focus();
     dijit.byId("next"+column).set("label","Next");
+  }
+  function validate(){
+    //sample id must be assigned
+    if ($("#sample_id_column").val() == "-1" || $("#sample_id_column").val()==""){
+      myDialog = new dijit.Dialog({
+            title: "Form Error Dialog",
+            content: "Sample ID must be assigned to a column",
+            style: "width: 300px"
+      });
+      myDialog.show();
+      return false
+    }
+    //timestamp must be assigned
+    if ($("#timestamp_column").val() ==  "-1" || $("#timestamp_column").val() ==  ""){
+      myDialog = new dijit.Dialog({
+            title: "Form Error Dialog",
+            content: "A Timestamp must be assigned to a column",
+            style: "width: 300px"
+      });
+      myDialog.show();
+      return false
+    }
+    else{
+      return true;
+    }  
   }
