@@ -37,8 +37,17 @@ Form Progress:
         Please Setup the Information that will be associated with each sample created.
       Data Parsing Template Name:
       =text_field_tag("template_name", @data_template.nil? ? "SampleStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d") : @data_template.name, :size => 80 )
-      =check_box_tag("save_template", "yes", @data_template.nil? ? true : false, :disabled=> @data_template.nil? ? true : false)       
-      Save Parsing Template.
+      -#=check_box_tag("save_template", "yes", @data_template.nil? ? true : false, :disabled=> @data_template.nil? ? true : false)
+      - if !@data_template.nil?
+        %select{:id=>"save_template", :name=>"save_template", :dojoType=>"dijit.form.Select",  :style=>"width: 70px;"}       
+          %option{:value => "true", :selected => @data_template.nil? ? "selected" : ""}
+            Yes
+          %option{:value => "false", :selected => @data_template.nil? ? "" : "selected"}
+            Do Not 
+        Save This As A New Parsing Template.
+      -else
+        =hidden_field_tag "save_template", "true"
+        
       =clear_break
 
       =clear_break
@@ -47,7 +56,7 @@ Form Progress:
       =hidden_field_tag("site", @site.id)
       =clear_break
       %label{:id => "source_label", :onclick=>"dijit.byId('new_source').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Choose A Source:
-      =select_tag("source", options_for_select(@sources, @data_template.nil? ? "None" : @data_template.samples.first.data_values.first.source.id.to_s), :onChange=>"updateSource()")
+      =select_tag("source", options_for_select(@sources, @data_template.nil? ? "None" : @data_template.source.nil? ? "None" : @data_template.source.id.to_s), :onChange=>"updateSource()")
       =clear_break
       =hidden_field_tag("data_stream_id", @data_template.nil? ? "" : @data_template.id.to_s)
       -if !@data_template.nil? 
@@ -61,10 +70,10 @@ Form Progress:
       -#  %span{:id => "selected_site", :class=>"var_spans"}None
       -#=clear_break  
       Currently Selected Sample Type:
-      = select_tag('sample_type',  options_for_select(@sample_type_options, @data_template.nil? ? "Grab" : @data_template.samples.first.sample_type))
+      = select_tag('sample_type',  options_for_select(@sample_type_options, @data_template.nil? ? "Grab" : @data_template.samples.empty? ? "Grab" : @data_template.samples.first.sample_type))
       =clear_break
       Currently Selected Sample Medium:
-      = select_tag('sample_medium',  options_for_select(@sample_medium_options, @data_template.nil? ? "Surface Water" : @data_template.samples.first.material), :onChange=>"$('#variable_sample_medium').val($('#sample_medium').val());")
+      = select_tag('sample_medium',  options_for_select(@sample_medium_options, @data_template.nil? ? "Surface Water" : @data_template.samples.empty? ? "Surface Water" : @data_template.samples.first.material), :onChange=>"$('#variable_sample_medium').val($('#sample_medium').val());")
       =clear_break
       
       %div{:dojoType=>"dijit.layout.TabContainer", :id => "timestamp_selection"}
@@ -423,7 +432,8 @@ Form Progress:
     Save Samples
   = link_to('Cancel', project_path(@project), :class => 'icon icon-cancel')
 
-
+  %div{:dojoType=>"dijit.Dialog", :disableCloseButton => true, :id=>"loading_dialog", :title=>"Saving Data..."}
+    #search-div-loader
 :javascript  
   $(document).ready(function() {
   });
@@ -459,6 +469,7 @@ Form Progress:
   dojo.require("dojox.grid.enhanced.plugins.Filter");
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
   dojo.require("dijit.form.RadioButton");
+  dojo.require("dijit.form.Select");
   dojo.require("voeis.Server");
   var current_site_offset = #{@data_template.nil? ? @site.time_zone_offset : @data_template.utc_offset.nil? ? @site.time_zone_offset : @data_template.utc_offset};
   variableDataStore = voeis.Server.DEFAULT.globalVariablesDataStore();
@@ -976,6 +987,7 @@ Form Progress:
       return false
     }
     else{
+      dijit.byId("loading_dialog").show();
       return true;
     }  
   }
