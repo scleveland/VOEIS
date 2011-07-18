@@ -72,7 +72,7 @@ class Voeis::Site
     require "geonames"
     zone = Geonames::WebService.timezone self.latitude, self.longitude
     self.time_zone_offset = zone.gmt_offset
-    self.save
+    self.save!
   end
   
   def load_from_his
