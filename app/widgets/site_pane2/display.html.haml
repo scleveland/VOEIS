@@ -1,0 +1,198 @@
+:css
+  #content { margin:10px 50px }
+  #wrapper {
+    padding-bottom: 20px;
+    background-color: #ccb;
+    padding-top: 1px;
+  }
+  #wrapper img { margin-right:12px }
+  #wrapper p { margin:0 20px }
+
+  #form-table { width:600px; }
+  #form-table td { width:50%; }
+  .form-element { width:15em; }
+  #site_name { width:25em; }
+  #site_local_projection_id { width:20em; }
+  #site_pos_accuracy_m { width:20em; }
+  #site_comments { width:42em; }
+
+
+- content_for(:javascripts) do
+  :javascript
+    dojo.require("dijit.dijit");
+    dojo.require("dijit.Declaration");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dijit.layout.TabContainer");
+    dojo.require("dojox.layout.TableContainer");
+    dojo.require("dijit.form.TextBox");
+    
+    //$(window).ready(function(){ 
+    //dojo.addOnLoad(function(){
+        //dojo.parser.parse();
+        //hideLoader();
+    //});
+    
+%h2{:id=>"site00-name-head", :style=>"margin-top:0;"}
+  $$$site-name$$$
+
+-#-if !current_user.nil? && current_user.projects.include?(@project)
+-#  = link_to('Edit', edit_project_site_path(@project,@site.id), :class=>'icon icon-edit')
+-#  &nbsp;&nbsp;&nbsp;
+-#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
+-#%br
+-#%br
+
+-#tab_browser{:dojoType=>"dijit.layout.TabContainer"}
+-#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"margin-top:0;padding-top:0;"}
+-#tab_browser{:style=>"margin-top:0;padding-top:0;width:700px;"}
+#show-site00{:dojoType=>"dijit.layout.ContentPane", :title=>@site.name, :style=>"margin-top:0;padding-top:0;"}
+  %table
+    %tr
+      %td{:style=>"width:200px;"}
+        %b SHOW DETAILS:
+      %td
+        -#= link_to('CANCEL', project_path(@project), :class => 'icon icon-cancel') 
+        -#= link_to('CANCEL', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
+        -#-if !@current_user.nil? && @current_user.projects.include?(@project)
+        -if @auth
+          &nbsp;&nbsp;&nbsp;
+          = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show-site00').hide();$('#edit-site00').show();") 
+  %br
+
+  %table{:id=>"site00-property-table", :style=>'width:80%;'}
+    - @site.properties.each do |prop|
+      %tr{:class=>"row#{cycle('1','0')}"}
+        %td
+          %b
+            #{prop.name.to_s.capitalize}
+        %td{:class=>"show_#{prop.name}"}
+          $$$#{prop.name}$$$
+
+  %br{:style=>'float:none; clear:both;'}
+  %br
+
+  %table{:id=>"site00-variable-table", :style=>"width:80%"}
+    %tr
+      %th{:width=>"40%"} Variable Data
+      %th{:width=>"20%"} Count
+      %th{:width=>"15%"} Start
+      %th{:width=>"15%"} Stop
+    %tr
+      %td
+        $$$site-variable-data$$$
+
+  %br{:style=>'float:none; clear:both;'}
+  
+  #all_variables-site00
+    %h3{:style=>"margin-top:0;"}
+      Existing Samples
+    = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
+      = hidden_field_tag('column_array', @sample_labels.to_json)
+      = hidden_field_tag('row_array', "$$$site-samps$$$")
+      = hidden_field_tag('file_name', "project_samples")
+      = submit_tag("Export Samples")
+  %br
+  %table{:id=>"site00-sample-table", :style=>"width:80%;"} 
+    %tr
+      - @sample_labels.each do |label|
+        %th
+          %b
+            = label
+    %tr
+      %td
+        $$$site-sample-data$$$
+
+-if @auth
+  #edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>'EDIT', :style=>"margin-top:0;padding-top:0;display:none;"}
+    %table
+      %tr
+        %td{:style=>"width:200px;"}
+          %b EDITING:
+        %td
+          = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit-site00').hide();$('#show-site00').show();") 
+    %br
+
+    -#= form_for(:site, @site, :remote=>true, :url=>project_site_path(@project, @site), :builder=>YogoFormBuilder, :html=>{:method=>"put", :onsubmit=>"return checkform();"} )do |f|
+    = form_for(:site, @site, :url=>"/projects/#{@project.id}/sites/$$$id$$$/", :html=>{:method=>:put, :id=>"site00-edit-form", :onsubmit=>"return checkform();"} )do |f|
+
+      %table{:id=>"form-table"}
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_name"} Name
+              = f.text_field("name", :value=>"$$$name$$$")
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_code"} Code
+            = f.text_field("code", :value=>"$$$code$$$")
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_latitude"} Latitude
+            = f.text_field("latitude", :value=>"$$$latitude$$$")
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_longitude"} Longitude
+            = f.text_field("longitude", :value=>"$$$longitude$$$")
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_elevation_m"} Elevation
+            = f.text_field("elevation_m", :value=>"$$$elevation_m$$$")
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_vertical_datum"} Vertical Datum
+            = f.text_field("vertical_datum", :value=>"$$$vertical_datum$$$")
+        %tr
+          %td 
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_local_x"} Local X
+            = f.text_field("local_x", :value=>"$$$local_x$$$")
+          %td 
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_local_y"} Local Y
+            = f.text_field("local_y", :value=>"$$$local_y$$$")
+        %tr
+          %td{:colspan=>"2"}
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_local_projection_id"} Local Projection
+            = f.text_field("local_projection_id", :value=>"$$$local_projection_id$$$") 
+        %tr
+          %td{:colspan=>"2"}
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_pos_accuracy_m"} Position Accuracy
+            = f.text_field("pos_accuracy_m", :value=>"$$$pos_accuracy_m$$$")
+        %tr
+          %td 
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_state"} State
+            = f.text_field("state", :value=>"$$$state$$$")
+          %td 
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_county"} County
+            = f.text_field("county", :value=>"$$$county$$$")
+        %tr
+          %td{:colspan=>"2"}
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_comments"} Comments
+            = f.text_area("comments", :value=>"$$$comments$$$")
+        %tr
+          %td{:colspan=>"2"}
+            = f.submit("Save Site", :onclick => "$('#loader').toggle();")
+            = link_to('Cancel', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit-site00').hide();$('#show-site00').show();") 
+            -#= link_to('Cancel', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
+
+%br{:style=>'float:none; clear:both;'}

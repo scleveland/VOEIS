@@ -32,7 +32,7 @@ class Voeis::SitesController < Voeis::BaseController
     @samples = @site.samples
     @samples.all(:order => [:lab_sample_code.asc]).each do |samp|
        @temp_array = Array.new
-       @temp_array=Array[samp.sample_type, samp.lab_sample_code, samp.material,samp.sites.first.name, samp.local_date_time.to_s]
+       @temp_array=Array[samp.sample_type, samp.lab_sample_code, samp.material, samp.local_date_time.to_s]
        @current_samples << @temp_array
     end
     show!

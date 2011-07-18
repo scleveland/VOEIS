@@ -6,13 +6,13 @@ dojo.declare("voeis.ui.SitePane", dijit.layout.ContentPane, {
     siteId: "",
     projectId: "",
     closable: true,
-    
-    ioArgs: {
-        headers: {
-            "Accept": "text/html"
-        }
-    },
-    
+  
+	  xxxioArgs: {
+	      headers: {
+	          "Accept": "text/html"
+	      }
+	  },
+
     constructor: function() {
         this.server = this.server || voeis.Server.DEFAULT;
         this.watch("siteId", dojo.hitch(this, "_siteUpdated"));
