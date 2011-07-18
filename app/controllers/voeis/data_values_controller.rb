@@ -1190,24 +1190,24 @@ class Voeis::DataValuesController < Voeis::BaseController
        end
      end
      if !params[:DST].nil?
-       utc_offset = params[:utc_offset].to_i + 1
+       dst_time = 1
        dst = true
      else
-      utc_offset = params[:utc_offset].to_i
+      dst_time = 0
       dst = false
      end
      #if the timestamp is in UTC then don't apply the calculate utc_offset just use 0
      if params[:time_support] == "UTC"
        dstream_utc_offset = 0
      else
-       dstream_utc_offset = utc_offset
+       dstream_utc_offset = params[:utc_offset].to_i
      end
      #use this when we decide to save templates and reuse them
-     if params[:save_template] == "yes"
+     if params[:save_template] == "true"
        data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array, dstream_utc_offset, dst)
      end
 
-     if params[:save_template] == "yes"
+     if params[:save_template] == "true"
        data_stream = parent.managed_repository{Voeis::DataStream.get(data_stream_id[:data_template_id])}
      else
        data_stream = parent.managed_repository{Voeis::DataStream.get(params[:data_stream_id])}
@@ -1224,6 +1224,7 @@ class Voeis::DataValuesController < Voeis::BaseController
      range = params[:row_size].to_i - 1
      #store all the Variables in the managed repository
      @col_vars = Array.new
+     @variables = Array.new
      (0..range).each do |i|
        if columns_array[i] != nil && columns_array[i] != "ignore" && ignore_array[i] != i && i != timestamp_col && i != sample_id_col && i != vertical_offset_col && ending_vertical_offset_col != i && meta_tag_array[i].to_i == -1
          @var = Voeis::Variable.get(columns_array[i].to_i)
@@ -1251,6 +1252,7 @@ class Voeis::DataValuesController < Voeis::BaseController
                       :spatial_units_id => @var.spatial_units_id
                       )
             @col_vars[i] = variable
+            @variables << variable
           end#managed repo
         end #end if
      end  #end i loop
@@ -1287,7 +1289,7 @@ class Voeis::DataValuesController < Voeis::BaseController
              sample_datetime = Chronic.parse(@csv_row[row][timestamp_col]).to_datetime
              sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,
                           sample_datetime.day,sample_datetime.hour,sample_datetime.min,
-                          sample_datetime.sec, data_stream.utc_offset/24.to_f)
+                          sample_datetime.sec, (data_stream.utc_offset+dst_time)/24.to_f)
              
              @sample = Voeis::Sample.new(:sample_type =>   params[:sample_type],
                                          :material => params[:sample_medium],
@@ -1312,7 +1314,7 @@ class Voeis::DataValuesController < Voeis::BaseController
 
                    new_data_val = Voeis::DataValue.new(:data_value => /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(@csv_row[row][i].to_s) ? @csv_row[row][i].to_f : -9999.0, 
                       :local_date_time => sampletime,
-                      :utc_offset => utc_offset,
+                      :utc_offset => data_stream.utc_offset+dst_time,
                       :observes_daylight_savings => dst,
                       :date_time_utc => sampletime.utc,  
                       :replicate => 0,
@@ -1337,6 +1339,7 @@ class Voeis::DataValuesController < Voeis::BaseController
               end #end if @csv_array.nil?
            end #end managed repo
          end #end row loop
+         #@site.update_site_data_catalog_variables(@variables)
          parent.publish_his
          flash[:notice] = "File parsed and stored successfully."
          redirect_to project_path(params[:project_id])
@@ -1349,8 +1352,8 @@ class Voeis::DataValuesController < Voeis::BaseController
    
    #columns is an array of the columns that store the variable id
    def create_sample_and_data_parsing_template(template_name, timestamp_col, sample_id_col, columns_array, ignore_array, site, datafile, start_line, row_size, vertical_offset_col, ending_vertical_offset_col, meta_tag_array, utc_offset, dst)
-      @data_stream
       parent.managed_repository do
+        debugger
         @data_stream = Voeis::DataStream.create(:name => template_name.to_s,
           :description => "NA",
           :filename => datafile,
