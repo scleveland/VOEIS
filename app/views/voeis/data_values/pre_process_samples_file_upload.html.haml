@@ -71,6 +71,8 @@
       - template_string = template_string + "<option value="+template.id.to_s+">"+template.name+"</option>"
     = select_tag("data_template_id", template_string.html_safe)
     =clear_break
-    %button{:id=> 'upload_button',:dojoType=>"dijit.form.Button", :title=>'Upload', :disabled=>true, :type=>"submit"}
+    %button{:id=> 'upload_button',:dojoType=>"dijit.form.Button", :title=>'Upload', :disabled=>true, :type=>"submit", :onClick => 'dijit.byId("uploading_dialog").show();'}
       Upload File
     
+    %div{:dojoType=>"dijit.Dialog", :disableCloseButton => true, :id=>"uploading_dialog", :title=>"Uploading File..."}
+      #search-div-loader
