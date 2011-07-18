@@ -1353,7 +1353,6 @@ class Voeis::DataValuesController < Voeis::BaseController
    #columns is an array of the columns that store the variable id
    def create_sample_and_data_parsing_template(template_name, timestamp_col, sample_id_col, columns_array, ignore_array, site, datafile, start_line, row_size, vertical_offset_col, ending_vertical_offset_col, meta_tag_array, utc_offset, dst,source)
       parent.managed_repository do
-        debugger
         @data_stream = Voeis::DataStream.create(:name => template_name.to_s,
           :description => "NA",
           :filename => datafile,
