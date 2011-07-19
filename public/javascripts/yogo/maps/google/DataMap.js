@@ -2,6 +2,7 @@ dojo.provide("yogo.maps.google.DataMap");
 dojo.require("yogo.maps.google.Map");
 dojo.require("dojo.store.Observable");
 dojo.require("dojo.store.Memory");
+//UPDATE!
 
 dojo.declare("yogo.maps.google.DataMap", yogo.maps.google.Map, {
     store: null,
