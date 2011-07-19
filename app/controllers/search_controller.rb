@@ -1,4 +1,8 @@
-class SearchController < InheritedResources::Base
+class SearchController < ApplicationController
 # The search controller!
+
+  def project
+    
+  end
 
 end
