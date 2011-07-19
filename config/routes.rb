@@ -52,11 +52,11 @@ Yogo::Application.routes.draw do
       resources :apivs do
         collection do
           get :dojo_variables_for_tree
-          get :create_project_site
-          get :create_project_variable
-          get :update_project_site
-          get :update_project_variable
-          get :update_voeis_variable
+          post :create_project_site
+          post :create_project_variable
+          put :update_project_site
+          put :update_project_variable
+          put :update_voeis_variable
           get :get_project_sites
           get :get_voeis_sites
           get :get_voeis_sites
