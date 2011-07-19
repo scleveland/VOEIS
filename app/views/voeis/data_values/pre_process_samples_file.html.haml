@@ -49,7 +49,9 @@ Form Progress:
         =hidden_field_tag "save_template", "true"
         
       =clear_break
-
+      Data Template Description:
+      =clear_break
+      =text_area_tag("template_description", @data_template.nil? ? "" : @data_template.description, :rows=>5, :cols => 80)
       =clear_break
       The Site to associate with all Samples: #{@site.name+'|'+@site.code}
       -#=select_tag("site", options_for_select(@sites, "None"), :onChange=>"updateSite()")
@@ -166,7 +168,7 @@ Form Progress:
         %table
           - (0..@header_rows).each do |row|
             %tr
-              %td Row #{row}
+              %td Row #{row+1}
               %td  
                 = @csv_array[row][col-1]
         =clear_break
