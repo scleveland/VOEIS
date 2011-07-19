@@ -328,7 +328,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
    # @author Sean Cleveland
    #
    # @api public
-   def pre_process_samples_file_upload
+   def pre_process_logger_file_upload
      @project = parent
      @data_templates = parent.managed_repository{Voeis::DataStream.all(:type => "Sensor")}
      @general_categories = Voeis::GeneralCategoryCV.all
@@ -339,7 +339,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
    # This is the Sample Wizard Upload Second Step for describing how to parse a CSV file
    # @author Sean Cleveland
    # @api public
-   def pre_process_samples_file
+   def pre_process_logger_file
 
         require 'csv_helper'
         @data_template = parent.managed_repository{Voeis::DataStream.get(params[:data_template_id].to_i)}  
@@ -434,7 +434,9 @@ class Voeis::LoggerImportsController < Voeis::BaseController
             @data_types = Voeis::DataTypeCV.all
             @general_categories = Voeis::GeneralCategoryCV.all
             @batch = Voeis::MetaTag.first_or_create(:name => "Batch", :category =>"Chemistry")
+             @labs = Voeis::Lab.all
 
+             
             @label_array = Array["Variable Name","Variable Code","Unit Name","Speciation","Sample Medium","Value Type","Is Regular","Time Support","Time Unit ID","Data Type","General Cateogry"]
             @current_variables = Array.new     
             @variables.all(:order => [:variable_name.asc]).each do |var|

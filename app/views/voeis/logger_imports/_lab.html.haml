@@ -1,0 +1,30 @@
+- content_for(:javascripts) do
+  :javascript
+    function createLab(){ 
+    $.post("#{root_url + "labs"}.json?lab[lab_name]=" +$("#lab_lab_name").val()+"&lab[lab_organization]=" + $("#lab_lab_organization").val(),
+    function(data) {
+      $('#variable_lab_id').append($("<option></option>").attr("value",data['id']).text($("#lab_lab_name").val())); 
+      $('#variable_lab_id').val(data['id']);
+      dijit.byId("new_lab").hide();
+    }
+    );
+    }
+    dojo.require("dijit.Tooltip");
+
+#new_lab{:dojoType=>"dijit.Dialog", :title=>"New Lab"}
+  %h3 Create a new Lab:
+  = form_for (:lab) do |f|
+    = f.label("Lab Name:")
+    =clear_break
+    =f.text_field :lab_name, :size=> 50
+    =clear_break
+    = f.label("Lab Organization:")
+    =clear_break
+    =f.text_field :lab_organization, :size=> 50
+    =clear_break
+    %button{:id=> 'new_lab_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createLab();"}
+      Create lab
+
+
+
+
