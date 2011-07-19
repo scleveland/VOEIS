@@ -1,5 +1,5 @@
 -#variable partial
-= render(:partial => "variable", :locals =>{:variable => @variables,
+= render(:partial => "variable_create", :locals =>{:variable => @variables,
                                             :variable =>@variable,
                                             :units=>@units,
                                             :variable_names=>@variable_names,
@@ -12,6 +12,7 @@
                                             :label_array=>@label_array,
                                             :current_variables=>@current_variables,
                                             :lab_methods=>@lab_methods,
+                                            :labs=>@labs,
                                             :field_methods=>@field_methods,
                                             :spatial_offset_types => @spatial_offset_types,
                                             :offset_units => @offset_units,
@@ -35,7 +36,7 @@ Form Progress:
       %h2 
         Please Setup the Information that will be associated with data.
       Data Parsing Template Name:
-      =text_field_tag("template_name", @data_template.nil? ? "SampleStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d") : @data_template.name, :size => 80 )
+      =text_field_tag("template_name", @data_template.nil? ? "LoggerStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d") : @data_template.name, :size => 80 )
       =check_box_tag("save_template", "yes", @data_template.nil? ? true : false, :disabled=> @data_template.nil? ? true : false)       
       Save Parsing Template.
       =clear_break

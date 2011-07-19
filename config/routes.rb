@@ -111,9 +111,9 @@ Yogo::Application.routes.draw do
           post :upload
           post :export
           get  :field_measurement
-          get  :pre_process_samples_file_upload
+          get  :pre_process_logger_file_upload
           post :store_logger_data_from_file
-          post  :pre_process_samples_file
+          post  :pre_process_logger_file
         end
       end
       resources :data_values do
