@@ -305,9 +305,10 @@
           :store=>"psites", 
           :clientSort=>"true", 
           :style=>"float:left;width:900px;height:250px;", 
-          :rowSelector=>"20px", 
+          :selectionMode=>"none", 
           :jsId=>"SiteDisplayGrid", 
           :id=>"SiteDisplayGrid"}
+    -#:rowSelector=>"20px", 
     %script{:type => "dojo/method", :event => "onRowDblClick", :args => "evt"}
       :plain
         //WAS OPEN SITE DETAIL (no longer needed)
