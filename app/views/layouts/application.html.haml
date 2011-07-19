@@ -148,7 +148,7 @@
               = link_to("Overview", "#", :dojoType => "yogo.ui.MenuLink", :onclick=>"dijit.byId('overview_dialog').show();return false;")
               -#-if !current_user.nil? && current_user.projects.include?(@project)
               -#  = link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
-              - if @sites.count > 0
+              - if !@sites.nil? && @sites.count > 0
                 -#= link_to("Add Variable", new_project_variable_path(@project), :dojoType => "yogo.ui.MenuLink")
                 -#= link_to("Add Unit", new_project_unit_path(@project), :dojoType => "yogo.ui.MenuLink")
                 = link_to("Add Sample", new_project_sample_path(@project), :dojoType => "yogo.ui.MenuLink")

@@ -30,6 +30,7 @@
     var icon_blue = 'http://www.google.com/intl/en_us/mapfiles/ms/icons/blue-dot.png';
     var icon_default = icon_red;
     var icon_pop = icon_blue;
+    var site_tabs = [];
     var site_data = [
       #{@sites.map{|site| "        "+site.to_json}.join(",\n")}
     ];
@@ -65,6 +66,21 @@
       for(var i=0;i<site_data.length;i++) 
         if(site_data[i].id==siteId) 
           return site_data[i];
+    }
+    
+    function is_tab00(siteId) {
+      for(var i=0;i<site_tabs.length;i++) 
+        if(site_tabs[i]==siteId) 
+          return true;
+      return false;
+    }
+    
+    function is_tab(siteId) {
+      var tabs = dijit.byId('tab_browser');
+      for(var i=0;i<tabs.site_tabs.length;i++) 
+        if(tabs.site_tabs[i]==siteId) 
+          return true;
+      return false;
     }
     
     function pmap_init() {
@@ -108,6 +124,8 @@
         marker.window = new google.maps.InfoWindow({content:marker.info});
         marker.pop = function() {
           // this.setIcon(); this.getIcon();
+          //var tabs = dijit.byId('tab_browser');
+          //tabs.selectChild("#{@project.id}");
           for(var i=0;i<pmarkers.length;i++) {
             pmarkers[i].window.close();
             pmarkers[i].setIcon(icon_default);
@@ -130,9 +148,10 @@
         };
         marker.seltable = function() {
           // click SiteDisplayGrid
-          //var map = dijit.byId("#{@project.id}");
-          var tabs = dijit.byId('tab_browser');
-          tabs.selectChild(pmap);
+          //var map = dijit.byId("overview");
+          //var tabs = dijit.byId('tab_browser');
+          //tabs.selectChild(map);
+          //tabs.selectChild("#{@project.id}");
           var item = site_data[this.idx];
           var grid = dijit.byId('SiteDisplayGrid');
           var col = grid.layout.cells[1];
@@ -148,9 +167,9 @@
           grid.selection.addToSelection(item);
         };
         marker.click = function(){
-          this.pop();
           this.selsite();
           this.seltable();
+          this.pop();
         };
         google.maps.event.addListener(marker, 'click', marker.click);
         pmarkers.push(marker);
@@ -169,6 +188,23 @@
       dojo.parser.parse();
       //dijit.byId('SiteDisplayGrid').canSort = function(col,field){ return (col>1 && field=='name'); };
       //dijit.byId('SiteDisplayGrid').canSort = function(col,field){ return false; };
+      var tabs = dijit.byId('tab_browser');
+      tabs.isTab = function(siteId) {
+        var tabs = dijit.byId('tab_browser');
+        tabs.site_tabs = tabs.site_tabs || [];
+        for(var i=0;i<tabs.site_tabs.length;i++) 
+          if(tabs.site_tabs[i]==siteId) return true;
+        return false;
+      };
+      tabs.showSiteTabs = function(elId) {
+        var tabs = dijit.byId('tab_browser');
+        var out = '';
+    		tabs.site_tabs = tabs.site_tabs || [];
+        for(var i=0;i<tabs.site_tabs.length;i++) 
+          out += tabs.site_tabs[i];
+        if(elId) $('#'+elId).text(out);
+        return out;
+      };
       function proj_pop() {
         dijit.byId('overview_dialog').show();
         dijit.byId('SiteDisplayGrid').show();
@@ -236,8 +272,11 @@
     - else
       %span.icon{:style=>"padding:0;"}
         = @project.name
-      %span{:style=>"font-size:10px;"}
-        &nbsp;&nbsp; (click for Project Overview)
+        &nbsp;&nbsp;&nbsp;
+    %span{:style=>"font-size:10px;"}
+      &nbsp;&nbsp; (click for Project Overview)
+      &nbsp;&nbsp;&nbsp;
+      %span#show-site-tabs
 
 = clear_break
 
@@ -278,6 +317,9 @@
       :plain
         //var map = dijit.byId(@project);
         //var map = getElementById('#{@project.id}');
+        var project = dijit.byId("overview");
+        var tabs = dijit.byId('tab_browser');
+        tabs.selectChild(project);
         var item = this.getItem(idx);
         pmarkers[item.idx].pop();
         pmarkers[item.idx].selsite();
@@ -323,13 +365,27 @@
   (function(){
     var openSiteTab = function(tabs, siteId, editMode) {
       //var sitePane = new voeis.ui.SitePane();
-      var sitePane = new voeis.ui.SitePane2();
-      sitePane.setSite(get_site(siteId));
-      console.log(sitePane.test);
-      sitePane.editMode = editMode || false;
-      //sitePane.style = "display:block;";
-      tabs.addChild(sitePane);
+      //var site = get_site(siteId);
+      //var site = dijit.byId('site'+siteId);
+      //alert('>>>'+is_tab00(siteId));
+      console.log('>>>'+is_tab00(siteId));
+      if(is_tab00(siteId)) {
+        var sitePane = dojo.byId('site'+siteId);
+        //var sitePane = document.getElementById('site'+siteId);
+        //sitePane = dijit.byId(sitePane);
+        //var sitePane = 'site'+siteId;
+        console.log('set tab to >>> '+sitePane);
+      } else {
+        var sitePane = new voeis.ui.SitePane2();
+        sitePane.setSite(get_site(siteId));
+        sitePane.editMode = editMode || false;
+        console.log(sitePane.test);
+        tabs.addChild(sitePane);
+        //tabs.showSiteTabs('show-site-tabs');
+        //console.log('>>>'+tabs.tabs.showSiteTabs());
+      };
       tabs.selectChild(sitePane);
+      tabs.startup();
     };
 
     var openTab = function(tabs, pane) {
@@ -354,18 +410,18 @@
 
     dojo.subscribe("voeis/project/site/select", function(siteId) {
       console.log(arguments);
-      var tab_browser = dijit.byId('tab_browser');
-      openSiteTab(tab_browser, siteId, false);
+      var tabs = dijit.byId('tab_browser');
+      openSiteTab(tabs, siteId, false);
     });
 
     dojo.subscribe("voeis/project/site/edit", function(siteId) {
       console.log(arguments);
-      var projectId = "#{@project.id}";
-      var tab_browser = dijit.byId('tab_browser');    
-      openSiteTab(tab_browser, projectId, siteId);
+      var tabs = dijit.byId('tab_browser');    
+      openSiteTab(tabs, siteId, true);
     });
 
     dojo.subscribe("voeis/project/browse", function(projectId) {
+      var projectId = "#{@project.id}";
       var tabs = dijit.byId('tab_browser');
       //openSitesGridTab(tabs, projectId);
       var grid = voeis.ui.ProjectSitesGrid(projectId);
