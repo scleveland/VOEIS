@@ -173,25 +173,27 @@ namespace :yogo do
     end
     desc "Auto Migrate Global and Local DBs"
     task :auto_upgrade, :needs => [:environment] do
-        #upgrade all the global models
-        DataMapper::Model.descendants.each do |model|
-          begin
-            model.auto_upgrade!
-          rescue
-          end #end Rescue
-        end #end DataMapper
-        Project.all.each do |project|
-          project.managed_repository do
-            puts project.name
-            DataMapper::Model.descendants.each do |model|
-              begin
-                model.auto_upgrade!
-              rescue
-                puts model.name+": Failed to upgrade!"
-              end #end Rescue
-            end #end DataMapper
-          end #end Managed Repo
-        end #end Project.all
+      include Odhelper
+      Odhelper::upgrade_projects
+        # #upgrade all the global models
+        # DataMapper::Model.descendants.each do |model|
+        #   begin
+        #     model.auto_upgrade!
+        #   rescue
+        #   end #end Rescue
+        # end #end DataMapper
+        # Project.all.each do |project|
+        #   project.managed_repository do
+        #     puts project.name
+        #     DataMapper::Model.descendants.each do |model|
+        #       begin
+        #         model.auto_upgrade!
+        #       rescue
+        #         puts model.name+": Failed to upgrade!"
+        #       end #end Rescue
+        #     end #end DataMapper
+        #   end #end Managed Repo
+        # end #end Project.all
     end #end task
     desc "Update the Site Data Catlogs for All Projects"
     task :update_site_data_catalogs, :needs => [:environment] do
