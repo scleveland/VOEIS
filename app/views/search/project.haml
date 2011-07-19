@@ -1,0 +1,19 @@
+:javascript
+  dojo.require("dijit.form.Form");
+  dojo.require("dijit.form.Button");
+  dojo.require("dijit.form.ValidationTextBox");
+  dojo.require("dijit.form.CheckBox");
+
+%h1 Search!
+
+#searchForm(dojoType="dijit.form.Form" jsId="searchForm" encType="multipart/form-data" action="" method="")
+  %script(type="dojo/method" event="onReset")
+    return confirm('Form is valid, press OK to submit');
+  %script(type="dojo/method" event="onSubmit")
+    alert('Form contains invalid data.  Please correct first');
+    return false;
+  #queryDefinition
+    %h2 Query Definition
+    %input(type="text" id="site" name="site" required="false" dojoType="dijit.form.CheckBox")
+    %label(for='site') Site
+    
