@@ -45,7 +45,7 @@
 -#tab_browser{:dojoType=>"dijit.layout.TabContainer"}
 -#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"margin-top:0;padding-top:0;"}
 -#tab_browser{:style=>"margin-top:0;padding-top:0;width:700px;"}
-#show-site00{:dojoType=>"dijit.layout.ContentPane", :title=>@site.name, :style=>"margin-top:0;padding-top:0;$$$show-style$$$"}
+#show-site00{:dojoType=>"dijit.layout.ContentPane", :title=>@site.name, :style=>"margin-top:0;padding-top:0;"}
   %table
     %tr
       %td{:style=>"width:200px;"}
@@ -106,7 +106,7 @@
         $$$site-sample-data$$$
 
 -if @auth
-  #edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>'EDIT', :style=>"margin-top:0;padding-top:0;$$$edit-style$$$"}
+  #edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>'EDIT', :style=>"margin-top:0;padding-top:0;display:none;"}
     %table
       %tr
         %td{:style=>"width:200px;"}
@@ -116,7 +116,7 @@
     %br
 
     -#= form_for(:site, @site, :remote=>true, :url=>project_site_path(@project, @site), :builder=>YogoFormBuilder, :html=>{:method=>"put", :onsubmit=>"return checkform();"} )do |f|
-    = form_for(:site, @site, :romote=>true, :url=>"/projects/#{@project.id}/sites/$$$id$$$/", :html=>{:method=>:put, :id=>"site00-edit-form", :onsubmit=>"document.getElementById('site00').siteFormSave(this);checkform();return false;"} )do |f|
+    = form_for(:site, @site, :romote=>true, :url=>"/projects/#{@project.id}/sites/$$$id$$$/", :html=>{:method=>:put, :id=>"site00-edit-form", :onsubmit=>"dijit.byNode(dojo.byId('site00')).siteFormSave(this);"} )do |f|
 
       %table{:id=>"form-table"}
         %tr
@@ -196,6 +196,8 @@
           %td{:colspan=>"2"}
             = f.submit("Save Site", :onclick => "$('#loader').toggle();")
             = link_to('Cancel', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit-site00').hide();$('#show-site00').show();") 
+            -#= link_to('TEST', 'javascript:', :class=>'icon icon-cancel', :onclick=>"dijit.byNode(dojo.byId('site00')).siteFormSave(this);") 
+            -#%input{:type=>"button", :value=>"TEST", :onclick=>"dijit.byNode(dojo.byId('site00')).siteFormSave(this.form);"}
             -#= link_to('Cancel', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
 
 %br{:style=>'float:none; clear:both;'}

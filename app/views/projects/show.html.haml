@@ -371,24 +371,15 @@
   (function(){
     var openSiteTab = function(tabs, siteId, editMode) {
       //var sitePane = new voeis.ui.SitePane();
-      //var site = get_site(siteId);
-      //var site = dijit.byId('site'+siteId);
-      //alert('>>>'+is_tab00(siteId));
-      console.log('>>>'+is_tab00(siteId));
+      //console.log('>>>'+is_tab00(siteId));
       if(is_tab00(siteId)) {
-        var sitePane = dojo.byId('site'+siteId);
-        //var sitePane = document.getElementById('site'+siteId);
-        //sitePane = dijit.byId(sitePane);
-        //var sitePane = 'site'+siteId;
-        console.log('set tab to >>> '+sitePane);
+        var sitePane = dijit.byNode(dojo.byId('site'+siteId));
+        //console.log('set tab to >>> '+sitePane);
       } else {
         var sitePane = new voeis.ui.SitePane2();
         sitePane.setSite(get_site(siteId));
         sitePane.editMode = editMode || false;
-        console.log(sitePane.test);
         tabs.addChild(sitePane);
-        //tabs.showSiteTabs('show-site-tabs');
-        //console.log('>>>'+tabs.tabs.showSiteTabs());
       };
       tabs.selectChild(sitePane);
     };
