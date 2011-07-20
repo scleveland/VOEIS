@@ -27,8 +27,8 @@ Create a new site for the project:
   = f.text_field("state")         
   = f.text_area("comments")            
   = f.submit("Save Site", :onclick => "$('#loader').toggle();")
-  = link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
-=render_widget :vertical_datum
+  -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
+-#=render_widget :vertical_datum
 :javascript  
   function checkform()
   {if ($('#site_name').val() =="")
