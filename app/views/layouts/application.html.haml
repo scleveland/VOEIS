@@ -16,6 +16,7 @@
     = csrf_meta_tag
 
     = stylesheet_link_tag('jquery-ui-1.8.1.custom')
+    
     -#= stylesheet_link_tag("/javascripts/dijit/themes/claro/claro.css")
     = stylesheet_link_tag("/javascripts/dojox/grid/resources/Grid.css") 	
     = stylesheet_link_tag("/javascripts/dojox/grid/resources/claroGrid.css")
@@ -144,8 +145,8 @@
               = @project.name
             %div{:dojoType => "dijit.Menu"}                    
               = link_to("Overview", "#", :dojoType => "yogo.ui.MenuLink", :onclick=>"dijit.byId('overview_dialog').show();return false;")
-              -#-if !current_user.nil? && current_user.projects.include?(@project)
-              -#  = link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
+              -if !current_user.nil? && current_user.projects.include?(@project)
+                = link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
               - if !@sites.nil? && @sites.count > 0
                 -#= link_to("Add Variable", new_project_variable_path(@project), :dojoType => "yogo.ui.MenuLink")
                 -#= link_to("Add Unit", new_project_unit_path(@project), :dojoType => "yogo.ui.MenuLink")
