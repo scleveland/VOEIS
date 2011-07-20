@@ -62,7 +62,7 @@
           -#= link_to('TEST', 'javascript:', :class=>'icon icon-edit', :onclick=>"alert('EDIT>>> '+site_pane2.editMode);") 
   %br
 
-  %table{:id=>"site00-property-table", :style=>'width:80%;'}
+  %table{:id=>"site00-property-table", :style=>"width:46%;margin-right:20px;float:left;"}
     - @site.properties.each do |prop|
       %tr{:class=>"row#{cycle('1','0')}"}
         %td
@@ -71,20 +71,20 @@
         %td{:class=>"show_#{prop.name}"}
           $$$#{prop.name}$$$
 
-  %br{:style=>'float:none; clear:both;'}
-  %br
+  -#%br{:style=>'float:none; clear:both;'}
+  -#%br
 
-  %table{:id=>"site00-variable-table", :style=>"width:80%"}
+  %table{:id=>"site00-variable-table", :style=>"width:48%;foat:left;"}
     %tr
       %th{:width=>"40%"} Variable Data
-      %th{:width=>"20%"} Count
-      %th{:width=>"15%"} Start
-      %th{:width=>"15%"} Stop
+      %th{:width=>"20%", :align=>"left"} Count
+      %th{:width=>"15%", :align=>"left"} Start
+      %th{:width=>"15%", :align=>"left"} Stop
     %tr
       %td
         $$$site-variable-data$$$
 
-  %br{:style=>'float:none; clear:both;'}
+  -#%br{:style=>'float:none; clear:both;'}
   
   #all_variables-site00
     %h3{:style=>"margin-top:0;"}
@@ -95,7 +95,7 @@
       = hidden_field_tag('file_name', "project_samples")
       = submit_tag("Export Samples")
   %br
-  %table{:id=>"site00-sample-table", :style=>"width:80%;"} 
+  %table{:id=>"site00-sample-table", :style=>"width:45%;"} 
     %tr
       - @sample_labels.each do |label|
         %th
@@ -116,7 +116,7 @@
     %br
 
     -#= form_for(:site, @site, :remote=>true, :url=>project_site_path(@project, @site), :builder=>YogoFormBuilder, :html=>{:method=>"put", :onsubmit=>"return checkform();"} )do |f|
-    = form_for(:site, @site, :url=>"/projects/#{@project.id}/sites/$$$id$$$/", :html=>{:method=>:put, :id=>"site00-edit-form", :onsubmit=>"return checkform();"} )do |f|
+    = form_for(:site, @site, :romote=>true, :url=>"/projects/#{@project.id}/sites/$$$id$$$/", :html=>{:method=>:put, :id=>"site00-edit-form", :onsubmit=>"document.getElementById('site00').siteFormSave(this);checkform();return false;"} )do |f|
 
       %table{:id=>"form-table"}
         %tr

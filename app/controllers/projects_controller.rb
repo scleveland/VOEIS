@@ -66,10 +66,12 @@ class ProjectsController < InheritedResources::Base
     @sites = @project.managed_repository{ Voeis::Site.all }
     @site1 = @sites[0]
     @site_stats = []
+    @site_var_stats = []
     @site_samps = []
     @variable_labels = Array["Variable Data","Count","Start","End"]
     @sample_labels = Array["Sample Type","Lab Sample Code","Sample Medium","Timestamp"]
     @sample_fields = Array["sample_type","lab_sample_code","material","local_date_time"]
+    
     @sites.map{ |site| 
       stats = @project.managed_repository{Voeis::SiteDataCatalog.all(:site_id=>site.id)}.aggregate(:record_number.sum, :starting_timestamp.min, :ending_timestamp.max)
       stats.map!{ |x| 
@@ -84,6 +86,32 @@ class ProjectsController < InheritedResources::Base
         end
       }
       @site_stats << {:vars=>site.variables.count, :count=>stats[0], :first=>stats[1], :last=>stats[2]}
+    }
+    
+    #@site_var_stats = @project.managed_repository{Voeis::SiteDataCatalog.all(:order=>site.id)}
+    @sites.map{ |site| 
+      @temp_array = []
+      site.variables.map{ |var|
+        stats = @project.managed_repository{Voeis::SiteDataCatalog.first(:site_id=>site.id, :variable_id=>var.id)}
+        if !stats.nil?
+          var_stats = [stats.record_number, stats.starting_timestamp, stats.ending_timestamp]
+          var_stats.map!{ |x| 
+            if x.nil?
+              x = 'NA'
+            else
+              if x.class.to_s[0,4]=='Date'
+                x = x.strftime('%m/%d/%Y')
+              else
+                x = x
+              end
+            end
+          }
+        else
+          var_stats = ['NA', 'NA', 'NA']
+        end
+        @temp_array << {:var=>var.variable_name, :count=>var_stats[0], :first=>var_stats[1], :last=>var_stats[2]}
+      }
+      @site_var_stats << @temp_array
     }
     
     @sites.map{ |site| 

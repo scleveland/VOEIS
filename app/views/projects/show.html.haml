@@ -37,6 +37,9 @@
     var site_stat_data = [
       #{@site_stats.map{|site| "        "+site.to_json}.join(",\n")}
     ];
+    var site_var_data = [
+      #{@site_var_stats.map{|site| "        "+site.to_json}.join(",\n")}
+    ];
     var site_samp_data = [
       #{@site_samps.map{|site| "        "+site.to_json}.join(",\n")}
     ];
@@ -57,9 +60,10 @@
         items: site_data };
         
     function edit_formatter(id) {
-      var link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+id+']);"><img src="/images/view.gif" alt="VIEW site" title="VIEW" /></a>';
-      var edlink = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/edit\', ['+id+']);"><img src="/images/edit16.png" alt="EDIT site" title="EDIT" /></a>';
-      return '&nbsp;&nbsp;'+link+'&nbsp;&nbsp;'+edlink;
+      var link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/pop\', ['+id+']);"><img src="/images/icons/blue-dot16.png" alt="MAP site" title="MAP" /></a>';
+      var vlink = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+id+']);"><img src="/images/icons/view.gif" alt="VIEW site" title="VIEW" /></a>';
+      var edlink = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/edit\', ['+id+']);"><img src="/images/icons/edit16.png" alt="EDIT site" title="EDIT" /></a>';
+      return link+'&nbsp;&nbsp;'+vlink+'&nbsp;&nbsp;'+edlink;
     }
     
     function get_site(siteId) {
@@ -168,7 +172,7 @@
         };
         marker.click = function(){
           this.selsite();
-          this.seltable();
+          //this.seltable();
           this.pop();
         };
         google.maps.event.addListener(marker, 'click', marker.click);
@@ -318,15 +322,16 @@
       :plain
         //var map = dijit.byId(@project);
         //var map = getElementById('#{@project.id}');
-        var project = dijit.byId("overview");
-        var tabs = dijit.byId('tab_browser');
-        tabs.selectChild(project);
-        var item = this.getItem(idx);
-        pmarkers[item.idx].pop();
-        pmarkers[item.idx].selsite();
+        
+        //var projPane = dijit.byId("overview");
+        //var tabs = dijit.byId('tab_browser');
+        //tabs.selectChild(project);
+        //var item = this.getItem(idx);
+        //pmarkers[item.idx].pop();
+        //pmarkers[item.idx].selsite();
     %thead
       %tr
-        %th{:field=>"id", :width=>"75px", :filterable=>false, :formatter=>'edit_formatter'} View/Edit
+        %th{:field=>"id", :width=>"95px", :filterable=>false, :formatter=>'edit_formatter'} View/Edit
         %th{:field=>"name", :width=>"auto", :filterable=>true} Name
         %th{:field=>"id", :width=>"55px", :filterable=>true} Site ID
         %th{:field=>"code", :width=>"140px", :filterable=>true} Code
@@ -386,7 +391,6 @@
         //console.log('>>>'+tabs.tabs.showSiteTabs());
       };
       tabs.selectChild(sitePane);
-      tabs.startup();
     };
 
     var openTab = function(tabs, pane) {
@@ -419,6 +423,16 @@
       console.log(arguments);
       var tabs = dijit.byId('tab_browser');    
       openSiteTab(tabs, siteId, true);
+    });
+
+    dojo.subscribe("voeis/project/site/pop", function(siteId) {
+      console.log(arguments);
+      var site = get_site(siteId);
+      var projPane = dijit.byId("overview");
+      var tabs = dijit.byId('tab_browser');
+      tabs.selectChild(projPane);
+      pmarkers[site.idx].pop();
+      pmarkers[site.idx].selsite();
     });
 
     dojo.subscribe("voeis/project/browse", function(projectId) {
