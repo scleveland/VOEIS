@@ -25,7 +25,7 @@ $(document).ready(function(){
   });
   
   //Initialization for the lightbox-style image popups
-  $("a.fancybox").fancybox();
+  /*$("a.fancybox").fancybox();
   
   $("a[rel=gallery]").fancybox({
     'transitionIn'  : 'none',
@@ -34,7 +34,7 @@ $(document).ready(function(){
     'titleFormat'   : function(title, currentArray, currentIndex, currentOpts) {
       return '<span id="fancybox-title-over">Image ' + (currentIndex + 1) + ' / ' + currentArray.length + (title.length ? ' &nbsp; ' + title : '') + '</span>';
     }
-  });
+  });*/
   
   // Dataset tab behavior (for the project show page)
   $(".action-tabs").tabs();
