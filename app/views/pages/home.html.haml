@@ -2,21 +2,25 @@
   dojo.require("dijit.layout.ContentPane");
 :css
   #head {
-    margin-left: 1em;
+    background-color: #69C;
+    //margin-left: 1em;
     margin-top: 10px;
-    font-family: Georgia, serif;
+    width: 100%;
     font-size: 20pt;
-    font-style: italic;
+    font-family: 'Arial Black', Gadget, sans-serif;
+    font-weight: bold;
+    //font-style: italic;
     //color: #1767a7; //#3A4491;
   }
   #head-voeis {
-    font-family: 'Arial Black', Gadget, sans-serif;
-    font-weight: bold;
-    font-style: normal;
+    font-size: 16pt;
+    font-weight: normal;
+    font-family: Georgia, serif;
+    font-style: italic;
   }
   #content { margin:0px 20px}
   #wrapper {
-    background-color: #69C;//#ccb;
+    //background-color: #69C;//#ccb;
     padding-top: 1px;
   }
   #login-image img { margin-right:20px; }
@@ -36,19 +40,29 @@
     font-weight: bold;
     
   }
+  
+  #title{
+    min-height:10em;
+    display:table-cell;
+    vertical-align:top;
+    padding-top: 10px;
+  }
 
 #content
   #wrapper
     #head 
       #logo{:style=>"display:table;"}
-        =image_tag("voeis_logo-word2-100.png") 
-        #title{:style =>"min-height:10em;display:table-cell;vertical-align:middle;"}
-          The Virtual Observatory and Ecological Informatics System
+        =image_tag("voeis_logo-90.png") 
+        #title
+          VOEIS &nbsp; 
+          #head-voeis
+            The Virtual Observatory and Ecological Informatics System
     
     = form_for(:user_session, :url => user_session_path, :builder => YogoFormBuilder) do |f|
       #login-image
         = image_tag("Flathead.jpg", :alt => "Flathead Lake at sunset.", :align => "left",:width=>"550px")
       #login-description
+        %br
         %p{:style=>"font-size:10pt;"} The Virtual Observatory and Ecological Informatics System (VOEIS, pronounced like VOICE) provides a framework for data acquisition, analysis, model integration, and display of data products from completed workflows including geospatially explicit models, graphs from statistical analyses, GIS displays of classified ecological attributes on the landscape, and 3-D visualization models of waterscape and landscape processes.
         %br
 
