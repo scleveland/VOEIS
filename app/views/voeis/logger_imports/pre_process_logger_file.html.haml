@@ -36,9 +36,22 @@ Form Progress:
       %h2 
         Please Setup the Information that will be associated with data.
       Data Parsing Template Name:
-      =text_field_tag("template_name", @data_template.nil? ? "LoggerStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d") : @data_template.name, :size => 80 )
-      =check_box_tag("save_template", "yes", @data_template.nil? ? true : false, :disabled=> @data_template.nil? ? true : false)       
-      Save Parsing Template.
+      - if !@data_template.nil? 
+        -if @data_template.sites.first.id != @site.id
+          =text_field_tag("template_name", "LoggerStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d|%k:%M"), :size => 80 )
+        -else
+          =text_field_tag("template_name",@data_template.name, :size => 80 )
+      -else
+        =text_field_tag("template_name", "LoggerStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d|%k:%M"), :size => 80 )    
+      - if !@data_template.nil? && @data_template.sites.first.id == @site.id
+        %select{:id=>"save_template", :name=>"save_template", :dojoType=>"dijit.form.Select",  :style=>"width: 70px;"}       
+          %option{:value => "true", :selected => @data_template.nil? ? "selected" : ""}
+            Yes
+          %option{:value => "false", :selected => @data_template.nil? ? "" : "selected"}
+            Do Not 
+        Save This As A New Parsing Template.
+      -else
+        =hidden_field_tag "save_template", "true"
       =clear_break
       Data Template Description:
       =clear_break
@@ -54,7 +67,7 @@ Form Progress:
       =hidden_field_tag("data_stream_id", @data_template.nil? ? "" : @data_template.id.to_s)
       -if !@data_template.nil? 
         :javascript
-          dojo.addOnLoad(function(){
+          $(document).ready(function() {
           dijit.byId("next0").set("disabled", false);
           updateProgressBar();
           });
@@ -94,33 +107,33 @@ Form Progress:
         -if !(ds_col = @data_template.data_stream_columns.first(:column_number => col-1)).nil?
           -if ds_col.name == "SampleID"
             :javascript
-              dojo.addOnLoad(function(){
+              $(document).ready(function() {
               assignSample(#{col.to_s});
               });
           -elsif ds_col.name == "Timestamp"
             :javascript
-              dojo.addOnLoad(function(){
+              $(document).ready(function() {
               assignTimestamp(#{col.to_s});
               });
           -elsif ds_col.name == "VerticalOffset"
             :javascript
-              dojo.addOnLoad(function(){
+              $(document).ready(function() {
               assignVerticalOffset(#{col.to_s});
               });
           -elsif ds_col.name == "EndingVerticalOffset"
             :javascript
-              dojo.addOnLoad(function(){
+              $(document).ready(function() {
               assignEndingVerticalOffset(#{col.to_s});
               });
           -elsif ds_col.name == "Ignore"
             :javascript
-              dojo.addOnLoad(function(){
+              $(document).ready(function() {
               assignIgnore(#{col.to_s});
               });
           -elsif ds_col.name == "MetaTag"
             -this_mtag = Voeis::MetaTag.first(:name=>ds_col.meta_tag.name, :category=>ds_col.meta_tag.category)
             :javascript
-              dojo.addOnLoad(function(){
+              $(document).ready(function() {
               $("#var_span#{col.to_s}").text("Tag: #{this_mtag.name}");
               $("#var_td_variable_name_#{col.to_s}").text("#{this_mtag.name}");
               dijit.byId("Column#{col.to_s}").set("title", "Column#{col.to_s}:#{this_mtag.name}:#{this_mtag.category}:#{this_mtag.id.to_s}");
@@ -131,7 +144,7 @@ Form Progress:
           -else #this is a variable column 
             -this_var = Voeis::Variable.first(:variable_code=>ds_col.variables.first.variable_code)
             :javascript
-              dojo.addOnLoad(function(){
+              $(document).ready(function() {
               $("#var_span#{col.to_s}").text("Variable: #{this_var.variable_name}");
               $("#var_td_variable_name_#{col.to_s}").text("#{this_var.variable_name}");
               $("#var_td_speciation_#{col.to_s}").text("#{this_var.speciation}");
@@ -148,7 +161,7 @@ Form Progress:
               updateProgressBar();
               });
           :javascript
-            dojo.addOnLoad(function(){
+            $(document).ready(function() {
             dijit.byId("next#{col.to_s}").set("disabled", false);
             });
       %div{:id => "Column"+col.to_s, :dojoType=>"dijit.TitlePane", :title=>"Column"+col.to_s, :open => "false", :class => "column_panes", :toggleable=>"false"}
@@ -187,10 +200,10 @@ Form Progress:
               %span
                 Assign The Timestamp To This Column
             =clear_break
-            %button{:dojoType=>"dijit.form.Button", :id=>"metatag_select_button"+col.to_s,:onClick=>"dijit.byId('MetaTaggrid#{col.to_s}').sort('name');dijit.byId('metatag_dialog#{col.to_s}').show();"}
-              %span
-                Assign A Meta Tag
-            =clear_break
+            -#%button{:dojoType=>"dijit.form.Button", :id=>"metatag_select_button"+col.to_s,:onClick=>"dijit.byId('MetaTaggrid#{col.to_s}').sort('name');dijit.byId('metatag_dialog#{col.to_s}').show();"}
+            -#%span
+            -#Assign A Meta Tag
+            -#=clear_break
             %div{:dojoType=>"dijit.form.DropDownButton", :id=>"vertical_offset_assignment_select_button"+col.to_s}
               %span
                 Assign Vertical Offsets
@@ -212,10 +225,10 @@ Form Progress:
                         Assign The Ending Vertical Offset To This Column
                     =clear_break
             =clear_break
-            %button{:dojoType=>"dijit.form.Button", :title=>"Batch Results", :id=>"batch_column"+col.to_s, :onClick=>"assignBatch(#{col});", :class=>"icon icon-add"}
-              %span
-                Assign Batch Result To This Column
-            =clear_break
+            -#%button{:dojoType=>"dijit.form.Button", :title=>"Batch Results", :id=>"batch_column"+col.to_s, :onClick=>"assignBatch(#{col});", :class=>"icon icon-add"}
+            -#%span
+            -#Assign Batch Result To This Column
+            -#=clear_break
             %button{:dojoType=>"dijit.form.Button", :title=>"Ignore Column", :id=>"ignore_column"+col.to_s, :onClick=>"assignIgnore(#{col});", :class=>"icon icon-add"}
               %span
                 Ignore Column

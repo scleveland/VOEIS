@@ -209,7 +209,16 @@
                 
               
         
-      #main_container{:dojoType => "dijit.layout.ContentPane", :region => "center", :gutters => "false", :style => "padding:0"}
+      #main_container{:dojoType => "dijit.layout.ContentPane", :region => "center", :gutters => "false", :style => "padding:0; background-color:light-grey"}
+        #flash
+          %b{:class=> "error"}
+            = flash[:error]
+          %b{:class=> "warning"}
+            = flash[:warning]
+          %b{:class=> "alert"}
+            = flash[:alert]
+          %b{:class=> "notice"}
+            = flash[:notice]
         = content_for?(:content) ? yield(:content) : yield
 
       #bottom.claro{:dojoType => "dijit.layout.ContentPane", :region => "bottom", :gutters => "false", :style => "padding:0"}

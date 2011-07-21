@@ -321,7 +321,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
    
    ###########################################################################################
    
-   # Gather information necessary to store samples and data
+   # Gather information necessary to store logger data
    #
    #
    #
@@ -335,8 +335,8 @@ class Voeis::LoggerImportsController < Voeis::BaseController
      @sites = parent.managed_repository{Voeis::Site.all}
    end
    
-   # pre_process_samples_files
-   # This is the Sample Wizard Upload Second Step for describing how to parse a CSV file
+   # pre_process_logger_files
+   # This is the Logger Wizard Upload Second Step for describing how to parse a CSV file
    # @author Sean Cleveland
    # @api public
    def pre_process_logger_file
@@ -350,7 +350,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
           if ! ['text/csv', 'text/comma-separated-values', 'application/vnd.ms-excel',
                 'application/octet-stream','application/csv'].include?(datafile.content_type)
             flash[:error] = "File type #{datafile.content_type} not allowed"
-            redirect_to(:controller =>"voeis/data_values", :action => "pre_process_samples_file_upload", :params => {:id => params[:project_id]})
+            redirect_to(:controller =>"voeis/logger_imports", :action => "pre_process_logger_file_upload", :params => {:id => params[:project_id]})
 
           else
             #file can be saved
@@ -458,12 +458,12 @@ class Voeis::LoggerImportsController < Voeis::BaseController
           end       
 
         else
-            redirect_to(:controller =>"voeis/import_loggers", :action => "pre_process_samples_file_upload", :params => {:id => params[:project_id]})
+            redirect_to(:controller =>"voeis/logger_imports", :action => "pre_process_logger_file_upload", :params => {:id => params[:project_id]})
           end
 
       end
    
-   # Parses a csv file containing samples and data values
+    # Parses a csv file containing logger data values
     #
     # @example parse_logger_csv_header?datafile='myfilename'&start_line=3&replicate=2&column1=23&column2=24
     #
@@ -479,6 +479,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
     # @api public
     def store_logger_data_from_file
       require 'chronic'  #for robust timestamp parsing
+      begin #begin rescue
       data_stream =""
       timestamp_col =""
       sample_id_col = ""
@@ -562,11 +563,8 @@ class Voeis::LoggerImportsController < Voeis::BaseController
         dstream_utc_offset = utc_offset
       end
       #use this when we decide to save templates and reuse them
-      if params[:save_template] == "yes"
-        data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array, dstream_utc_offset, dst, @project_source, min_array, max_array, difference_array)
-      end
-
-      if params[:save_template] == "yes"
+      if params[:save_template] == "true"
+        data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array, dstream_utc_offset, dst, @project_source, min_array, max_array, difference_array) 
         data_stream = parent.managed_repository{Voeis::DataStream.get(data_stream_id[:data_template_id])}
       else
         data_stream = parent.managed_repository{Voeis::DataStream.get(params[:data_stream_id])}
@@ -669,14 +667,17 @@ class Voeis::LoggerImportsController < Voeis::BaseController
           end #end row loop
           parent.publish_his
           flash[:notice] = "File parsed and stored successfully."
-          redirect_to project_path(params[:project_id])
+          redirect_to project_path(params[:project_id]) and return
+        rescue Exception => e  
+          flash[:error] = "Problem Parsing Logger File: "+ e.message
+          redirect_to(:controller =>"voeis/logger_imports", :action => "pre_process_logger_file_upload", :params => {:id => params[:project_id]})
+        end
     end# end def
     
     #columns is an array of the columns that store the variable id
      def create_sample_and_data_parsing_template(template_name, timestamp_col, sample_id_col, columns_array, ignore_array, site, datafile, start_line, row_size, vertical_offset_col, ending_vertical_offset_col, meta_tag_array, utc_offset, dst, source, min_array, max_array, difference_array)
         @data_stream = ""
         parent.managed_repository do
-
           @data_stream = Voeis::DataStream.create(:name => template_name.to_s,
             :description => "NA",
             :filename => datafile,
@@ -768,6 +769,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
             end #managed_repository
           elsif  columns_array[i] != nil#create other data_stream_columns and create variables
             #puts params["column"+i.to_s]
+            
             var = Voeis::Variable.get(columns_array[i].to_i)
             parent.managed_repository do
               data_stream_column = Voeis::DataStreamColumn.create(
