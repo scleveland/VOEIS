@@ -22,14 +22,20 @@
         items: project_data };
     
     var pcount = '#{@projects.length}';
-    
+
+    function project_formatter(id) {
+      var link = '<a href="/projects/'+id+'"><img src="/images/view.gif" alt="SHOW project" title="SHOW project" /></a>';
+      //var link = '<a href="javascript:" onclick="alert(\'SiteID; \'+id);"><img src="/images/view.gif" alt="VIEW site" title="VIEW" /></a>';
+      return '&nbsp;&nbsp;'+link;
+    };
+
     $(window).load(function(){ 
       var loading = dijit.byId('loading_dialog');
       var map = dijit.byId('split_map');
-      google.maps.event.addListener(map._map, 'center_changed', function(){
+      //google.maps.event.addListener(map._map, 'center_changed', function(){
         //MAP POSITION CHANGED!
-        loading.hide();
-      });
+        //loading.hide();
+      //});
     });
 
 - content_for(:stylesheets) do
@@ -41,6 +47,7 @@
   %table{:id=>'projects_table', :title=>"Projects", :dojoType=>"dojox.grid.EnhancedGrid", :store=>"projectsDataStore", :plugins=>"{indirectSelection: true}"}
     %thead
       %tr
+        %th{:field=>"id", :width=>"45px", :filterable=>false, :formatter=>'project_formatter'} Show
         %th{:field => "name", :width => "auto"} Project 
     %script{:type => "dojo/method", :event => "onRowDblClick", :args => "evt"}
       :plain
@@ -52,14 +59,14 @@
       :plain
         console.log("selected:");
         console.log(arguments);
-        dijit.byId('loading_dialog').show();
+        //dijit.byId('loading_dialog').show();
         var item = this.getItem(idx);
         dojo.publish("voeis/project/browse", [item]);
     %script{:type => "dojo/method", :event => "onDeselected", :args => "idx"}
       :plain
         console.log("deselected:");
         console.log(arguments);
-        dijit.byId('loading_dialog').show();
+        //dijit.byId('loading_dialog').show();
         var map = dijit.byId('split_map');
         var item = this.getItem(idx);
         var tabs = dijit.byId('tab_browser');

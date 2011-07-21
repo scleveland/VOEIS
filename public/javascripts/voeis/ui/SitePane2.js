@@ -44,72 +44,64 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		for(var i=0;i<site_properties.length;i++) 
 			sitePane = sitePane.replace(new RegExp('\\$\\$\\$'+site_properties[i]+'\\$\\$\\$', 'g'), this.site[site_properties[i]]);
 			//$('#show-'+siteTag+' .show_'+site_properties[i]).text(this.site[site_properties[i]]);
-			//document.getElementById('show_'+site_properties[i]).value = this.site[site_properties[i]];
+			//document.getElementById('show_'+site_properties[i]).value = this.site[site_proper
 
-		//var variable_table = document.getElementById('variable-table');
-		//var sample_table = document.getElementById('sample-table');
-		//var variable_table = dijit.byId(siteTag+'-variable-table');
-		//var sample_table = dijit.byId('sample-table');
-		//alert('>>> '+variable_table);
-		//variable_table.selection.selectRange(0,variable_table.rowCount).removeSelectedRows();
-		//sample_table.selection.selectRange(0,sample_table.rowCount).removeSelectedRows();
-		//for(var i=0;i<this.site_stats.length;i++)
-		//	variable_table.addRow(this.site_stats[i]);
-		//for(var i=0;i<this.site_samps.length;i++)
-		//	sample_table.addRow(this.site_samps[i]);
-		//alert('>>>\n'+this.content);
-		
 		//SHOW VARIABLE STUFF
-		var data = [];
-		if(this.site_stats.length>0) {
-			for(var i=0;i<this.site_stats.length;i++) {
-				for(var stat in this.site_stats[i])
-					data.push(this.site_stats[i][stat]+'</td><td>');
+		var data = '';
+		if(this.site_var_stats.length>0) {
+			for(var i=0;i<this.site_var_stats.length;i++) {
+				data += this.site_var_stats[i].var+'</td><td>\n';
+				data += this.site_var_stats[i].count+'</td><td>\n';
+				data += this.site_var_stats[i].first+'</td><td>\n';
+				data += this.site_var_stats[i].last+'</td></tr>\n';
+				data += '<tr><td>'
 			};
-			data.join('</tr><tr>\n');
+//				for(var stat in this.site_var_stats[i])
+//					data.push(this.site_var_stats[i][stat]+'</td><td>');
+//				data.join('</tr><tr>\n');
 		} else {
-			data = '<em>&nbsp;&nbsp;&nbsp; - no data available -</em></td><td></td><td></td><td>';
+			//data = '<em>&nbsp;&nbsp;&nbsp; - no data available -</em></td><td></td><td></td><td>';
+			data = '</td><td colspan="2"><em>- no data available -</em></td><td>';
 		};
 		sitePane = sitePane.replace(/\$\$\$site-variable-data\$\$\$/, data);
 		
 		//SHOW SAMPLE STUFF
-		data = [];
+		data = '';
 		if(this.site_samps.length>0) {
-			sitePane = sitePane.replace(/\$\$\$export-style\$\$\$/, 'display:none;');
-			//sitePane = sitePane.replace(/\$\$\$export-style\$\$\$/, '');
+			sitePane = sitePane.replace(/\$\$\$export-style\$\$\$/, '');
 			for(var i=0;i<this.site_samps.length;i++) {
-				for(var samp in this.site_samps[i])
-					data.push(this.site_samps[i][samp]+'</td><td>');
+				data += this.site_samps[i][0]+'</td><td>\n';
+				data += this.site_samps[i][1]+'</td><td>\n';
+				data += this.site_samps[i][2]+'</td><td>\n';
+				data += this.site_samps[i][3]+'</td></tr>\n';
+				data += '<tr><td>'
 			};
-			data.join('</tr><tr>\n');
 		} else {
-			sitePane = sitePane.replace(/\$\$\$export-style\$\$\$/, 'display:none;');
+			sitePane = sitePane.replace(/\$\$\$export-style\$\$\$/, 'display:none');
 			//sitePane = sitePane.replace(/\$\$\$export-style\$\$\$/, '');
 			//data = '<td><em>&nbsp;&nbsp;&nbsp; no data available</em></td>';
-			data = '<em>&nbsp;&nbsp;&nbsp; - no data available -</em></td><td></td><td></td><td>';
+			data = '</td><td colspan="2"><em>- no data available -</em></td><td>';
 		};
 		sitePane = sitePane.replace(/\$\$\$site-sample-data\$\$\$/, data);
-		sitePane = sitePane.replace(/\$\$\$site-samps\$\$\$/, this.site_samps.toString());
+		sitePane = sitePane.replace(/\$\$\$site-samps\$\$\$/, dojo.toJson(this.site_samps));
 
+		/* ***
 		if(this.editMode) {
-			sitePane = sitePane.replace(/\$\$\$edit-style\$\$\$/, '');
-			sitePane = sitePane.replace(/\$\$\$show-style\$\$\$/, 'display:none;');
+			sitePane = sitePane.replace(/\$\$\$show-style\$\$\$/, '***TEST***');
+			sitePane = sitePane.replace(/\$\$\$edit-style\$\$\$/, '***TEST***');
 		} else {
-			sitePane = sitePane.replace(/\$\$\$show-style\$\$\$/, '');
-			sitePane = sitePane.replace(/\$\$\$edit-style\$\$\$/, 'display:none;');
-		};
+			sitePane = sitePane.replace(/\$\$\$show-style\$\$\$/, 'display:none');
+			sitePane = sitePane.replace(/\$\$\$edit-style\$\$\$/, 'display:none');
+		};*/
 		
 		this.set('content', sitePane);
+		//this.refresh();
 
-	},
+		if(this.editMode) {
+			$('#show-site'+this.site.id).hide();
+			$('#edit-site'+this.site.id).show();
+		};
 
-	xxxonClose: function() {
-		var new_tabs = [];
-		for(var i=0;i<this.tabs.site_tabs.length;i++)
-			if(this.site.id!=this.tabs.site_tabs[i])
-				new_tabs.push(this.tabs.site_tabs[i]);
-		this.tabs.site_tabs = new_tabs;
-		return true;
 	},
 
 	onClose: function() {
@@ -137,6 +129,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		
 		this.siteIdx = this.site.idx;
 		this.site_stats = site_stat_data[this.siteIdx];
+		this.site_var_stats = site_var_data[this.siteIdx];
 		this.site_samps = site_samp_data[this.siteIdx];
 		this.siteUpdate();
 	},
@@ -147,14 +140,26 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 				return site_data[i];
 	},
 
-	setSitePane: function(divId) {
-		var paneDivId = divId || self.paneDivId;
-		paneDivId = 'site_pane_proto';
-		self.paneDivId = paneDivId;
-		var sitePane = document.getElementById(paneDivId).cloneNode(true);
-		sitePane = sitePane.nodeValue;
-		this.sitePane = sitePane;
-		//this.content = this.sitePane;
+	siteSave: function(props) {
+		var new_data = site_data[this.siteIdx];
+		for(prop in props) 
+			new_data[prop] = props[prop];
+		site_data[this.siteIdx] = new_data;
+		this.siteUpdate();
+	},
+
+	siteFormSave: function(form) {
+		var new_data = site_data[this.siteIdx];
+		for(fn in new_data) {
+			console.log('FIELD >> '+fn)
+			var fld = form.elements['site['+fn+']']
+			if(fld) {
+				new_data[fn] = fld.value;
+				console.log('UPDATE >> '+fn)
+			};
+		};
+		site_data[this.siteIdx] = new_data;
+		this.siteUpdate();
 	}
 
 });
