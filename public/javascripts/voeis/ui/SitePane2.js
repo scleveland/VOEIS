@@ -74,7 +74,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 				data += this.site_samps[i][1]+'</td><td>\n';
 				data += this.site_samps[i][2]+'</td><td>\n';
 				data += this.site_samps[i][3]+'</td></tr>\n';
-				data += '<tr><td>'
+				data += '<tr class="'+((i+1==this.site_samps.length)?'':'row'+(i+1)%2)+'"><td>'
 			};
 		} else {
 			sitePane = sitePane.replace(/\$\$\$export-style\$\$\$/, 'display:none');
@@ -85,22 +85,15 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		sitePane = sitePane.replace(/\$\$\$site-sample-data\$\$\$/, data);
 		sitePane = sitePane.replace(/\$\$\$site-samps\$\$\$/, dojo.toJson(this.site_samps));
 
-		/* ***
-		if(this.editMode) {
-			sitePane = sitePane.replace(/\$\$\$show-style\$\$\$/, '***TEST***');
-			sitePane = sitePane.replace(/\$\$\$edit-style\$\$\$/, '***TEST***');
-		} else {
-			sitePane = sitePane.replace(/\$\$\$show-style\$\$\$/, 'display:none');
-			sitePane = sitePane.replace(/\$\$\$edit-style\$\$\$/, 'display:none');
-		};*/
-		
 		this.set('content', sitePane);
 		//this.refresh();
 
+		/*
 		if(this.editMode) {
 			$('#show-site'+this.site.id).hide();
 			$('#edit-site'+this.site.id).show();
 		};
+		*/
 
 	},
 
