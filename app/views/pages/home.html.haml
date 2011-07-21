@@ -1,3 +1,5 @@
+:javascript
+  dojo.require("dijit.layout.ContentPane");
 :css
   #head {
     margin-left: 1em;
@@ -5,16 +7,16 @@
     font-family: Georgia, serif;
     font-size: 20pt;
     font-style: italic;
-    color: #3A4491;
+    //color: #1767a7; //#3A4491;
   }
   #head-voeis {
     font-family: 'Arial Black', Gadget, sans-serif;
     font-weight: bold;
     font-style: normal;
   }
-  #content { margin:10px 50px }
+  #content { margin:0px 20px}
   #wrapper {
-    background-color: #ccb;
+    background-color: #69C;//#ccb;
     padding-top: 1px;
   }
   #login-image img { margin-right:20px; }
@@ -31,28 +33,32 @@
     margin-left: 0;
     margin-bottom: 20px;
     font-size: 12pt;
-    font-weight: normal;
+    font-weight: bold;
     
   }
 
 #content
   #wrapper
-    %h2{:id=>"head"} 
-      %span{:id=>"head-voeis"}
-        VOEIS &nbsp; 
-      The Virtual Observatory and Ecological Informatics System
+    #head 
+      #logo{:style=>"display:table;"}
+        =image_tag("voeis_logo-word2-100.png") 
+        #title{:style =>"min-height:10em;display:table-cell;vertical-align:middle;"}
+          The Virtual Observatory and Ecological Informatics System
     
     = form_for(:user_session, :url => user_session_path, :builder => YogoFormBuilder) do |f|
       #login-image
         = image_tag("Flathead.jpg", :alt => "Flathead Lake at sunset.", :align => "left",:width=>"550px")
       #login-description
-        %p The Virtual Observatory and Ecological Informatics System (VOEIS, pronounced like VOICE) provides a framework for data acquisition, analysis, model integration, and display of data products from completed workflows including geospatially explicit models, graphs from statistical analyses, GIS displays of classified ecological attributes on the landscape, and 3-D visualization models of waterscape and landscape processes.
+        %p{:style=>"font-size:10pt;"} The Virtual Observatory and Ecological Informatics System (VOEIS, pronounced like VOICE) provides a framework for data acquisition, analysis, model integration, and display of data products from completed workflows including geospatially explicit models, graphs from statistical analyses, GIS displays of classified ecological attributes on the landscape, and 3-D visualization models of waterscape and landscape processes.
         %br
 
         %ul{:id=>"links", :style=>""}
           %li
-            =link_to("Browse Public Projects in VOEIS", projects_path($project))
+            %span{:class => "icon datahub-icon-25"}
+              =link_to("Browse Public Projects in VOEIS", projects_path($project), :style=>"margin-left:10px;")
           %li
-            =link_to("More about VOEIS", page_url(:about))
+            %span{:class => "icon datahub-icon-25"}
+              =link_to("More about VOEIS", page_url(:about),:style=>"margin-left:10px;")
           %li
-            =link_to("VOEIS data live at BlueWaterTaskForce.org", page_url(:bluewater))
+            %span{:class => "icon datahub-icon-25"}
+              =link_to("VOEIS data live at BlueWaterTaskForce.org", page_url(:bluewater),:style=>"margin-left:10px;")
