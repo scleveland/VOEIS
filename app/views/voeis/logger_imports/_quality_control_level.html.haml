@@ -1,32 +1,46 @@
 - content_for(:javascripts) do
   :javascript
     function  createQualityControlLevel(){ 
-    $.post("#{root_url + "quality_control_levels"}.json?quality_control_level[quality_control_level_code]=" +$("#quality_control_level_quality_control_level_code").val()+"&quality_control_level[definition]=" + $("#quality_control_level_definition").val()+"&quality_control_level[explanation]="+$("#quality_control_level_explanation").val(),
+    $.post("#{root_url + "quality_control_levels"}.json?quality_control_level[quality_control_level_code]=" +$("#quality_control_level_code").val()+"&quality_control_level[definition]=" + $("#qaqc_definition").val()+"&quality_control_level[explanation]="+$("#qaqc_explanation").val(),
     function(data) {
-      $('#variable_quality_control').append($("<option></option>").attr("value",data['id']).text($("#quality_control_level_quality_control_level_code").val() + ':' + $("#quality_control_level_definition").val())); 
+      $('#variable_quality_control').append($("<option></option>").attr("value",data['id']).text($("#quality_control_level_code").val() + ':' + $("#qaqc_definition").val())); 
       $('#variable_quality_control').val(data['id']);
       dijit.byId("new_quality_control_level").hide();
     }
     );
     }
+    dojo.require("dijit.dijit");
+    dojo.require("dijit.form.Form");
+    dojo.require("dijit.form.Button");
+    dojo.require("dijit.form.ValidationTextBox");
     dojo.require("dijit.Tooltip");
     
 
 #new_quality_control_level{:dojoType=>"dijit.Dialog", :title=>"New Quality Control Level"}
 
-  = form_for (:quality_control_level) do |f|
+  = form_for :quality_control_level, :html=>{:dojoType=>"dijit.form.Form", :id=>"quality_control_level"} do |f|
     %label Quality Control Level Code:
-    =f.text_field :quality_control_level_code, :size => 30
+    -#=f.text_field :quality_control_level_code, :size => 30
+    %input{:type=>"text", :name=>"qualtiy_control_level_code", :id=>"quality_control_level_code", :dojoType=>"dijit.form.ValidationTextBox", :size=>30,  :style=>"width:30em", :required=>"true", :invalidMessage=>"Invalid Must be an Integer."}
     =clear_break      
     %label Definition:
     %br
-    =f.text_area :definition, :cols=>50, :rows=>3
+    -#=f.text_area :definition, :cols=>50, :rows=>3
+    %input{:type=>"text", :name=>"qaqc_definition", :id=>"qaqc_definition", :dojoType=>"dijit.form.ValidationTextBox", :required=>"true", :style=>"width:50em", :size=>50}
     =clear_break
     %label Explanation:
     %br
-    =f.text_area :explanation, :cols=> 50, :rows => 2
-    =clear_break\
+    -#=f.text_area :explanation, :cols=> 50, :rows => 2
+    %input{:type=>"text", :name=>"qaqc_explaination", :id=>"qaqc_explaination", :dojoType=>"dijit.form.ValidationTextBox", :required=>"true", :size => 50, :style=>"width:50em"}
+    =clear_break
+    %br
     %button{:id=> 'new_quality_control_level_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createQualityControlLevel();"}
       Create Quality Control Level
-
+      %script{:type=>"dojo/method", :event=>"startup"}
+        var form = dijit.byId("quality_control_level");
+        // set initial state
+        this.attr("disabled", !form.isValid());
+        this.connect(form, "onValidStateChange", function(state){
+        this.attr("disabled", !state);
+        });
 

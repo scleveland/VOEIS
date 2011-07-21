@@ -53,7 +53,7 @@
       }
       $(window).ready(function(){ 
           dojo.parser.parse();
-          hideLoader();
+          //hideLoader();
       });
 
       dojo.addOnLoad(function(){
@@ -102,7 +102,16 @@
 
     
   %body.typography.claro
-    #preloader
+    -##preloader
+    #flash
+      %b{:class=> "error"}
+        = flash[:error]
+      %b{:class=> "warning"}
+        = flash[:warning]
+      %b{:class=> "alert"}
+        = flash[:alert]
+      %b{:class=> "notice"}
+        = flash[:notice]  
     #border_container{:dojoType => "dijit.layout.BorderContainer", :gutters => 'false'}
       #top{:dojoType => "dijit.Toolbar", :region => "top"}
         #datahubButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "datahub-icon-25"}
@@ -208,8 +217,8 @@
         = yield :toolbar
                 
               
-        
-      #main_container{:dojoType => "dijit.layout.ContentPane", :region => "center", :gutters => "false", :style => "padding:0"}
+      
+      #main_container{:dojoType => "dijit.layout.ContentPane", :region => "center", :gutters => "false", :style => "padding:0; background-color:light-grey"}
         = content_for?(:content) ? yield(:content) : yield
 
       #bottom.claro{:dojoType => "dijit.layout.ContentPane", :region => "bottom", :gutters => "false", :style => "padding:0"}

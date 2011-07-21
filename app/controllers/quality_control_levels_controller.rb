@@ -20,11 +20,7 @@ class QualityControlLevelsController  < InheritedResources::Base
   
   # POST /variables
   def create
-    if params[:quality_control_level].nil?
-      @quality_control_level = Voeis::QualityControlLevel.new(:term=> params[:term], :definition => params[:definition])
-    else
-      @quality_control_level = Voeis::QualityControlLevel.new(params[:quality_control_level])
-    end
+    @quality_control_level = Voeis::QualityControlLevel.new(params[:quality_control_level])
     respond_to do |format|
       if @quality_control_level.save
         flash[:notice] = 'Quality Control Level was successfully created.'

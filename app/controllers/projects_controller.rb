@@ -17,7 +17,24 @@ class ProjectsController < InheritedResources::Base
       return 'application'
     end
   end
-
+  def update
+    @project = Project.get(params[:id])
+     @project.is_private = params[:project][:is_private].to_i
+     @project.description = params[:project][:description]
+     @project.publish_to_his = params[:project][:publish_to_his].to_i
+     respond_to do |format|
+       if @project.save
+         flash[:notice] = 'Project was successfully updated.'
+         format.json do
+           render :json => @project.as_json, :callback => params[:jsoncallback]
+         end
+         format.html {render :action => "edit"}
+       else
+         flash[:error] = 'Project was NOT updated.'
+         format.html { render :action => "edit" }
+       end
+     end
+  end
   def index
     ### PUBLIC & USER PROJECTS ###
     @projects = Project.all(:is_private=>false)

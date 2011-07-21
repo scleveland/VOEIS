@@ -1126,6 +1126,7 @@ class Voeis::DataValuesController < Voeis::BaseController
    # @api public
    def store_samples_and_data_from_file
      require 'chronic'  #for robust timestamp parsing
+     begin #rescue errors
      data_stream =""
      timestamp_col =""
      sample_id_col = ""
@@ -1342,7 +1343,11 @@ class Voeis::DataValuesController < Voeis::BaseController
          #@site.update_site_data_catalog_variables(@variables)
          parent.publish_his
          flash[:notice] = "File parsed and stored successfully."
-         redirect_to project_path(params[:project_id])
+         redirect_to project_path(params[:project_id]) and return
+         rescue Exception => e  
+           flash[:error] = "Problem Parsing Logger File: "+ e.message
+           redirect_to(:controller =>"voeis/data_values", :action => "pre_process_samples_file_upload", :params => {:id => params[:project_id]})
+         end
    end# end def
 
     

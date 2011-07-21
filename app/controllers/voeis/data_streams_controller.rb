@@ -406,7 +406,7 @@ class Voeis::DataStreamsController < Voeis::BaseController
          @column_array.each do |col|
            column_names << col[0]
          end
-         csv_string = FasterCSV.generate do |csv|
+         csv_string = CSV.generate do |csv|
            csv << column_names
            csv << @row_array
          end

@@ -36,9 +36,14 @@ Form Progress:
       %h2 
         Please Setup the Information that will be associated with each sample created.
       Data Parsing Template Name:
-      =text_field_tag("template_name", @data_template.nil? ? "SampleStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d") : @data_template.name, :size => 80 )
-      -#=check_box_tag("save_template", "yes", @data_template.nil? ? true : false, :disabled=> @data_template.nil? ? true : false)
-      - if !@data_template.nil?
+      - if !@data_template.nil? 
+        -if @data_template.sites.first.id != @site.id
+          =text_field_tag("template_name", "SampleStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d|%k:%M"), :size => 80 )
+        -else
+          =text_field_tag("template_name",@data_template.name, :size => 80 )
+      -else
+        =text_field_tag("template_name", "SampleStream|"+@site.code+'|'+Time.now.strftime("%Y-%m-%d|%k:%M"), :size => 80 )    
+      - if !@data_template.nil? && @data_template.sites.first.id == @site.id
         %select{:id=>"save_template", :name=>"save_template", :dojoType=>"dijit.form.Select",  :style=>"width: 70px;"}       
           %option{:value => "true", :selected => @data_template.nil? ? "selected" : ""}
             Yes
