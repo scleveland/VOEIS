@@ -79,7 +79,7 @@ class Voeis::SamplesController < Voeis::BaseController
       @variable_hash = Hash.new
       i = 1
       @variable_hash['variables'] = Array.new
-      site.samples.variables.each do |var|
+      (site.samples.variables + site.data_values.variables).each do |var|
         @var_hash = Hash.new
         @var_hash['id'] = var.id
         @var_hash['name'] = var.variable_name+":"+var.data_type
@@ -180,19 +180,19 @@ class Voeis::SamplesController < Voeis::BaseController
       else #we want only one variable
         variable = parent.managed_repository{Voeis::Variable.get(params[:variable])}
         @var_name = variable.variable_name
-        my_sample = nil
-        variable.samples.each do |sample|
-          if sample.sites.first.id == site.id
-            my_sample = sample
-          end
-        end
+        # my_sample = nil
+        # variable.samples.each do |sample|
+        #   if sample.sites.first.id == site.id
+        #     my_sample = sample
+        #   end
+        # end
         
         @grid_array = Array.new
-        if !my_sample.nil?
+        #if !my_sample.nil?
           @column_array << ["Timestamp", 'datetime']
           @column_array << ["Vertical Offset", 'number']
           @column_array << [variable.variable_name, 'number']
-          @data_vals = (variable.samples.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & site.samples.data_values & variable.data_values).each do |data_val|
+          @data_vals = (variable.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & site.data_values).each do |data_val|
             temp_array = Array.new
             row_hash = Hash.new
             temp_array << data_val.local_date_time.to_datetime
@@ -205,9 +205,9 @@ class Voeis::SamplesController < Voeis::BaseController
             @row_array << temp_array
             @grid_array << @row_hash.as_json
           end
-        end
+        #end
         @graph_data = Array.new
-        @data_vals.map{|d| @graph_data << Array[d.local_date_time.to_datetime.to_i, d.data_value]}
+        #@data_vals.map{|d| @graph_data << Array[d.local_date_time.to_datetime.to_i, d.data_value]}
       end #end if "ALL"
       if params[:export] == 1
          column_names = Array.new
