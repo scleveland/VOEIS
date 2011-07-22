@@ -98,12 +98,30 @@ class Voeis::SamplesController < Voeis::BaseController
     parent.managed_repository do
       @start_year = Voeis::DataValue.first(:order => [:local_date_time.asc])
       @end_year = Voeis::DataValue.last(:order => [:local_date_time.asc])
+      
+      sensor_start_year = Voeis::SensorValue.first(:order => [:timestamp.asc])
+      sensor_end_year = Voeis::SensorValue.last(:order => [:timestamp.asc])
       if @start_year.nil? || @end_year.nil?
         @start_year = Time.now.year
         @end_year = Time.now.year
       else
         @start_year = @start_year.local_date_time.to_time.year
         @end_year = @end_year.local_date_time.to_time.year
+      end
+      
+      if sensor_start_year.nil? || sensor_end_year.nil?
+        sensor_start_year = Time.now.year
+        sensor_end_year = Time.now.year
+      else
+        sensor_start_year = sensor_start_year.timestamp.to_time.year
+        sensor_end_year = sensor_end_year.timestamp.to_time.year
+      end
+      
+      if @start_year > sensor_start_year
+        @start_year = sensor_start_year
+      end
+      if @end_year < sensor_end_year
+        @end_year = sensor_end_year
       end
       @sites = Voeis::Site.all
         variable_opt_array = Array.new
