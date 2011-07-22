@@ -222,7 +222,7 @@
         = content_for?(:content) ? yield(:content) : yield
 
       #bottom.claro{:dojoType => "dijit.layout.ContentPane", :region => "bottom", :gutters => "false", :style => "padding:0"}
-        #footer
+        #footer{:style=>"padding-top:6px; border-top: 1px #6F97CB solid;"}
           #yogo-brand{:style=>"display:inline;"}
             = link_to(image_tag("partners/uky.nobox.png", :alt => "University of Kentucky logo", :title => "University of Kentucky"), 'http://www.uky.edu') 
             = link_to(image_tag("partners/umt.black.gif", :alt => "The University of Montana logo", :title => "The University of Montana"), 'http://www.umt.edu') 

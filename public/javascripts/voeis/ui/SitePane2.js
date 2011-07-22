@@ -14,7 +14,6 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	constructor: function(site) {
     //this.tabs = dijit.byId('tab_browser');
 		//this.tabs.site_tabs = this.tabs.site_tabs || [];
-		this.site_tabs = site_tabs;
 		
 		//this.project = #{@project.to_json};
 		//this.setSitePane();
@@ -50,7 +49,9 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		var data = '';
 		if(this.site_var_stats.length>0) {
 			for(var i=0;i<this.site_var_stats.length;i++) {
-				data += this.site_var_stats[i].var+'</td><td>\n';
+				data += '<a href="javascript:" onclick="dojo.publish(\'voeis/project/variable\', [';
+				data += this.site_var_stats[i].varid+',\''+this.site_var_stats[i].varname+'\']);">';
+				data += '<strong>'+this.site_var_stats[i].varname+'</strong></a></td><td>\n';
 				data += this.site_var_stats[i].count+'</td><td>\n';
 				data += this.site_var_stats[i].first+'</td><td>\n';
 				data += this.site_var_stats[i].last+'</td></tr>\n';
@@ -98,11 +99,6 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	},
 
 	onClose: function() {
-		var new_tabs = [];
-		for(var i=0;i<this.site_tabs.length;i++)
-			if(this.site.id!=this.site_tabs[i])
-				new_tabs.push(this.site_tabs[i]);
-		site_tabs = new_tabs;
 		return true;
 	},
 
@@ -117,8 +113,6 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			};
 		};
 		this.set('id', 'site'+this.site.id);
-		this.site_tabs.push(this.site.id);
-		//this.tabs.site_tabs.push(this.site.id);
 		
 		this.siteIdx = this.site.idx;
 		this.site_stats = site_stat_data[this.siteIdx];

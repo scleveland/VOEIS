@@ -30,7 +30,6 @@
     var icon_blue = 'http://www.google.com/intl/en_us/mapfiles/ms/icons/blue-dot.png';
     var icon_default = icon_red;
     var icon_pop = icon_blue;
-    var site_tabs = [];
     var site_data = [
       #{@sites.map{|site| "        "+site.to_json}.join(",\n")}
     ];
@@ -70,21 +69,6 @@
       for(var i=0;i<site_data.length;i++) 
         if(site_data[i].id==siteId) 
           return site_data[i];
-    }
-    
-    function is_tab00(siteId) {
-      for(var i=0;i<site_tabs.length;i++) 
-        if(site_tabs[i]==siteId) 
-          return true;
-      return false;
-    }
-    
-    function is_tab(siteId) {
-      var tabs = dijit.byId('tab_browser');
-      for(var i=0;i<tabs.site_tabs.length;i++) 
-        if(tabs.site_tabs[i]==siteId) 
-          return true;
-      return false;
     }
     
     function pmap_init() {
@@ -283,14 +267,17 @@
 
 = clear_break
 
+-#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width:905px;height:540px;margin-top:0;padding-top:0;"}
 #tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width:905px;height:540px;margin-top:0;padding-top:0;"}
   #overview{:dojoType=>"dijit.layout.ContentPane", :title=>"Project", :style=>"margin:0;padding:0;", :selected=>true}
     .show-map{:style=>"float:left;width:700px;height:500px;margin:0;padding:0;", :id=>@project.id}
+    -#.show-map{:style=>"float:left;width:700px;height:500px;margin:0;padding:0;", :id=>@project.id}
     -#= render(:partial => 'overview_map', :locals => { :project => @project,
     -#                                                  :sites => @sites,
     -#                                                  :class_name => 'show-map' } )
     %table{:id=>'project_sites', :dojoType=>"dojox.grid.EnhancedGrid", :store=>"psites", 
             :style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
+      -#:style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
       %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
         :plain
           //var map = dijit.byId(@project);
@@ -308,10 +295,10 @@
           :store=>"psites", 
           :clientSort=>"true", 
           :style=>"float:left;width:900px;", 
-          :selectionMode=>"none", 
           :jsId=>"SiteDisplayGrid", 
           :id=>"SiteDisplayGrid"}
     -#:rowSelector=>"20px", 
+    -#:selectionMode=>"none", 
     %script{:type => "dojo/method", :event => "onRowDblClick", :args => "evt"}
       :plain
         //WAS OPEN SITE DETAIL (no longer needed)
@@ -322,18 +309,22 @@
         //var map = dijit.byId(@project);
         //var map = getElementById('#{@project.id}');
         
-        //var projPane = dijit.byId("overview");
-        //var tabs = dijit.byId('tab_browser');
+        var projPane = dijit.byId("overview");
+        var tabs = dijit.byId('tab_browser');
+        console.log('TAB: '+tabs.selectedChildWidget.id);
+        if(tabs.selectedChildWidget.id=='overview') return
         //tabs.selectChild(project);
-        //var item = this.getItem(idx);
+        var item = this.getItem(idx);
+        dojo.publish('voeis/project/site/select', [item.id]);
+        //tabs.selectChild(project);
         //pmarkers[item.idx].pop();
         //pmarkers[item.idx].selsite();
     %thead
       %tr
-        %th{:field=>"id", :width=>"65px", :filterable=>false, :formatter=>'edit_formatter'} View/Edit
+        %th{:field=>"id", :width=>"65px", :filterable=>false, :formatter=>'edit_formatter'} Map/View
         %th{:field=>"name", :width=>"auto", :filterable=>true} Name
         %th{:field=>"id", :width=>"55px", :filterable=>true} Site ID
-        %th{:field=>"code", :width=>"140px", :filterable=>true} Code
+        %th{:field=>"code", :width=>"autopx", :filterable=>true} Code
         %th{:field=>"state", :width=>"70px", :filterable=>true} State
         %th{:field=>"data_vars", :width=>"55px", :filterable=>true} Vars
         %th{:field=>"data_count", :width=>"65px", :filterable=>true} Data
@@ -371,16 +362,38 @@
     var openSiteTab = function(tabs, siteId, editMode) {
       //var sitePane = new voeis.ui.SitePane();
       //console.log('>>>'+is_tab00(siteId));
-      if(is_tab00(siteId)) {
-        var sitePane = dijit.byNode(dojo.byId('site'+siteId));
-        //console.log('set tab to >>> '+sitePane);
+      var sitePane = dojo.byId('site'+siteId);
+      if(sitePane) {
+        sitePane = dijit.byNode(sitePane);
       } else {
-        var sitePane = new voeis.ui.SitePane2();
+        sitePane = new voeis.ui.SitePane2();
         sitePane.setSite(get_site(siteId));
         sitePane.editMode = editMode || false;
         tabs.addChild(sitePane);
       };
       tabs.selectChild(sitePane);
+    };
+
+    var openVarTab = function(tabs, projectId, varId, varName) {
+      //var varPane = new voeis.ui.VariablePane();
+      var projVarId = projectId+'-var'+varId;
+      var varPane = dojo.byId(projVarId);
+      if(varPane) {
+        varPane = dijit.byNode(varPane);
+      } else {
+        varPane = new dijit.layout.ContentPane({
+          id: projVarId,
+          title: varName,
+          closable: true,
+      	  ioArgs: { headers: {"Accept": "text/html"} },
+          store: voeis.Server.DEFAULT,
+          href: "/projects/#{@project.id}/variables/"+varId});
+        //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
+        //projectSitePath(this.projectId, this.siteId)
+        tabs.addChild(varPane);
+        
+      };
+      tabs.selectChild(varPane);
     };
 
     var openTab = function(tabs, pane) {
@@ -423,6 +436,13 @@
       tabs.selectChild(projPane);
       pmarkers[site.idx].pop();
       pmarkers[site.idx].selsite();
+    });
+
+    dojo.subscribe("voeis/project/variable", function(varId,varName) {
+      console.log(arguments);
+      var projectId = "#{@project.id}";
+      var tabs = dijit.byId('tab_browser');
+      openVarTab(tabs, projectId, varId, varName);
     });
 
     dojo.subscribe("voeis/project/browse", function(projectId) {

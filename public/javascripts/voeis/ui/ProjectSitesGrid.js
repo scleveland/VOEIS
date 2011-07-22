@@ -10,7 +10,7 @@ voeis.ui.ProjectSitesGrid = function(projectId, store, server) {
 			return '&nbsp;&nbsp;'+link;
 		};
 		var close_tab = function() {
-      dijit.byId('loading_dialog').show();
+      //dijit.byId('loading_dialog').show();
   		var map = dijit.byId('split_map');
       var tabs = dijit.byId('tab_browser');
       var tab_browser = dijit.byId('right_tabs');
