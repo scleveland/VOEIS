@@ -12,12 +12,15 @@
   = date_select('range', 'end_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
   = clear_break
 
-  = f.submit('Search', :onclick => "$('#loader').toggle();")
+  = f.submit('Search', :onclick => "dijit.byId('loading_dialog').show();")
   = link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
-=clear_break
+= clear_break
 
+%div{:dojoType=>"dijit.Dialog", :disableCloseButton => true, :id=>"loading_dialog", :title=>"Loading..."}
+  #search-div-loader
 #search_results
   :javascript  
+    dojo.require('dijit.Dialog');
     $(function() { 
     $("#site").change(function() { 
     $('#loader').toggle();

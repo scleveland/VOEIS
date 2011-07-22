@@ -109,7 +109,7 @@ class Voeis::SamplesController < Voeis::BaseController
         variable_opt_array = Array.new
         if @sites.all(:order => [:name.asc]).first.samples.count > 0
           #variable_opt_array << ["All", "All"]
-          @sites.all(:order => [:name.asc]).first.samples.variables.each do |var|
+          @sites.all(:order => [:name.asc]).first.data_values.variables.each do |var|
             variable_opt_array << [var.variable_name+":"+var.data_type, var.id.to_s]
           end
         else
@@ -180,6 +180,7 @@ class Voeis::SamplesController < Voeis::BaseController
       else #we want only one variable
         variable = parent.managed_repository{Voeis::Variable.get(params[:variable])}
         @var_name = variable.variable_name
+        @units = Voeis::Unit.get(variable.variable_units_id).units_name
         # my_sample = nil
         # variable.samples.each do |sample|
         #   if sample.sites.first.id == site.id
@@ -192,7 +193,8 @@ class Voeis::SamplesController < Voeis::BaseController
           @column_array << ["Timestamp", 'datetime']
           @column_array << ["Vertical Offset", 'number']
           @column_array << [variable.variable_name, 'number']
-          @data_vals = (variable.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & site.data_values).each do |data_val|
+          @data_vals = (variable.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & site.data_values)
+          @data_vals.all(:order=>[:local_date_time.asc]).each do |data_val|
             temp_array = Array.new
             row_hash = Hash.new
             temp_array << data_val.local_date_time.to_datetime
@@ -207,7 +209,7 @@ class Voeis::SamplesController < Voeis::BaseController
           end
         #end
         @graph_data = Array.new
-        #@data_vals.map{|d| @graph_data << Array[d.local_date_time.to_datetime.to_i, d.data_value]}
+        @data_vals.map{|d| @graph_data << Array[d.local_date_time.to_datetime.to_i*1000, d.data_value]}
       end #end if "ALL"
       if params[:export] == 1
          column_names = Array.new
