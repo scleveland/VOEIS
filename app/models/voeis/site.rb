@@ -132,6 +132,22 @@ class Voeis::Site
       else
         entry.record_number = 0
       end
+      if !var.data_values.empty?
+        if !self.data_values.nil?
+          dvalue_count = (var.data_values & self.data_values).count
+          entry.record_number = entry.record_number + dvalue_count
+          if dvalue_count > 0
+            dval_first = (var.data_values & self.data_values).first(:order=>[:local_date_time]).local_date_time
+            dval_last = (var.data_values & self.data_values).last(:order=>[:local_date_time]).local_date_time
+            if !entry.starting_timestamp.nil? && dval_first < entry.starting_timestamp
+              entry.starting_timestamp = dval_first
+            end
+            if !entry.ending_timestamp.nil? &&  dval_last > entry.ending_timestamp
+              entry.ending_timestamp = dval_last
+            end
+          end
+        end
+      end
       entry.valid?
       puts entry.errors.inspect()
       entry.save
@@ -150,6 +166,22 @@ class Voeis::Site
         end #end if
       else
         entry.record_number = 0
+      end
+      if !var.data_values.empty?
+        if !self.data_values.nil?
+          dvalue_count = (var.data_values & self.data_values).count
+          entry.record_number = entry.record_number + dvalue_count
+          if dvalue_count > 0
+            dval_first = (var.data_values & self.data_values).first(:order=>[:local_date_time]).local_date_time
+            dval_last = (var.data_values & self.data_values).last(:order=>[:local_date_time]).local_date_time
+            if !entry.starting_timestamp.nil? && dval_first < entry.starting_timestamp
+              entry.starting_timestamp = dval_first
+            end
+            if !entry.ending_timestamp.nil? &&  dval_last > entry.ending_timestamp
+              entry.ending_timestamp = dval_last
+            end
+          end
+        end
       end
       entry.valid?
       puts entry.errors.inspect()

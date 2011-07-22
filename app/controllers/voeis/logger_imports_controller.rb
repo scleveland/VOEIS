@@ -599,6 +599,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
                        :general_category => @var.general_category,
                        :no_data_value => @var.no_data_value)
              @col_vars[i] = variable
+             @variables << variable
            end#managed repo
          end #end if
       end  #end i loop
@@ -665,6 +666,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
                end #end if @csv_array.nil?
             end #end managed repo
           end #end row loop
+          @site.update_site_data_catalog_variables(@variables)
           parent.publish_his
           flash[:notice] = "File parsed and stored successfully."
           redirect_to project_path(params[:project_id]) and return
