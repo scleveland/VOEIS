@@ -28,6 +28,98 @@ For: Variable(
     =hidden_field_tag('start_date', start_date)
     =hidden_field_tag('end_date', end_date)
     =submit_tag("Export Results")
+    = javascript_include_tag(:defaults, "jquery.flot.js")
+  :javascript
+    dojo.require("dijit.dijit");
+    dojo.require("dijit.Dialog");
+    dojo.require("dijit.form.Form");
+    dojo.require("dijit.form.Button");
+    dojo.require("dojox.form.Uploader");
+    dojo.require("dojox.grid.EnhancedGrid");
+    dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+    dojo.require("dojox.grid.enhanced.plugins.Filter");
+    dojo.require("dojo.data.ItemFileReadStore");
+    dojo.require("dijit.layout.TabContainer");
+    dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+    var value_data = [
+    #{data_vals.map{|c| "        "+c.to_json}.join(",\n")}
+     ];
+    var data = #{graph_data.as_json};
+    var values_json = {
+    identifier: 'id',
+    label: 'name',
+    items: value_data };
+    var value_store = new dojo.data.ItemFileReadStore({data: values_json});
+    var plot =$.plot($("#placeholder"), [data],{
+           series: {
+               color : "blue",
+               lines: { show: true },
+               points: { show: true }
+              },
+
+           grid:  { hoverable: true, clickable: true },
+           xaxis: { mode: "time" },
+           xaxis: { mode: "time" },
+           pan:   { interactive: true },
+           zoom:  { interactive: true }
+    });
+
+    //Function ShowToolTip and previousPoint allow the hover function to display
+     //a message for each data point on the graph when the cursor hoversover
+     
+     //I would only mess with the css if you really need to otherwise this
+     //shouldn't need any modification
+     function showTooltip(x, y, contents) {
+         $('<div id="tooltip">' + contents + '</div>').css( {
+             position: 'absolute',
+             display: 'none',
+             top: y + 5,
+             left: x + 5,
+             border: '1px solid #fdd',
+             padding: '2px',
+             'background-color': '#fee',
+             opacity: 0.80
+         }).appendTo("body").fadeIn(200);
+     };
+
+     //Most of this should remain the same
+     //NOTE-- the time string for #x is in UTC format and currently is in GMT time
+     var previousPoint = null;
+     $("#placeholder").bind("plothover", function (event, pos, item) {
+         var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+         dDate = new Date();
+         dDate.setTime(mEpoch);
+         $("#x").text(dDate.toLocaleString());
+         $("#y").text(pos.y);
+
+         if (item) {
+             if (previousPoint != item.datapoint) {
+                 previousPoint = item.datapoint;
+                 $("#tooltip").remove();
+                 var x = item.datapoint[0].toFixed(2),
+                     y = item.datapoint[1].toFixed(2);
+                     var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+                     dDate = new Date();
+                     dDate.setTime(mEpoch);
+                 showTooltip(item.pageX, item.pageY,
+                   //*****You will need to change the sensor name here to the appropriate one selected above
+                            dDate.toLocaleString() + " = " + y + " " + "#{variable}|#{units}" );
+             }
+         }
+         else {
+             $("#tooltip").remove();
+             previousPoint = null;            
+         }
+     });
+  #placeholder{:style=>"width:600px;height:300px;"}
+  -##value_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pvalues", :data=>"values_json"}
+  -#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{filter:true}",  :store=>"value_store", :clientSort=>"true", :style=>"width: 700px; height: 400px;", :jsId=>"ValueDisplayGrid", :id=>"ValueDisplayGrid", :title=>"Sites"}
+  -#%thead
+  -#%tr
+  -#%th{:field=>"local_date_time", :width=>"190px", :filterable=>true} Timestamp
+  -#%th{:field=>"vertical_offset", :width=>"130px", :filterable=>true} Vertical Offset
+  -#%th{:field=>"data_value", :width=>"100px", :filterable=>true} Value
+          
   -i=0
   %table
     %tr
@@ -40,12 +132,4 @@ For: Variable(
         -row.each do |col|
           %td{:class =>"search-results"}
             =col
-  -visualization "my_table", "Table", :width => 1000, :height => 400, :html => {:class => "g_table"} do |chart|
-    -column_array.each do |col|
-      -if col[0] == "Timestamp"
-        -chart.datetime "Timestamp"
-      -elsif col[1] == 'number'
-        -chart.number col[0]
-    -chart.add_rows(row_array)
-      
--# #pagination-links= pagination_links(@query, params[:page], 10)
+  

@@ -1340,7 +1340,7 @@ class Voeis::DataValuesController < Voeis::BaseController
               end #end if @csv_array.nil?
            end #end managed repo
          end #end row loop
-         #@site.update_site_data_catalog_variables(@variables)
+         @site.update_site_data_catalog_variables(@variables)
          parent.publish_his
          flash[:notice] = "File parsed and stored successfully."
          redirect_to project_path(params[:project_id]) and return
