@@ -86,7 +86,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		sitePane = sitePane.replace(/\$\$\$site-sample-data\$\$\$/, data);
 		var json_samps = dojo.toJson(this.site_samps).replace(/"/g, '&quot;');
 		sitePane = sitePane.replace(/\$\$\$site-samps\$\$\$/, json_samps);
-		console.log(json_samps);
+		//console.log(json_samps);
 
 		this.set('content', sitePane);
 		//this.refresh();

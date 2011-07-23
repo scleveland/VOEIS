@@ -49,7 +49,7 @@
   %table
     %tr
       %td{:style=>"width:200px;"}
-        %b SHOW DETAILS:
+        %b SHOW DETAILS
       %td
         -#= link_to('CANCEL', project_path(@project), :class => 'icon icon-cancel') 
         -#= link_to('CANCEL', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
@@ -86,16 +86,18 @@
 
   -#%br{:style=>'float:none; clear:both;'}
   
+  %h3{:style=>"margin-top:0;"}
+    Existing Samples
   #all_variables-site00{:style=>"$$$export-style$$$"}
-    %h3{:style=>"margin-top:0;"}
-      Existing Samples
     = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
       = hidden_field_tag('column_array', @sample_labels.to_json)
       = hidden_field_tag('row_array', "$$$site-samps$$$")
       = hidden_field_tag('file_name', "project_samples")
       = submit_tag("Export Samples")
 
-  %br
+      %br
+      %br
+
   %table{:id=>"site00-sample-table", :style=>"width:45%;"} 
     %tr
       - @sample_labels.each do |label|
@@ -111,7 +113,7 @@
     %table
       %tr
         %td{:style=>"width:200px;"}
-          %b EDITING:
+          %b EDITING
         %td
           = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit-site00').hide();$('#show-site00').show();") 
     %br
