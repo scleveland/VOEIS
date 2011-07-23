@@ -26,7 +26,7 @@
     function project_formatter(id) {
       var href = '/projects/'+id;
       var img = '<img src="/images/view.gif" alt="SHOW project" title="SHOW project" />';
-      var onclick = 'window.status="LOADING...";return true;';
+      var onclick = 'window.defaultStatus="LOADING...";return true;';
       var link = '<a href="'+href+'" onclick="'+onclick+'">'+img+'</a>';
       //var link = '<a href="javascript:" onclick="alert(\'SiteID; \'+id);"><img src="/images/view.gif" alt="VIEW site" title="VIEW" /></a>';
       return '&nbsp;&nbsp;'+link;
@@ -60,11 +60,11 @@
         //dojo.publish("voeis/project/browse", [id]);
     %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
       :plain
-        console.log("selected:");
+        //console.log("selected:");
         console.log(arguments);
         console.log('URL: '+window.location);
         console.log('STAT: '+window.deafultStatus);
-        if(window.status=='LOADING...') return;
+        if(window.defaultStatus=='LOADING...') return;
         //dijit.byId('loading_dialog').show();
         var item = this.getItem(idx);
         dojo.publish("voeis/project/browse", [item]);
@@ -85,10 +85,35 @@
 :javascript
   (function(){
     var openSiteTab = function(tabs, projectId, siteId) {
-      var sitePane = new voeis.ui.SitePane();
-      tabs.addChild(sitePane);
-      sitePane.set({projectId:projectId, siteId:siteId});
+      var sitePane = dojo.byId(projectId+'--'+siteId);
+      if(sitePane) {
+        sitePane = dijit.byNode(sitePane);
+      } else {
+        var sitePane = new voeis.ui.SitePane();
+        sitePane.set({projectId:projectId, siteId:siteId});
+        //sitePane.setSite(projectId, siteId);
+        tabs.addChild(sitePane);
+      };
       tabs.selectChild(sitePane);
+    };
+
+    var openVarTab = function(tabs, projectId, varId, varName) {
+      //var varPane = new voeis.ui.VariablePane();
+      var projVarId = projectId+'-var'+varId;
+      var varPane = dojo.byId(projVarId);
+      if(varPane) {
+        varPane = dijit.byNode(varPane);
+      } else {
+        varPane = new dijit.layout.ContentPane({
+          id: projVarId,
+          title: varName,
+          closable: true,
+      	  ioArgs: { headers: {"Accept": "text/html"} },
+          store: voeis.Server.DEFAULT,
+          href: "/projects/"+projectId+"/variables/"+varId});
+        tabs.addChild(varPane);
+      };
+      tabs.selectChild(varPane);
     };
 
     var openSitesGridTab = function(tabs, projectId) {
@@ -158,6 +183,12 @@
       popMapMarker(projectId, siteId);
       var tab_browser = dijit.byId('right_tabs');    
       openSiteTab(tab_browser, projectId, siteId);
+    });
+
+    dojo.subscribe("voeis/project/variable/tab", function(projectId, varId, varName) {
+      console.log(arguments);
+      var tab_browser = dijit.byId('right_tabs');
+      openVarTab(tab_browser, projectId, varId, varName);
     });
 
     dojo.subscribe("voeis/project/browse", function(project) {

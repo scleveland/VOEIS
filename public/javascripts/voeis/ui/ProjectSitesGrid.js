@@ -45,19 +45,29 @@ voeis.ui.ProjectSitesGrid = function(projectId, store, server) {
 			]
     });
     dojo.connect(grid, "onRowDblClick", this, function(evt) {
-			var item = grid.getItem(evt.rowIndex);
-			if(item && item.id) {
+			//NOT USING DBL-CLICK
+			//var item = grid.getItem(evt.rowIndex);
+			//if(item && item.id) {
 				//dojo.publish("voeis/project/site/selected", [projectId, item.id]);
-			}
+			//}
 		});
 		dojo.connect(grid, "onSelected", this, function(idx) {
 			var item = grid.getItem(idx);
 			if(item && item.id) {
 				//dojo.publish("voeis/project/site/selected", [projectId, item.id]);
-				var projId = item.projectId();
-				dojo.publish("voeis/project/site/popped", [projId, item.id]);
-			}
-		});
+        var projId = item.projectId();
+        var siteId = item.id;
+        dojo.publish("voeis/project/site/popped", [projId, siteId]);
+				
+        var tab_browser = dijit.byId('right_tabs');
+        var sitePane = dojo.byId(projId+'--'+siteId);
+        if(sitePane) {
+            sitePane = dijit.byNode(sitePane);
+            tab_browser.selectChild(sitePane);
+        };
+	      
+      };
+    });
 		dojo.when(project, function(project) {
 			grid.set("title", project.name);
 		});
