@@ -7,9 +7,11 @@
 # 
 #
 namespace :yogo do
+  include Rake::DSL
+  
   namespace :db do
     desc "Import legacy database into Yogo."
-    task :import, :db, :name, :needs => :environment do |task, args|
+    task :import, [:db, :name] => [:environment] do |task, args|
       # FIXME - we need to make this rake task work at some point
       return 
 
@@ -68,10 +70,10 @@ namespace :yogo do
     end
   
     desc "Backup all databases"
-    task :backup, :needs => [:backup_master, :backup_projects]
+    task :backup => [:backup_master, :backup_projects]
   
     desc "Backup the databases with pg_backup"
-    task :backup_master, :needs => :environment do
+    task :backup_master => :environment do
       current_db = repository(:default).adapter.options
       host          = current_db[:host] || 'localhost'
       port          = current_db[:port] || 5432
@@ -96,7 +98,7 @@ namespace :yogo do
     end
     
     desc "Backup project databases with pg_backup"
-    task :backup_projects, :needs => [:environment] do
+    task :backup_projects => [:environment] do
       project_config = Rails::DataMapper.configuration.repositories["yogo-db"]["default"]
       host         = project_config["host"] || localhost
       port         = project_config["port"] || 5432
@@ -124,38 +126,46 @@ namespace :yogo do
     end
   
     desc "Reload the databases"
-    task :load_from_backup, :needs => [:load_master_from_backup, :load_projects_from_backup]
+    task :load_from_backup => [:unzip_backups, :load_master_from_backup, :load_projects_from_backup]
   
-    task :load_from_backups, :needs => :load_from_backup
+    task :load_from_backups => :load_from_backup
+  
+    task :unzip_backups do
+      begin
+        backup_path = "#{::Rails.root}/db/backup"
+        cmd = ['cd', backup_path, '&&', '']
+        system("cd #{backup_path} && gzip -vd *.gz")
+      rescue
+        puts "--- Unzip Backups: No GZipped Backup Files."
+      end
+    end
   
     desc "Reload the master database"
-    task :load_master_from_backup, :needs => [:environment] do
+    task :load_master_from_backup => [:environment] do
         current_db = repository(:default).adapter.options
         host          = current_db[:host] || 'localhost'
         port          = current_db[:port] || 5432
         username      = current_db[:username]
         database      = current_db[:path]
-        output_path   = "#{::Rails.root.to_s}/db/backup"
+        output_path   = "#{::Rails.root}/db/backup"
         options = []
         options << "--host=#{host}"
         options << "--port=#{port}" 
         options << "--username=#{username}" unless username.blank?
 
         create_database = ["createdb"] + options + [database]
-        # puts create_database.join(' ')
         system(*create_database)
-        # puts command.join(' ')
         load_database = ['psql'] + options + ["--file=#{output_path}/voeis_backup.sql", database]
         system(*load_database)
     end
     
     desc "Reload project databases"
-    task :load_projects_from_backup, :needs => [:environment] do
+    task :load_projects_from_backup => [:environment] do
         project_config = Rails::DataMapper.configuration.repositories["yogo-db"]["default"]
         host         = project_config["host"] || localhost
         port         = project_config["port"] || 5432
         username     = project_config["username"]
-        output_path  = "#{::Rails.root.to_s}/db/backup"
+        output_path  = "#{::Rails.root}/db/backup"
         options = []
         options << "--host=#{host}"
         options << "--port=#{port}"
@@ -172,7 +182,7 @@ namespace :yogo do
         end
     end
     desc "Auto Migrate Global and Local DBs"
-    task :auto_upgrade, :needs => [:environment] do
+    task :auto_upgrade => [:environment] do
       include Odhelper
       Odhelper::upgrade_projects
         # #upgrade all the global models
@@ -196,7 +206,7 @@ namespace :yogo do
         # end #end Project.all
     end #end task
     desc "Update the Site Data Catlogs for All Projects"
-    task :update_site_data_catalogs, :needs => [:environment] do
+    task :update_site_data_catalogs => [:environment] do
         Project.all.each do |project|
           project.update_project_site_data_catalog
         end #end Project.all

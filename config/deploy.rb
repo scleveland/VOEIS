@@ -83,9 +83,14 @@ namespace :db do
   desc "Get the remote database and save it locally"
   task :get_remote_database do
     db.run_backup_task
+    db.compress_backup_files
     db.download_backup_files
   end
   
+  task :compress_backup_files do
+    run "bash -c 'cd #{current_path}/db/backup && gzip -vf *.sql'"
+  end
+
   task :download_backup_files do
     download("#{current_path}/db/backup/", "db/backup/", :recursive => true)
   end
