@@ -13,9 +13,10 @@ Yogo::Application.routes.draw do
     member do
       post :upload
       get  :collect_data
+      get  :search, :controller => 'search', :action => 'project'
     end
     collection do
-      get  :search
+      # get  :search # not yet implemented
       post :export
       post :publish_his
       get  :get_user_projects
