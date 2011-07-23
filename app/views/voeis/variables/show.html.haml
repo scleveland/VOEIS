@@ -5,7 +5,7 @@
     dojo.require("dojox.layout.TableContainer");
     dojo.require("dijit.form.TextBox");
     
-- content_for(:toolbar) do
+-# content_for(:toolbar) do
   -##projectButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
   -#  %span 
   -#    = @project.name
@@ -30,8 +30,8 @@
   -#  %div{:dojoType => "dijit.Menu"}                    
   -#    -if !current_user.nil? && current_user.projects.include?(@project)
   -#      = link_to("Edit Site", edit_project_site_path(@project,resource.id), :dojoType => "yogo.ui.MenuLink")
-    
-%h2
+
+%h2{:style=>"margin-top:0;"}
   #{@variable.variable_name}
 
 -#EDIT VARIABLE BUTTON
@@ -39,7 +39,6 @@
 -#&nbsp;&nbsp;&nbsp;
 -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
 -#= link_to('Cancel', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
-%br
 %br
 
 -i = 0
@@ -119,6 +118,8 @@
 
 %br{:style=>'float:none; clear:both;'}
 %br
+%br
+
 -##all_variables
 -#  %h3
 -#    Existing Samples    

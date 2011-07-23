@@ -120,30 +120,30 @@
   
   %br{:style=>'float:none; clear:both;'}
   %br
-  - if @site.samples.count>0
-    #all_variables
-      %h3
-        Existing Samples    
-      = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
-        = hidden_field_tag('column_array', @label_array.to_json)
-        = hidden_field_tag('row_array', @current_samples.to_json)
-        = hidden_field_tag('file_name', "project_samples")
-        = submit_tag("Export Samples")
-      %br
-      #variables_list
-        %table{:id=>"sample-table", :style=>'width:60%;float:left;'}
-          %tr
-            - @label_array.each do |label|
-              %th
-                %b
-                  = label
-          - @site.samples.each do |samp|
-            %tr{:class=>"row#{cycle('1','0')}"}
-              - @field_array.each do |field|
-                %td
-                  = samp[field].to_s
-                
-          -#%em &nbsp;&nbsp;&nbsp; no samples to show
+
+  %h3
+    Existing Samples    
+  #all_variables
+    = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
+      = hidden_field_tag('column_array', @label_array.to_json)
+      = hidden_field_tag('row_array', @current_samples.to_json)
+      = hidden_field_tag('file_name', "project_samples")
+      = submit_tag("Export Samples")
+    %br
+    #variables_list
+      %table{:id=>"sample-table", :style=>'width:60%;float:left;'}
+        %tr
+          - @label_array.each do |label|
+            %th
+              %b
+                = label
+        - @site.samples.each do |samp|
+          %tr{:class=>"row#{cycle('1','0')}"}
+            - @field_array.each do |field|
+              %td
+                = samp[field].to_s
+              
+        -#%em &nbsp;&nbsp;&nbsp; no samples to show
 
 %br{:style=>'float:none; clear:both;'}
 
