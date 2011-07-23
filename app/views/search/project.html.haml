@@ -1,0 +1,57 @@
+:javascript
+  dojo.require("dijit.form.Form");
+  dojo.require("dijit.form.Button");
+  dojo.require("dijit.form.ValidationTextBox");
+  dojo.require("dijit.form.CheckBox");
+  dojo.require("dojox.grid.EnhancedGrid");
+  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+  dojo.require("dojox.grid.enhanced.plugins.Filter");
+  dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+  
+  /* voeis data */
+  dojo.require ("voeis.Server")
+  var siteStore = voeis.Server.DEFAULT.projectSitesDataStore('#{@project.id}');
+  var variableStore = voeis.Server.DEFAULT.globalVariablesDataStore();
+  
+
+%h1 Search #{@project.name}!
+
+#searchForm(dojoType="dijit.form.Form" jsId="searchForm" encType="multipart/form-data" action="" method="")
+  %script(type="dojo/method" event="onReset")
+    return confirm('Form is valid, press OK to submit');
+  %script(type="dojo/method" event="onSubmit")
+    alert('Form contains invalid data.  Please correct first');
+    return false;
+  #queryDefinition
+    %h2 Query Definition
+    
+    #sites
+      %h3 Sites
+      %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{nestedSorting:true, filter:true, indirectSelection: true}",  :store=>"siteStore", :clientSort=>"true", :style=>"width: 400px; height: 150px;", :jsId=>"SiteDisplayGrid", :id=>"SiteDisplayGrid", :title=>"Sites"}
+        %thead
+          %tr
+            %th{:field=>"name", :width=>"350px", :filterable=>true} Name
+    #variables
+      %h3 Variables
+      %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{nestedSorting:true, filter:true, indirectSelection: true}",  :store=>"variableStore", :clientSort=>"true", :style=>"width: 400px; height: 150px;", :jsId=>"VariableDisplayGrid", :id=>"VariableDisplayGrid", :title=>"Variables"}
+        %thead
+          %tr
+            %th{:field=>"variable_name", :width=>"350px", :filterable=>true} Variable Name
+    #category 
+      Category
+      %input(id='categorySelect' dojoType='dijit.form.filteringSelect' store='categoryStore')
+    #units Units
+    #medium Medium
+    #value_type Value Type
+    #data_type Data Type
+    #qa_qc QA/QC
+  #date_range
+    %h2 Date Range
+    #date_start  
+      Start 
+      %input(type="text" id="dob" name="dob" dojoType="dijit.form.DateTextBox")
+    #date_end  
+      End 
+      %input(type="text" id="dob" name="dob" dojoType="dijit.form.DateTextBox")
+    
+    
