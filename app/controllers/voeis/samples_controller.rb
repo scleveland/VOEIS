@@ -7,6 +7,9 @@ class Voeis::SamplesController < Voeis::BaseController
             :instance_name => 'sample',
             :resource_class => Voeis::Sample
   
+  has_widgets do |root|
+    root << widget(:flot_graph)
+  end
 
   def new
     @project = parent
