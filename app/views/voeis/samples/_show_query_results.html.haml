@@ -112,6 +112,7 @@ For: Variable(
          }
      });
   #placeholder{:style=>"width:600px;height:300px;"}
+  -#=render_widget :flot_graph, :display, :variable=>variable, :data => graph_data
   -##value_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pvalues", :data=>"values_json"}
   -#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{filter:true}",  :store=>"value_store", :clientSort=>"true", :style=>"width: 700px; height: 400px;", :jsId=>"ValueDisplayGrid", :id=>"ValueDisplayGrid", :title=>"Sites"}
   -#%thead
