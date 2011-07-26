@@ -133,12 +133,16 @@ class Voeis::Site
         entry.record_number = 0
       end
       if !var.data_values.empty?
-        if !self.data_values.empty?
-          dvalue_count = (var.data_values & self.data_values).count
-          entry.record_number = entry.record_number + dvalue_count
-          if dvalue_count > 0
-            dval_first = (var.data_values & self.data_values).first(:order=>[:local_date_time]).local_date_time
-            dval_last = (var.data_values & self.data_values).last(:order=>[:local_date_time]).local_date_time
+        if !self.data_values.nil?
+          #dvalue_count = (var.data_values & self.data_values).count
+          sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{var.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{self.id}"
+          results = repository.adapter.select(sql)
+          entry.record_number = entry.record_number + results.length
+          if results.length > 0
+            sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time"
+            dresults = repository.adapter.select(sql)
+            dval_first = dresults.first[:local_date_time]#(var.data_values & self.data_values).first(:order=>[:local_date_time]).local_date_time
+            dval_last = dresults.first[:local_date_time] #(var.data_values & self.data_values).last(:order=>[:local_date_time]).local_date_time
             if entry.starting_timestamp.nil? || dval_first < entry.starting_timestamp
               entry.starting_timestamp = dval_first
             end
@@ -169,11 +173,15 @@ class Voeis::Site
       end
       if !var.data_values.empty?
         if !self.data_values.nil?
-          dvalue_count = (var.data_values & self.data_values).count
-          entry.record_number = entry.record_number + dvalue_count
-          if dvalue_count > 0
-            dval_first = (var.data_values & self.data_values).first(:order=>[:local_date_time]).local_date_time
-            dval_last = (var.data_values & self.data_values).last(:order=>[:local_date_time]).local_date_time
+          #dvalue_count = (var.data_values & self.data_values).count
+          sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{var.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{self.id}"
+          results = repository.adapter.select(sql)
+          entry.record_number = entry.record_number + results.length
+          if results.length > 0
+            sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time"
+            dresults = repository.adapter.select(sql)
+            dval_first = dresults.first[:local_date_time]#(var.data_values & self.data_values).first(:order=>[:local_date_time]).local_date_time
+            dval_last = dresults.first[:local_date_time] #(var.data_values & self.data_values).last(:order=>[:local_date_time]).local_date_time
             if entry.starting_timestamp.nil? || dval_first < entry.starting_timestamp
               entry.starting_timestamp = dval_first
             end
