@@ -153,8 +153,11 @@
           #projectButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
             %span 
               = @project.name
-            %div{:dojoType => "dijit.Menu"}                    
-              = link_to("Overview", "#", :dojoType => "yogo.ui.MenuLink", :onclick=>"dijit.byId('overview_dialog').show();return false;")
+            %div{:dojoType => "dijit.Menu"}
+              - if @project.id.to_s == request.fullpath[-(@project.id.to_s.length)..-1]
+                = link_to("Overview", "javascript:", :dojoType => "yogo.ui.MenuLink", :onclick=>"dijit.byId('overview_dialog').show();")
+              - else
+                = link_to("Project Home", project_path(@project), :dojoType => "yogo.ui.MenuLink")
               -if !current_user.nil? && current_user.projects.include?(@project)
                 = link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
                 - if !@sites.nil? && @sites.count > 0

@@ -11,17 +11,20 @@ voeis.ui.ProjectSitesGrid = function(projectId, store, server) {
 		};
 		var close_tab = function() {
       //dijit.byId('loading_dialog').show();
+			//console.log('>>> CLOSE TAB: '+grid.id);
   		var map = dijit.byId('split_map');
       var tabs = dijit.byId('tab_browser');
       var tab_browser = dijit.byId('right_tabs');
       var map_pane = dijit.byId('map_pane');
 			var pgrid = dijit.byId('projects_table');
+			//console.debug(pgrid.selection.getSelected());
       tab_browser.selectChild(map_pane);
-				for(var i=0; i<pgrid.rowCount; i++)
-					if(grid.id==pgrid.getItem(i).id) {
-						pgrid.selection.remove(i);
-						break;
-					};
+			for(var i=0; i<pgrid.rowCount; i++)
+				if(pgrid.selection.isSelected(i) && grid.id==pgrid.getItem(i).id) {
+					console.log('>>> REMOVE: '+i);
+					pgrid.selection.deselect(i);
+					break;
+				};
      	map.store.remove(projectId);
       return true;
 		};
