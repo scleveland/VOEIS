@@ -227,7 +227,16 @@ POST /variables
 76
 77
 78
-79</pre>
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/voeis/variables_controller.rb', line 48</span>
@@ -241,8 +250,17 @@ POST /variables
   <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:detection_limit</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
     <span class='ivar'>@variable</span><span class='period'>.</span><span class='id detection_limit'>detection_limit</span> <span class='op'>=</span> <span class='kw'>nil</span>
   <span class='kw'>end</span>
-  <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:value_type</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id nil?'>nil?</span>
-    <span class='ivar'>@variable</span><span class='period'>.</span><span class='id value_type'>value_type</span> <span class='op'>=</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:quality_control</span><span class='rbracket'>]</span>
+  <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:field_method_id</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
+    <span class='ivar'>@variable</span><span class='period'>.</span><span class='id field_method_id'>field_method_id</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='kw'>end</span>
+  <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:lab_id</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
+    <span class='ivar'>@variable</span><span class='period'>.</span><span class='id lab_id'>lab_id</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='kw'>end</span>
+  <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:lab_method_id</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
+    <span class='ivar'>@variable</span><span class='period'>.</span><span class='id lab_method_id'>lab_method_id</span> <span class='op'>=</span> <span class='kw'>nil</span>
+  <span class='kw'>end</span>
+  <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:spatial_offset_type</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
+    <span class='ivar'>@variable</span><span class='period'>.</span><span class='id spatial_offset_type'>spatial_offset_type</span> <span class='op'>=</span> <span class='kw'>nil</span>
   <span class='kw'>end</span>
   <span class='kw'>if</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id save'>save</span>  
     <span class='id respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id format'>format</span><span class='op'>|</span>
@@ -397,7 +415,7 @@ GET /variables/new
 </div>
     
     <div id="footer">
-  Generated on Fri Jul  1 11:28:09 2011 by 
+  Generated on Tue Jul 26 13:52:49 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

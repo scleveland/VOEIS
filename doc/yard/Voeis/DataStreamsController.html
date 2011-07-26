@@ -2235,7 +2235,7 @@ Yogo Team
        <span class='ivar'>@column_array</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id col'>col</span><span class='op'>|</span>
          <span class='id column_names'>column_names</span> <span class='op'>&lt;&lt;</span> <span class='id col'>col</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span>
        <span class='kw'>end</span>
-       <span class='id csv_string'>csv_string</span> <span class='op'>=</span> <span class='const'>FasterCSV</span><span class='period'>.</span><span class='id generate'>generate</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id csv'>csv</span><span class='op'>|</span>
+       <span class='id csv_string'>csv_string</span> <span class='op'>=</span> <span class='const'>CSV</span><span class='period'>.</span><span class='id generate'>generate</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id csv'>csv</span><span class='op'>|</span>
          <span class='id csv'>csv</span> <span class='op'>&lt;&lt;</span> <span class='id column_names'>column_names</span>
          <span class='id csv'>csv</span> <span class='op'>&lt;&lt;</span> <span class='ivar'>@row_array</span>
        <span class='kw'>end</span>
@@ -2566,7 +2566,7 @@ Yogo Team
 </div>
     
     <div id="footer">
-  Generated on Fri Jul  1 11:28:10 2011 by 
+  Generated on Tue Jul 26 13:52:51 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>
