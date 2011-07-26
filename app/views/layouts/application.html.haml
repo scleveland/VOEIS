@@ -103,15 +103,16 @@
     
   %body.typography.claro
     -##preloader
-    #flash
-      %b{:class=> "error"}
-        = flash[:error]
-      %b{:class=> "warning"}
-        = flash[:warning]
-      %b{:class=> "alert"}
-        = flash[:alert]
-      %b{:class=> "notice"}
-        = flash[:notice]  
+    -if !flash.empty?
+      #flash
+        %b{:class=> "error"}
+          = flash[:error]
+        %b{:class=> "warning"}
+          = flash[:warning]
+        %b{:class=> "alert"}
+          = flash[:alert]
+        %b{:class=> "notice"}
+          = flash[:notice]  
     #border_container{:dojoType => "dijit.layout.BorderContainer", :gutters => 'false'}
       #top{:dojoType => "dijit.Toolbar", :region => "top"}
         #datahubButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "datahub-icon-25"}
