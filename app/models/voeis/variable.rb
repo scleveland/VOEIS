@@ -84,8 +84,14 @@ class Voeis::Variable
   has n, :speciation_cvs,      :model => "Voeis::SpeciationCV",     :through => Resource
   has n, :value_type_cvs,      :model => "Voeis::ValueTypeCV",      :through => Resource
   has n, :variable_name_cvs,   :model => "Voeis::VariableNameCV",   :through => Resource
-  has 1, :lab_method,          :model => "Voeis::LabMethod", :through => Resource
-  has 1, :field_method,        :model => "Voeis::FieldMethod", :through => Resource
+
+  belongs_to :variable_units,     :model => "Voeis::Unit"
+  belongs_to :time_units,         :model => "Voeis::Unit"
+  belongs_to :lab_method,         :model => "Voeis::LabMethod"
+  belongs_to :lab,                :model => "Voeis::Lab"
+  belongs_to :field_method,       :model => "Voeis::FieldMethod"
+  belongs_to :spatial_units,      :model => "Voeis::Unit"
+  
   has n, :meta_tags, :model => 'Voeis::MetaTag', :through => Resource
   has n, :spatial_offsets,      :model => "Voeis::SpatialOffset",    :through => Resource
   
