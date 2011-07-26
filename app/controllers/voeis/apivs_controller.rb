@@ -686,22 +686,24 @@ class Voeis::ApivsController < Voeis::BaseController
   # @api public
   def update_project_site
     @site = ""
-    parent.managed_repository do
-      @site = Voeis::Site.get(params[:id])
-      
-      @site.update(:name => params[:name], 
-                   :code => params[:code],
-                   :latitude => params[:latitude],
-                   :longitude => params[:longitude],
-                   :state => params[:state])
-      puts @site.valid?
-      puts @site.errors.inspect()
-      begin
-       @site.save
-      rescue
-       puts @site = {:errors => @site.errors}
-      end
-    end
+    begin
+      if !params['id'].empty?
+        parent.managed_repository do
+          @site = Voeis::Site.get(params['id'].to_i)
+          Voeis::Site.properties.each do |prop|
+            if prop.name.to_s != "id"
+              if !params[prop.name].nil?
+                @site[prop.name.to_s] = params[prop.name.to_s]
+              end #endif
+            end#endif
+          end#end loop
+          @site.save!
+        end #end repo
+      end #endif
+    rescue Exception => e
+      @site=Hash.new
+      @site[:errors] = e.message
+    end #end rescue
     respond_to do |format|
       format.json do
         render :json => @site.to_json, :callback => params[:jsoncallback]
@@ -1004,19 +1006,24 @@ class Voeis::ApivsController < Voeis::BaseController
    # @api public
    def update_project_variable
      @variable = ""
-     if !params[:id].nil?
-       parent.managed_repository do
-         @variable = Voeis::Variable.get(params[:id])
-         Voeis::Variable.properties.each do |prop|
-           if prop.name.to_s != "id"
-             if !params[prop.name].nil?
-               @variable[prop.name.to_s] = params[prop.name.to_s]
+     begin
+       if !params[:id].empty?
+         parent.managed_repository do
+           @variable = Voeis::Variable.get(params[:id].to_i)
+           Voeis::Variable.properties.each do |prop|
+             if prop.name.to_s != "id"
+               if !params[prop.name].nil?
+                 @variable[prop.name.to_s] = params[prop.name.to_s]
+               end
              end
            end
+           @variable.save!
          end
-         @variable.save
        end
-     end
+     rescue Exception => e
+       @variable=Hash.new
+       @variable[:errors] = e.message
+     end #end rescue
      respond_to do |format|
        format.json do
          render :json => @variable.to_json, :callback => params[:jsoncallback]
@@ -1029,8 +1036,8 @@ class Voeis::ApivsController < Voeis::BaseController
    
    def update_voeis_variable
      @variable = ""
-     if !params[:id].nil?
-       @variable = Voeis::Variable.get(params[:id])
+     if !params[:id].empty?
+       @variable = Voeis::Variable.get(params[:id].to_i)
        Voeis::Variable.properties.each do |prop|
          if prop.name.to_s != "id"
            if !params[prop.name].nil?
