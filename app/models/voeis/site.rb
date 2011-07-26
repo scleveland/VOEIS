@@ -36,11 +36,12 @@ class Voeis::Site
   property :longitude,           Float,   :required => true
   property :lat_long_datum_id,   Integer, :required => false, :default => 0
   property :elevation_m,         Float,   :required => false
-  property :vertical_datum,      String,  :required => false
+  #property :vertical_datum,      String,  :required => false
+  property :vertical_datum_id,   Integer, :required => false
   property :local_x,             Float,   :required => false
   property :local_y,             Float,   :required => false
   property :local_projection_id, Integer, :required => false
-  property :local_projection,    String,  :required => false
+  #property :local_projection,    String,  :required => false
   property :pos_accuracy_m,      Float,   :required => false
   property :state,               String,  :required => true
   property :county,              String,  :required => false
@@ -60,7 +61,9 @@ class Voeis::Site
   has n, :data_values,   :model => "Voeis::DataValue",   :through => Resource
   has n, :samples,       :model => "Voeis::Sample",      :through => Resource
   has n, :variables,     :model => "Voeis::Variable",    :through => Resource
-
+  has 1, :vertical_datum, :model => "Voeis::VerticalDatumCV"
+  has 1, :local_projection, :model => "Voeis::LocalProjectionCV"
+  #has 1, :lat_long_datum, :model=>"Voes::LatLongDatumCV"
   alias :site_name  :name
   alias :site_name= :name=
 
@@ -123,15 +126,15 @@ class Voeis::Site
   def update_site_data_catalog
     self.variables.each do |var|
       entry = Voeis::SiteDataCatalog.first_or_create(:site_id => self.id, :variable_id => var.id)
-      if !var.sensor_types.empty?
-        entry.record_number = (self.sensor_values & var.sensor_types.first.sensor_values).count
-        if entry.record_number > 0
-          entry.starting_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).first(:order=>[:timestamp]).timestamp
-          entry.ending_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).last(:order=>[:timestamp]).timestamp
-        end #end if
-      else
-        entry.record_number = 0
-      end
+      # if !var.sensor_types.empty?
+      #   entry.record_number = (self.sensor_values & var.sensor_types.first.sensor_values).count
+      #   if entry.record_number > 0
+      #     entry.starting_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).first(:order=>[:timestamp]).timestamp
+      #     entry.ending_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).last(:order=>[:timestamp]).timestamp
+      #   end #end if
+      # else
+      #   entry.record_number = 0
+      # end
       if !var.data_values.empty?
         if !self.data_values.nil?
           #dvalue_count = (var.data_values & self.data_values).count
