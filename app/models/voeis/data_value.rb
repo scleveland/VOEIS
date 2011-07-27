@@ -120,6 +120,8 @@ class Voeis::DataValue
   # Parses a csv row using an existing data_column template
   # column values are stored in sensor_values
   #
+  # TODO wrap associations in A POSTGRES Transaction
+  #
   # @example parse_logger_csv_header("filename")
   #
   # @param [String] csv_file
@@ -183,13 +185,17 @@ class Voeis::DataValue
           if sample_id != -1
             sample_value=[]
             sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\") VALUES "
-            sample_value << "('#{sample_type}', '#{sample_medium}',#{row[sample_id]}, '#{timestamp}')"
-            sql << sample_value.join(',')
-            repository.adapter.execute(sql)
+            sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}')"
+            #sql << sample_value.join(',')
+            sql << " RETURNING \"id\""
+            newsample_id = repository.adapter.execute(sql)
             sql = "INSERT INTO \"voeis_data_value_samples\" (\"data_value_id\",\"sample_id\") VALUES "
             sql << (0..result_ids.length-1).collect{|i|
-              "(#{result_ids[i]},#{sample_id})"
+              "(#{result_ids[i]},#{newsample_id.insert_id})"
             }.join(',')
+            repository.adapter.execute(sql)
+            sql = "INSERT INTO \"voeis_sample_sites\" (\"sample_id\",\"site_id\") VALUES "
+            sql << "(#{newsample_id.insert_id},#{site_id})"
             repository.adapter.execute(sql)
           #end
         #end#end if
