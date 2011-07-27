@@ -37,10 +37,10 @@ class Voeis::Site
   property :lat_long_datum_id,   Integer, :required => false, :default => 0
   property :elevation_m,         Float,   :required => false
   #property :vertical_datum,      String,  :required => false
-  property :vertical_datum_id,   Integer, :required => false
+  property :vertical_datum_id,   Integer, :required => false, :default => -1
   property :local_x,             Float,   :required => false
   property :local_y,             Float,   :required => false
-  property :local_projection_id, Integer, :required => false
+  property :local_projection_id, Integer, :required => false, :default => -1
   #property :local_projection,    String,  :required => false
   property :pos_accuracy_m,      Float,   :required => false
   property :state,               String,  :required => true
