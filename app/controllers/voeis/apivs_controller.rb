@@ -149,12 +149,7 @@ class Voeis::ApivsController < Voeis::BaseController
      end
    end
    respond_to do |format|
-     format.json do
-       render :json => @data_stream_values.as_json, :callback => params[:jsoncallback]
-     end
-     format.xml do
-       render :xml => @data_stream_values.to_xml
-     end
+     format_response(@data_stream_values, format)
    end
   end
   
@@ -290,12 +285,7 @@ class Voeis::ApivsController < Voeis::BaseController
      @dts= Voeis::DataStream.all
    end
    respond_to do |format|
-     format.json do
-       render :json => @dts.to_json, :callback => params[:jsoncallback]
-     end
-     format.xml do
-       render :xml => @dts.to_xml
-     end
+     format_response(@dts, format)
    end
   end
   
@@ -330,12 +320,7 @@ class Voeis::ApivsController < Voeis::BaseController
       @stream.save
     end
     respond_to do |format|
-     format.json do
-       render :json => @stream.to_json, :callback => params[:jsoncallback]
-     end
-     format.xml do
-       render :xml => @stream.to_xml
-     end
+     format_response(@stream, format)
     end
   end
   
@@ -376,12 +361,7 @@ class Voeis::ApivsController < Voeis::BaseController
         @data_column.save!
       end
       respond_to do |format|
-       format.json do
-         render :json => @data_column.to_json, :callback => params[:jsoncallback]
-       end
-       format.xml do
-         render :xml => @data_column.to_xml
-       end
+       format_response(@data_column, format)
       end
   end
   
@@ -427,12 +407,7 @@ class Voeis::ApivsController < Voeis::BaseController
       project_site.save!
     end
     respond_to do |format|
-     format.json do
-       render :json => @sensor_type.to_json, :callback => params[:jsoncallback]
-     end
-     format.xml do
-       render :xml => @sensor_type.to_xml
-     end
+     format_response(@sensor_type, format)
     end
   end
   
@@ -476,12 +451,7 @@ class Voeis::ApivsController < Voeis::BaseController
       @sensor_value.save!
     end
     respond_to do |format|
-     format.json do
-       render :json => @sensor_value.to_json, :callback => params[:jsoncallback]
-     end
-     format.xml do
-       render :xml => @sensor_value.to_xml
-     end
+     format_response(@sensor_value, format)
     end
   end
   
@@ -525,12 +495,7 @@ class Voeis::ApivsController < Voeis::BaseController
      end
    end
    respond_to do |format|
-     format.json do
-       render :json => @data_values.as_json, :callback => params[:jsoncallback]
-     end
-     format.xml do
-       render :xml => @data_values.to_xml
-     end
+     format_response(@data_values, format)
    end
   end
   
@@ -567,12 +532,7 @@ class Voeis::ApivsController < Voeis::BaseController
        @data_values[:site] = @site.as_json
      end
      respond_to do |format|
-       format.json do
-         render :json => @data_values.as_json, :callback => params[:jsoncallback]
-       end
-       format.xml do
-         render :xml => @data_values.to_xml
-       end
+       format_response(@data_values, format)
      end
     end
   end
@@ -618,12 +578,7 @@ class Voeis::ApivsController < Voeis::BaseController
        end
      end
      respond_to do |format|
-       format.json do
-         render :json => @data_values.as_json, :callback => params[:jsoncallback]
-       end
-       format.xml do
-         render :xml => @data_values.to_xml
-       end
+       format_response(@data_values, format)
      end
     end
   end
@@ -659,12 +614,7 @@ class Voeis::ApivsController < Voeis::BaseController
       end
     end
     respond_to do |format|
-      format.json do
-        render :json => @site.to_json, :callback => params[:jsoncallback]
-      end
-      format.xml do
-        render :xml => @site.to_xml
-      end
+      format_response(@site, format)
     end
   end
   
@@ -705,12 +655,7 @@ class Voeis::ApivsController < Voeis::BaseController
       @site[:errors] = e.message
     end #end rescue
     respond_to do |format|
-      format.json do
-        render :json => @site.to_json, :callback => params[:jsoncallback]
-      end
-      format.xml do
-        render :xml => @site.to_xml
-      end
+      format_response(@site, format)
     end
   end
   
@@ -730,12 +675,7 @@ class Voeis::ApivsController < Voeis::BaseController
       @site = Voeis::Site.get(params[:id])
     end
     respond_to do |format|
-      format.json do
-        render :json => @site.to_json, :callback => params[:jsoncallback]
-      end
-      format.xml do
-        render :xml => @site.to_xml
-      end
+      format_response(@site, format)
     end
   end
 
@@ -754,12 +694,6 @@ class Voeis::ApivsController < Voeis::BaseController
       @site = Voeis::Site.all()
     end
     respond_to do |format|
-      # format.json do
-      #   render :json => @site.to_json, :callback => params[:jsoncallback]
-      # end
-      # format.xml do
-      #   render :xml => @site.to_xml
-      # end
       format_response(@site, format)
     end
   end
@@ -777,12 +711,7 @@ class Voeis::ApivsController < Voeis::BaseController
      @site = ""
      @site = Voeis::Site.all()
      respond_to do |format|
-       format.json do
-         render :json => @site.to_json, :callback => params[:jsoncallback]
-       end
-       format.xml do
-         render :xml => @site.to_xml
-       end
+       format_response(@site, format)
      end
    end
    #************Variables
@@ -822,12 +751,7 @@ class Voeis::ApivsController < Voeis::BaseController
       end
     end
     respond_to do |format|
-      format.json do
-        render :json => @data_values.as_json, :callback => params[:jsoncallback]
-      end
-      format.xml do
-        render :xml => @data_values.to_xml
-      end
+      format_response(@data_values, format)
     end
    end 
    
@@ -875,12 +799,7 @@ class Voeis::ApivsController < Voeis::BaseController
       end
     end
     respond_to do |format|
-      format.json do
-        render :json => @data_values.as_json, :callback => params[:jsoncallback]
-      end
-      format.xml do
-        render :xml => @data_values.to_xml
-      end
+      format_response(@data_values, format)
     end
    end
    
@@ -913,10 +832,7 @@ class Voeis::ApivsController < Voeis::BaseController
       end
      end
      respond_to do |format|
-       format.json do
-         format.html
-         render :json => @variable.to_json, :callback => params[:jsoncallback]
-       end
+       format_response(@variable, format)
      end
    end
    
@@ -936,12 +852,7 @@ class Voeis::ApivsController < Voeis::BaseController
        @variable = Voeis::Variable.get(params[:id])
      end
      respond_to do |format|
-       format.json do
-         render :json => @variable.to_json, :callback => params[:jsoncallback]
-       end
-       format.xml do
-         render :xml => @variable.to_xml
-       end
+       format_response(@variable, format)
      end
    end
   # get_project_variables
@@ -959,12 +870,7 @@ class Voeis::ApivsController < Voeis::BaseController
       @variable = Voeis::Variable.all()
     end
     respond_to do |format|
-      format.json do
-        render :json => @variable.to_json, :callback => params[:jsoncallback]
-      end
-      format.xml do
-        render :xml => @variable.to_xml
-      end
+      format_response(@variable, format)
     end
   end
   
@@ -981,12 +887,7 @@ class Voeis::ApivsController < Voeis::BaseController
      @variables = ""
      @variables = Voeis::Variable.all()
      respond_to do |format|
-       format.json do
-         render :json => @variables.as_json, :callback => params[:jsoncallback]
-       end
-       format.xml do
-         render :xml => @variables.to_xml
-       end
+       format_response(@variables, format)
      end
    end
    
@@ -1025,12 +926,7 @@ class Voeis::ApivsController < Voeis::BaseController
        @variable[:errors] = e.message
      end #end rescue
      respond_to do |format|
-       format.json do
-         render :json => @variable.to_json, :callback => params[:jsoncallback]
-       end
-       format.xml do
-         render :xml => @variable.to_xml
-       end
+       format_response(@variable, format)
      end
    end
    
@@ -1048,12 +944,7 @@ class Voeis::ApivsController < Voeis::BaseController
        @variable.save
      end
      respond_to do |format|
-       format.json do
-         render :json => @variable.to_json, :callback => params[:jsoncallback]
-       end
-       format.xml do
-         render :xml => @variable.to_xml
-       end
+       format_response(@variable, format)
      end
    end
    
@@ -1062,12 +953,7 @@ class Voeis::ApivsController < Voeis::BaseController
      @variables = Hash.new
      @variables = {:identifer=>"id", :label=> "variable_code", :items => Voeis::Variable.all()}
      respond_to do |format|
-       format.json do
-         render :json => @variables.as_json, :callback => params[:jsoncallback]
-       end
-       format.xml do
-         render :xml => @variables.to_xml
-       end
+       format_response(@variables, format)
      end
    end
    
@@ -1106,12 +992,7 @@ class Voeis::ApivsController < Voeis::BaseController
         end
     end#managed repo
     respond_to do |format|
-      format.json do
-        render :json => @new_var.to_json, :callback => params[:jsoncallback]
-      end
-      format.xml do
-        render :xml => @new_var.to_xml
-      end
+      format_response(@new_var, format)
     end
   end
  
@@ -1136,12 +1017,7 @@ class Voeis::ApivsController < Voeis::BaseController
       @var_hash[:items] = @var_hash[:items] + @var_name_array
     end
     respond_to do |format|
-      format.json do
-       render :json => @var_hash.as_json, :callback => params[:jsoncallback]
-      end
-      format.xml do
-       render :xml => @var_hash.to_xml
-      end
+      format_response(@var_hash, format)
     end
   end
  
@@ -1162,12 +1038,7 @@ class Voeis::ApivsController < Voeis::BaseController
      @samples = Voeis::Sample.all()
    end
    respond_to do |format|
-     format.json do
-       render :json => @samples.to_json, :callback => params[:jsoncallback]
-     end
-     format.xml do
-       render :xml => @samples.to_xml
-     end
+     format_response(@samples, format)
    end
   end
 
@@ -1190,12 +1061,7 @@ class Voeis::ApivsController < Voeis::BaseController
    end
    
    respond_to do |format|
-     format.json do
-       render :json => @sample.to_json, :callback => params[:jsoncallback]
-     end
-     format.xml do
-       render :xml => @sample.to_xml
-     end
+     format_response(@sample, format)
    end
   end
    
@@ -1238,12 +1104,7 @@ class Voeis::ApivsController < Voeis::BaseController
      end
    end
    respond_to do |format|
-     format.json do
-       render :json => @sample.to_json, :callback => params[:jsoncallback]
-     end
-     format.xml do
-       render :xml => @sample.to_xml
-     end
+     format_response(@sample, format)
    end
   end
   
@@ -1265,12 +1126,7 @@ class Voeis::ApivsController < Voeis::BaseController
      @measurements = Voeis::Sample.get(params[:sample_id].to_i).data_values
    end
    respond_to do |format|
-     format.json do
-       render :json => @measurements.to_json, :callback => params[:jsoncallback]
-     end
-     format.xml do
-       render :xml => @measurements.to_xml
-     end
+     format_response(@measurements, format)
    end
   end
   
@@ -1328,12 +1184,7 @@ class Voeis::ApivsController < Voeis::BaseController
        end
      end
      respond_to do |format|
-       format.json do
-         render :json => @measurement.to_json, :callback => params[:jsoncallback]
-       end
-       format.xml do
-         render :xml => @measurement.to_xml
-       end
+       format_response(@measurement, format)
      end
   end
    
