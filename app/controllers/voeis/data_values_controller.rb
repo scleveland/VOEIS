@@ -1138,7 +1138,7 @@ class Voeis::DataValuesController < Voeis::BaseController
      @source = Voeis::Source.get(params[:source])
      @project_source = nil
      parent.managed_repository do
-       if Voeis::Source.first(:organization => @source.organization,      
+       @project_source = Voeis::Source.first_or_create(:organization => @source.organization,      
                               :source_description => @source.source_description,
                               :source_link => @source.source_link,       
                               :contact_name => @source.contact_name,      
@@ -1149,28 +1149,9 @@ class Voeis::DataValuesController < Voeis::BaseController
                               :state => @source.state,             
                               :zip_code => @source.zip_code,          
                               :citation => @source.citation,          
-                              :metadata_id =>@source.metadata_id).nil?       
-          Voeis::Source.create(@source.attributes)
-        else
-          @project_source = Voeis::Source.first(:organization => @source.organization,      
-                                  :source_description => @source.source_description,
-                                  :source_link => @source.source_link,       
-                                  :contact_name => @source.contact_name,      
-                                  :phone => @source.phone,             
-                                  :email =>@source.email,             
-                                  :address => @source.address,           
-                                  :city => @source.city,              
-                                  :state => @source.state,             
-                                  :zip_code => @source.zip_code,          
-                                  :citation => @source.citation,          
-                                  :metadata_id =>@source.metadata_id)
-        end
+                              :metadata_id =>@source.metadata_id)
      end
-     #put this back in later
-       #if params[:no_save] != "no"
      
-     #create a parsing template
-     #create and save new DataStream
      columns_array = Array.new
      ignore_array = Array.new
      meta_tag_array = Array.new
@@ -1203,24 +1184,13 @@ class Voeis::DataValuesController < Voeis::BaseController
      else
        dstream_utc_offset = params[:utc_offset].to_i
      end
-     #use this when we decide to save templates and reuse them
+     #get or create the DataStream
      if params[:save_template] == "true"
        data_stream_id = create_sample_and_data_parsing_template(params[:template_name], timestamp_col, sample_id_col, columns_array, ignore_array, site, params[:datafile], params[:start_line], params[:row_size], vertical_offset_col, ending_vertical_offset_col, meta_tag_array, dstream_utc_offset, dst, @project_source)
-     end
-
-     if params[:save_template] == "true"
        data_stream = parent.managed_repository{Voeis::DataStream.get(data_stream_id[:data_template_id])}
      else
        data_stream = parent.managed_repository{Voeis::DataStream.get(params[:data_stream_id])}
-       
-     end
-     # if !data_stream.data_stream_columns.first(:name => "Timestamp").nil?
-     #   @timestamp_col = data_stream.data_stream_columns.first(:name => "Timestamp").column_number
-     # else
-     #   @timestamp_col = -1
-     # end
-     #   @sample_col = data_stream.data_stream_columns.first(:name => "SampleID").column_number
- 
+     end 
       
      range = params[:row_size].to_i - 1
      #store all the Variables in the managed repository
@@ -1254,6 +1224,8 @@ class Voeis::DataValuesController < Voeis::BaseController
                       )
             @col_vars[i] = variable
             @variables << variable
+            site.variables << variable
+            site.save
           end#managed repo
         end #end if
      end  #end i loop
@@ -1266,7 +1238,8 @@ class Voeis::DataValuesController < Voeis::BaseController
      
      #i = params[:start_line].to_i
      
-     parent.managed_repository{Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, params[:sample_type], params[:sample_medium])}
+     parent.managed_repository do 
+       Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, params[:sample_type], params[:sample_medium])
      
      # csv_data[params[:start_line].to_i-1..-1].each do |row|
      #   @csv_row[i] = row
@@ -1343,8 +1316,9 @@ class Voeis::DataValuesController < Voeis::BaseController
          #      end #end if @csv_array.nil?
          #   end #end managed repo
          # end #end row loop
-         puts "updating the site catalog" 
-         site.update_site_data_catalog_variables(@variables)
+           puts "updating the site catalog" 
+           Voeis::Site.get(site.id).update_site_data_catalog_variables(@variables)
+         end #end repo
          #parent.publish_his
          flash[:notice] = "File parsed and stored successfully."
          redirect_to project_path(params[:project_id]) and return
