@@ -334,12 +334,6 @@ default value for this field is -9999.
       <pre class="lines">
 
 
-93
-94
-95
-96
-97
-98
 99
 100
 101
@@ -354,10 +348,16 @@ default value for this field is -9999.
 110
 111
 112
-113</pre>
+113
+114
+115
+116
+117
+118
+119</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/variable.rb', line 93</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/variable.rb', line 99</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id load_from_his'>load_from_his</span>
   <span class='id his_variables'>his_variables</span> <span class='op'>=</span> <span class='id repository'>repository</span><span class='lparen'>(</span><span class='symbol'>:his</span><span class='rparen'>)</span><span class='lbrace'>{</span> <span class='const'>His</span><span class='op'>::</span><span class='const'>Variable</span><span class='period'>.</span><span class='id all'>all</span> <span class='rbrace'>}</span>
@@ -404,12 +404,6 @@ default value for this field is -9999.
       <pre class="lines">
 
 
-115
-116
-117
-118
-119
-120
 121
 122
 123
@@ -428,10 +422,16 @@ default value for this field is -9999.
 136
 137
 138
-139</pre>
+139
+140
+141
+142
+143
+144
+145</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/variable.rb', line 115</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/variable.rb', line 121</span>
 
 <span class='kw'>def</span> <span class='id store_to_his'>store_to_his</span><span class='lparen'>(</span><span class='id u_id'>u_id</span><span class='rparen'>)</span>
   <span class='id var_to_store'>var_to_store</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='id u_id'>u_id</span><span class='rparen'>)</span>
@@ -468,7 +468,7 @@ default value for this field is -9999.
 </div>
     
     <div id="footer">
-  Generated on Tue Jul 26 13:52:46 2011 by 
+  Generated on Wed Jul 27 00:33:38 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>
