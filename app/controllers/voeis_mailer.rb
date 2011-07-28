@@ -19,4 +19,10 @@ class VoeisMailer < ActionMailer::Base
          :subject => subject, 
          :body => body ).deliver
   end
+  
+  def email_rescued_exception(error_msg)
+    mail(:to =>%w{ sean.b.cleveland@gmail.com pol.llovet@gmail.com thomasheetderks@gmail.com},
+         :subject => "Caught Exception Error",
+         :body => error_msg).deliver
+  end
 end
