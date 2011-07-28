@@ -98,7 +98,13 @@ class ApplicationController < ActionController::Base
     end
   end
   
-  
+  def email_exception(e)
+    if RAILS_ENV == 'production'
+      ExceptionNotifier::Notifier.exception_notification(request.env, e).deliver
+    else
+      puts "IN PRODUCTION THIS WOULD BE Emailed:"+e.message
+    end
+  end
   
    
 end
