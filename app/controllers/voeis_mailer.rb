@@ -21,7 +21,7 @@ class VoeisMailer < ActionMailer::Base
   end
   
   def email_rescued_exception(e)
-    @requst = ActionDispatch::Request.new(request.env)
+    @request = ActionDispatch::Request.new(request.env)
     req = "URL       :#{@request.url}\n"
     req << "IP address: #{@request.remote_ip}\n"
     req << "Parameters: #{@request.filtered_parameters.inspect}\n"
