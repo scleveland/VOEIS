@@ -1320,11 +1320,11 @@ class Voeis::DataValuesController < Voeis::BaseController
            Voeis::Site.get(site.id).update_site_data_catalog_variables(@variables)
          end #end repo
          #parent.publish_his
-         flash[:notice] = "File parsed and stored successfully."
+         flash[:notice] = "File parsed and stored successfully for #{site.name}."
          redirect_to project_path(params[:project_id]) and return
          rescue Exception => e  
            email_exception(e,request.env)
-           flash[:error] = "Problem Parsing Logger File: "+ e.message
+           flash[:error] = "Problem Parsing Sample File: "+ e.message
            redirect_to(:controller =>"voeis/data_values", :action => "pre_process_samples_file_upload", :params => {:id => params[:project_id]})
          end
    end# end def
