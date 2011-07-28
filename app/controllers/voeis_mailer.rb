@@ -21,8 +21,16 @@ class VoeisMailer < ActionMailer::Base
   end
   
   def email_rescued_exception(e)
+    @requst = ActionDispatch::Request.new(request.env)
+    req = "URL       :#{@request.url}\n"
+    req << "IP address: #{@request.remote_ip}\n"
+    req << "Parameters: #{@request.filtered_parameters.inspect}\n"
+    req << "Rails root: #{Rails.root}\n"
     mail(:to =>%w{ sean.b.cleveland@gmail.com pol.llovet@gmail.com thomasheetderks@gmail.com},
          :subject => "Caught Exception Error",
-         :body => "\n\nMessage\n__________\n"+e.message+"\n\nRequest\n__________\n"+"\n\nBacktrace\n_________\n"+e.backtrace * "\n").deliver
+         :body => "\n\nMessage\n__________\n"+e.message+"\n\nRequest\n__________\n"+req+"\n\nBacktrace\n_________\n"+e.backtrace * "\n").deliver
+         
+
+         
   end
 end
