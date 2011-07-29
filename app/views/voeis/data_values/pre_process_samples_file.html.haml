@@ -205,10 +205,10 @@ Form Progress:
               %span
                 Assign The Sample ID To This Column
             =clear_break
-            %button{:dojoType=>"dijit.form.Button", :id=>"metatag_select_button"+col.to_s,:onClick=>"dijit.byId('MetaTaggrid#{col.to_s}').sort('name');dijit.byId('metatag_dialog#{col.to_s}').show();"}
-              %span
-                Assign A Meta Tag
-            =clear_break
+            -#%button{:dojoType=>"dijit.form.Button", :id=>"metatag_select_button"+col.to_s,:onClick=>"dijit.byId('MetaTaggrid#{col.to_s}').sort('name');dijit.byId('metatag_dialog#{col.to_s}').show();"}
+            -#%span
+            -#Assign A Meta Tag
+            -#=clear_break
             %div{:dojoType=>"dijit.form.DropDownButton", :id=>"vertical_offset_assignment_select_button"+col.to_s}
               %span
                 Assign Vertical Offsets
@@ -230,10 +230,10 @@ Form Progress:
                         Assign The Ending Vertical Offset To This Column
                     =clear_break
             =clear_break
-            %button{:dojoType=>"dijit.form.Button", :title=>"Batch Results", :id=>"batch_column"+col.to_s, :onClick=>"assignBatch(#{col});", :class=>"icon icon-add"}
-              %span
-                Assign Batch Result To This Column
-            =clear_break
+            -#%button{:dojoType=>"dijit.form.Button", :title=>"Batch Results", :id=>"batch_column"+col.to_s, :onClick=>"assignBatch(#{col});", :class=>"icon icon-add"}
+            -#%span
+            -#    Assign Batch Result To This Column
+            -#=clear_break
             %button{:dojoType=>"dijit.form.Button", :title=>"Ignore Column", :id=>"ignore_column"+col.to_s, :onClick=>"assignIgnore(#{col});", :class=>"icon icon-add"}
               %span
                 Ignore Column

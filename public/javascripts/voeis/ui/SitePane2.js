@@ -50,7 +50,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		if(this.site_var_stats.length>0) {
 			for(var i=0;i<this.site_var_stats.length;i++) {
 				data += '<a href="javascript:" onclick="dojo.publish(\'voeis/project/variable\', [';
-				data += this.site_var_stats[i].varid+',\''+this.site_var_stats[i].varname+'\']);">';
+				data += this.site_var_stats[i].varid+',\''+this.site_var_stats[i].varname+'\','+this.site.id+']);">';
 				data += '<strong>'+this.site_var_stats[i].varname+'</strong></a></td><td>\n';
 				data += this.site_var_stats[i].count+'</td><td>\n';
 				data += this.site_var_stats[i].first+'</td><td>\n';

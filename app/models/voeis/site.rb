@@ -37,10 +37,10 @@ class Voeis::Site
   property :lat_long_datum_id,   Integer, :required => false, :default => 0
   property :elevation_m,         Float,   :required => false
   #property :vertical_datum,      String,  :required => false
-  property :vertical_datum_id,   Integer, :required => false
+  property :vertical_datum_id,   Integer, :required => false, :default => -1
   property :local_x,             Float,   :required => false
   property :local_y,             Float,   :required => false
-  property :local_projection_id, Integer, :required => false
+  property :local_projection_id, Integer, :required => false, :default => -1
   #property :local_projection,    String,  :required => false
   property :pos_accuracy_m,      Float,   :required => false
   property :state,               String,  :required => true
@@ -61,8 +61,13 @@ class Voeis::Site
   has n, :data_values,   :model => "Voeis::DataValue",   :through => Resource
   has n, :samples,       :model => "Voeis::Sample",      :through => Resource
   has n, :variables,     :model => "Voeis::Variable",    :through => Resource
+<<<<<<< HEAD
   belongs_to  :vertical_datum,    :model => "Voeis::VerticalDatumCV"
   belongs_to  :local_projection,  :model => "Voeis::LocalProjectionCV"
+=======
+  has 1, :vertical_datum, :model => "Voeis::VerticalDatumCV", :child_key=>"vertical_datum_id"
+  has 1, :local_projection, :model => "Voeis::LocalProjectionCV", :child_key=>"local_projection_id"
+>>>>>>> c4650a14324f75769fb97bab47a9bb70ac56ab9b
   #has 1, :lat_long_datum, :model=>"Voes::LatLongDatumCV"
   alias :site_name  :name
   alias :site_name= :name=
@@ -157,7 +162,7 @@ class Voeis::Site
       end
       entry.valid?
       puts entry.errors.inspect()
-      entry.save
+      entry.save!
     end #end each
   end
   
@@ -165,15 +170,15 @@ class Voeis::Site
   def update_site_data_catalog_variables(variables)
     variables.each do |var|
       entry = Voeis::SiteDataCatalog.first_or_create(:site_id => self.id, :variable_id => var.id)
-      if !var.sensor_types.empty?
-        entry.record_number = (self.sensor_values & var.sensor_types.first.sensor_values).count
-        if entry.record_number > 0
-          entry.starting_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).first(:order=>[:timestamp]).timestamp
-          entry.ending_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).last(:order=>[:timestamp]).timestamp
-        end #end if
-      else
-        entry.record_number = 0
-      end
+      # if !var.sensor_types.empty?
+      #   entry.record_number = (self.sensor_values & var.sensor_types.first.sensor_values).count
+      #   if entry.record_number > 0
+      #     entry.starting_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).first(:order=>[:timestamp]).timestamp
+      #     entry.ending_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).last(:order=>[:timestamp]).timestamp
+      #   end #end if
+      # else
+      #   entry.record_number = 0
+      # end
       if !var.data_values.empty?
         if !self.data_values.nil?
           #dvalue_count = (var.data_values & self.data_values).count
@@ -196,7 +201,7 @@ class Voeis::Site
       end
       entry.valid?
       puts entry.errors.inspect()
-      entry.save
+      entry.save!
     end #end each
   end
 end

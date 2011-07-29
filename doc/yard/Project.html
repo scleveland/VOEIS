@@ -418,7 +418,6 @@ lamb
       <pre class="lines">
 
 
-132
 133
 134
 135
@@ -434,10 +433,11 @@ lamb
 145
 146
 147
-148</pre>
+148
+149</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 132</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 133</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id store_site_to_system'>store_site_to_system</span><span class='lparen'>(</span><span class='id u_id'>u_id</span><span class='rparen'>)</span>
   <span class='id site_to_store'>site_to_store</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='id u_id'>u_id</span><span class='rparen'>)</span><span class='rbrace'>}</span>
@@ -557,7 +557,8 @@ Set of permissions the current user has
 75
 76
 77
-78</pre>
+78
+79</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/models/project.rb', line 52</span>
@@ -576,14 +577,15 @@ Set of permissions the current user has
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/meta_tag$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/source$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/site$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/site$update</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/unit$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                        <span class='comment'>#&quot;voeis/site$update&quot;,
+</span>                        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/unit$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/variable$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/lab_method$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/sample$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/sample_material$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/site_data_catalog$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/apiv$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                        <span class='comment'>#&quot;voeis/site_data_catalog$update&quot;,
+</span>                        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/apiv$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/data_value$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='kw'>self</span><span class='period'>.</span><span class='id is_private?'>is_private?</span>
     <span class='kw'>return</span> <span class='id base_permission'>base_permission</span> <span class='kw'>if</span> <span class='id user'>user</span><span class='period'>.</span><span class='id nil?'>nil?</span>
     <span class='lparen'>(</span><span class='kw'>super</span> <span class='op'>+</span> <span class='id base_permission'>base_permission</span> <span class='op'>+</span> <span class='id user'>user</span><span class='period'>.</span><span class='id memberships'>memberships</span><span class='lparen'>(</span><span class='symbol'>:project_id</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id id'>id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id roles'>roles</span><span class='period'>.</span><span class='id map'>map</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id r'>r</span><span class='op'>|</span> <span class='id r'>r</span><span class='period'>.</span><span class='id actions'>actions</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id flatten'>flatten</span><span class='period'>.</span><span class='id uniq'>uniq</span>
@@ -607,7 +609,6 @@ Set of permissions the current user has
       <pre class="lines">
 
 
-80
 81
 82
 83
@@ -657,10 +658,11 @@ Set of permissions the current user has
 127
 128
 129
-130</pre>
+130
+131</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 81</span>
 
 <span class='kw'>def</span> <span class='id publish_his'>publish_his</span>
   <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id publish_to_his'>publish_to_his</span>
@@ -731,12 +733,12 @@ Set of permissions the current user has
       <pre class="lines">
 
 
-175
-176
-177</pre>
+177
+178
+179</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 175</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 177</span>
 
 <span class='kw'>def</span> <span class='id sites'>sites</span>
   <span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id all'>all</span> <span class='rbrace'>}</span>
@@ -759,16 +761,16 @@ Set of permissions the current user has
       <pre class="lines">
 
 
-150
 151
 152
 153
 154
 155
-156</pre>
+156
+157</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 150</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 151</span>
 
 <span class='kw'>def</span> <span class='id update_project_site_data_catalog'>update_project_site_data_catalog</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span> <span class='kw'>do</span>
@@ -806,12 +808,12 @@ fetch all variables from the Projects
       <pre class="lines">
 
 
-180
-181
-182</pre>
+182
+183
+184</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 180</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 182</span>
 
 <span class='kw'>def</span> <span class='id variables'>variables</span>
   <span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Variable</span><span class='period'>.</span><span class='id all'>all</span><span class='rbrace'>}</span>
@@ -826,7 +828,7 @@ fetch all variables from the Projects
 </div>
     
     <div id="footer">
-  Generated on Tue Jul 26 13:52:46 2011 by 
+  Generated on Wed Jul 27 00:33:38 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

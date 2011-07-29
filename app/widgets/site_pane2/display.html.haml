@@ -86,28 +86,31 @@
         $$$site-variable-data$$$
 
   -#%br{:style=>'float:none; clear:both;'}
-  
-  %h3{:style=>"margin-top:0;"}
-    Existing Samples
-  #all_variables-site00{:style=>"$$$export-style$$$"}
-    = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
-      = hidden_field_tag('column_array', @sample_labels.to_json)
-      = hidden_field_tag('row_array', "$$$site-samps$$$")
-      = hidden_field_tag('file_name', "project_samples")
-      = submit_tag("Export Samples")
+  %div
+    %h3{:style=>"margin-top:0;"}
+      Existing Samples
+    #all_variables-site00{:style=>"$$$export-style$$$"}
+      = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
+        = hidden_field_tag('column_array', @sample_labels.to_json)
+        = hidden_field_tag('row_array', "$$$site-samps$$$")
+        = hidden_field_tag('file_name', "project_samples")
+        = submit_tag("Export Samples")
 
-      %br
-      %br
-
-  %table{:id=>"site00-sample-table", :style=>"width:45%;"} 
-    %tr
-      - @sample_labels.each do |label|
-        %th
-          %b
-            = label
-    %tr
-      %td
-        $$$site-sample-data$$$
+        %br
+        %br    
+    %table{:id=>"site00-sample-table", :style=>"width:45%;"} 
+      %tr
+        - @sample_labels.each do |label|
+          %th{:style=>"width:23%;align:center;"}
+            %b
+              = label
+      %tr
+        %td{:colspan=>"4"}
+          %div{:class=>"sample-list"}  
+            %table
+              %tr
+                %td{:style=>"width:23%;align:center;"}
+                  $$$site-sample-data$$$
 
 -if @auth
   #edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>'EDIT', :style=>"margin-top:0;padding-top:0;display:none;"}

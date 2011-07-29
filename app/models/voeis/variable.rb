@@ -143,4 +143,12 @@ class Voeis::Variable
     var_to_store.save
     new_his_var
   end
+  
+  def self.last_five_site_values(site_id)
+      
+  end
+  
+  def last_ten_values_graph(site)
+    (self.data_values & site.data_values).all(:order=>[:local_date_time], :limit=>10).map{|dv| [dv.local_date_time.to_datetime.to_i, dv.data_value] }
+  end  
 end

@@ -120,6 +120,8 @@ class Voeis::DataValue
   # Parses a csv row using an existing data_column template
   # column values are stored in sensor_values
   #
+  # TODO wrap associations in A POSTGRES Transaction
+  #
   # @example parse_logger_csv_header("filename")
   #
   # @param [String] csv_file
@@ -161,37 +163,42 @@ class Voeis::DataValue
                                 
               end #end if
           end #end loop
-          sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\") VALUES "
-          sql << row_values.join(',')
-          sql << " RETURNING \"id\""
-          result_ids = repository.adapter.select(sql)
-          sql = "INSERT INTO \"voeis_data_value_variables\" (\"data_value_id\",\"variable_id\") VALUES "
-          sql << (0..result_ids.length-1).collect{|i|
-            "(#{result_ids[i]},#{data_col_array[variable_cols[i]][variable].id})"
-          }.join(',')
-          repository.adapter.execute(sql)
-          sql = "INSERT INTO \"voeis_data_value_sites\" (\"data_value_id\",\"site_id\") VALUES "
-          sql << (0..result_ids.length-1).collect{|i|
-            "(#{result_ids[i]},#{site_id})"
-          }.join(',')
-          repository.adapter.execute(sql)
-          sql = "INSERT INTO \"voeis_data_stream_data_values\" (\"data_value_id\",\"data_stream_id\") VALUES "
-          sql << (0..result_ids.length-1).collect{|i|
-            "(#{result_ids[i]},#{data_stream_id})"
-          }.join(',')
-          repository.adapter.execute(sql)
-          if sample_id != -1
-            sample_value=[]
-            sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\") VALUES "
-            sample_value << "('#{sample_type}', '#{sample_medium}',#{row[sample_id]}, '#{timestamp}')"
-            sql << sample_value.join(',')
-            repository.adapter.execute(sql)
-            sql = "INSERT INTO \"voeis_data_value_samples\" (\"data_value_id\",\"sample_id\") VALUES "
+          if !row_values.empty?
+            sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\") VALUES "
+            sql << row_values.join(',')
+            sql << " RETURNING \"id\""
+            result_ids = repository.adapter.select(sql)
+            sql = "INSERT INTO \"voeis_data_value_variables\" (\"data_value_id\",\"variable_id\") VALUES "
             sql << (0..result_ids.length-1).collect{|i|
-              "(#{result_ids[i]},#{sample_id})"
+              "(#{result_ids[i]},#{data_col_array[variable_cols[i]][variable].id})"
             }.join(',')
             repository.adapter.execute(sql)
-          #end
+            sql = "INSERT INTO \"voeis_data_value_sites\" (\"data_value_id\",\"site_id\") VALUES "
+            sql << (0..result_ids.length-1).collect{|i|
+              "(#{result_ids[i]},#{site_id})"
+            }.join(',')
+            repository.adapter.execute(sql)
+            sql = "INSERT INTO \"voeis_data_stream_data_values\" (\"data_value_id\",\"data_stream_id\") VALUES "
+            sql << (0..result_ids.length-1).collect{|i|
+              "(#{result_ids[i]},#{data_stream_id})"
+            }.join(',')
+            repository.adapter.execute(sql)
+            if sample_id != -1
+              sample_value=[]
+              sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\") VALUES "
+              sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}')"
+              #sql << sample_value.join(',')
+              sql << " RETURNING \"id\""
+              newsample_id = repository.adapter.execute(sql)
+              sql = "INSERT INTO \"voeis_data_value_samples\" (\"data_value_id\",\"sample_id\") VALUES "
+              sql << (0..result_ids.length-1).collect{|i|
+                "(#{result_ids[i]},#{newsample_id.insert_id})"
+              }.join(',')
+              repository.adapter.execute(sql)
+              sql = "INSERT INTO \"voeis_sample_sites\" (\"sample_id\",\"site_id\") VALUES "
+              sql << "(#{newsample_id.insert_id},#{site_id})"
+              repository.adapter.execute(sql)
+           end
         #end#end if
 
     end

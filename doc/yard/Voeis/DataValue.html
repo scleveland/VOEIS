@@ -450,6 +450,9 @@ Yogo Team
 Parses a csv row using an existing data_column template column values are
 stored in sensor_values
 </p>
+<p>
+TODO wrap associations in A POSTGRES Transaction
+</p>
 
 
   </div>
@@ -540,8 +543,6 @@ Yogo Team
       <pre class="lines">
 
 
-134
-135
 136
 137
 138
@@ -604,10 +605,16 @@ Yogo Team
 195
 196
 197
-198</pre>
+198
+199
+200
+201
+202
+203
+204</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 134</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 136</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id parse_logger_row'>parse_logger_row</span><span class='lparen'>(</span><span class='id data_timestamp_col'>data_timestamp_col</span><span class='comma'>,</span> <span class='id data_stream_id'>data_stream_id</span><span class='comma'>,</span> <span class='id vertical_offset_col'>vertical_offset_col</span><span class='comma'>,</span> <span class='id date_col'>date_col</span><span class='comma'>,</span> <span class='id time_col'>time_col</span><span class='comma'>,</span> <span class='id row'>row</span><span class='comma'>,</span> <span class='id site_id'>site_id</span><span class='comma'>,</span> <span class='id data_col_array'>data_col_array</span><span class='comma'>,</span> <span class='id variable_cols'>variable_cols</span><span class='comma'>,</span> <span class='id sample_id'>sample_id</span><span class='comma'>,</span> <span class='id sample_type'>sample_type</span><span class='comma'>,</span> <span class='id sample_medium'>sample_medium</span><span class='comma'>,</span> <span class='id end_vertical_offset_col'>end_vertical_offset_col</span><span class='rparen'>)</span>
   <span class='id require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>chronic</span><span class='tstring_end'>'</span></span>  <span class='comment'>#for robust timestamp parsing
@@ -661,13 +668,17 @@ Yogo Team
         <span class='kw'>if</span> <span class='id sample_id'>sample_id</span> <span class='op'>!=</span> <span class='op'>-</span><span class='int'>1</span>
           <span class='id sample_value'>sample_value</span><span class='op'>=</span><span class='lbracket'>[</span><span class='rbracket'>]</span>
           <span class='id sql'>sql</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>INSERT INTO \&quot;voeis_samples\&quot; (\&quot;sample_type\&quot;,\&quot;material\&quot;,\&quot;lab_sample_code\&quot;,\&quot;local_date_time\&quot;) VALUES </span><span class='tstring_end'>&quot;</span></span>
-          <span class='id sample_value'>sample_value</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>('</span><span class='embexpr_beg'>#{</span><span class='id sample_type'>sample_type</span><span class='rbrace'>}</span><span class='tstring_content'>', '</span><span class='embexpr_beg'>#{</span><span class='id sample_medium'>sample_medium</span><span class='rbrace'>}</span><span class='tstring_content'>',</span><span class='embexpr_beg'>#{</span><span class='id row'>row</span><span class='lbracket'>[</span><span class='id sample_id'>sample_id</span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='tstring_content'>, '</span><span class='embexpr_beg'>#{</span><span class='id timestamp'>timestamp</span><span class='rbrace'>}</span><span class='tstring_content'>')</span><span class='tstring_end'>&quot;</span></span>
-          <span class='id sql'>sql</span> <span class='op'>&lt;&lt;</span> <span class='id sample_value'>sample_value</span><span class='period'>.</span><span class='id join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>,</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
-          <span class='id repository'>repository</span><span class='period'>.</span><span class='id adapter'>adapter</span><span class='period'>.</span><span class='id execute'>execute</span><span class='lparen'>(</span><span class='id sql'>sql</span><span class='rparen'>)</span>
+          <span class='id sql'>sql</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>('</span><span class='embexpr_beg'>#{</span><span class='id sample_type'>sample_type</span><span class='rbrace'>}</span><span class='tstring_content'>', '</span><span class='embexpr_beg'>#{</span><span class='id sample_medium'>sample_medium</span><span class='rbrace'>}</span><span class='tstring_content'>','</span><span class='embexpr_beg'>#{</span><span class='id row'>row</span><span class='lbracket'>[</span><span class='id sample_id'>sample_id</span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='tstring_content'>', '</span><span class='embexpr_beg'>#{</span><span class='id timestamp'>timestamp</span><span class='rbrace'>}</span><span class='tstring_content'>')</span><span class='tstring_end'>&quot;</span></span>
+          <span class='comment'>#sql &lt;&lt; sample_value.join(',')
+</span>          <span class='id sql'>sql</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'> RETURNING \&quot;id\&quot;</span><span class='tstring_end'>&quot;</span></span>
+          <span class='id newsample_id'>newsample_id</span> <span class='op'>=</span> <span class='id repository'>repository</span><span class='period'>.</span><span class='id adapter'>adapter</span><span class='period'>.</span><span class='id execute'>execute</span><span class='lparen'>(</span><span class='id sql'>sql</span><span class='rparen'>)</span>
           <span class='id sql'>sql</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>INSERT INTO \&quot;voeis_data_value_samples\&quot; (\&quot;data_value_id\&quot;,\&quot;sample_id\&quot;) VALUES </span><span class='tstring_end'>&quot;</span></span>
           <span class='id sql'>sql</span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='int'>0</span><span class='op'>..</span><span class='id result_ids'>result_ids</span><span class='period'>.</span><span class='id length'>length</span><span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span><span class='period'>.</span><span class='id collect'>collect</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id i'>i</span><span class='op'>|</span>
-            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(</span><span class='embexpr_beg'>#{</span><span class='id result_ids'>result_ids</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='tstring_content'>,</span><span class='embexpr_beg'>#{</span><span class='id sample_id'>sample_id</span><span class='rbrace'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
+            <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(</span><span class='embexpr_beg'>#{</span><span class='id result_ids'>result_ids</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='rbrace'>}</span><span class='tstring_content'>,</span><span class='embexpr_beg'>#{</span><span class='id newsample_id'>newsample_id</span><span class='period'>.</span><span class='id insert_id'>insert_id</span><span class='rbrace'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
           <span class='rbrace'>}</span><span class='period'>.</span><span class='id join'>join</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>,</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
+          <span class='id repository'>repository</span><span class='period'>.</span><span class='id adapter'>adapter</span><span class='period'>.</span><span class='id execute'>execute</span><span class='lparen'>(</span><span class='id sql'>sql</span><span class='rparen'>)</span>
+          <span class='id sql'>sql</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>INSERT INTO \&quot;voeis_sample_sites\&quot; (\&quot;sample_id\&quot;,\&quot;site_id\&quot;) VALUES </span><span class='tstring_end'>&quot;</span></span>
+          <span class='id sql'>sql</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(</span><span class='embexpr_beg'>#{</span><span class='id newsample_id'>newsample_id</span><span class='period'>.</span><span class='id insert_id'>insert_id</span><span class='rbrace'>}</span><span class='tstring_content'>,</span><span class='embexpr_beg'>#{</span><span class='id site_id'>site_id</span><span class='rbrace'>}</span><span class='tstring_content'>)</span><span class='tstring_end'>&quot;</span></span>
           <span class='id repository'>repository</span><span class='period'>.</span><span class='id adapter'>adapter</span><span class='period'>.</span><span class='id execute'>execute</span><span class='lparen'>(</span><span class='id sql'>sql</span><span class='rparen'>)</span>
         <span class='comment'>#end
 </span>      <span class='comment'>#end#end if
@@ -684,7 +695,7 @@ Yogo Team
 </div>
     
     <div id="footer">
-  Generated on Tue Jul 26 13:52:46 2011 by 
+  Generated on Wed Jul 27 00:33:38 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

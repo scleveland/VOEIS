@@ -63,13 +63,14 @@ class Project
                           "voeis/meta_tag$retrieve",
                           "voeis/source$retrieve",
                           "voeis/site$retrieve",
-                          "voeis/site$update",
+                          #"voeis/site$update",
                           "voeis/unit$retrieve",
                           "voeis/variable$retrieve",
                           "voeis/lab_method$retrieve",
                           "voeis/sample$retrieve",
                           "voeis/sample_material$retrieve",
                           "voeis/site_data_catalog$retrieve",
+                          #"voeis/site_data_catalog$update",
                           "voeis/apiv$retrieve",
                           "voeis/data_value$retrieve"] unless self.is_private?
       return base_permission if user.nil?
@@ -158,6 +159,7 @@ class Project
   # in the Project#managed_repository.
   # @author Ryan Heimbuch
   manage Voeis::Site
+  manage Voeis::SiteDataCatalog
   manage Voeis::DataStream
   manage Voeis::DataStreamColumn
   manage Voeis::MetaTag
