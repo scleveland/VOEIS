@@ -61,13 +61,12 @@ class Voeis::Site
   has n, :data_values,   :model => "Voeis::DataValue",   :through => Resource
   has n, :samples,       :model => "Voeis::Sample",      :through => Resource
   has n, :variables,     :model => "Voeis::Variable",    :through => Resource
-<<<<<<< HEAD
+
   belongs_to  :vertical_datum,    :model => "Voeis::VerticalDatumCV"
   belongs_to  :local_projection,  :model => "Voeis::LocalProjectionCV"
-=======
-  has 1, :vertical_datum, :model => "Voeis::VerticalDatumCV", :child_key=>"vertical_datum_id"
-  has 1, :local_projection, :model => "Voeis::LocalProjectionCV", :child_key=>"local_projection_id"
->>>>>>> c4650a14324f75769fb97bab47a9bb70ac56ab9b
+  #has 1, :vertical_datum, :model => "Voeis::VerticalDatumCV", :child_key=>"vertical_datum_id"
+  #has 1, :local_projection, :model => "Voeis::LocalProjectionCV", :child_key=>"local_projection_id"
+
   #has 1, :lat_long_datum, :model=>"Voes::LatLongDatumCV"
   alias :site_name  :name
   alias :site_name= :name=
