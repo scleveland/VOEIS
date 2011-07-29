@@ -98,7 +98,7 @@
       tabs.selectChild(sitePane);
     };
 
-    var openVarTab = function(tabs, projectId, varId, varName) {
+    var openVarTab = function(tabs, projectId, varId, varName, siteId) {
       //var varPane = new voeis.ui.VariablePane();
       var projVarId = projectId+'-var'+varId;
       var varPane = dojo.byId(projVarId);
@@ -111,7 +111,7 @@
           closable: true,
       	  ioArgs: { headers: {"Accept": "text/html"} },
           store: voeis.Server.DEFAULT,
-          href: "/projects/"+projectId+"/variables/"+varId});
+          href: "/projects/"+projectId+"/variables/"+varId+".html?&site_id="+siteId});
         tabs.addChild(varPane);
       };
       tabs.selectChild(varPane);
@@ -186,10 +186,10 @@
       openSiteTab(tab_browser, projectId, siteId);
     });
 
-    dojo.subscribe("voeis/project/variable/tab", function(projectId, varId, varName) {
+    dojo.subscribe("voeis/project/variable/tab", function(projectId, varId, varName, siteId) {
       console.log(arguments);
       var tab_browser = dijit.byId('right_tabs');
-      openVarTab(tab_browser, projectId, varId, varName);
+      openVarTab(tab_browser, projectId, varId, varName, siteId);
     });
 
     dojo.subscribe("voeis/project/browse", function(project) {
