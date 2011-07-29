@@ -33,6 +33,9 @@
     var site_data = [
       #{@sites.map{|site| "        "+site.to_json}.join(",\n")}
     ];
+    var site_ref_data = [
+      #{@site_ref.map{|site| "        "+site.to_json}.join(",\n")}
+    ];
     var site_stat_data = [
       #{@site_stats.map{|site| "        "+site.to_json}.join(",\n")}
     ];
@@ -43,7 +46,7 @@
       #{@site_samps.map{|site| "        "+site.to_json}.join(",\n")}
     ];
     var site_properties = [
-      #{@site.properties.map{|prop| "'"+prop.name.to_s+"'"}.join(",\n")}
+      #{@site_properties.map{|prop| "'"+prop.to_s+"'"}.join(",\n")}
     ];
 	  
     for(var i=0;i<site_data.length;i++) {
@@ -52,6 +55,9 @@
       site_data[i]['data_count'] = site_stat_data[i].count;
       site_data[i]['data_start'] = site_stat_data[i].first;
       site_data[i]['data_end'] = site_stat_data[i].last;
+      site_data[i]['lat_long_datum'] = '-unknow-';
+      site_data[i]['vertical_datum'] = site_ref_data[i].vert_datum;
+      site_data[i]['local_projection'] = site_ref_data[i].local_proj;
     };
     var psites_json = {
         identifier: 'id',
