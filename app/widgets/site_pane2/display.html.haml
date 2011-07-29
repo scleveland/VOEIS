@@ -123,7 +123,7 @@
     %br
 
     -#= form_for(:site, @site, :remote=>true, :url=>project_site_path(@project, @site), :builder=>YogoFormBuilder, :html=>{:method=>"put", :onsubmit=>"return checkform();"} )do |f|
-    = form_for(:site, @site, :remote=>true, :url=>"/projects/#{@project.id}/sites/$$$id$$$/", :html=>{:method=>:put, :id=>"site00-edit-form", :onsubmit=>"dijit.byNode(dojo.byId('site00')).siteFormSave(this);"} )do |f|
+    = form_for(:site, @site, :remote=>true, :url=>"/projects/#{@project.id}/sites/$$$id$$$/", :html=>{:method=>:put, :id=>"site00-edit-form", :onsubmit=>"dijit.byNode(dojo.byId('site00')).siteFormSave(this);return true;"} )do |f|
 
       %table{:id=>"form-table"}
         %tr
