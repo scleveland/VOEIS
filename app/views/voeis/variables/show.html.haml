@@ -43,7 +43,7 @@
 -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
 -#= link_to('Cancel', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
 %br
-#placeholder{:style=>"width:300px;height:150px;"}
+-#placeholder{:style=>"width:300px;height:150px;"}
 
 -i = 0
 %table{:id => "property-table", :style=>'float:left;'}
@@ -61,7 +61,7 @@
   -# COLLECTED DATA STATS
   -# COMMENTED OUT because lack of SITE ID to select
   - var_stats = @site_variable_stats.first(:variable_id=>@variable.id)
-  %table{:id => "var-stats-table", :style=>'float:right;'}
+  %table{:id => "var-stats-table", :style=>'float:right;width:45%'}
     %tr{:class=>"row#{i+1}"}
       %td
         %b
@@ -85,7 +85,21 @@
         %b
           &nbsp;&nbsp; Ending
       %td
-        = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
+    %tr
+      %th{:colspan=>2}
+        Recent Data Values
+    %tr
+      %th
+        Timestamp
+      %th
+        Value   
+    -@data.each do |dv|
+      %tr
+        %td
+          = dv[0]
+        %td
+          = dv[1]
+        -#= var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
   
 
   :javascript

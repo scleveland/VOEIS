@@ -21,6 +21,7 @@ class Voeis::VariablesController < Voeis::BaseController
       @site =  parent.managed_repository{Voeis::Site.get(params[:site_id].to_i)}
       @site_variable_stats = parent.managed_repository{Voeis::SiteDataCatalog.all(:variable_id=>params[:id].to_i, :site_id=>params[:site_id].to_i)}
       @graph_data = @variable.last_ten_values_graph(@site)
+      @data = @variable.last_ten_values(@site)
     end
     #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
     
