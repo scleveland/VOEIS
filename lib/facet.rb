@@ -1,3 +1,13 @@
+###
+#
+# Facet
+# Authz using the facet pattern for DataMapper Resources
+#
+#
+
+## 
+# Add a helper method to the root object to set a default false is_facet? response
+#
 class Object
   def is_facet?
     false
