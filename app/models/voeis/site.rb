@@ -37,10 +37,10 @@ class Voeis::Site
   property :lat_long_datum_id,   Integer, :required => false, :default => 0
   property :elevation_m,         Float,   :required => false
   #property :vertical_datum,      String,  :required => false
-  property :vertical_datum_id,   Integer, :required => false, :default => -1
+  #property :vertical_datum_id,   Integer, :required => false, :default => -1
   property :local_x,             Float,   :required => false
   property :local_y,             Float,   :required => false
-  property :local_projection_id, Integer, :required => false, :default => -1
+  #property :local_projection_id, Integer, :required => false, :default => -1
   #property :local_projection,    String,  :required => false
   property :pos_accuracy_m,      Float,   :required => false
   property :state,               String,  :required => true
@@ -62,8 +62,8 @@ class Voeis::Site
   has n, :samples,       :model => "Voeis::Sample",      :through => Resource
   has n, :variables,     :model => "Voeis::Variable",    :through => Resource
 
-  belongs_to  :vertical_datum,    :model => "Voeis::VerticalDatumCV"
-  belongs_to  :local_projection,  :model => "Voeis::LocalProjectionCV"
+  has 1,  :vertical_datum,    :model => "Voeis::VerticalDatumCV",    :through => Resource #, :child_key=>"vertical_datum_id"
+  has 1,  :local_projection,  :model => "Voeis::LocalProjectionCV",    :through => Resource# :child_key=>"local_projection_id"
   #has 1, :vertical_datum, :model => "Voeis::VerticalDatumCV", :child_key=>"vertical_datum_id"
   #has 1, :local_projection, :model => "Voeis::LocalProjectionCV", :child_key=>"local_projection_id"
 
