@@ -85,6 +85,7 @@
         %b
           &nbsp;&nbsp; Ending
       %td
+        = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
     %tr
       %th{:colspan=>2}
         Recent Data Values
@@ -99,7 +100,7 @@
           = dv[0]
         %td
           = dv[1]
-        -#= var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
+        
   
 
   :javascript
