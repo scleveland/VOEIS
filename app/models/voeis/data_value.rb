@@ -22,10 +22,11 @@ class Voeis::DataValue
   has 1, :site,       :model => "Voeis::Site",     :through => Resource
   has 1,:source,       :model => "Voeis::Source",       :through => Resource
 
-  has n, :sample,     :model => "Voeis::Sample",   :through => Resource
+  has 1, :sample,     :model => "Voeis::Sample",   :through => Resource
   has n, :meta_tags,  :model => "Voeis::MetaTag",  :through => Resource
-  has n, :variable,   :model => "Voeis::Variable", :through => Resource
+  has 1, :variable,   :model => "Voeis::Variable", :through => Resource
   has n, :data_streams,  :model => "Voeis::DataStream", :through => Resource
+  has 1, :sensor_type,  :model => "Voeis::SensorType", :through => Resource
   #has n, :method,     :model => "Voeis::Method", :through => Resource
   
   
