@@ -98,7 +98,7 @@ namespace :yogo do
     end
     
     desc "Backup project databases with pg_backup"
-    task :backup_projects => [:environment] do
+    task :backup_projects => :environment do
       project_config = Rails::DataMapper.configuration.repositories["yogo-db"]["default"]
       host         = project_config["host"] || localhost
       port         = project_config["port"] || 5432
@@ -131,80 +131,68 @@ namespace :yogo do
     task :load_from_backups => :load_from_backup
   
     task :unzip_backups do
-      begin
-        backup_path = "#{::Rails.root}/db/backup"
-        cmd = ['cd', backup_path, '&&', '']
-        system("cd #{backup_path} && gzip -vd *.gz")
-      rescue
-        puts "--- Unzip Backups: No GZipped Backup Files."
-      end
+      puts "Unzipping backup files..."
+      backup_path = "#{::Rails.root}/db/backup"
+      system("cd #{backup_path} && gzip -vfd *.gz")
     end
   
     desc "Reload the master database"
     task :load_master_from_backup => [:environment] do
-        current_db = repository(:default).adapter.options
-        host          = current_db[:host] || 'localhost'
-        port          = current_db[:port] || 5432
-        username      = current_db[:username]
-        database      = current_db[:path]
-        output_path   = "#{::Rails.root}/db/backup"
-        options = []
-        options << "--host=#{host}"
-        options << "--port=#{port}" 
-        options << "--username=#{username}" unless username.blank?
+      current_db = repository(:default).adapter.options
+      host          = current_db[:host] || 'localhost'
+      port          = current_db[:port] || 5432
+      username      = current_db[:username]
+      database      = current_db[:path]
+      output_path   = "#{::Rails.root}/db/backup"
+      options = []
+      options << "--host=#{host}"
+      options << "--port=#{port}" 
+      options << "--username=#{username}" unless username.blank?
 
-        create_database = ["createdb"] + options + [database]
-        system(*create_database)
-        load_database = ['psql'] + options + ["--file=#{output_path}/voeis_backup.sql", database]
-        system(*load_database)
+      puts "Creating the Master Database..."
+      create_database = ["createdb"] + options + [database]
+      `#{create_database.join(' ')}`
+      load_database = ['psql -a'] + options + ["--file=#{output_path}/voeis_backup.sql", database]
+      load_database +=  ["| pv -trb > #{output_path}/load_master_from_backup.log"]
+      puts "Loading the Master Database..."
+      `#{load_database.join(' ')}`
     end
     
     desc "Reload project databases"
     task :load_projects_from_backup => [:environment] do
-        project_config = Rails::DataMapper.configuration.repositories["yogo-db"]["default"]
-        host         = project_config["host"] || localhost
-        port         = project_config["port"] || 5432
-        username     = project_config["username"]
-        output_path  = "#{::Rails.root}/db/backup"
-        options = []
-        options << "--host=#{host}"
-        options << "--port=#{port}"
-        options << "--username=#{username}" unless username.blank?
-        # command << "--verbose"
-        Project.all.each do |project|
-          project_opts = project.managed_repository.adapter.options
-          database = project_opts["database"]
-          create_database = ["createdb"] + options + [database]
-          system(*create_database)
-          load_database = ['psql'] + options + ["--file=#{output_path}/#{database}.sql", database]
-          # puts load_database.join(' ')
-          system(*load_database)
-        end
+      st = `date`
+      project_config = Rails::DataMapper.configuration.repositories["yogo-db"]["default"]
+      host         = project_config["host"] || localhost
+      port         = project_config["port"] || 5432
+      username     = project_config["username"]
+      output_path  = "#{::Rails.root}/db/backup"
+      options = []
+      options << "--host=#{host}"
+      options << "--port=#{port}"
+      options << "--username=#{username}" unless username.blank?
+      # command << "--verbose"
+      Project.all.each do |project|
+        database = project.managed_repository.adapter.options["database"]
+        create_database = ["createdb"] + options + [database]
+        puts "Creating the #{database} Database..."
+        # system(*create_database)
+        `#{create_database.join(' ')}`
+        load_database = ['psql -a'] + options + ["--file=#{output_path}/#{database}.sql", database]
+        load_database +=  ["| pv -trb > #{output_path}/load_projects_from_backup.log"]
+        puts "Loading the Data..."
+        `#{load_database.join(' ')}`
+        # system(*load_database)
+      end
+      ed = `date`
+      puts "Start: #{st}\nEnd:   #{ed}"
     end
+    
     desc "Auto Migrate Global and Local DBs"
     task :auto_upgrade => [:environment] do
       include Odhelper
       Odhelper::upgrade_projects
-        # #upgrade all the global models
-        # DataMapper::Model.descendants.each do |model|
-        #   begin
-        #     model.auto_upgrade!
-        #   rescue
-        #   end #end Rescue
-        # end #end DataMapper
-        # Project.all.each do |project|
-        #   project.managed_repository do
-        #     puts project.name
-        #     DataMapper::Model.descendants.each do |model|
-        #       begin
-        #         model.auto_upgrade!
-        #       rescue
-        #         puts model.name+": Failed to upgrade!"
-        #       end #end Rescue
-        #     end #end DataMapper
-        #   end #end Managed Repo
-        # end #end Project.all
-    end #end task
+    end 
+    
     desc "Update the Site Data Catlogs for All Projects"
     task :update_site_data_catalogs => [:environment] do
         Project.all.each do |project|
