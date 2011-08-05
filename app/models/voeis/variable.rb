@@ -67,7 +67,7 @@ class Voeis::Variable
   property :spatial_units_id,   Integer,  :required => false
   property :spatial_offset_type,   String,  :required => false, :length => 512
   property :spatial_offset_value, Float,    :required => false
-  property :logger_type,       String,    :required =>false, :length => 512
+  property :logger_type,        String,   :required =>false, :length => 512
   property :logger_id,          String,   :required => false, :length => 512
   property :sensor_type,        String,   :required => false, :length => 512
   property :sensor_id,          String,   :required => false, :length => 512
