@@ -26,6 +26,52 @@ module Odhelper
     DataMapper.auto_upgrade!
   end
   
+  # def add_created_at_postgres
+  #   DataMapper::Model.descendants.each do |model|
+  #     begin
+  #       sql = "ALTER TABLE #{model.storage_name} ALTER COLUMN created_at DROP NOT NULL"
+  #       repository.adapter.execute(sql)
+  #     rescue
+  #     end
+  #   end
+  #   Project.all.each do |project|
+  #     project.managed_repository do
+  #       puts project.name
+  #       DataMapper::Model.descendants.each do |model|
+  #         begin
+  #           sql = "ALTER TABLE #{model.storage_name} ALTER COLUMN created_at DROP NOT NULL"
+  #           repository.adapter.execute(sql)
+  #         rescue => e
+  #           puts model.name+": #{e}"
+  #         end
+  #       end
+  #     end
+  #   end
+  # end
+  
+  def auto_migrate_versions
+    DataMapper::Model.descendants.each do |model|
+      begin
+        model::Version.auto_migrate!
+      rescue
+      end
+    end
+    Project.all.each do |project|
+      project.managed_repository do
+        puts project.name
+
+        DataMapper::Model.descendants.each do |model|
+          begin
+            model::Version.auto_migrate!
+          rescue => e
+            puts model.name+": #{e}"
+          end
+        end
+      end
+    end
+    up  DataMapper.auto_upgrade!
+  end
+  
   
   
   def fix_scientific_data(project)

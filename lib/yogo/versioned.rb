@@ -8,7 +8,8 @@ module Yogo
       property :updated_at,          ::DataMapper::Property::DateTime#, :key=>true, :default=>DateTime.now
       property :updated_by,          ::DataMapper::Property::Integer
       property :updated_comment,     ::DataMapper::Property::Text
-      #property :created_at,          ::DataMapper::Property::DateTime
+      property :created_at,          ::DataMapper::Property::DateTime, :required => false
+      property :deleted_at,          ::DataMapper::Property::ParanoidDateTime
       #timestamps :created_at
 
       # Register before save hooks
