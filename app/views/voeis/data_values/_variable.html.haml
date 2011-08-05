@@ -6,9 +6,10 @@
     updated_var = data  
     update_text= data["variable_name"];
     $("#"+current_id_to_update).val(data["id"]);
+    update_id = data["id"];
     updateVarSpans(current_column);
     dijit.byId("new_variable").hide();
-    dijit.byId("waiting_dialog").hide();
+    //dijit.byId("waiting_dialog").hide();
     }
     );
     }
