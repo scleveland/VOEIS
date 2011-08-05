@@ -94,12 +94,13 @@
         Timestamp
       %th
         Value   
-    -@data.each do |dv|
-      %tr
-        %td
-          = dv[0]
-        %td
-          = dv[1]
+    -if !@data.nil?
+      -@data.each do |dv|
+        %tr
+          %td
+            = dv[0]
+          %td
+            = dv[1]
         
   
 
