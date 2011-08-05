@@ -92,7 +92,7 @@ namespace :db do
   end
 
   task :download_backup_files do
-    download("#{shared_path}/db/backup/", "db/backup/", :recursive => true)
+    download("#{current_path}/db/backup/", "db/backup/", :recursive => true)
   end
   
   task :run_backup_task do
