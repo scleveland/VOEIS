@@ -429,6 +429,8 @@ class Voeis::LoggerImportsController < Voeis::BaseController
             @quality_control_levels = Voeis::QualityControlLevel.all
             @sample_mediums= Voeis::SampleMediumCV.all
             @sample_types = Voeis::SampleTypeCV.all
+            @sensor_types = Voeis::SensorTypeCV.all
+            @logger_types = Voeis::LoggerTypeCV.all
             @value_types= Voeis::ValueTypeCV.all
             @speciations = Voeis::SpeciationCV.all
             @data_types = Voeis::DataTypeCV.all
