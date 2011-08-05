@@ -26,6 +26,8 @@ module Odhelper
     DataMapper.auto_upgrade!
   end
   
+  
+  
   def fix_scientific_data(project)
     project.managed_repository do
       Voeis::SensorValue.all(:value => -9999.0).each do |val|
@@ -175,4 +177,82 @@ module Odhelper
       report =report + "</div>"
     end
   end
+  
+  def move_project_sensor_values_to_data_values(project)
+    sites = project.managed_repository{Voeis::Site.all}
+    sites.each do |site|
+      site.data_streams.each do |data_stream|
+        #select all sensor_values related to the site and variable
+        data_stream_id = data_stream.id
+        data_stream.data_stream_columns.each do |dcol|
+          row_values = Array.new
+          if !dcol.sensor_types.first.nil?
+            var = dcol.sensor_types.first.variables.first
+            sensor_type = project.managed_repository{Voeis::SensorType.get(dcol.sensor_types.first.id)}
+            (sensor_type.sensor_values).each do |val|
+              row_values << "(#{val.value}, '#{val.timestamp}', #{val.vertical_offset},FALSE, '#{val.string_value}', '#{val.created_at}', '#{val.updated_at}', #{val.timestamp.utc_offset/(60*60) },'#{val.timestamp.utc}',FALSE,NULL,#{val.quality_control_level} )"
+            end             
+            if !row_values.empty?
+              sql = "INSERT INTO \"voeis_data_values\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\") VALUES "
+              sql << row_values.join(',')
+              sql << " RETURNING \"id\""
+              result_ids = project.managed_repository{repository.adapter.select(sql)}
+              sql = "INSERT INTO \"voeis_data_value_variables\" (\"data_value_id\",\"variable_id\") VALUES "
+              sql << (0..result_ids.length-1).collect{|i|
+                "(#{result_ids[i]},#{var.id})"
+              }.join(',')
+              project.managed_repository{repository.adapter.execute(sql)}
+              sql = "INSERT INTO \"voeis_data_value_sites\" (\"data_value_id\",\"site_id\") VALUES "
+              sql << (0..result_ids.length-1).collect{|i|
+                "(#{result_ids[i]},#{site.id})"
+              }.join(',')
+              project.managed_repository{repository.adapter.execute(sql)}
+              sql = "INSERT INTO \"voeis_data_stream_data_values\" (\"data_value_id\",\"data_stream_id\") VALUES "
+              sql << (0..result_ids.length-1).collect{|i|
+                "(#{result_ids[i]},#{data_stream_id})"
+              }.join(',')
+              project.managed_repository{repository.adapter.execute(sql)}
+              sql = "INSERT INTO \"voeis_data_value_sensor_type\" (\"data_value_id\",\"sensor_type_id\") VALUES "
+              sql << (0..result_ids.length-1).collect{|i|
+                "(#{result_ids[i]},#{sensor_type.id})"
+              }.join(',')
+              project.managed_repository{repository.adapter.execute(sql)}
+            end
+          end
+        end
+      end
+    end
+  end
+  
+  def move_sensor_values_to_data_values
+    Project.all.each do |project|
+      move_project_sensor_values_to_data_values(project)
+    end  
+  end
 end
+
+# 
+# DataMapper::Model.descendants.each do |model|
+#   begin
+#     model::Version
+#   rescue
+#   end
+# end
+# Project.all.each do |project|
+#   project.managed_repository do
+#     puts project.name
+# 
+#     DataMapper::Model.descendants.each do |model|
+#       begin
+#         model.all.each do |m|
+#           m.updated_at = m.created_at
+#           m.save!
+#         end
+#         model.auto_upgrade!
+#       rescue => e
+#         puts model.name+": #{e}"
+#       end
+#     end
+#   end
+# end
+# DataMapper.auto_upgrade!
