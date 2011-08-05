@@ -78,7 +78,7 @@ class Voeis::Variable
   yogo_versioned
 
   has n, :data_stream_columns, :model => "Voeis::DataStreamColumn", :through => Resource
-  has n, :sensor_types,        :model => "Voeis::SensorType",       :through => Resource
+  #has n, :sensor_types,        :model => "Voeis::SensorType",       :through => Resource
   has n, :units,               :model => "Voeis::Unit",             :through => Resource
   has n, :data_values,         :model => "Voeis::DataValue",        :through => Resource
   has n, :sites,               :model => "Voeis::Site",             :through => Resource
