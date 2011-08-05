@@ -52,8 +52,8 @@ dojo.declare("yogo.maps.google.DataMap", yogo.maps.google.Map, {
     },
     _itemsChanged: function(object, removedFrom, insertedAt) {
         // this should be made more efficient
-        console.log("_itemsChanged");
-        console.debug(arguments);
+        //console.log("_itemsChanged");
+        //console.debug(arguments);
         if(!this._itemsChanging) {
             this.updateMarkers(true);
         }
@@ -110,7 +110,7 @@ dojo.declare("yogo.maps.google.DataMap", yogo.maps.google.Map, {
         }
         
         dojo.forEach(currMarkers, function(marker) {
-            console.debug(marker);
+            //console.debug(marker);
             bounds.extend(marker.getPosition());
         });
         return bounds;
@@ -137,15 +137,15 @@ dojo.declare("yogo.maps.google.DataMap", yogo.maps.google.Map, {
     },
 		markers: this._markers,
     updateMarkers: function(updateBounds) {
-        console.log("getting items");
+        //console.log("getting items");
+        //console.log("mapping items to markers");
         var items = this.items();
-        console.log("mapping items to markers");
         var newMarkers = this.createMarkers();
 				var markerhash = this.generateHash(newMarkers);
 
         dojo.when(newMarkers, dojo.hitch(this, function(markers) {
-            console.debug(markers);
-            console.log("removing old markers");
+            //console.debug(markers);
+            //console.log("removing old markers");
             dojo.forEach(this._markers, function(marker) {
                 marker.setMap(null); // remove the marker
             }, this);
@@ -155,7 +155,7 @@ dojo.declare("yogo.maps.google.DataMap", yogo.maps.google.Map, {
             console.log("adding new markers");
 
             dojo.forEach(markers, function(marker) {
-                console.debug(marker);
+                //console.debug(marker);
                 this._markers.push(marker);                
                 marker.setMap(this._map);
             }, this);

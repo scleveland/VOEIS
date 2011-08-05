@@ -67,13 +67,18 @@ class Voeis::Variable
   property :spatial_units_id,   Integer,  :required => false
   property :spatial_offset_type,   String,  :required => false, :length => 512
   property :spatial_offset_value, Float,    :required => false
+  property :logger_type,        String,   :required =>false, :length => 512
+  property :logger_id,          String,   :required => false, :length => 512
+  property :sensor_type,        String,   :required => false, :length => 512
+  property :sensor_id,          String,   :required => false, :length => 512
+  
   
   property :his_id,            Integer, :required => false, :index => true
 
   yogo_versioned
 
   has n, :data_stream_columns, :model => "Voeis::DataStreamColumn", :through => Resource
-  has n, :sensor_types,        :model => "Voeis::SensorType",       :through => Resource
+  #has n, :sensor_types,        :model => "Voeis::SensorType",       :through => Resource
   has n, :units,               :model => "Voeis::Unit",             :through => Resource
   has n, :data_values,         :model => "Voeis::DataValue",        :through => Resource
   has n, :sites,               :model => "Voeis::Site",             :through => Resource
@@ -84,8 +89,14 @@ class Voeis::Variable
   has n, :speciation_cvs,      :model => "Voeis::SpeciationCV",     :through => Resource
   has n, :value_type_cvs,      :model => "Voeis::ValueTypeCV",      :through => Resource
   has n, :variable_name_cvs,   :model => "Voeis::VariableNameCV",   :through => Resource
-  has 1, :lab_method,          :model => "Voeis::LabMethod", :through => Resource
-  has 1, :field_method,        :model => "Voeis::FieldMethod", :through => Resource
+
+  belongs_to :variable_units,     :model => "Voeis::Unit"
+  belongs_to :time_units,         :model => "Voeis::Unit"
+  belongs_to :lab_method,         :model => "Voeis::LabMethod"
+  belongs_to :lab,                :model => "Voeis::Lab"
+  belongs_to :field_method,       :model => "Voeis::FieldMethod"
+  belongs_to :spatial_units,      :model => "Voeis::Unit"
+  
   has n, :meta_tags, :model => 'Voeis::MetaTag', :through => Resource
   has n, :spatial_offsets,      :model => "Voeis::SpatialOffset",    :through => Resource
   
@@ -136,5 +147,32 @@ class Voeis::Variable
     var_to_store.his_id = new_his_var.id
     var_to_store.save
     new_his_var
+  end
+  
+  def self.last_five_site_values(site_id)
+      
+  end
+  
+  def last_ten_values_graph(site)
+    #(self.data_values & site.data_values).all(:order=>[:local_date_time], :limit=>10).map{|dv| [dv.local_date_time.to_datetime.to_i, dv.data_value] }
+    sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{self.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{site.id}"
+    results = repository.adapter.select(sql)
+    if results.length != 0
+      sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time DESC LIMIT 10"
+      dresults = repository.adapter.select(sql)
+      dresults.map{|dv| [dv[:local_date_time].to_datetime.to_i, dv[:data_value]]}
+    end
+  end  
+  
+  
+  def last_ten_values(site)
+    sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{self.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{site.id}"
+    results = repository.adapter.select(sql)
+    if results.length != 0
+      sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time DESC LIMIT 10"
+      dresults = repository.adapter.select(sql)
+      dresults.map{|dv| [dv[:local_date_time].to_datetime, dv[:data_value]]}
+      #(self.data_values & site.data_values).all(:order=>[:local_date_time], :limit=>10).map{|dv| [dv.local_date_time.to_datetime, dv.data_value] }
+    end
   end
 end

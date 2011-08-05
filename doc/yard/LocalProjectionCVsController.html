@@ -78,7 +78,7 @@
   
   
     <dt class="r2 last">Defined in:</dt>
-    <dd class="r2 last">app/controllers/voeis/local_project_c_vs_controller.rb</dd>
+    <dd class="r2 last">app/controllers/voeis/local_projection_c_vs_controller.rb</dd>
   
 </dl>
 <div class="clear"></div>
@@ -269,7 +269,7 @@ POST /variables
 25</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/local_project_c_vs_controller.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/local_projection_c_vs_controller.rb', line 15</span>
 
 <span class='kw'>def</span> <span class='id create'>create</span>
   <span class='ivar'>@local_projection</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>LocalProjectionCV</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable_name_c_v</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -305,7 +305,7 @@ POST /variables
 32</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/local_project_c_vs_controller.rb', line 30</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/local_projection_c_vs_controller.rb', line 30</span>
 
 <span class='kw'>def</span> <span class='id invalid_page'>invalid_page</span>
   <span class='id redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='symbol'>:back</span><span class='rparen'>)</span>
@@ -348,7 +348,7 @@ GET /variables/new
 12</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/local_project_c_vs_controller.rb', line 6</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/local_projection_c_vs_controller.rb', line 6</span>
 
 <span class='kw'>def</span> <span class='id new'>new</span>
   <span class='ivar'>@local_projection</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>LocalProjectionCV</span><span class='period'>.</span><span class='id new'>new</span>
@@ -380,7 +380,7 @@ GET /variables/new
 28</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/local_project_c_vs_controller.rb', line 26</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/local_projection_c_vs_controller.rb', line 26</span>
 
 <span class='kw'>def</span> <span class='id show'>show</span>
   
@@ -395,7 +395,7 @@ GET /variables/new
 </div>
     
     <div id="footer">
-  Generated on Fri Jul  1 11:28:10 2011 by 
+  Generated on Wed Jul 27 00:33:43 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

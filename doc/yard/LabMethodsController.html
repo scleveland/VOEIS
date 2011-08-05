@@ -269,22 +269,14 @@ POST /lab_methods
 25
 26
 27
-28
-29
-30
-31
-32</pre>
+28</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/lab_methods_controller.rb', line 15</span>
 
 <span class='kw'>def</span> <span class='id create'>create</span>
-  <span class='comment'># if params[:lab_method].nil?
-</span>  <span class='comment'>#       @lab_method = Voeis::LabMethod.new(:lab_name=&gt; params[:lab_name], :lab_organization =&gt; params[:lab_organization], :lab_method_name =&gt; params[:lab_method_name], :lab_method_description =&gt; params[:lab_method_description])
-</span>  <span class='comment'>#     else
-</span>    <span class='ivar'>@lab_method</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>LabMethod</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:lab_method</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-  <span class='comment'># end
-</span>  <span class='id respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id format'>format</span><span class='op'>|</span>
+  <span class='ivar'>@lab_method</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>LabMethod</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:lab_method</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='id respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id format'>format</span><span class='op'>|</span>
     <span class='kw'>if</span> <span class='ivar'>@lab_method</span><span class='period'>.</span><span class='id save'>save</span>
       <span class='id flash'>flash</span><span class='lbracket'>[</span><span class='symbol'>:notice</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Lab Method was successfully created.</span><span class='tstring_end'>'</span></span>
       <span class='id format'>format</span><span class='period'>.</span><span class='id json'>json</span> <span class='kw'>do</span>
@@ -314,12 +306,12 @@ POST /lab_methods
       <pre class="lines">
 
 
-37
-38
-39</pre>
+33
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/lab_methods_controller.rb', line 37</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/lab_methods_controller.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id invalid_page'>invalid_page</span>
   <span class='id redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='symbol'>:back</span><span class='rparen'>)</span>
@@ -389,12 +381,12 @@ GET /lab_methods/new
       <pre class="lines">
 
 
-33
-34
-35</pre>
+29
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/lab_methods_controller.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/lab_methods_controller.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id show'>show</span>
   
@@ -409,7 +401,7 @@ GET /lab_methods/new
 </div>
     
     <div id="footer">
-  Generated on Fri Jul  1 11:28:08 2011 by 
+  Generated on Wed Jul 27 00:33:41 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

@@ -429,6 +429,8 @@ class Voeis::LoggerImportsController < Voeis::BaseController
             @quality_control_levels = Voeis::QualityControlLevel.all
             @sample_mediums= Voeis::SampleMediumCV.all
             @sample_types = Voeis::SampleTypeCV.all
+            @sensor_types = Voeis::SensorTypeCV.all
+            @logger_types = Voeis::LoggerTypeCV.all
             @value_types= Voeis::ValueTypeCV.all
             @speciations = Voeis::SpeciationCV.all
             @data_types = Voeis::DataTypeCV.all
@@ -581,6 +583,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
       range = params[:row_size].to_i - 1
       #store all the Variables in the managed repository
       @col_vars = Array.new
+      @variables = Array.new
       (0..range).each do |i|
         if columns_array[i] != nil && columns_array[i] != "ignore" && ignore_array[i] != i && i != timestamp_col && i != sample_id_col && i != vertical_offset_col && ending_vertical_offset_col != i && meta_tag_array[i].to_i == -1
           @var = Voeis::Variable.get(columns_array[i].to_i)
@@ -605,72 +608,79 @@ class Voeis::LoggerImportsController < Voeis::BaseController
       end  #end i loop
       #site.save
       #create csv_row array
-      @csv_row = Array.new
-      csv_temp_data = CSV.read(params[:datafile])
-      csv_size = csv_temp_data.length
-      csv_data = CSV.read(params[:datafile])
-
-      i = params[:start_line].to_i
-      csv_data[params[:start_line].to_i-1..-1].each do |row|
-        @csv_row[i] = row
-            i = i + 1
-      end#end row loop
-          (params[:start_line].to_i-1..csv_size.to_i).each do |row|
-            if !@csv_row[row].nil?
-            #create meta_tag_data
-             row_meta_tag_array = Array.new #store the current rows MetaTagData objects for association later
-             data_stream.data_stream_columns.all(:name=>"MetaTag").each do |col| 
-               @mtag = col.meta_tag
-               parent.managed_repository do
-                 mdtag = Voeis::MetaTag.new(:name=>@mtag.name, :category=>@mtag.category)
-                 mdtag.value = @csv_row[row][col.column_number]
-                 mdtag.save
-                 row_meta_tag_array << mdtag
-               end #managed_repository
-             end #data_stream_columns
-            parent.managed_repository do
-              #create sample
-              @site = Voeis::Site.get(site.id)
-              #calculate the correct local_offset
-              sample_datetime = Chronic.parse(@csv_row[row][timestamp_col]).to_datetime
-              sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,
-                           sample_datetime.day,sample_datetime.hour,sample_datetime.min,
-                           sample_datetime.sec, data_stream.utc_offset/24.to_f)
-
-              (0..range).each do |i|
-                if columns_array[i] != "ignore" && sample_id_col != i && timestamp_col != i &&
-                   columns_array[i] != nil && vertical_offset_col != i && 
-                   ending_vertical_offset_col != i && meta_tag_array[i].to_i == -1
-
-                  new_data_val = Voeis::DataValue.new(:data_value => /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(@csv_row[row][i].to_s) ? @csv_row[row][i].to_f : -9999.0, 
-                       :local_date_time => sampletime,
-                       :utc_offset => utc_offset,
-                       :observes_daylight_savings => dst,
-                       :date_time_utc => sampletime.utc,  
-                       :replicate => 0,
-                       :quality_control_level=>@col_vars[i].quality_control.to_i,
-                       :string_value =>  @csv_row[row][i].blank? ? "Empty" : @csv_row[row][i],
-                       :vertical_offset =>  vertical_offset_col == "" ? 0.0 : @csv_row[row][vertical_offset_col].to_i,
-                       :end_vertical_offset => ending_vertical_offset_col == "" ? nil : @csv_row[row][ending_vertical_offset_col].to_i) 
-                  new_data_val.save
-                  new_data_val.site = @site
-                  # @site.data_values << new_data_val
-                  # @site.save
-                  new_data_val.variable << @col_vars[i]
-                  new_data_val.source = @project_source
-                  row_meta_tag_array.map{|mtag| new_data_val.meta_tags << mtag}  #add meta_data
-                  new_data_val.data_streams << data_stream
-                  new_data_val.save
-                 end #end if
-                end #end i loop
-               end #end if @csv_array.nil?
-            end #end managed repo
-          end #end row loop
-          @site.update_site_data_catalog_variables(@variables)
-          parent.publish_his
-          flash[:notice] = "File parsed and stored successfully."
+      
+      parent.managed_repository do 
+         Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, nil, nil)
+         
+      # @csv_row = Array.new
+      #       csv_temp_data = CSV.read(params[:datafile])
+      #       csv_size = csv_temp_data.length
+      #       csv_data = CSV.read(params[:datafile])
+      # 
+      #       i = params[:start_line].to_i
+      #       csv_data[params[:start_line].to_i-1..-1].each do |row|
+      #         @csv_row[i] = row
+      #             i = i + 1
+      #       end#end row loop
+      #           (params[:start_line].to_i-1..csv_size.to_i).each do |row|
+      #             if !@csv_row[row].nil?
+      #             #create meta_tag_data
+      #              row_meta_tag_array = Array.new #store the current rows MetaTagData objects for association later
+      #              data_stream.data_stream_columns.all(:name=>"MetaTag").each do |col| 
+      #                @mtag = col.meta_tag
+      #                parent.managed_repository do
+      #                  mdtag = Voeis::MetaTag.new(:name=>@mtag.name, :category=>@mtag.category)
+      #                  mdtag.value = @csv_row[row][col.column_number]
+      #                  mdtag.save
+      #                  row_meta_tag_array << mdtag
+      #                end #managed_repository
+      #              end #data_stream_columns
+      #             parent.managed_repository do
+      #               #create sample
+      #               @site = Voeis::Site.get(site.id)
+      #               #calculate the correct local_offset
+      #               sample_datetime = Chronic.parse(@csv_row[row][timestamp_col]).to_datetime
+      #               sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,
+      #                            sample_datetime.day,sample_datetime.hour,sample_datetime.min,
+      #                            sample_datetime.sec, data_stream.utc_offset/24.to_f)
+      # 
+      #               (0..range).each do |i|
+      #                 if columns_array[i] != "ignore" && sample_id_col != i && timestamp_col != i &&
+      #                    columns_array[i] != nil && vertical_offset_col != i && 
+      #                    ending_vertical_offset_col != i && meta_tag_array[i].to_i == -1
+      # 
+      #                   new_data_val = Voeis::DataValue.new(:data_value => /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(@csv_row[row][i].to_s) ? @csv_row[row][i].to_f : -9999.0, 
+      #                        :local_date_time => sampletime,
+      #                        :utc_offset => utc_offset,
+      #                        :observes_daylight_savings => dst,
+      #                        :date_time_utc => sampletime.utc,  
+      #                        :replicate => 0,
+      #                        :quality_control_level=>@col_vars[i].quality_control.to_i,
+      #                        :string_value =>  @csv_row[row][i].blank? ? "Empty" : @csv_row[row][i],
+      #                        :vertical_offset =>  vertical_offset_col == "" ? 0.0 : @csv_row[row][vertical_offset_col].to_i,
+      #                        :end_vertical_offset => ending_vertical_offset_col == "" ? nil : @csv_row[row][ending_vertical_offset_col].to_i) 
+      #                   new_data_val.save
+      #                   new_data_val.site = @site
+      #                   # @site.data_values << new_data_val
+      #                   # @site.save
+      #                   new_data_val.variable << @col_vars[i]
+      #                   new_data_val.source = @project_source
+      #                   row_meta_tag_array.map{|mtag| new_data_val.meta_tags << mtag}  #add meta_data
+      #                   new_data_val.data_streams << data_stream
+      #                   new_data_val.save
+      #                  end #end if
+      #                 end #end i loop
+      #                end #end if @csv_array.nil?
+      #             end #end managed repo
+      #           end #end row loop
+          puts "updating the site catalog" 
+           Voeis::Site.get(site.id).update_site_data_catalog_variables(@variables)
+        end
+          # parent.publish_his
+          flash[:notice] = "File parsed and stored successfully for #{site.name}."
           redirect_to project_path(params[:project_id]) and return
         rescue Exception => e  
+          email_exception(e,request.env)
           flash[:error] = "Problem Parsing Logger File: "+ e.message
           redirect_to(:controller =>"voeis/logger_imports", :action => "pre_process_logger_file_upload", :params => {:id => params[:project_id]})
         end
@@ -744,7 +754,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
               data_stream_column.data_streams << @data_stream
               data_stream_column.save
             end #managed_repository
-          elsif  columns_array[i] == "ignore"
+          elsif  columns_array[i] == "ignore" || ignore_array[i] == i.to_s
             parent.managed_repository do
               data_stream_column = Voeis::DataStreamColumn.create(
                                     :column_number => i,
@@ -769,7 +779,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
               data_stream_column.meta_tag = mtag
               data_stream_column.save
             end #managed_repository
-          elsif  columns_array[i] != nil#create other data_stream_columns and create variables
+          elsif  columns_array[i] != nil || columns_array[i] != ""#create other data_stream_columns and create variables
             #puts params["column"+i.to_s]
             
             var = Voeis::Variable.get(columns_array[i].to_i)

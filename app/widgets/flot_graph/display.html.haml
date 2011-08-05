@@ -1,0 +1,66 @@
+%div{:id=>@variable.variable_code, :style=>"width:600px;height:300px;"}
+= javascript_include_tag(:defaults, "jquery.flot.js")
+:javascript
+  
+  var plot =$.plot($("##{@variable.variable_code}"), #{@data.as_json},{
+         series: {
+             color : "blue",
+             lines: { show: true },
+             points: { show: true }
+            },
+
+         grid:  { hoverable: true, clickable: true },
+         xaxis: { mode: "time" },
+         xaxis: { mode: "time" },
+         pan:   { interactive: true },
+         zoom:  { interactive: true }
+  });
+
+  //Function ShowToolTip and previousPoint allow the hover function to display
+   //a message for each data point on the graph when the cursor hoversover
+ 
+   //I would only mess with the css if you really need to otherwise this
+   //shouldn't need any modification
+   function showTooltip(x, y, contents) {
+       $('<div id="tooltip">' + contents + '</div>').css( {
+           position: 'absolute',
+           display: 'none',
+           top: y + 5,
+           left: x + 5,
+           border: '1px solid #fdd',
+           padding: '2px',
+           'background-color': '#fee',
+           opacity: 0.80
+       }).appendTo("body").fadeIn(200);
+   };
+
+   //Most of this should remain the same
+   //NOTE-- the time string for #x is in UTC format and currently is in GMT time
+   var previousPoint = null;
+   $("##{@variable.variable_code}").bind("plothover", function (event, pos, item) {
+       var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+       dDate = new Date();
+       dDate.setTime(mEpoch);
+       $("#x").text(dDate.toLocaleString());
+       $("#y").text(pos.y);
+
+       if (item) {
+           if (previousPoint != item.datapoint) {
+               previousPoint = item.datapoint;
+               $("#tooltip").remove();
+               var x = item.datapoint[0].toFixed(2),
+                   y = item.datapoint[1].toFixed(2);
+                   var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+                   dDate = new Date();
+                   dDate.setTime(mEpoch);
+               showTooltip(item.pageX, item.pageY,
+                 //*****You will need to change the sensor name here to the appropriate one selected above
+                          dDate.toLocaleString() + " = " + y + " " + "#{@variable.variable_name}|" );
+           }
+       }
+       else {
+           $("#tooltip").remove();
+           previousPoint = null;            
+       }
+   });
+   

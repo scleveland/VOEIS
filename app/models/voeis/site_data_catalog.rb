@@ -9,6 +9,4 @@ class Voeis::SiteDataCatalog
   property :ending_timestamp,    DateTime, :required => false
 
 
-
-  
 end

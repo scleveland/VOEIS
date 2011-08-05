@@ -5,9 +5,11 @@ module Yogo
   module Versioned
     def yogo_versioned
       # Add properties required for versioning
-      property :updated_at,          ::DataMapper::Property::DateTime
+      property :updated_at,          ::DataMapper::Property::DateTime#, :key=>true, :default=>DateTime.now
       property :updated_by,          ::DataMapper::Property::Integer
       property :updated_comment,     ::DataMapper::Property::Text
+      #property :created_at,          ::DataMapper::Property::DateTime
+      #timestamps :created_at
 
       # Register before save hooks
       before(:save) do

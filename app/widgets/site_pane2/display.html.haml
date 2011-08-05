@@ -12,8 +12,9 @@
   #form-table td { width:50%; }
   .form-element { width:15em; }
   #site_name { width:25em; }
-  #site_local_projection_id { width:20em; }
+  .form-dropdown { width:36em }
   #site_pos_accuracy_m { width:20em; }
+  #site_description { width:42em; }
   #site_comments { width:42em; }
 
 
@@ -63,13 +64,13 @@
   %br
 
   %table{:id=>"site00-property-table", :style=>"width:46%;margin-right:20px;float:left;"}
-    - @site.properties.each do |prop|
+    - @site_properties.each do |prop|
       %tr{:class=>"row#{cycle('1','0')}"}
         %td
           %b
-            #{prop.name.to_s.capitalize}
-        %td{:class=>"show_#{prop.name}"}
-          $$$#{prop.name}$$$
+            #{prop.capitalize}
+        %td{:class=>"show_#{prop}"}
+          $$$#{prop}$$$
 
   -#%br{:style=>'float:none; clear:both;'}
   -#%br
@@ -85,28 +86,31 @@
         $$$site-variable-data$$$
 
   -#%br{:style=>'float:none; clear:both;'}
-  
-  %h3{:style=>"margin-top:0;"}
-    Existing Samples
-  #all_variables-site00{:style=>"$$$export-style$$$"}
-    = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
-      = hidden_field_tag('column_array', @sample_labels.to_json)
-      = hidden_field_tag('row_array', "$$$site-samps$$$")
-      = hidden_field_tag('file_name', "project_samples")
-      = submit_tag("Export Samples")
+  %div
+    %h3{:style=>"margin-top:0;"}
+      Existing Samples
+    #all_variables-site00{:style=>"$$$export-style$$$"}
+      = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
+        = hidden_field_tag('column_array', @sample_labels.to_json)
+        = hidden_field_tag('row_array', "$$$site-samps$$$")
+        = hidden_field_tag('file_name', "project_samples")
+        = submit_tag("Export Samples")
 
-      %br
-      %br
-
-  %table{:id=>"site00-sample-table", :style=>"width:45%;"} 
-    %tr
-      - @sample_labels.each do |label|
-        %th
-          %b
-            = label
-    %tr
-      %td
-        $$$site-sample-data$$$
+        %br
+        %br    
+    %table{:id=>"site00-sample-table", :style=>"width:45%;"} 
+      %tr
+        - @sample_labels.each do |label|
+          %th{:style=>"width:23%;align:center;"}
+            %b
+              = label
+      %tr
+        %td{:colspan=>"4"}
+          %div{:class=>"sample-list"}  
+            %table
+              %tr
+                %td{:style=>"width:23%;align:center;"}
+                  $$$site-sample-data$$$
 
 -if @auth
   #edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>'EDIT', :style=>"margin-top:0;padding-top:0;display:none;"}
@@ -119,7 +123,7 @@
     %br
 
     -#= form_for(:site, @site, :remote=>true, :url=>project_site_path(@project, @site), :builder=>YogoFormBuilder, :html=>{:method=>"put", :onsubmit=>"return checkform();"} )do |f|
-    = form_for(:site, @site, :remote=>true, :url=>"/projects/#{@project.id}/sites/$$$id$$$/", :html=>{:method=>:put, :id=>"site00-edit-form", :onsubmit=>"dijit.byNode(dojo.byId('site00')).siteFormSave(this);"} )do |f|
+    = form_for(:site, @site, :remote=>true, :url=>"/projects/#{@project.id}/sites/$$$id$$$/", :html=>{:method=>:put, :id=>"site00-edit-form", :onsubmit=>"dijit.byNode(dojo.byId('site00')).siteFormSave(this);return true;"} )do |f|
 
       %table{:id=>"form-table"}
         %tr
@@ -145,16 +149,11 @@
                 %label{:for=>"site_longitude"} Longitude
             = f.text_field("longitude", :value=>"$$$longitude$$$")
         %tr
-          %td
+          %td{:colspan=>"2"}
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_elevation_m"} Elevation
             = f.text_field("elevation_m", :value=>"$$$elevation_m$$$")
-          %td
-            .from-element
-              %span{:class=>'label'}
-                %label{:for=>"site_vertical_datum"} Vertical Datum
-            = f.text_field("vertical_datum", :value=>"$$$vertical_datum$$$")
         %tr
           %td 
             .from-element
@@ -170,8 +169,22 @@
           %td{:colspan=>"2"}
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_local_projection_id"} Local Projection
-            = f.text_field("local_projection_id", :value=>"$$$local_projection_id$$$") 
+                %label{:for=>"site_vertical_datum"} Vertical Datum ($$$vertical_datum$$$)
+            -#= f.text_field("vertical_datum", :value=>"$$$vertical_datum_id$$$") 
+            - vert_datum_options = Array.new
+            - Voeis::VerticalDatumCV.all(:order => [:term.asc]).each do |item|
+              - vert_datum_options << [item.term, item.id.to_s]
+            = f.select('vertical_datum',  options_for_select(vert_datum_options, '$$$vertical_datum$$$'), :class=>"form-dropdown")
+        %tr
+          %td{:colspan=>"2"}
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_local_projection"} Local Projection ($$$local_projection$$$)
+            -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
+            - local_proj_options = Array.new
+            - Voeis::LocalProjectionCV.all(:order => [:term.asc]).each do |item|
+              - local_proj_options << [item.term, item.id.to_s]
+            = f.select('local_projection',  options_for_select(local_proj_options, '$$$local_projection$$$'), :class=>"form-dropdown")
         %tr
           %td{:colspan=>"2"}
             .from-element
@@ -189,6 +202,12 @@
               %span{:class=>'label'}
                 %label{:for=>"site_county"} County
             = f.text_field("county", :value=>"$$$county$$$")
+        %tr
+          %td{:colspan=>"2"}
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_description"} Description
+            = f.text_area("description", :value=>"$$$description$$$")
         %tr
           %td{:colspan=>"2"}
             .from-element

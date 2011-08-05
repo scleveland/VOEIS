@@ -8,15 +8,23 @@ class Voeis::VariablesController < Voeis::BaseController
             :instance_name => 'variable',
             :resource_class => Voeis::Variable
 
+  has_widgets do |root|
+    root << widget(:flot_graph)
+  end
+
   def show
     @project = parent
     #@sites = Voeis::Site.all
+    @variable = parent.managed_repository{Voeis::Variable.get(params[:id].to_i)}
     @sites = parent.managed_repository{Voeis::Site.all}
-    #@site =  parent.managed_repository{Voeis::Site.get(params[:id])}
-    @site_variable_stats = parent.managed_repository{Voeis::SiteDataCatalog.all}
-    debugger
+    if !params[:site_id].nil?
+      @site =  parent.managed_repository{Voeis::Site.get(params[:site_id].to_i)}
+      @site_variable_stats = parent.managed_repository{Voeis::SiteDataCatalog.all(:variable_id=>params[:id].to_i, :site_id=>params[:site_id].to_i)}
+      @graph_data = @variable.last_ten_values_graph(@site)
+      @data = @variable.last_ten_values(@site)
+    end
     #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
-    @variable = parent.managed_repository{Voeis::Variable.get(params[:id])}
+    
   end
 
   # GET /variables/new

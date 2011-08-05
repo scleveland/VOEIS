@@ -1,3 +1,4 @@
+= javascript_include_tag("jquery.flot.js")
 - content_for(:javascripts) do
   :javascript
     dojo.require("dijit.dijit");
@@ -32,14 +33,17 @@
   -#      = link_to("Edit Site", edit_project_site_path(@project,resource.id), :dojoType => "yogo.ui.MenuLink")
 
 %h2{:style=>"margin-top:0;"}
-  #{@variable.variable_name}
-
+  -if !@site.nil? 
+    #{@site.name}:#{@variable.variable_name}
+  -else
+    #{@variable.variable_name}
 -#EDIT VARIABLE BUTTON
 -#= link_to('Edit', edit_project_variable_path(@project,@variable.id), :class=>'icon icon-edit')
 -#&nbsp;&nbsp;&nbsp;
 -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
 -#= link_to('Cancel', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
 %br
+-#placeholder{:style=>"width:300px;height:150px;"}
 
 -i = 0
 %table{:id => "property-table", :style=>'float:left;'}
@@ -53,34 +57,119 @@
       %td
         #{@variable[prop.name]}
   
--# COLLECTED DATA STATS
--# COMMENTED OUT because lack of SITE ID to select
--#  - var_stats = @site_variable_stats.first(:variable_id=>@variable.id)
--#  %tr{:class=>"row#{i+1}"}
--#    %td
--#      %b
--#        Collected Data
--#    %td
--#      &nbsp;
--#  %tr{:class=>"row#{i}"}
--#    %td
--#      %b
--#        &nbsp;&nbsp; Count
--#    %td
--#      = var_stats.record_number
--#  %tr{:class=>"row#{i+1}"}
--#    %td
--#      %b
--#        &nbsp;&nbsp; Starting
--#    %td
--#      = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
--#  %tr{:class=>"row#{i}"}
--#    %td
--#      %b
--#        &nbsp;&nbsp; Ending
--#    %td
--#      = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
+-if @site
+  -# COLLECTED DATA STATS
+  -# COMMENTED OUT because lack of SITE ID to select
+  - var_stats = @site_variable_stats.first(:variable_id=>@variable.id)
+  %table{:id => "var-stats-table", :style=>'float:right;width:45%'}
+    %tr{:class=>"row#{i+1}"}
+      %td
+        %b
+          Collected Data
+      %td
+        &nbsp;
+    %tr{:class=>"row#{i}"}
+      %td
+        %b
+          &nbsp;&nbsp; Count
+      %td
+        = var_stats.record_number
+    %tr{:class=>"row#{i+1}"}
+      %td
+        %b
+          &nbsp;&nbsp; Starting
+      %td
+        = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
+    %tr{:class=>"row#{i}"}
+      %td
+        %b
+          &nbsp;&nbsp; Ending
+      %td
+        = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
+    %tr
+      %th{:colspan=>2}
+        Recent Data Values
+    %tr
+      %th
+        Timestamp
+      %th
+        Value   
+    -if !@data.nil?
+      -@data.each do |dv|
+        %tr
+          %td
+            = dv[0]
+          %td
+            = dv[1]
+        
+  
 
+  :javascript
+    var gdata = #{@graph_data.as_json};
+    var plot =$.plot($("#placeholder"), [gdata],{
+           series: {
+               color : "blue",
+               lines: { show: true },
+               points: { show: true }
+              },
+
+           grid:  { hoverable: true, clickable: true },
+           xaxis: { mode: "time" },
+           xaxis: { mode: "time" },
+           pan:   { interactive: true },
+           zoom:  { interactive: true }
+    });
+
+    //Function ShowToolTip and previousPoint allow the hover function to display
+     //a message for each data point on the graph when the cursor hoversover
+
+     //I would only mess with the css if you really need to otherwise this
+     //shouldn't need any modification
+     function showTooltip(x, y, contents) {
+         $('<div id="tooltip">' + contents + '</div>').css( {
+             position: 'absolute',
+             display: 'none',
+             top: y + 5,
+             left: x + 5,
+             border: '1px solid #fdd',
+             padding: '2px',
+             'background-color': '#fee',
+             opacity: 0.80
+         }).appendTo("body").fadeIn(200);
+     };
+
+     //Most of this should remain the same
+     //NOTE-- the time string for #x is in UTC format and currently is in GMT time
+     var previousPoint = null;
+     $("#placeholder").bind("plothover", function (event, pos, item) {
+         var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+         dDate = new Date();
+         dDate.setTime(mEpoch);
+         $("#x").text(dDate.toLocaleString());
+         $("#y").text(pos.y);
+
+         if (item) {
+             if (previousPoint != item.datapoint) {
+                 previousPoint = item.datapoint;
+                 $("#tooltip").remove();
+                 var x = item.datapoint[0].toFixed(2),
+                     y = item.datapoint[1].toFixed(2);
+                     var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+                     dDate = new Date();
+                     dDate.setTime(mEpoch);
+                 showTooltip(item.pageX, item.pageY,
+                   //*****You will need to change the sensor name here to the appropriate one selected above
+                            dDate.toLocaleString() + " = " + y + " " + "#{@variable.variable_name}|" );
+             }
+         }
+         else {
+             $("#tooltip").remove();
+             previousPoint = null;            
+         }
+     });
+
+  
+  -#= render_widget :flot_graph, :display, :variable=>@variable, :data=>@graph_data
 -#%table{:id=>'stats', :class=>'', :style=>'width:50%; padding:0; float:left; margin-left:50px;'}
 -#  %tr
 -#    %td

@@ -179,6 +179,8 @@ Yogo::Application.routes.draw do
   resources :variable_name_c_vs
   resources :sample_medium_c_vs
   resources :value_type_c_vs
+  resources :sensor_type_c_vs
+  resources :logger_type_c_vs
   resources :speciation_c_vs
   resources :data_type_c_vs
   resources :general_category_c_vs

@@ -36,11 +36,12 @@ class Voeis::Site
   property :longitude,           Float,   :required => true
   property :lat_long_datum_id,   Integer, :required => false, :default => 0
   property :elevation_m,         Float,   :required => false
-  property :vertical_datum,      String,  :required => false
+  #property :vertical_datum,      String,  :required => false
+  #property :vertical_datum_id,   Integer, :required => false, :default => -1
   property :local_x,             Float,   :required => false
   property :local_y,             Float,   :required => false
-  property :local_projection_id, Integer, :required => false
-  property :local_projection,    String,  :required => false
+  #property :local_projection_id, Integer, :required => false, :default => -1
+  #property :local_projection,    String,  :required => false
   property :pos_accuracy_m,      Float,   :required => false
   property :state,               String,  :required => true
   property :county,              String,  :required => false
@@ -61,6 +62,12 @@ class Voeis::Site
   has n, :samples,       :model => "Voeis::Sample",      :through => Resource
   has n, :variables,     :model => "Voeis::Variable",    :through => Resource
 
+  has 1,  :vertical_datum,    :model => "Voeis::VerticalDatumCV",    :through => Resource #, :child_key=>"vertical_datum_id"
+  has 1,  :local_projection,  :model => "Voeis::LocalProjectionCV",    :through => Resource# :child_key=>"local_projection_id"
+  #has 1, :vertical_datum, :model => "Voeis::VerticalDatumCV", :child_key=>"vertical_datum_id"
+  #has 1, :local_projection, :model => "Voeis::LocalProjectionCV", :child_key=>"local_projection_id"
+
+  #has 1, :lat_long_datum, :model=>"Voes::LatLongDatumCV"
   alias :site_name  :name
   alias :site_name= :name=
 
@@ -123,34 +130,18 @@ class Voeis::Site
   def update_site_data_catalog
     self.variables.each do |var|
       entry = Voeis::SiteDataCatalog.first_or_create(:site_id => self.id, :variable_id => var.id)
-      if !var.sensor_types.empty?
-        entry.record_number = (self.sensor_values & var.sensor_types.first.sensor_values).count
-        if entry.record_number > 0
-          entry.starting_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).first(:order=>[:timestamp]).timestamp
-          entry.ending_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).last(:order=>[:timestamp]).timestamp
-        end #end if
-      else
-        entry.record_number = 0
+      sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{var.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{self.id}"
+      results = repository.adapter.select(sql)
+      if results.length > 0
+        entry.record_number = entry.record_number + results.length
+        sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time"
+        dresults = repository.adapter.select(sql)
+        entry.starting_timestamp = dresults.first[:local_date_time]#(var.data_values & self.data_values).first(:order=>[:local_date_time]).local_date_time
+        entry.ending_timestamp = dresults.last[:local_date_time] #(var.data_values & self.data_values).last(:order=>[:local_date_time]).local_date_time
+        entry.valid?
+        puts entry.errors.inspect()
+        entry.save!
       end
-      if !var.data_values.empty?
-        if !self.data_values.empty?
-          dvalue_count = (var.data_values & self.data_values).count
-          entry.record_number = entry.record_number + dvalue_count
-          if dvalue_count > 0
-            dval_first = (var.data_values & self.data_values).first(:order=>[:local_date_time]).local_date_time
-            dval_last = (var.data_values & self.data_values).last(:order=>[:local_date_time]).local_date_time
-            if entry.starting_timestamp.nil? || dval_first < entry.starting_timestamp
-              entry.starting_timestamp = dval_first
-            end
-            if entry.ending_timestamp.nil? ||  dval_last > entry.ending_timestamp
-              entry.ending_timestamp = dval_last
-            end
-          end
-        end
-      end
-      entry.valid?
-      puts entry.errors.inspect()
-      entry.save
     end #end each
   end
   
@@ -158,34 +149,18 @@ class Voeis::Site
   def update_site_data_catalog_variables(variables)
     variables.each do |var|
       entry = Voeis::SiteDataCatalog.first_or_create(:site_id => self.id, :variable_id => var.id)
-      if !var.sensor_types.empty?
-        entry.record_number = (self.sensor_values & var.sensor_types.first.sensor_values).count
-        if entry.record_number > 0
-          entry.starting_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).first(:order=>[:timestamp]).timestamp
-          entry.ending_timestamp = (self.sensor_values & var.sensor_types.first.sensor_values).last(:order=>[:timestamp]).timestamp
-        end #end if
-      else
-        entry.record_number = 0
+      sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{var.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{self.id}"
+      results = repository.adapter.select(sql)
+      if results.length > 0
+        entry.record_number = entry.record_number + results.length
+        sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time"
+        dresults = repository.adapter.select(sql)
+        entry.starting_timestamp = dresults.first[:local_date_time]#(var.data_values & self.data_values).first(:order=>[:local_date_time]).local_date_time
+        entry.ending_timestamp = dresults.last[:local_date_time] #(var.data_values & self.data_values).last(:order=>[:local_date_time]).local_date_time
+        entry.valid?
+        puts entry.errors.inspect()
+        entry.save!
       end
-      if !var.data_values.empty?
-        if !self.data_values.nil?
-          dvalue_count = (var.data_values & self.data_values).count
-          entry.record_number = entry.record_number + dvalue_count
-          if dvalue_count > 0
-            dval_first = (var.data_values & self.data_values).first(:order=>[:local_date_time]).local_date_time
-            dval_last = (var.data_values & self.data_values).last(:order=>[:local_date_time]).local_date_time
-            if entry.starting_timestamp.nil? || dval_first < entry.starting_timestamp
-              entry.starting_timestamp = dval_first
-            end
-            if entry.ending_timestamp.nil? ||  dval_last > entry.ending_timestamp
-              entry.ending_timestamp = dval_last
-            end
-          end
-        end
-      end
-      entry.valid?
-      puts entry.errors.inspect()
-      entry.save
     end #end each
   end
 end

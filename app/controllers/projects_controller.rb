@@ -84,12 +84,29 @@ class ProjectsController < InheritedResources::Base
     @site1 = @sites[0]
     @site_stats = []
     @site_var_stats = []
+    @site_ref = []
     @site_samps = []
     @variable_labels = Array["Variable Data","Count","Start","End"]
     @sample_labels = Array["Sample Type","Lab Sample Code","Sample Medium","Timestamp"]
     @sample_fields = Array["sample_type","lab_sample_code","material","local_date_time"]
+    @site_ref_props = []
+    @site_properties = @site.properties.map{ |prop| 
+      #prop = prop.name.to_s
+      if prop.name.to_s[-3..-1]=='_id'
+        prop.name.to_s[0..-4]
+        #@site_ref_props << prop
+      else
+        prop.name.to_s
+      end
+    }
     
-    @sites.map{ |site| 
+    @sites.each{ |site| 
+      vert_datum = site.vertical_datum.nil? ? '' : site.vertical_datum.term.to_s
+      local_proj = site.local_projection.nil? ? '' : site.local_projection.term.to_s
+      @site_ref << {:vert_datum=>vert_datum, :local_proj=>local_proj}
+    }
+    
+    @sites.each{ |site| 
       stats = @project.managed_repository{Voeis::SiteDataCatalog.all(:site_id=>site.id)}.aggregate(:record_number.sum, :starting_timestamp.min, :ending_timestamp.max)
       stats.map!{ |x| 
         if x.nil?
@@ -106,7 +123,7 @@ class ProjectsController < InheritedResources::Base
     }
     
     #@site_var_stats = @project.managed_repository{Voeis::SiteDataCatalog.all(:order=>site.id)}
-    @sites.map{ |site| 
+    @sites.each{ |site| 
       @temp_array = []
       site.variables.map{ |var|
         stats = @project.managed_repository{Voeis::SiteDataCatalog.first(:site_id=>site.id, :variable_id=>var.id)}
@@ -131,7 +148,7 @@ class ProjectsController < InheritedResources::Base
       @site_var_stats << @temp_array
     }
     
-    @sites.map{ |site| 
+    @sites.each{ |site| 
       @temp_array = []
       site.samples.all(:order => [:lab_sample_code.asc]).each { |samp|
         @temp_array << Array[samp.sample_type, samp.lab_sample_code, samp.material, samp.local_date_time.to_s]

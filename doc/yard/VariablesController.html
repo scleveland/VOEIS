@@ -219,23 +219,41 @@ POST /variables
 43
 44
 45
-46</pre>
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/variables_controller.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='id create'>create</span>
    <span class='ivar'>@variable</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Variable</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-    <span class='kw'>if</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id variable_code'>variable_code</span><span class='period'>.</span><span class='id nil?'>nil?</span> <span class='op'>||</span> <span class='ivar'>@variable_code</span> <span class='op'>==</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>undefined</span><span class='tstring_end'>&quot;</span></span>
-      <span class='ivar'>@variable</span><span class='period'>.</span><span class='id variable_code'>variable_code</span> <span class='op'>=</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id id'>id</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='op'>+</span><span class='ivar'>@variable</span><span class='period'>.</span><span class='id variable_name'>variable_name</span><span class='op'>+</span><span class='ivar'>@variable</span><span class='period'>.</span><span class='id speciation'>speciation</span><span class='op'>+</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Unit</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='ivar'>@variable</span><span class='period'>.</span><span class='id variable_units_id'>variable_units_id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id units_name'>units_name</span>
-    <span class='kw'>end</span>
-    <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:detection_limit</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
-      <span class='ivar'>@variable</span><span class='period'>.</span><span class='id detection_limit'>detection_limit</span> <span class='op'>=</span> <span class='kw'>nil</span>
-    <span class='kw'>end</span>
-    <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:value_type</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id nil?'>nil?</span>
-      <span class='ivar'>@variable</span><span class='period'>.</span><span class='id value_type'>value_type</span> <span class='op'>=</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:quality_control</span><span class='rbracket'>]</span>
-    <span class='kw'>end</span>
-    <span class='id debugger'>debugger</span>
+   <span class='kw'>if</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id variable_code'>variable_code</span><span class='period'>.</span><span class='id nil?'>nil?</span> <span class='op'>||</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id variable_code'>variable_code</span> <span class='op'>==</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>undefined</span><span class='tstring_end'>&quot;</span></span>
+     <span class='ivar'>@variable</span><span class='period'>.</span><span class='id variable_code'>variable_code</span> <span class='op'>=</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id id'>id</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='op'>+</span><span class='ivar'>@variable</span><span class='period'>.</span><span class='id variable_name'>variable_name</span><span class='op'>+</span><span class='ivar'>@variable</span><span class='period'>.</span><span class='id speciation'>speciation</span><span class='op'>+</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Unit</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='ivar'>@variable</span><span class='period'>.</span><span class='id variable_units_id'>variable_units_id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id units_name'>units_name</span>
+   <span class='kw'>end</span>
+   <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:detection_limit</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
+     <span class='ivar'>@variable</span><span class='period'>.</span><span class='id detection_limit'>detection_limit</span> <span class='op'>=</span> <span class='kw'>nil</span>
+   <span class='kw'>end</span>
+   <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:field_method_id</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
+     <span class='ivar'>@variable</span><span class='period'>.</span><span class='id field_method_id'>field_method_id</span> <span class='op'>=</span> <span class='kw'>nil</span>
+   <span class='kw'>end</span>
+   <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:lab_id</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
+     <span class='ivar'>@variable</span><span class='period'>.</span><span class='id lab_id'>lab_id</span> <span class='op'>=</span> <span class='kw'>nil</span>
+   <span class='kw'>end</span>
+   <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:lab_method_id</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
+     <span class='ivar'>@variable</span><span class='period'>.</span><span class='id lab_method_id'>lab_method_id</span> <span class='op'>=</span> <span class='kw'>nil</span>
+   <span class='kw'>end</span>
+   <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:spatial_offset_type</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
+     <span class='ivar'>@variable</span><span class='period'>.</span><span class='id spatial_offset_type'>spatial_offset_type</span> <span class='op'>=</span> <span class='kw'>nil</span>
+   <span class='kw'>end</span>
+
   <span class='id respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id format'>format</span><span class='op'>|</span>
     <span class='kw'>if</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id save'>save</span>
       <span class='id flash'>flash</span><span class='lbracket'>[</span><span class='symbol'>:notice</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Variables was successfully created.</span><span class='tstring_end'>'</span></span>
@@ -266,12 +284,12 @@ POST /variables
       <pre class="lines">
 
 
-58
-59
-60</pre>
+67
+68
+69</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/variables_controller.rb', line 58</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/variables_controller.rb', line 67</span>
 
 <span class='kw'>def</span> <span class='id invalid_page'>invalid_page</span>
   <span class='id redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='symbol'>:back</span><span class='rparen'>)</span>
@@ -331,7 +349,7 @@ GET /variables/new
 </div>
     
     <div id="footer">
-  Generated on Fri Jul  1 11:28:07 2011 by 
+  Generated on Wed Jul 27 00:33:40 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

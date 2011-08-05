@@ -18,6 +18,7 @@ class Voeis::SensorType
   has n, :sites,                     :model => "Voeis::Site", :through => Resource
   has n, :data_stream_columns,       :model => 'Voeis::DataStreamColumn', :through => Resource
   has n, :sensor_values,             :model => "Voeis::SensorValue", :through => Resource
+  has n, :data_values,               :model => "Voeis::DataValue", :through => Resource
   has n, :variables,                 :model => "Voeis::Variable", :through => Resource
 
 end
