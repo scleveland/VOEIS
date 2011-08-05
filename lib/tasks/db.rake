@@ -148,12 +148,14 @@ namespace :yogo do
       options << "--host=#{host}"
       options << "--port=#{port}" 
       options << "--username=#{username}" unless username.blank?
-
+      pv = `which pv`
+      
       puts "Creating the Master Database..."
       create_database = ["createdb"] + options + [database]
       `#{create_database.join(' ')}`
       load_database = ['psql -a'] + options + ["--file=#{output_path}/voeis_backup.sql", database]
-      load_database +=  ["| pv -trb > #{output_path}/load_master_from_backup.log"]
+      load_database += ["| #{pv}"] unless pv.blank?
+      load_database +=  ["> #{output_path}/load_master_from_backup.log"]
       puts "Loading the Master Database..."
       `#{load_database.join(' ')}`
     end
@@ -170,6 +172,8 @@ namespace :yogo do
       options << "--host=#{host}"
       options << "--port=#{port}"
       options << "--username=#{username}" unless username.blank?
+      pv = `which pv`
+      
       # command << "--verbose"
       Project.all.each do |project|
         database = project.managed_repository.adapter.options["database"]
@@ -178,7 +182,8 @@ namespace :yogo do
         # system(*create_database)
         `#{create_database.join(' ')}`
         load_database = ['psql -a'] + options + ["--file=#{output_path}/#{database}.sql", database]
-        load_database +=  ["| pv -trb > #{output_path}/load_projects_from_backup.log"]
+        load_database += ["| #{pv}"] unless pv.blank?
+        load_database +=  ["> #{output_path}/load_projects_from_backup.log"]
         puts "Loading the Data..."
         `#{load_database.join(' ')}`
         # system(*load_database)
