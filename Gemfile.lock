@@ -24,7 +24,8 @@ GIT
 
 GIT
   remote: git://github.com/yogo/dm-is-versioned.git
-  revision: 7ae0937ced687881d91b80e6d65e0a5945694f95
+  revision: 53acfa5faa34249b080acc398e0c865dd3d9ec1a
+  ref: 53acfa5faa34249b080acc398e0c865dd3d9ec1a
   branch: voeis/patches
   specs:
     dm-is-versioned (1.1.0)
