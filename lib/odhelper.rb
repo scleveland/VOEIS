@@ -4,7 +4,7 @@ module Odhelper
   end
   
   def upgrade_projects
-    User.current = User.first
+    #User.current = User.first
     DataMapper::Model.descendants.each do |model|
       begin
         model::Version
@@ -313,20 +313,7 @@ module Odhelper
     end
   end
   
-  v =Voeis::Source.create(
-                        :organization => "Unknown",      
-                        :source_description => "Unknown",
-                        :source_link => "Unknown",       
-                        :contact_name => "Unknown",      
-                        :phone => "Unknown",             
-                        :email =>"Unknown@n.com",             
-                        :address => "Unknown",           
-                        :city => "Unknown",              
-                        :state => "Unknown",             
-                        :zip_code => "Unknown",          
-                        :citation => "Unknown",          
-                        :metadata_id => 0)
-  
+
   def set_data_stream_source(source_id)
     @source = Voeis::Source.get(source_id)
     Project.all.each do |project|
