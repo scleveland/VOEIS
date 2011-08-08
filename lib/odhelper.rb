@@ -4,6 +4,7 @@ module Odhelper
   end
   
   def upgrade_projects
+    User.current = User.first
     DataMapper::Model.descendants.each do |model|
       begin
         model::Version
