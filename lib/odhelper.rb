@@ -235,11 +235,13 @@ module Odhelper
           if !dcol.sensor_types.first.nil?
             var = dcol.sensor_types.first.variables.first
             sensor_type = project.managed_repository{Voeis::SensorType.get(dcol.sensor_types.first.id)}
-            (sensor_type.sensor_values).each do |val|
-              row_values << "(#{val.value}, '#{val.timestamp}', #{val.vertical_offset},FALSE, '#{val.string_value}', '#{val.created_at}', '#{val.updated_at}', #{val.timestamp.utc_offset/(60*60) },'#{val.timestamp.utc}',FALSE,NULL,#{val.quality_control_level} )"
+            (sensor_type.sensor_values.all(:moved => nil)).each do |val|
+              row_values << "(#{val.value}, '#{val.timestamp}', #{val.vertical_offset},FALSE, '#{val.string_value}', '#{val.created_at}', '#{val.updated_at}', #{val.timestamp.utc_offset/(60*60) },'#{val.timestamp.utc}',FALSE,NULL,#{val.quality_control_level}, '#{data_stream.type}' )"
+              val.moved = true
+              val.save
             end             
             if !row_values.empty?
-              sql = "INSERT INTO \"voeis_data_values\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\") VALUES "
+              sql = "INSERT INTO \"voeis_data_values\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"type\") VALUES "
               sql << row_values.join(',')
               sql << " RETURNING \"id\""
               result_ids = project.managed_repository{repository.adapter.select(sql)}
@@ -258,16 +260,16 @@ module Odhelper
                 "(#{result_ids[i]},#{data_stream_id})"
               }.join(',')
               project.managed_repository{repository.adapter.execute(sql)}
-              sql = "INSERT INTO \"voeis_data_value_sensor_type\" (\"data_value_id\",\"sensor_type_id\") VALUES "
+              sql = "INSERT INTO \"voeis_data_value_sensor_types\" (\"data_value_id\",\"sensor_type_id\") VALUES "
               sql << (0..result_ids.length-1).collect{|i|
-                "(#{result_ids[i]},#{sensor_type.id})"
+                 "(#{result_ids[i]},#{sensor_type.id})"
               }.join(',')
               project.managed_repository{repository.adapter.execute(sql)}
             end
           end
         end
       end
-    end
+    end###
   end
   
   def move_sensor_values_to_data_values
@@ -275,7 +277,66 @@ module Odhelper
       move_project_sensor_values_to_data_values(project)
     end  
   end
+  
+  def set_data_values_type
+    Project.all.each do |project|
+      project.managed_repository do
+        sql ="UPDATE voeis_data_values SET type = 'Sample' WHERE type IS NULL"
+        repository.adapter.execute(sql)
+      end
+    end 
+  end
+  
+  def set_project_data_stream_source(source, project)
+    @source = source
+    @project_source = nil
+    project.managed_repository do
+      @project_source = Voeis::Source.first_or_create(:organization => @source.organization,      
+                            :source_description => @source.source_description,
+                            :source_link => @source.source_link,       
+                            :contact_name => @source.contact_name,      
+                            :phone => @source.phone,             
+                            :email =>@source.email,             
+                            :address => @source.address,           
+                            :city => @source.city,              
+                            :state => @source.state,             
+                            :zip_code => @source.zip_code,          
+                            :citation => @source.citation,          
+                            :metadata_id =>@source.metadata_id)
+      Voeis::DataStream.all.each do |data_stream|
+        if data_stream.source.nil?
+          data_stream.source = @project_source
+          data_stream.save
+        end
+      end
+    end
+  end
+  
+  v =Voeis::Source.create(
+                        :organization => "Unknown",      
+                        :source_description => "Unknown",
+                        :source_link => "Unknown",       
+                        :contact_name => "Unknown",      
+                        :phone => "Unknown",             
+                        :email =>"Unknown@n.com",             
+                        :address => "Unknown",           
+                        :city => "Unknown",              
+                        :state => "Unknown",             
+                        :zip_code => "Unknown",          
+                        :citation => "Unknown",          
+                        :metadata_id => 0)
+  
+  def set_data_stream_source(source_id)
+    @source = Voeis::Source.get(source_id)
+    Project.all.each do |project|
+      set_project_data_stream_source(@source, project) 
+    end
+  end
+  
+  # sql ="SELECT * FROM voeis_data_values WHERE type IS NULL LIMIT 1"
+  # results =repository.adapter.select(sql)
 end
+
 
 # 
 # DataMapper::Model.descendants.each do |model|

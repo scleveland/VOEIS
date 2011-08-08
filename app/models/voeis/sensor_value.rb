@@ -15,6 +15,7 @@ class Voeis::SensorValue
   property :published,       Boolean,  :required => false
   property :sensor_id,       Integer,  :required => true, :default => -1, :index => true
   property :quality_control_level,    Integer, :required=>true, :default=>0
+  property :moved,          Boolean, :required => false
   yogo_versioned
 
   has n, :site,         :model => "Voeis::Site",       :through => Resource

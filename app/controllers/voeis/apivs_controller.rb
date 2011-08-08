@@ -236,7 +236,7 @@ class Voeis::ApivsController < Voeis::BaseController
             csv.close()
             path = File.dirname(@new_file)
           if first_row.count == data_stream_template.data_stream_columns.count
-            flash_error = flash_error.merge(parent.managed_repository{Voeis::SensorValue.parse_logger_csv(@new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line)})
+            flash_error = flash_error.merge(parent.managed_repository{Voeis::DataValue.parse_logger_csv(@new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil)})
           else
             #the file does not match the data_templates number of columns
             flash_error[:error] = "File does not match the data_templates number of columns. Columns in First Row:" + first_row.count.to_s +  " Voeis expected:" + data_stream_template.data_stream_columns.count.to_s + " rows."
