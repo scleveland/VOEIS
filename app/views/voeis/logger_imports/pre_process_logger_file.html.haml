@@ -11,8 +11,8 @@
                                             :general_categories=> @general_categories,
                                             :label_array=>@label_array,
                                             :current_variables=>@current_variables,
-                                            :lab_methods=>@lab_methods,
-                                            :labs=>@labs,
+                                            :sensor_types=>@sensor_types,
+                                            :logger_types=>@logger_types,
                                             :field_methods=>@field_methods,
                                             :spatial_offset_types => @spatial_offset_types,
                                             :offset_units => @offset_units,
@@ -125,7 +125,7 @@ Form Progress:
               $(document).ready(function() {
               assignEndingVerticalOffset(#{col.to_s});
               });
-          -elsif ds_col.name == "Ignore"
+          -elsif ds_col.name == "Ignore" || ds_col.name == "ignore"
             :javascript
               $(document).ready(function() {
               assignIgnore(#{col.to_s});
@@ -238,7 +238,7 @@ Form Progress:
         %div{:dojoType=>"dijit.Dialog", :id =>"metatag_dialog"+col.to_s}
           Select A Voeis MetaTag By Clicking On It:
 
-          %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{nestedSorting:true, filter:true}",  :store=>"metatagDataStore", :clientSort=>"true", :style=>"width: 800px; height: 300px;", :rowSelector=>"20px", :jsId=>"MetaTaggrid"+col.to_s, :class=>"metagrid", :id=>"MetaTaggrid"+col.to_s, :sortInfo=>"2"}
+          %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{filter:true}",  :store=>"metatagDataStore", :clientSort=>"true", :style=>"width: 800px; height: 300px;", :rowSelector=>"20px", :jsId=>"MetaTaggrid"+col.to_s, :class=>"metagrid", :id=>"MetaTaggrid"+col.to_s, :sortInfo=>"2"}
             %thead
               %tr
                 %th{:field=>"name", :width=>"100px", :filterable=>true}
@@ -303,7 +303,7 @@ Form Progress:
         %div{:dojoType=>"dijit.Dialog", :id =>"variable_dialog"+col.to_s,  :class=>"var_tree"}
           Select A Voeis Variable By Clicking On It:
           
-          %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{nestedSorting:true, filter:true}",  :store=>"variableDataStore", :clientSort=>"true", :style=>"width: 800px; height: 300px;", :rowSelector=>"20px", :jsId=>"Variablegrid"+col.to_s, :id=>"Variablegrid"+col.to_s}
+          %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{filter:true}",  :store=>"variableDataStore", :clientSort=>"true", :style=>"width: 800px; height: 300px;", :rowSelector=>"20px", :jsId=>"Variablegrid"+col.to_s, :id=>"Variablegrid"+col.to_s, :class =>"variablegrid"}
             %thead
               %tr
                 -@var_properties.each do |prop|
@@ -439,6 +439,7 @@ Form Progress:
     #search-div-loader
 :javascript  
   $(document).ready(function() {
+    dijit.registry.byClass("dojox.grid.EnhancedGrid").forEach(function(grid){if(grid.class == "variablegrid"){grid.sort();}});
   });
 
   var variable_json_store = {identifier: 'id', label: 'name',items: []}
@@ -962,7 +963,7 @@ Form Progress:
 
 
 
-    dijit.byId("Column"+column).set("title", "Column"+column+": "+update_text);
+    dijit.byId("Column"+column).set("title", "Column"+column+": "+update_text+':'+update_id);
     dijit.byId("next"+column).set("disabled", false);
     dijit.byId("next"+column).focus();
     dijit.byId("next"+column).set("label","Next");

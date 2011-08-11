@@ -1400,7 +1400,7 @@ class Voeis::DataValuesController < Voeis::BaseController
             data_stream_column.data_streams << @data_stream
             data_stream_column.save
           end #managed_repository
-        elsif  columns_array[i] == "ignore"
+        elsif  columns_array[i] == "ignore" || ignore_array[i] == i.to_s
           parent.managed_repository do
             data_stream_column = Voeis::DataStreamColumn.create(
                                   :column_number => i,
@@ -1425,7 +1425,7 @@ class Voeis::DataValuesController < Voeis::BaseController
             data_stream_column.meta_tag = mtag
             data_stream_column.save
           end #managed_repository
-        elsif  columns_array[i] != nil#create other data_stream_columns and create variables
+        elsif  columns_array[i] != nil  || columns_array[i] != ""#create other data_stream_columns and create variables
           #puts params["column"+i.to_s]
           var = Voeis::Variable.get(columns_array[i].to_i)
           parent.managed_repository do

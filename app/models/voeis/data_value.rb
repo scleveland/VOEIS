@@ -15,6 +15,7 @@ class Voeis::DataValue
   property :end_vertical_offset,        Float,    :required=>false
   property :string_value,               String,   :required => true, :default => "Unknown"
   property :quality_control_level,      Integer,  :required=>true, :default=>0
+  property :datatype,                  String,   :required =>false, :default =>"Sample"
   property :published,                  Boolean,  :required => false
   
   yogo_versioned
@@ -22,10 +23,11 @@ class Voeis::DataValue
   has 1, :site,       :model => "Voeis::Site",     :through => Resource
   has 1,:source,       :model => "Voeis::Source",       :through => Resource
 
-  has n, :sample,     :model => "Voeis::Sample",   :through => Resource
+  has 1, :sample,     :model => "Voeis::Sample",   :through => Resource
   has n, :meta_tags,  :model => "Voeis::MetaTag",  :through => Resource
-  has n, :variable,   :model => "Voeis::Variable", :through => Resource
+  has 1, :variable,   :model => "Voeis::Variable", :through => Resource
   has n, :data_streams,  :model => "Voeis::DataStream", :through => Resource
+  has 1, :sensor_type,  :model => "Voeis::SensorType", :through => Resource
   #has n, :method,     :model => "Voeis::Method", :through => Resource
   
   
@@ -143,6 +145,7 @@ class Voeis::DataValue
     vertical_offset = vertical_offset_col == "" ? 0.0 : row[vertical_offset_col.to_i].to_f
   end_vertical_offset = end_vertical_offset_col == "" ? 0.0 : row[end_vertical_offset_col.to_i].to_f
     data_stream = Voeis::DataStream.get(data_stream_id)
+    source = data_stream.source
     if data_stream.DST
        dst_time = 1
      else
@@ -159,12 +162,12 @@ class Voeis::DataValue
           (0..row.size-1).each do |i|
             if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID"
                 cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
-                row_values << "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{data_stream.DST}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f} )"
+                row_values << "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{data_stream.DST}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}' )"
                                 
               end #end if
           end #end loop
           if !row_values.empty?
-            sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\") VALUES "
+            sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\") VALUES "
             sql << row_values.join(',')
             sql << " RETURNING \"id\""
             result_ids = repository.adapter.select(sql)
@@ -181,6 +184,11 @@ class Voeis::DataValue
             sql = "INSERT INTO \"voeis_data_stream_data_values\" (\"data_value_id\",\"data_stream_id\") VALUES "
             sql << (0..result_ids.length-1).collect{|i|
               "(#{result_ids[i]},#{data_stream_id})"
+            }.join(',')
+            repository.adapter.execute(sql)
+            sql = "INSERT INTO \"voeis_data_value_sources\" (\"data_value_id\",\"source_id\") VALUES "
+            sql << (0..result_ids.length-1).collect{|i|
+              "(#{result_ids[i]},#{source.id})"
             }.join(',')
             repository.adapter.execute(sql)
             if sample_id != -1

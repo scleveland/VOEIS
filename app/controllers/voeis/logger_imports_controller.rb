@@ -429,6 +429,8 @@ class Voeis::LoggerImportsController < Voeis::BaseController
             @quality_control_levels = Voeis::QualityControlLevel.all
             @sample_mediums= Voeis::SampleMediumCV.all
             @sample_types = Voeis::SampleTypeCV.all
+            @sensor_types = Voeis::SensorTypeCV.all
+            @logger_types = Voeis::LoggerTypeCV.all
             @value_types= Voeis::ValueTypeCV.all
             @speciations = Voeis::SpeciationCV.all
             @data_types = Voeis::DataTypeCV.all
@@ -752,7 +754,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
               data_stream_column.data_streams << @data_stream
               data_stream_column.save
             end #managed_repository
-          elsif  columns_array[i] == "ignore"
+          elsif  columns_array[i] == "ignore" || ignore_array[i] == i.to_s
             parent.managed_repository do
               data_stream_column = Voeis::DataStreamColumn.create(
                                     :column_number => i,
@@ -777,7 +779,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
               data_stream_column.meta_tag = mtag
               data_stream_column.save
             end #managed_repository
-          elsif  columns_array[i] != nil#create other data_stream_columns and create variables
+          elsif  columns_array[i] != nil || columns_array[i] != ""#create other data_stream_columns and create variables
             #puts params["column"+i.to_s]
             
             var = Voeis::Variable.get(columns_array[i].to_i)

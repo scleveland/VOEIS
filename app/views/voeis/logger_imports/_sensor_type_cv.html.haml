@@ -1,0 +1,32 @@
+- content_for(:javascripts) do
+  :javascript
+    function createSensorType() {
+      
+    $.post("#{root_url + "sensor_type_c_vs"}.json?sensor_type_c_v[term]=" + $("#sensor_type_c_v_term").val()+"&sensor_type_c_v[description]=" + $("#sensor_type_c_v_description").val(),
+    function(data) {
+    $('#variable_sensor_type').
+    append($("<option></option>").
+    attr("sensor",$("#sensor_type_c_v_term").val()).
+    text($("#sensor_type_c_v_term").val())); 
+    $('#variable_sensor_type').val($("#sensor_type_c_v_term").val());
+    $("#sensor_type_c_v_term").val("");
+    $("#sensor_type_c_v_definition").val("");
+    dijit.byId("new_sensor_type").hide();
+    return false;
+    }
+    );
+    }
+    
+#new_sensor_type{:dojoType=>"dijit.Dialog", :title=>"New Sensor Type"}
+  %h3 Create a new Sensor Type:
+  = form_for(:sensor_type_c_v )do |f|
+    = f.label("Term:")
+    = clear_break
+    = f.text_area("term", :cols => 45, :rows => 2, :style => {:resize => "none"}, :class => "sensor_type_term")
+    =clear_break
+    = f.label("Description:")
+    = clear_break
+    = f.text_area("description", :cols => 45, :rows => 6, :style => {:resize => "none"}, :class => "sensor_type_definition")
+    =clear_break
+    %button{:id=> 'new_sensor_type_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createSensorType();"}
+      Create Sensor Type

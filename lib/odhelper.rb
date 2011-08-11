@@ -4,6 +4,7 @@ module Odhelper
   end
   
   def upgrade_projects
+    User.current = User.first
     DataMapper::Model.descendants.each do |model|
       begin
         model::Version
@@ -25,6 +26,54 @@ module Odhelper
     end
     DataMapper.auto_upgrade!
   end
+  
+  # def add_created_at_postgres
+  #   DataMapper::Model.descendants.each do |model|
+  #     begin
+  #       sql = "ALTER TABLE #{model.storage_name} ALTER COLUMN created_at DROP NOT NULL"
+  #       repository.adapter.execute(sql)
+  #     rescue
+  #     end
+  #   end
+  #   Project.all.each do |project|
+  #     project.managed_repository do
+  #       puts project.name
+  #       DataMapper::Model.descendants.each do |model|
+  #         begin
+  #           sql = "ALTER TABLE #{model.storage_name} ALTER COLUMN created_at DROP NOT NULL"
+  #           repository.adapter.execute(sql)
+  #         rescue => e
+  #           puts model.name+": #{e}"
+  #         end
+  #       end
+  #     end
+  #   end
+  # end
+  
+  def auto_migrate_versions
+    DataMapper::Model.descendants.each do |model|
+      begin
+        model::Version.auto_migrate!
+      rescue
+      end
+    end
+    Project.all.each do |project|
+      project.managed_repository do
+        puts project.name
+
+        DataMapper::Model.descendants.each do |model|
+          begin
+            model::Version.auto_migrate!
+          rescue => e
+            puts model.name+": #{e}"
+          end
+        end
+      end
+    end
+    up  DataMapper.auto_upgrade!
+  end
+  
+  
   
   def fix_scientific_data(project)
     project.managed_repository do
@@ -175,4 +224,158 @@ module Odhelper
       report =report + "</div>"
     end
   end
+  
+  def move_project_sensor_values_to_data_values(project)
+    sites = project.managed_repository{Voeis::Site.all}
+    sites.each do |site|
+      puts "SITE: "+site.name
+      site.data_streams.each do |data_stream|
+        #select all sensor_values related to the site and variable
+        puts "DATASTREAM: "+ data_stream.name
+        data_stream_id = data_stream.id
+        source = data_stream.source
+        data_stream.data_stream_columns.each do |dcol|
+          row_values = Array.new
+          if !dcol.sensor_types.first.nil?
+            var = dcol.sensor_types.first.variables.first
+            sensor_type = project.managed_repository{Voeis::SensorType.get(dcol.sensor_types.first.id)}
+            puts "SENSOR: "+sensor_type.name
+            (sensor_type.sensor_values.all(:moved => nil)).each do |val|
+              print val.id.to_s + ','
+              STDOUT.flush
+              row_values << "(#{val.value}, '#{val.timestamp}', #{val.vertical_offset},FALSE, '#{val.string_value}', '#{val.created_at}', '#{val.updated_at}', #{val.timestamp.utc_offset/(60*60) },'#{val.timestamp.utc}',FALSE,NULL,#{val.quality_control_level}, '#{data_stream.type}' )"
+              # val.moved = true
+              # puts "Before Save"
+              # puts row_values[0]
+              # val.save
+              # puts "AFTER save"
+              sql = "UPDATE voeis_sensor_values SET moved = true WHERE id = #{val.id}"
+              project.managed_repository{repository.adapter.execute(sql)}
+            end             
+            puts "STORING VALUES"
+            if !row_values.empty?
+              sql = "INSERT INTO \"voeis_data_values\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\") VALUES "
+              sql << row_values.join(',')
+              sql << " RETURNING \"id\""
+              result_ids = project.managed_repository{repository.adapter.select(sql)}
+              sql = "INSERT INTO \"voeis_data_value_variables\" (\"data_value_id\",\"variable_id\") VALUES "
+              sql << (0..result_ids.length-1).collect{|i|
+                "(#{result_ids[i]},#{var.id})"
+              }.join(',')
+              project.managed_repository{repository.adapter.execute(sql)}
+              sql = "INSERT INTO \"voeis_data_value_sites\" (\"data_value_id\",\"site_id\") VALUES "
+              sql << (0..result_ids.length-1).collect{|i|
+                "(#{result_ids[i]},#{site.id})"
+              }.join(',')
+              project.managed_repository{repository.adapter.execute(sql)}
+              sql = "INSERT INTO \"voeis_data_stream_data_values\" (\"data_value_id\",\"data_stream_id\") VALUES "
+              sql << (0..result_ids.length-1).collect{|i|
+                "(#{result_ids[i]},#{data_stream_id})"
+              }.join(',')
+              project.managed_repository{repository.adapter.execute(sql)}
+              sql = "INSERT INTO \"voeis_data_value_sensor_types\" (\"data_value_id\",\"sensor_type_id\") VALUES "
+              sql << (0..result_ids.length-1).collect{|i|
+                 "(#{result_ids[i]},#{sensor_type.id})"
+              }.join(',')
+              project.managed_repository{repository.adapter.execute(sql)}
+              begin
+              sql = "INSERT INTO \"voeis_data_value_sources\" (\"data_value_id\",\"source_id\") VALUES "
+              sql << (0..result_ids.length-1).collect{|i|
+                "(#{result_ids[i]},#{source.id})"
+              }.join(',')
+              repository.adapter.execute(sql)
+              rescue
+                puts "Problem STORING SOURCE*****************"
+              end
+            puts "DONE STORING VALUES"
+            end
+          end
+        end
+      end
+    end###
+  end
+  
+  def move_sensor_values_to_data_values
+    Project.all.each do |project|
+      puts "PROJECT: " + project.name
+      move_project_sensor_values_to_data_values(project)
+    end  
+  end
+  
+  def set_data_values_type
+    Project.all.each do |project|
+      project.managed_repository do
+        sql ="UPDATE voeis_data_values SET type = 'Sample' WHERE type IS NULL"
+        repository.adapter.execute(sql)
+      end
+    end 
+  end
+  
+  def set_project_data_stream_source(project)
+    #@source = source
+    @project_source = nil
+    project.managed_repository do
+      @project_source = Voeis::Source.first(
+                            :organization => "Unknown",      
+                            :source_description => "Unknown",
+                            :source_link => "Unknown",       
+                            :contact_name => "Unknown",      
+                            :phone => "Unknown",             
+                            :email =>"Unknown@n.com",             
+                            :address => "Unknown",           
+                            :city => "Unknown",              
+                            :state => "Unknown",             
+                            :zip_code => "Unknown",          
+                            :citation => "Unknown",          
+                            :metadata_id => 0)
+      Voeis::DataStream.all.each do |data_stream|
+        unless data_stream.source
+          data_stream.source = @project_source
+          data_stream.save
+        end
+      end
+    end
+  end
+  
+  
+  def set_data_stream_source
+    Project.all.each do |project|
+      puts project.name
+      begin
+        set_project_data_stream_source(project) 
+      rescue Exception => e
+        puts project.name + " had a proplem:" + e.message
+      end
+    end
+  end
+  
+  # sql ="SELECT * FROM voeis_data_values WHERE type IS NULL LIMIT 1"
+  # results =repository.adapter.select(sql)
 end
+
+
+# 
+# DataMapper::Model.descendants.each do |model|
+#   begin
+#     model::Version
+#   rescue
+#   end
+# end
+# Project.all.each do |project|
+#   project.managed_repository do
+#     puts project.name
+# 
+#     DataMapper::Model.descendants.each do |model|
+#       begin
+#         model.all.each do |m|
+#           m.updated_at = m.created_at
+#           m.save!
+#         end
+#         model.auto_upgrade!
+#       rescue => e
+#         puts model.name+": #{e}"
+#       end
+#     end
+#   end
+# end
+# DataMapper.auto_upgrade!

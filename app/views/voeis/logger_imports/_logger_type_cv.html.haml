@@ -1,0 +1,32 @@
+- content_for(:javascripts) do
+  :javascript
+    function createLoggerType() {
+      
+    $.post("#{root_url + "logger_type_c_vs"}.json?logger_type_c_v[term]=" + $("#logger_type_c_v_term").val()+"&logger_type_c_v[description]=" + $("#logger_type_c_v_description").val(),
+    function(data) {
+    $('#variable_logger_type').
+    append($("<option></option>").
+    attr("logger",$("#logger_type_c_v_term").val()).
+    text($("#logger_type_c_v_term").val())); 
+    $('#variable_logger_type').val($("#logger_type_c_v_term").val());
+    $("#logger_type_c_v_term").val("");
+    $("#logger_type_c_v_definition").val("");
+    dijit.byId("new_logger_type").hide();
+    return false;
+    }
+    );
+    }
+    
+#new_logger_type{:dojoType=>"dijit.Dialog", :title=>"New Logger Type"}
+  %h3 Create a new Logger Type:
+  = form_for(:logger_type_c_v )do |f|
+    = f.label("Term:")
+    = clear_break
+    = f.text_area("term", :cols => 45, :rows => 2, :style => {:resize => "none"}, :class => "logger_type_term")
+    =clear_break
+    = f.label("Description:")
+    = clear_break
+    = f.text_area("description", :cols => 45, :rows => 6, :style => {:resize => "none"}, :class => "logger_type_definition")
+    =clear_break
+    %button{:id=> 'new_logger_type_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createLoggerType();"}
+      Create Logger Type
