@@ -25,6 +25,19 @@ class Voeis::SitesController < Voeis::BaseController
     @site_variable_stats = parent.managed_repository{Voeis::SiteDataCatalog.all(:site_id=>@site.id)}
     # debugger
     #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
+
+    @site_properties = @site.properties.map{ |prop| 
+      prop = prop.name.to_s
+      #if prop.name.to_s[-3..-1]=='_id'
+      #  prop.name.to_s[0..-4]
+      #  #@site_ref_props << prop
+      #else
+      #  prop.name.to_s
+      #end
+    }
+    #@site_properties << 'vertical_datum'
+    #@site_properties << 'local_projection'
+
     @sites = parent.managed_repository{Voeis::Site.all}
     @label_array = Array["Sample Type","Lab Sample Code","Sample Medium","Timestamp"]
     @field_array = Array["sample_type","lab_sample_code","material","local_date_time"]
@@ -45,6 +58,8 @@ class Voeis::SitesController < Voeis::BaseController
   def update
     params[:site][:latitude] = params[:site][:latitude].strip
     params[:site][:longitude] = params[:site][:longitude].strip
+    @vert_datum_global = Voeis::VerticalDatumCV.get(params[:vertical_datum_id])
+    @local_proj_global = Voeis::LocalProjectionCV.get(params[:local_projection_id])
     
     parent.managed_repository do 
       site = Voeis::Site.get(params[:id])
@@ -54,12 +69,22 @@ class Voeis::SitesController < Voeis::BaseController
       site.updated_at = Time.now
       puts site.valid?
       puts site.errors.inspect()
+      #### CV update -- global -> local
+      vert_datum = Voeis::VerticalDatumCV.first_or_create(:id=>@vert_datum_global.id,
+                                                          :term=>@vert_datum_global.term,
+                                                          :definition=>@vert_datum_global.definition)
+      site.vertical_datum = vert_datum
+      local_proj = Voeis::LocalProjectionCV.first_or_create(:id=>@local_proj_global.id,
+                                                          :term=>@local_proj_global.term,
+                                                          :definition=>@local_proj_global.definition)
+      site.local_projection = local_proj
       if site.save
          flash[:notice] = "Site was Updated successfully."
          redirect_to project_url(parent)
       end
     end
-    # update! do |success, failure|
+    
+    ### update! do |success, failure|
     #       success.html { redirect_to project_url(parent) }
     #     end
     

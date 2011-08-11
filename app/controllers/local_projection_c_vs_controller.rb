@@ -4,7 +4,7 @@ class LocalProjectionCVsController < ApplicationController
 
   # GET /variables/new
   def new
-    @local_projection = parent.managed_repository{Voeis::LocalProjectionCV.new}
+    @local_projection = Voeis::LocalProjectionCV.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -13,7 +13,7 @@ class LocalProjectionCVsController < ApplicationController
   
   # POST /variables
   def create
-    @local_projection = parent.managed_repository{Voeis::LocalProjectionCV.new(params[:variable_name_c_v])}
+    @local_projection = Voeis::LocalProjectionCV.new(params[:variable_name_c_v])
     respond_to do |format|
       if @local_projection.save
         flash[:notice] = 'Local Projection was successfully created.'

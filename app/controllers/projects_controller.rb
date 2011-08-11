@@ -17,24 +17,26 @@ class ProjectsController < InheritedResources::Base
       return 'application'
     end
   end
+  
   def update
     @project = Project.get(params[:id])
-     @project.is_private = params[:project][:is_private].to_i
-     @project.description = params[:project][:description]
-     @project.publish_to_his = params[:project][:publish_to_his].to_i
-     respond_to do |format|
-       if @project.save
-         flash[:notice] = 'Project was successfully updated.'
-         format.json do
-           render :json => @project.as_json, :callback => params[:jsoncallback]
-         end
-         format.html {render :action => "edit"}
-       else
-         flash[:error] = 'Project was NOT updated.'
-         format.html { render :action => "edit" }
-       end
-     end
+    @project.is_private = params[:project][:is_private].to_i
+    @project.description = params[:project][:description]
+    @project.publish_to_his = params[:project][:publish_to_his].to_i
+    respond_to do |format|
+      if @project.save
+        flash[:notice] = 'Project was successfully updated.'
+        format.json do
+          render :json => @project.as_json, :callback => params[:jsoncallback]
+        end
+        format.html {render :action => "edit"}
+      else
+        flash[:error] = 'Project was NOT updated.'
+        format.html { render :action => "edit" }
+      end
+    end
   end
+  
   def index
     ### PUBLIC & USER PROJECTS ###
     @projects = Project.all(:is_private=>false)
@@ -100,10 +102,11 @@ class ProjectsController < InheritedResources::Base
       end
     }
     
+    #### CV referenced fields
     @sites.each{ |site| 
       vert_datum = site.vertical_datum.nil? ? '' : site.vertical_datum.term.to_s
       local_proj = site.local_projection.nil? ? '' : site.local_projection.term.to_s
-      @site_ref << {:vert_datum=>vert_datum, :local_proj=>local_proj}
+      @site_ref << {:vertical_datum=>vert_datum, :local_projection=>local_proj}
     }
     
     @sites.each{ |site| 
@@ -155,6 +158,10 @@ class ProjectsController < InheritedResources::Base
       }
       @site_samps << @temp_array
     }
+    
+    #### CV stuff
+    @vartical_datum_items = Voeis::VerticalDatumCV.all(:order => [:term.asc])
+    @local_projection_items = Voeis::LocalProjectionCV.all(:order => [:term.asc])
     
     @current_data = Array.new
     @items = Array.new

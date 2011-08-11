@@ -49,6 +49,16 @@ class SitePane2Widget < Apotomo::Widget
       @site_samps << @temp_array
     }
     
+    #### CV stuff
+    @vertical_datum_items = []
+    @local_projection_items = []
+    @vertical_datums = Voeis::VerticalDatumCV.all(:order => [:term.asc])
+    #@vertical_datums_local = @project.managed_repository{Voeis::VerticalDatumCV.all(:order => [:term.asc])}
+    @local_projections = Voeis::LocalProjectionCV.all(:order => [:term.asc])
+    #@local_projections_local = @project.managed_repository{Voeis::LocalProjectionCV.all(:order => [:term.asc])}
+    @vertical_datums.each { |item| @vertical_datum_items << [item.term, item.id.to_s] }
+    @local_projections.each { |item| @local_projection_items << [item.term, item.id.to_s] }
+    
     render
   end
   

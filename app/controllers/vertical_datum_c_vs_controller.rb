@@ -4,7 +4,7 @@ class VerticalDatumCVsController < ApplicationController
 
   # GET /variables/new
   def new
-    @vertical_datum = parent.managed_repository{Voeis::VerticalDatumCV.new}
+    @vertical_datum = Voeis::VerticalDatumCV.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -13,8 +13,8 @@ class VerticalDatumCVsController < ApplicationController
   
   # POST /variables
   def create
-    @vertical_datum = parent.managed_repository{Voeis::VerticalDatumCV.new(params[:vertical_datum_c_v])}
-    ###
+    @vertical_datum = Voeis::VerticalDatumCV.new(params[:vertical_datum_c_v])
+    #debugger
     respond_to do |format|
       if @vertical_datum.save
         flash[:notice] = 'Vertical Datum was successfully created.'
