@@ -217,6 +217,7 @@
                 = f.password_field(:password, :label => 'Password', :dojoType => "dijit.form.TextBox")
                 = f.check_box(:remember_me, :dojoType => "dijit.form.CheckBox")
                 = f.submit("Login", :label => "Login", :dojoType => "dijit.form.Button")
+                %br
                 = link_to("Forgot My Password", reset_password_users_path)
         = yield :toolbar
                 
