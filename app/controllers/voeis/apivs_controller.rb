@@ -173,6 +173,7 @@ class Voeis::ApivsController < Voeis::BaseController
    #   
    # end
   # 
+  #curl -F datafile=@CR1000_BigSky_Weather_small2.csv	 -F data_template_id=1 http://localhost:3000/projects/cfee5aec-c520-11e0-a45c-c82a14fffebf/apivs/upload_logger_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
   # curl -F datafile=@matt1item.csv -F data_template_id=19 -F start_line=1 -F  api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_logger_data.json?
   # curl -F datafile=@YB_Hill.csv -F data_template_id=26 http://voeis.msu.montana.edu/projects/a459c38c-f288-11df-b176-6e9ffb75bc80/apivs/upload_logger_data.json?api_key=3b62ef7eda48955abc77a7647b4874e543edd7ffc2bb672a40215c8da51f6d09
   
@@ -221,11 +222,12 @@ class Voeis::ApivsController < Voeis::BaseController
               start_line = params[:start_line].to_i
             end
             lines =0
-            File.open(@new_file, 'r') do |file|
-              file.each_line do |line|
-                lines +=1
-              end
-            end
+            CSV.foreach(@new_file){|row| lines +=1}
+            # File.open(@new_file, 'r') do |file|
+            #               file.each_line do |line|
+            #                 lines +=1
+            #               end
+            #             end
             if lines < start_line
               @msg = @msg + " Your start_line: #{start_line} for file parsing is beyond the end of the file."
             end
@@ -246,7 +248,7 @@ class Voeis::ApivsController < Voeis::BaseController
             logger.info {e.to_s}
             logger.info {"YEAH"}
           #problem parsing file
-          flash_error[:error] = @msg
+          flash_error[:error] = @msg + e.message
           logger.info {@msg}
         end
       #parent.publish_his
@@ -485,7 +487,7 @@ class Voeis::ApivsController < Voeis::BaseController
          @var_hash = Hash.new
          @var_hash = var.as_json
          if !var.sensor_types.first.nil?
-           @var_hash = @var_hash.merge({'time_series_data' => @site.sensor_types.sensor_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time) & var.sensor_types.sensor_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time)})
+           @var_hash = @var_hash.merge({'time_series_data' => @site.sensor_types.data_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time) & var.sensor_types.sensor_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time)})
          end
          @var_hash = @var_hash.merge({'sample_data' => var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
          @values << @var_hash
@@ -788,8 +790,9 @@ class Voeis::ApivsController < Voeis::BaseController
           @var_hash = Hash.new
           @var_hash = @var.as_json
           if !@var.sensor_types.first.nil?
-            @var_hash = @var_hash.merge({'time_series_data' =>  @var.sensor_types.sensor_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time) & @site.sensor_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time)})
-            @var_hash = @var_hash.merge({'sample_data' => @var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time) & @site.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+            # @var_hash = @var_hash.merge({'time_series_data' =>  @var.sensor_types.sensor_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time) & @site.sensor_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time)})
+            # @var_hash = @var_hash.merge({'sample_data' => @var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time) & @site.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+            @var_hash = @var_hash.merge({'data' => @var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time) & @site.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
             @values << @var_hash
           end
           @data_values[:variable] = @values
