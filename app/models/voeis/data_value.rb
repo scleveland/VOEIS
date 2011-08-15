@@ -19,6 +19,7 @@ class Voeis::DataValue
   property :published,                  Boolean,  :required => false
   
   yogo_versioned
+  timestamps :at
   
   has 1, :site,       :model => "Voeis::Site",     :through => Resource
   has 1,:source,       :model => "Voeis::Source",       :through => Resource
@@ -109,7 +110,7 @@ class Voeis::DataValue
     #end
     total_records = 0
     data_value = Voeis::DataValue.last(:order =>[:id.asc]) 
-    if starting_id == -9999  && !Voeis::DatarValue.first(:order => [:id.asc]).nil?
+    if starting_id == -9999  && !Voeis::DataValue.first(:order => [:id.asc]).nil?
       total_records = data_value.id - Voeis::DataValue.first(:order => [:id.asc]).id
     elsif !Voeis::DataValue.last(:order =>[:id.asc]).nil? 
       total_records = data_value.id - starting_id
