@@ -38,7 +38,7 @@ task :production do
   set :repository,  "git://github.com/yogo/VOEIS.git"
   set :shell, "/bin/bash"
   
-  set :branch, "1.1-release"
+  set :branch, "master"
   set :deploy_via, :remote_cache
   set :copy_exclude, [".git"]
   
