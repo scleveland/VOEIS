@@ -143,16 +143,22 @@
 18
 19
 20
-21</pre>
+21
+22
+23
+24</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'lib/yogo/versioned.rb', line 6</span>
 
 <span class='kw'>def</span> <span class='id yogo_versioned'>yogo_versioned</span>
   <span class='comment'># Add properties required for versioning
-</span>  <span class='id property'>property</span> <span class='symbol'>:updated_at</span><span class='comma'>,</span>          <span class='op'>::</span><span class='const'>DataMapper</span><span class='op'>::</span><span class='const'>Property</span><span class='op'>::</span><span class='const'>DateTime</span>
-  <span class='id property'>property</span> <span class='symbol'>:updated_by</span><span class='comma'>,</span>          <span class='op'>::</span><span class='const'>DataMapper</span><span class='op'>::</span><span class='const'>Property</span><span class='op'>::</span><span class='const'>Integer</span>
+</span>  <span class='id property'>property</span> <span class='symbol'>:updated_at</span><span class='comma'>,</span>          <span class='op'>::</span><span class='const'>DataMapper</span><span class='op'>::</span><span class='const'>Property</span><span class='op'>::</span><span class='const'>DateTime</span><span class='comment'>#, :key=&gt;true, :default=&gt;DateTime.now
+</span>  <span class='id property'>property</span> <span class='symbol'>:updated_by</span><span class='comma'>,</span>          <span class='op'>::</span><span class='const'>DataMapper</span><span class='op'>::</span><span class='const'>Property</span><span class='op'>::</span><span class='const'>Integer</span>
   <span class='id property'>property</span> <span class='symbol'>:updated_comment</span><span class='comma'>,</span>     <span class='op'>::</span><span class='const'>DataMapper</span><span class='op'>::</span><span class='const'>Property</span><span class='op'>::</span><span class='const'>Text</span>
+  <span class='id property'>property</span> <span class='symbol'>:created_at</span><span class='comma'>,</span>          <span class='op'>::</span><span class='const'>DataMapper</span><span class='op'>::</span><span class='const'>Property</span><span class='op'>::</span><span class='const'>DateTime</span><span class='comma'>,</span> <span class='symbol'>:required</span> <span class='op'>=&gt;</span> <span class='kw'>false</span>
+  <span class='id property'>property</span> <span class='symbol'>:deleted_at</span><span class='comma'>,</span>          <span class='op'>::</span><span class='const'>DataMapper</span><span class='op'>::</span><span class='const'>Property</span><span class='op'>::</span><span class='const'>ParanoidDateTime</span>
+  <span class='id timestamps'>timestamps</span> <span class='symbol'>:created_at</span>
 
   <span class='comment'># Register before save hooks
 </span>  <span class='id before'>before</span><span class='lparen'>(</span><span class='symbol'>:save</span><span class='rparen'>)</span> <span class='kw'>do</span>
@@ -174,7 +180,7 @@
 </div>
     
     <div id="footer">
-  Generated on Wed Jul 27 00:33:38 2011 by 
+  Generated on Tue Aug 16 11:28:19 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>
