@@ -272,13 +272,13 @@ Returns the last updated sensor value
       <pre class="lines">
 
 
-33
 34
 35
-36</pre>
+36
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/sensor_value.rb', line 33</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/sensor_value.rb', line 34</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id last_updated'>last_updated</span>
   <span class='id lu'>lu</span> <span class='op'>=</span> <span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:order</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:timestamp</span><span class='period'>.</span><span class='id desc'>desc</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -392,7 +392,6 @@ Yogo Team
       <pre class="lines">
 
 
-54
 55
 56
 57
@@ -450,10 +449,11 @@ Yogo Team
 109
 110
 111
-112</pre>
+112
+113</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/sensor_value.rb', line 54</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/sensor_value.rb', line 55</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id parse_logger_csv'>parse_logger_csv</span><span class='lparen'>(</span><span class='id csv_file'>csv_file</span><span class='comma'>,</span> <span class='id data_stream_template_id'>data_stream_template_id</span><span class='comma'>,</span> <span class='id site_id'>site_id</span><span class='comma'>,</span> <span class='id start_line'>start_line</span><span class='op'>=</span><span class='kw'>nil</span><span class='rparen'>)</span>
   <span class='comment'>#Determine how the time is stored
@@ -622,7 +622,6 @@ Yogo Team
       <pre class="lines">
 
 
-130
 131
 132
 133
@@ -668,10 +667,11 @@ Yogo Team
 173
 174
 175
-176</pre>
+176
+177</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/sensor_value.rb', line 130</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/sensor_value.rb', line 131</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id parse_logger_row'>parse_logger_row</span><span class='lparen'>(</span><span class='id data_timestamp_col'>data_timestamp_col</span><span class='comma'>,</span> <span class='id data_stream_id'>data_stream_id</span><span class='comma'>,</span> <span class='id vertical_offset_col'>vertical_offset_col</span><span class='comma'>,</span> <span class='id date_col'>date_col</span><span class='comma'>,</span> <span class='id time_col'>time_col</span><span class='comma'>,</span> <span class='id row'>row</span><span class='comma'>,</span> <span class='id site'>site</span><span class='comma'>,</span> <span class='id data_col_array'>data_col_array</span><span class='comma'>,</span> <span class='id sensor_cols'>sensor_cols</span><span class='rparen'>)</span>
   <span class='id name'>name</span> <span class='op'>=</span> <span class='int'>2</span>
@@ -744,12 +744,12 @@ Yogo Team
       <pre class="lines">
 
 
-28
 29
-30</pre>
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/sensor_value.rb', line 28</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/sensor_value.rb', line 29</span>
 
 <span class='kw'>def</span> <span class='id name'>name</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id sensor_type'>sensor_type</span><span class='period'>.</span><span class='id name'>name</span>
@@ -764,7 +764,7 @@ Yogo Team
 </div>
     
     <div id="footer">
-  Generated on Wed Jul 27 00:33:39 2011 by 
+  Generated on Tue Aug 16 11:28:21 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>
