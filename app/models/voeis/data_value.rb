@@ -19,7 +19,7 @@ class Voeis::DataValue
   property :published,                  Boolean,  :required => false
   
   yogo_versioned
-  timestamps :at
+  #timestamps :at
   
   has 1, :site,       :model => "Voeis::Site",     :through => Resource
   has 1,:source,       :model => "Voeis::Source",       :through => Resource
@@ -164,7 +164,8 @@ class Voeis::DataValue
                    sample_datetime.day,sample_datetime.hour,sample_datetime.min,
                    sample_datetime.sec, (data_stream.utc_offset+dst_time)/24.to_f)
     #if t = Date.parse(timestamp) rescue nil?
-    #if (Voeis::DataValue.first(:local_date_time => timestamp) &  Voeis::Variable.get(data_col_array[variable_cols[0]][variable].id).data_values).nil?
+    #if (Voeis::DataValue.first(:local_date_time => timestamp) & 
+    if Voeis::Variable.get(data_col_array[variable_cols[0]][variable].id).data_values.first(:datatype=>data_stream.type, :local_date_time=>timestamp).nil?
           created_at = updated_at = Time.now.strftime("%Y-%m-%dT%H:%M:%S%z")
           row_values = []
           (0..row.size-1).each do |i|
@@ -222,7 +223,7 @@ class Voeis::DataValue
                }.join(',')
                repository.adapter.execute(sql)
            end
-        #end#end if
+        end#end if
 
     end
   end
