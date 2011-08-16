@@ -4,6 +4,7 @@
   :javascript
     dojo.require("dojox.grid.EnhancedGrid");
     dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+    dojo.require("dojox.layout.ContentPane");
     dojo.require("dojo.data.ItemFileReadStore");
     dojo.require("dojo.store.Memory");
     dojo.require("voeis.Server");
@@ -117,6 +118,11 @@
         	executeScripts: true,
       	  ioArgs: { headers: {"Accept": "text/html"} },
           store: voeis.Server.DEFAULT,
+          onDownloadEnd: function(){
+            console.log('load-done-NOW: ');
+            console.log('TEST-'+TEST);
+            graphInit(varId,varName);
+          },
           href: "/projects/"+projectId+"/variables/"+varId+".html?&site_id="+siteId});
         tabs.addChild(varPane);
       };
