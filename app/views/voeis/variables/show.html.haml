@@ -64,7 +64,7 @@
           #{@variable[prop.name]}
   
   -if @site
-    #placeholder{:style=>"width:300px;height:150px;margin:0 0 25px 50px;float:left;border:1px solid blue;"}
+    %div{:id=> "graph" + @variable.id.to_s,:style=>"width:300px;height:150px;margin:0 0 25px 50px;float:left;"}
     %br
     %br
     
@@ -118,7 +118,7 @@
       TEST2 = '#{@TEST}';
       var gdata = #{@graph_data.to_json};
       //var gdata = #{@variable.last_ten_values_graph(@site).to_json};
-      gdata = {};
+      //gdata = {};
 
       //graphInit();
       var graphInit = function(varId,varName) {
@@ -135,7 +135,7 @@
           console.debug(gdata);
           console.log('GDATA= ', gdata);
           console.log('TEST=', TEST);
-          var plot = $.plot($("#placeholder"), [gdata],{
+          var plot = $.plot($("#graph#{@variable.id.to_s}"), [gdata],{
               series: {
                   color : "blue",
                   lines: { show: true },
@@ -172,7 +172,7 @@
       //NOTE-- the time string for #x is in UTC format and currently is in GMT time
       var handleGraph = function(variable_name) {
           var previousPoint = null;
-          $("#placeholder").bind("plothover", function (event, pos, item) {
+          $("#graph #{@variable.id.to_s}").bind("plothover", function (event, pos, item) {
               var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
               dDate = new Date();
               dDate.setTime(mEpoch);
