@@ -5,7 +5,7 @@ class Voeis::SpatialOffsetType
   property :id,                 Serial
   property :type,               String, :required =>true, :length=> 512, :default=>"empty"
   
-  timestamps :at
+  #timestamps :at
   yogo_versioned
  
   has n, :spatial_offsets, :model => "Voeis::SpatialOffset", :through => Resource

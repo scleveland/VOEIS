@@ -26,7 +26,7 @@ class Voeis::FieldMethod
   property :method_link,        Text,   :required => false
   property :his_id,             Integer,:required => false
   
-  timestamps :at
+  #timestamps :at
   yogo_versioned
  
   has n, :variables, :model => "Voeis::Variable", :through => Resource

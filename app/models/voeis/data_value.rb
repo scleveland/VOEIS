@@ -19,6 +19,7 @@ class Voeis::DataValue
   property :published,                  Boolean,  :required => false
   
   yogo_versioned
+  #timestamps :at
   
   has 1, :site,       :model => "Voeis::Site",     :through => Resource
   has 1,:source,       :model => "Voeis::Source",       :through => Resource
@@ -71,6 +72,8 @@ class Voeis::DataValue
     end
     #site = Voeis::Site.get(site_id)
     data_col_array = Array.new
+    sensor_col_array = Array.new
+    sensor_cols = Array.new
     variable_cols = Array.new
     sample_id = -1
     Voeis::DataStream.get(data_stream_template_id).data_stream_columns.each do |col|
@@ -79,6 +82,10 @@ class Voeis::DataValue
         variable_cols << col.column_number
       elsif col.name ==  "SampleID"
         sample_id = col.column_number
+      end
+      sensor_col_array[col.column_number] = [col.sensor_types.first, col.unit, col.name]
+      if col.name != "ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "Vertical-Offset"
+        sensor_cols << col.column_number
       end
     end
     
@@ -99,7 +106,7 @@ class Voeis::DataValue
         if !row.empty?        
         Rails.logger.info '#{row.join(', ')}'
         #puts row.join(', ')
-          parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col)
+          parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols)
         else 
           #puts "EMPTY ROW"
         end
@@ -109,7 +116,7 @@ class Voeis::DataValue
     #end
     total_records = 0
     data_value = Voeis::DataValue.last(:order =>[:id.asc]) 
-    if starting_id == -9999  && !Voeis::DatarValue.first(:order => [:id.asc]).nil?
+    if starting_id == -9999  && !Voeis::DataValue.first(:order => [:id.asc]).nil?
       total_records = data_value.id - Voeis::DataValue.first(:order => [:id.asc]).id
     elsif !Voeis::DataValue.last(:order =>[:id.asc]).nil? 
       total_records = data_value.id - starting_id
@@ -135,10 +142,11 @@ class Voeis::DataValue
   # @author Yogo Team
   #
   # @api public
-  def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col)
+  def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array,sensor_cols)
     require 'chronic'  #for robust timestamp parsing
     name = 2
     variable = 0
+    sensor = 0
     unit = 1
     #Voeis::SensorValue.transaction do
     #timestamp = (data_timestamp_col == "") ? Time.parse(row[date_col].to_s + ' ' + row[time_col].to_s).strftime("%Y-%m-%dT%H:%M:%S%z") : row[data_timestamp_col.to_i]
@@ -156,7 +164,8 @@ class Voeis::DataValue
                    sample_datetime.day,sample_datetime.hour,sample_datetime.min,
                    sample_datetime.sec, (data_stream.utc_offset+dst_time)/24.to_f)
     #if t = Date.parse(timestamp) rescue nil?
-    #if (Voeis::DataValue.first(:local_date_time => timestamp) &  Voeis::Variable.get(data_col_array[variable_cols[0]][variable].id).data_values).nil?
+    #if (Voeis::DataValue.first(:local_date_time => timestamp) & 
+    if Voeis::Variable.get(data_col_array[variable_cols[0]][variable].id).data_values.first(:datatype=>data_stream.type, :local_date_time=>timestamp).nil?
           created_at = updated_at = Time.now.strftime("%Y-%m-%dT%H:%M:%S%z")
           row_values = []
           (0..row.size-1).each do |i|
@@ -191,6 +200,7 @@ class Voeis::DataValue
               "(#{result_ids[i]},#{source.id})"
             }.join(',')
             repository.adapter.execute(sql)
+            
             if sample_id != -1
               sample_value=[]
               sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\") VALUES "
@@ -206,8 +216,14 @@ class Voeis::DataValue
               sql = "INSERT INTO \"voeis_sample_sites\" (\"sample_id\",\"site_id\") VALUES "
               sql << "(#{newsample_id.insert_id},#{site_id})"
               repository.adapter.execute(sql)
+            else
+               sql = "INSERT INTO \"voeis_data_value_sensor_types\" (\"data_value_id\",\"sensor_type_id\") VALUES "
+               sql << (0..result_ids.length-1).collect{|i|
+                 "(#{result_ids[i]},#{sensor_col_array[sensor_cols[i]][sensor].id})"
+               }.join(',')
+               repository.adapter.execute(sql)
            end
-        #end#end if
+        end#end if
 
     end
   end

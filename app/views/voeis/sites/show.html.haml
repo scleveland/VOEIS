@@ -53,16 +53,8 @@
 -#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"margin-top:0;padding-top:0;"}
 -##tab_browser{:style=>"margin-top:0;padding-top:0;width:700px;"}
 .show{:dojoType=>"dijit.layout.ContentPane", :title=>@site.name, :style=>"margin-top:0;padding-top:0;"}
-  %table
-    %tr
-      %td{:style=>"width:200px;"}
-        %b SHOW DETAILS:
 
-      -#%td
-        -#= link_to('CANCEL', project_path(@project), :class => 'icon icon-cancel') 
-        -#= link_to('CANCEL', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
   %br
-
   %table{:id => "property-table", :style=>'width:80%;float:left;'}
     - @site_properties.each do |prop|
       %tr{:class=>"row#{cycle('1','0')}"}
@@ -74,7 +66,7 @@
 
   %br{:style=>'float:none; clear:both;'}
   %br
-  %table{:id=>'stats', :class=>'', :style=>'width:80%; padding:0; float:left; margin-left:10px;'}
+  %table{:id=>'stats', :class=>'', :style=>'width:40%; padding:0; float:left; margin-left:10px;'}
     %tr
       %td
         %h4{:style=>'margin-top:0;'}
@@ -100,7 +92,7 @@
           %td
             %b
               -#= link_to(var.variable_name, project_variable_path(@project,var.id)) 
-              = link_to(var.variable_name, "javascript:", :onclick=>"dojo.publish('voeis/project/variable/tab', ['#{@project.id}',#{var.id},'#{var.variable_name}']);")
+              = link_to(var.variable_name, "javascript:", :onclick=>"dojo.publish('voeis/project/variable/tab', ['#{@project.id}',#{var.id},'#{var.variable_name}',#{@site.id}]);")
           - if !var_stats.nil?
             %td
               -#= 'ID = %s'%var.id

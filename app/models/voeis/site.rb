@@ -133,7 +133,7 @@ class Voeis::Site
       sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{var.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{self.id}"
       results = repository.adapter.select(sql)
       if results.length > 0
-        entry.record_number = entry.record_number + results.length
+        entry.record_number = results.length
         sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time"
         dresults = repository.adapter.select(sql)
         entry.starting_timestamp = dresults.first[:local_date_time]#(var.data_values & self.data_values).first(:order=>[:local_date_time]).local_date_time
@@ -152,7 +152,7 @@ class Voeis::Site
       sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{var.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{self.id}"
       results = repository.adapter.select(sql)
       if results.length > 0
-        entry.record_number = entry.record_number + results.length
+        entry.record_number = results.length
         sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time"
         dresults = repository.adapter.select(sql)
         entry.starting_timestamp = dresults.first[:local_date_time]#(var.data_values & self.data_values).first(:order=>[:local_date_time]).local_date_time

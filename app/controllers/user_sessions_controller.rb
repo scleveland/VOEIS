@@ -15,7 +15,7 @@ class UserSessionsController < ApplicationController
   #
   # @api public
   def show
-    redirect_to login_url
+    redirect_to(:back)# login_url
   end
 
   ##
@@ -31,7 +31,8 @@ class UserSessionsController < ApplicationController
   #
   # @api public
   def new
-    render :action => 'new'
+    redirect_to(:back)
+    #render :action => 'new'
   end
 
   ##
@@ -62,12 +63,16 @@ class UserSessionsController < ApplicationController
   #
   # @api public
   def create
+    flash[:error] = "Invalid Login Credentials!"
     if authenticate!
       flash[:notice] = "Login successful!"
-      redirect_back_or_default root_url
+      flash[:error] = ""
+      #redirect_back_or_default root_url
     else
-      render :action => :new
+      #render :action => :new
+      flash[:error] = "Invalid Login Credentials!"
     end
+    redirect_to(:back)
   end
   
   ##

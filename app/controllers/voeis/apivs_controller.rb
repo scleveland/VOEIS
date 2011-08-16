@@ -173,6 +173,7 @@ class Voeis::ApivsController < Voeis::BaseController
    #   
    # end
   # 
+  #curl -F datafile=@CR1000_2_BigSky_NFork.csv	 -F data_template_id=2 http://localhost:3000/projects/cfee5aec-c520-11e0-a45c-c82a14fffebf/apivs/upload_logger_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
   # curl -F datafile=@matt1item.csv -F data_template_id=19 -F start_line=1 -F  api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_logger_data.json?
   # curl -F datafile=@YB_Hill.csv -F data_template_id=26 http://voeis.msu.montana.edu/projects/a459c38c-f288-11df-b176-6e9ffb75bc80/apivs/upload_logger_data.json?api_key=3b62ef7eda48955abc77a7647b4874e543edd7ffc2bb672a40215c8da51f6d09
   
@@ -221,11 +222,12 @@ class Voeis::ApivsController < Voeis::BaseController
               start_line = params[:start_line].to_i
             end
             lines =0
-            File.open(@new_file, 'r') do |file|
-              file.each_line do |line|
-                lines +=1
-              end
-            end
+            CSV.foreach(@new_file){|row| lines +=1}
+            # File.open(@new_file, 'r') do |file|
+            #               file.each_line do |line|
+            #                 lines +=1
+            #               end
+            #             end
             if lines < start_line
               @msg = @msg + " Your start_line: #{start_line} for file parsing is beyond the end of the file."
             end
@@ -246,7 +248,7 @@ class Voeis::ApivsController < Voeis::BaseController
             logger.info {e.to_s}
             logger.info {"YEAH"}
           #problem parsing file
-          flash_error[:error] = @msg
+          flash_error[:error] = @msg + e.message
           logger.info {@msg}
         end
       #parent.publish_his
@@ -484,10 +486,8 @@ class Voeis::ApivsController < Voeis::BaseController
        @site.variables. each do |var|
          @var_hash = Hash.new
          @var_hash = var.as_json
-         if !var.sensor_types.first.nil?
-           @var_hash = @var_hash.merge({'time_series_data' => @site.sensor_types.sensor_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time) & var.sensor_types.sensor_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time)})
-         end
-         @var_hash = @var_hash.merge({'sample_data' => var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+         @var_hash = @var_hash.merge({'time_series_data' => @site.data_values.all(:datatype=>"Sensor",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)}) 
+         @var_hash = @var_hash.merge({'sample_data' => @site.data_values.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
          @values << @var_hash
        end
        @data_values[:variables] = @values
@@ -521,11 +521,11 @@ class Voeis::ApivsController < Voeis::BaseController
      if @site.nil?
         @data_values[:error] = "There is no Site with ID:"+ params[:site_id].to_s
      else
-       @site.sensor_types.each do |sensor|
-         var = sensor.variables.first
+       @site.variables.each do |var|
+         #var = sensor.variables.first
          @var_hash = Hash.new
          @var_hash = var.as_json
-         @var_hash = @var_hash.merge({'data' =>       sensor.sensor_values.last(:order => [:timestamp.asc]).as_json}) 
+         @var_hash = @var_hash.merge({'data' => (var.data_values(:datatype=>"Sensor",:order => [:local_date_time.asc]) & @site.data_values).last.as_json}) 
          @values << @var_hash
        end
        @data_values[:variables] = @values
@@ -537,6 +537,43 @@ class Voeis::ApivsController < Voeis::BaseController
     end
   end
   
+  # pulls data from a within a project's site for samples only
+  #
+  # @example URL
+  # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  #
+  #
+  # @param [Integer] :site_id the id of the site to pull data for
+  # 
+  #
+  #
+  # @author Sean Cleveland
+  #
+  # @api public
+  def get_project_site_sample_data_last_update    
+   @site = ""
+   @data_values = Hash.new
+   @values = Array.new
+   parent.managed_repository do
+     @site= Voeis::Site.get(params[:site_id].to_i)
+     if @site.nil?
+        @data_values[:error] = "There is no Site with ID:"+ params[:site_id].to_s
+     else
+       @site.variables.each do |var|
+         #var = sensor.variables.first
+         @var_hash = Hash.new
+         @var_hash = var.as_json
+         @var_hash = @var_hash.merge({'data' => (var.data_values(:datatype=>"Sample",:order => [:local_date_time.asc]) & @site.data_values).last.as_json}) 
+         @values << @var_hash
+       end
+       @data_values[:variables] = @values
+       @data_values[:site] = @site.as_json
+     end
+     respond_to do |format|
+       format_response(@data_values, format)
+     end
+    end
+  end
   
   # pulls data from a within a project's site
   #
@@ -559,7 +596,7 @@ class Voeis::ApivsController < Voeis::BaseController
    @values = Array.new
    parent.managed_repository do
      @site= Voeis::Site.get(params[:site_id].to_i)
-     @variable = Voeis::Variable.get(params[:variable_id])
+     @variable = Voeis::Variable.get(params[:variable_id].to_i)
      @data_values[:site] = @site.as_json
      if @site.nil?
         @data_values[:error] = "There is no Site with ID:"+ params[:site_id].to_s
@@ -568,14 +605,14 @@ class Voeis::ApivsController < Voeis::BaseController
      elsif params[:start_datetime].nil? || params[:end_datetime].nil?
         @data_values[:error] = "The start and end times must not be null"
      else
-       sensors = @variable.sensor_types & @site.sensor_types
-       sensor=sensors.first
-       if sensor.nil?
-        @data_values[:error] = "There are no Sensor Value for this site and variable combination"
-       else
-         @data_values[:variable] = @variable
-         @data_values[:data] = Voeis::SensorValue.all(:sensor_id=>sensor.id,:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time, :order => [:timestamp.asc]).as_json 
-       end
+       #sensors = @variable.sensor_types & @site.sensor_types
+       #sensor=sensors.first
+       #if sensor.nil?
+      #  @data_values[:error] = "There are no Sensor Value for this site and variable combination"
+      # else
+         @data_values[:variable] = @variable.as_json
+         @data_values[:data] = (@site.data_values & @variable.data_values).all(:datatype=>"Sensor", :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :order => [:local_date_time.asc]).as_json 
+       #end
      end
      respond_to do |format|
        format_response(@data_values, format)
@@ -583,6 +620,50 @@ class Voeis::ApivsController < Voeis::BaseController
     end
   end
   
+  # pulls data from a within a project's site for samples only
+  #
+  # @example URL
+  # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  #
+  #
+  # @param [Integer] :site_id the id of the site to pull data for
+  # @param [Integer] :variable_id the id of the variable to get sensor values for
+  # @param [DateTime] :start_datetime pull data after this datetime
+  # @param [DateTime] :end_datetime pull date before this datetime
+  #
+  #
+  # @author Sean Cleveland
+  #
+  # @api public
+  def get_project_site_sample_values_by_variable    
+   @site = ""
+   @data_values = Hash.new
+   @values = Array.new
+   parent.managed_repository do
+     @site= Voeis::Site.get(params[:site_id].to_i)
+     @variable = Voeis::Variable.get(params[:variable_id].to_i)
+     @data_values[:site] = @site.as_json
+     if @site.nil?
+        @data_values[:error] = "There is no Site with ID:"+ params[:site_id].to_s
+     elsif @variable.nil?
+        @data_values[:error] = "There is no Variable with ID:"+ params[:variable_id].to_s
+     elsif params[:start_datetime].nil? || params[:end_datetime].nil?
+        @data_values[:error] = "The start and end times must not be null"
+     else
+       #sensors = @variable.sensor_types & @site.sensor_types
+       #sensor=sensors.first
+       #if sensor.nil?
+      #  @data_values[:error] = "There are no Sensor Value for this site and variable combination"
+      # else
+         @data_values[:variable] = @variable.as_json
+         @data_values[:data] = (@site.data_values & @variable.data_values).all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :order => [:local_date_time.asc]).as_json 
+       #end
+     end
+     respond_to do |format|
+       format_response(@data_values, format)
+     end
+    end
+  end
   
   # create_project_site
   # API for creating a new site within in a project
@@ -741,15 +822,13 @@ class Voeis::ApivsController < Voeis::BaseController
       else
         @var_hash = Hash.new
         @var_hash = @var.as_json
-        if !@var.sensor_types.first.nil?
-          @var_hash = @var_hash.merge({'time_series_data' =>  @var.sensor_types.sensor_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time)})
-          @var_hash = @var_hash.merge({'sample_data' => @var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
-          @values << @var_hash
-        end
+        @var_hash = @var_hash.merge({'time_series_data'=>  @var.data_values.all(:datatype=>"Sensor", :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+        @var_hash = @var_hash.merge({'sample_data' => @var.data_values.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+        @values << @var_hash
         @data_values[:variable] = @values
         @data_values[:project] = parent.as_json
-      end
-    end
+      end#end if
+    end #end repo
     respond_to do |format|
       format_response(@data_values, format)
     end
@@ -779,23 +858,23 @@ class Voeis::ApivsController < Voeis::BaseController
     parent.managed_repository do
       @site = Voeis::Site.get(params[:site_id].to_i)
       if @site.nil?
-        @data_values[:error] = "There is no site with the ID:"+params[:site_id]
+        @data_values[:error] = "There is no site with the ID:" + params[:site_id]
       else
         @var= Voeis::Variable.get(params[:variable_id].to_i)
         if @var.nil?
-          @data_values[:error] = "There is no variable with the ID:"+params[:variable_id]
+          @data_values[:error] = "There is no variable with the ID:" + params[:variable_id]
         else
           @var_hash = Hash.new
           @var_hash = @var.as_json
-          if !@var.sensor_types.first.nil?
-            @var_hash = @var_hash.merge({'time_series_data' =>  @var.sensor_types.sensor_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time) & @site.sensor_values.all(:timestamp.gte => params[:start_datetime].to_time, :timestamp.lte => params[:end_datetime].to_time)})
-            @var_hash = @var_hash.merge({'sample_data' => @var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time) & @site.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
-            @values << @var_hash
-          end
+          #if !@var.sensor_types.first.nil?
+          @var_hash = @var_hash.merge({'time_series_data'=>  (@var.data_values + @site.data_values).all(:datatype=>"Sensor", :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+          @var_hash = @var_hash.merge({'sample_data' => (@var.data_values + @site.data_values).all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+            #@var_hash = @var_hash.merge({'data' => @var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time) & @site.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})  
+        end
+          @values << @var_hash
           @data_values[:variable] = @values
           @data_values[:site] = @site
           @data_values[:project] = parent.as_json
-        end
       end
     end
     respond_to do |format|

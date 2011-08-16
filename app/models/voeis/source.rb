@@ -18,7 +18,7 @@ class Voeis::Source
   property :citation,           String,  :required => true, :default => "Unknown", :length => 512
   property :metadata_id,        Integer, :required => true, :default => 0
 
-  timestamps :at
+  #timestamps :at
   
   yogo_versioned
   
