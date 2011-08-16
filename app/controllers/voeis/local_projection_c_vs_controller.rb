@@ -1,4 +1,4 @@
-class LocalProjectionCVsController < ApplicationController
+class Voeis::LocalProjectionCVsController < Voeis::BaseController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
 

@@ -1,4 +1,4 @@
-class VerticalDatumCVsController < ApplicationController
+class Voeis::VerticalDatumCVsController < Voeis::BaseController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
 
