@@ -176,7 +176,7 @@
       %td
         = f.select('vertical_datum',  options_for_select(@vertical_datum_items), :class=>"form-dropdown")
       %td{:style=>"padding-top:20px;"}
-        = link_to('NEW', 'javascript:', :onclick=>"dijit.byId('site_new_local_projection').show();")
+        = link_to('NEW', 'javascript:', :onclick=>"dijit.byId('site_new_vertical_datum').show();")
         -#= link_to('NEW', 'javascript:', :onclick=>"$('#edit-site00 .hide-row').hide();$('#site00_new_vertical_datum_row').show();")
     %tr
       %td
