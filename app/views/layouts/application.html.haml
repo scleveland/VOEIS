@@ -121,8 +121,9 @@
           %div{:dojoType => "dijit.Menu"}
             = link_to("Home", '/', :dojoType => "yogo.ui.MenuLink")
             = link_to("About", page_url(:about), :dojoType => "yogo.ui.MenuLink")
-            = link_to("Help", page_url(:help), :dojoType => "yogo.ui.MenuLink")      
-
+            = link_to("Help", page_url(:help), :dojoType => "yogo.ui.MenuLink")  
+            = link_to("Developers", "/doc/yard/", :dojoType => "yogo.ui.MenuLink") 
+            
         #projectsButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
           %span{:style => "font-weight:bold"}
             Projects
