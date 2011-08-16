@@ -65,13 +65,15 @@
   
   -if @site
     %div{:id=> "graph" + @variable.id.to_s,:style=>"width:300px;height:150px;margin:0 0 25px 50px;float:left;"}
+
+    
     %br
     %br
     
     -# COLLECTED DATA STATS
     -# COMMENTED OUT because lack of SITE ID to select
     - var_stats = @site_variable_stats.first(:variable_id=>@variable.id)
-    %table{:id => "var-stats-table", :style=>'float:left;margin-left:36px;width:45%'}
+    %table{:id => "var-stats-table", :style=>'float:left;margin-left:5px;width:45%'}
       %tr{:class=>"row#{cycle('0','1')}"}
         %td{:colspan=>2}
           %b
@@ -141,9 +143,8 @@
                   lines: { show: true },
                   points: { show: true }
               },
-
+              ticks: 10,
               grid:  { hoverable: true, clickable: true },
-              xaxis: { mode: "time" },
               xaxis: { mode: "time" },
               pan:   { interactive: true },
               zoom:  { interactive: true }
@@ -156,7 +157,7 @@
       //I would only mess with the css if you really need to otherwise this
       //shouldn't need any modification
       var showTooltip = function(x, y, contents) {
-          $('<div id="tooltip">' + contents + '</div>').css( {
+          $('<div id="tooltip" style="z-index:200;">' + contents + '</div>').css( {
               position: 'absolute',
               display: 'none',
               top: y + 5,
@@ -172,7 +173,7 @@
       //NOTE-- the time string for #x is in UTC format and currently is in GMT time
       var handleGraph = function(variable_name) {
           var previousPoint = null;
-          $("#graph #{@variable.id.to_s}").bind("plothover", function (event, pos, item) {
+          $("#graph#{@variable.id.to_s}").bind("plothover", function (event, pos, item) {
               var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
               dDate = new Date();
               dDate.setTime(mEpoch);
@@ -191,7 +192,7 @@
                       showTooltip(item.pageX, item.pageY,
                       //*****You will need to change the sensor name here to the appropriate one selected above
                           //***dDate.toLocaleString() + " = " + y + " " + "#{@variable.variable_name}|" );
-                          dDate.toLocaleString()+" = "+y+" "+variable_name );
+                          dDate.toLocaleString()+" = "+y+" "+variable_name + "| #{@units.units_name}");
                   };
               } else {
                   $("#tooltip").remove();

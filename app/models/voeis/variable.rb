@@ -160,7 +160,7 @@ class Voeis::Variable
     if results.length != 0
       sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time DESC LIMIT 10"
       dresults = repository.adapter.select(sql)
-      dresults.map{|dv| [dv[:local_date_time].to_datetime.to_i, dv[:data_value]]}
+      dresults.map{|dv| [dv[:local_date_time].to_datetime.to_i*1000, dv[:data_value]]}
     end
   end  
   

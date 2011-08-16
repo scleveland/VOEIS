@@ -23,9 +23,11 @@ class Voeis::VariablesController < Voeis::BaseController
         @site_variable_stats = Voeis::SiteDataCatalog.all(:variable_id=>params[:id].to_i, :site_id=>params[:site_id].to_i)
         @graph_data = @variable.last_ten_values_graph(@site)
         @data = @variable.last_ten_values(@site)
+        
         @TEST = 'TESTING controller'
       end
     }
+    @units = Voeis::Unit.get(@variable.variable_units_id)
     logger.debug('>>>> graph_data = '+@graph_data.to_s)
     logger.debug('>>>> data = '+@data.to_s)
     #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
