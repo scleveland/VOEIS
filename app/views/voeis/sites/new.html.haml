@@ -36,9 +36,10 @@
       var form0 = 'new-site-form';
       var form = dojo.byId(form0);
       console.log('create = ',fn);
+      console.log('POST: ','#{@root_url}');
       data = {};
       data[fn+'_c_v'] = {term: $('#site_'+fn+'_term').val(), definition: $('#site_'+fn+'_definition').val()};
-      $.post("/"+fn+"_c_vs.json", data, function(dat) {
+      $.post("#{root_url}"+fn+"_c_vs.json", data, function(dat) {
         //$.post("#{@root_url}/"+fn+"_c_vs.json", data, function(dat) {
         //save//$('#site00_vertical_datum').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val() + ':' + $("#site00_vertical_datum_definition").val()));
         $('#site_'+fn).append($("<option></option>").attr("value",dat['id']).text($('#site_'+fn+'_term').val()));
