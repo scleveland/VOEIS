@@ -15,14 +15,19 @@ class Voeis::VariablesController < Voeis::BaseController
   def show
     @project = parent
     #@sites = Voeis::Site.all
-    @variable = parent.managed_repository{Voeis::Variable.get(params[:id].to_i)}
-    @sites = parent.managed_repository{Voeis::Site.all}
-    if !params[:site_id].nil?
-      @site =  @project.managed_repository{Voeis::Site.get(params[:site_id].to_i)}
-      @site_variable_stats = @project.managed_repository{Voeis::SiteDataCatalog.all(:variable_id=>params[:id].to_i, :site_id=>params[:site_id].to_i)}
-      @graph_data = @variable.last_ten_values_graph(@site)
-      @data = @variable.last_ten_values(@site)
-    end
+    @project.managed_repository{
+      @variable = Voeis::Variable.get(params[:id].to_i)
+      @sites = Voeis::Site.all
+      if !params[:site_id].nil?
+        @site =  Voeis::Site.get(params[:site_id].to_i)
+        @site_variable_stats = Voeis::SiteDataCatalog.all(:variable_id=>params[:id].to_i, :site_id=>params[:site_id].to_i)
+        @graph_data = @variable.last_ten_values_graph(@site)
+        @data = @variable.last_ten_values(@site)
+        @TEST = 'TESTING controller'
+      end
+    }
+    logger.debug('>>>> graph_data = '+@graph_data.to_s)
+    logger.debug('>>>> data = '+@data.to_s)
     #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
     
   end
