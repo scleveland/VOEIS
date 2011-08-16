@@ -677,8 +677,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
            Voeis::Site.get(site.id).update_site_data_catalog_variables(@variables)
         end
           # parent.publish_his
-          # :total_records_saved => total_records, :total_rows_parsed
-          flash[:notice] = "File parsed and stored successfully for #{site.name}. #{@results[:total_records_save]} data values saved and #{@results[:total_rows_parsed]} rows where parsed.} "
+          flash[:notice] = "File parsed and stored successfully for #{site.name}. #{@results[:total_records_saved]} data values saved and #{@results[:total_rows_parsed]} rows where parsed. "
           redirect_to project_path(params[:project_id]) and return
         rescue Exception => e  
           email_exception(e,request.env)

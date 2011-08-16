@@ -1237,9 +1237,9 @@ class Voeis::DataValuesController < Voeis::BaseController
      #csv_data = CSV.read(params[:datafile])
      
      #i = params[:start_line].to_i
-     
+     @results =""
      parent.managed_repository do 
-       Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, params[:sample_type], params[:sample_medium])
+       @results = Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, params[:sample_type], params[:sample_medium])
      
      # csv_data[params[:start_line].to_i-1..-1].each do |row|
      #   @csv_row[i] = row
@@ -1320,7 +1320,7 @@ class Voeis::DataValuesController < Voeis::BaseController
            Voeis::Site.get(site.id).update_site_data_catalog_variables(@variables)
          end #end repo
          #parent.publish_his
-         flash[:notice] = "File parsed and stored successfully for #{site.name}."
+         flash[:notice] = "File parsed and stored successfully for #{site.name}. #{@results[:total_records_saved]} data values saved and #{@results[:total_rows_parsed]} rows where parsed. "
          redirect_to project_path(params[:project_id]) and return
          rescue Exception => e  
            email_exception(e,request.env)
