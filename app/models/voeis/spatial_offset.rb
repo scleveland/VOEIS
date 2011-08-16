@@ -7,7 +7,7 @@ class Voeis::SpatialOffset
   property :value,              String,   :required => true
   property :units_id,           Integer,   :required => false
   
-  timestamps :at
+  #timestamps :at
   yogo_versioned
  
   has n, :variables, :model => "Voeis::Variable", :through => Resource

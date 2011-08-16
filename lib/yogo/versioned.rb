@@ -10,7 +10,7 @@ module Yogo
       property :updated_comment,     ::DataMapper::Property::Text
       property :created_at,          ::DataMapper::Property::DateTime, :required => false
       property :deleted_at,          ::DataMapper::Property::ParanoidDateTime
-      #timestamps :created_at
+      timestamps :created_at
 
       # Register before save hooks
       before(:save) do

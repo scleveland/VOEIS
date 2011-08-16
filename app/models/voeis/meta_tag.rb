@@ -8,7 +8,7 @@ class Voeis::MetaTag
   property :name,     String, :required => true, :length => 512, :index => true
   property :category, String, :required => true, :length => 512, :index => true
 
-  timestamps :at
+  #timestamps :at
   yogo_versioned
 
   has n, :sensor_values, :model => 'Voeis::SensorValue', :through => Resource

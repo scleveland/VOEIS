@@ -11,9 +11,9 @@ class Voeis::QualityControlLevel
   # repository(:default){
     property :his_id,            Integer, :required => false, :index => true
   # }
+  yogo_versioned
+  #timestamps :at
   
-  timestamps :at
-  
-  is_versioned :on => :updated_at
+  #is_versioned :on => :updated_at
 
 end
