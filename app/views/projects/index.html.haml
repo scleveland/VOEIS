@@ -110,10 +110,11 @@
       if(varPane) {
         varPane = dijit.byNode(varPane);
       } else {
-        varPane = new dijit.layout.ContentPane({
+        varPane = new dojox.layout.ContentPane({
           id: projVarId,
           title: varName,
           closable: true,
+        	executeScripts: true,
       	  ioArgs: { headers: {"Accept": "text/html"} },
           store: voeis.Server.DEFAULT,
           href: "/projects/"+projectId+"/variables/"+varId+".html?&site_id="+siteId});
