@@ -2,7 +2,7 @@ class VerticalDatumCVsController < ApplicationController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
 
-  # GET /variables/new
+  # LOCAL: GET /VerticalDatum/new
   def new
     @vertical_datum = parent.managed_repository{Voeis::VerticalDatumCV.new}
 
@@ -11,7 +11,7 @@ class VerticalDatumCVsController < ApplicationController
     end
   end
   
-  # POST /variables
+  # POST /VerticalDatum
   def create
     @vertical_datum = parent.managed_repository{Voeis::VerticalDatumCV.new(params[:vertical_datum_c_v])}
     ###
@@ -27,6 +27,7 @@ class VerticalDatumCVsController < ApplicationController
       end
     end
   end
+  
   def show
     
   end

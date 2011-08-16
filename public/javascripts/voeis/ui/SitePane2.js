@@ -25,7 +25,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		console.log('load-done-NOW: ');
 		console.log('>>>parseOnLoad:',this.parseOnLoad);
 		//if(initSiteForm(this.site.id)) this.loaded = true;
-		//initSiteForm(this.site.id);
+		//init_site_form(this.site);
 	},
 	
 	dialog: dijit.Dialog({
@@ -61,8 +61,6 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		//sitePane = sitePane.nodeValue;
 		//var sitePaneContent = $('#'+this.protoDivId).html();
 		var sitePaneContent = pane_proto00;
-		
-		console.log('siteUpdate: starting--');
 		
 		sitePaneContent = sitePaneContent.replace(/site00/g, siteTag);
 		sitePaneContent = sitePaneContent.replace(/\$\$\$site-name\$\$\$/g, sitename);
@@ -119,8 +117,6 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		//console.log(json_samps);
 
 		//sitePaneContent = sitePaneContent.replace(/dojotype_dialog/g, 'dojoType="dijit.Dialog"');
-		
-		console.log('siteUpdate: ready to set content');
 
 		/*
 		if(this.editMode) {
@@ -162,11 +158,13 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		this.dialog.attr('id', this.id+'_dialog');
 		
 		//### SETUP EDIT FORM
+		//init_site_form(this.site);
 		//if(!this.loaded) 
 		this.onUnload = function(){
 			this.onLoad = function(){
 				console.log('LOADED!');
 				//initSiteForm(this.site.id);
+				//init_site_form(this.site);
 			};
 		};
 		
@@ -194,15 +192,17 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		var new_data = site_data[this.siteIdx];
 		var new_ref_data = site_ref_data[this.siteIdx];
 		for(fn in new_data) {
-			console.log('FIELD >> '+fn)
-			var fld = form.elements['site['+fn+']']
+			//var fld = form.elements['site['+fn+']'];
+			var fld = form.elements['site_'+fn];
+			console.log('FIELD >> '+fn);
 			if(fld) {
 				new_data[fn] = fld.value;
-				console.log('UPDATE >> '+fn)
+				console.log('UPDATE >> '+fn+' = '+fld.value);
 				if(new_ref_data.hasOwnProperty(fn)) {
-					if(fld.type=='select-one') {
-						new_data[fn] = fld.options[fld.selectedIndex].text
-						new_data[fn+'_id'] = fld.options[fld.selectedIndex].value
+					if(fld.type=='select-one' && fld.options.length) {
+						console.log('SELECT-FIELD:', fn, fld.options[fld.selectedIndex].value);
+						new_data[fn] = fld.options[fld.selectedIndex].text;
+						new_data[fn+'_id'] = fld.options[fld.selectedIndex].value;
 					};
 					//else handle other from.element types
 				};

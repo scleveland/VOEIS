@@ -8,5 +8,5 @@ class Voeis::VerticalDatumCV
 
   yogo_versioned
 
-  has n, :sites,             :model => "Voeis::Site",         :through => Resource
+  has n, :sites,             :model => "Voeis::Site",         :through => Resource, :required=>false
 end

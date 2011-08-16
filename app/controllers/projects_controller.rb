@@ -92,7 +92,7 @@ class ProjectsController < InheritedResources::Base
     @sample_labels = Array["Sample Type","Lab Sample Code","Sample Medium","Timestamp"]
     @sample_fields = Array["sample_type","lab_sample_code","material","local_date_time"]
     @site_ref_props = []
-    @site_properties = @site.properties.map{ |prop| 
+    @site_properties = @site.class.properties.map{ |prop| 
       #prop = prop.name.to_s
       if prop.name.to_s[-3..-1]=='_id'
         prop.name.to_s[0..-4]
@@ -104,8 +104,8 @@ class ProjectsController < InheritedResources::Base
     
     #### CV referenced fields
     @sites.each{ |site| 
-      vert_datum = site.vertical_datum.nil? ? '' : site.vertical_datum.term.to_s
-      local_proj = site.local_projection.nil? ? '' : site.local_projection.term.to_s
+      vert_datum = site.vertical_datum_id.nil? ? '' : site.vertical_datum.term.to_s
+      local_proj = site.local_projection_id.nil? ? '' : site.local_projection.term.to_s
       @site_ref << {:vertical_datum=>vert_datum, :local_projection=>local_proj}
     }
     

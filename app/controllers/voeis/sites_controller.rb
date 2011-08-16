@@ -17,7 +17,18 @@ class Voeis::SitesController < Voeis::BaseController
   @project = parent
   
   def new
+    @project = parent
     @sites = Voeis::Site.all
+    
+    #### CV stuff
+    @vertical_datum_items = [['-none-', nil]]
+    @local_projection_items = [['-none-', nil]]
+    @vertical_datums = Voeis::VerticalDatumCV.all(:order => [:term.asc])
+    #@vertical_datums_local = @project.managed_repository{Voeis::VerticalDatumCV.all(:order => [:term.asc])}
+    @local_projections = Voeis::LocalProjectionCV.all(:order => [:term.asc])
+    #@local_projections_local = @project.managed_repository{Voeis::LocalProjectionCV.all(:order => [:term.asc])}
+    @vertical_datums.each { |item| @vertical_datum_items << [item.term, item.id.to_s] }
+    @local_projections.each { |item| @local_projection_items << [item.term, item.id.to_s] }
   end
   
   def show
@@ -58,11 +69,11 @@ class Voeis::SitesController < Voeis::BaseController
   def update
     params[:site][:latitude] = params[:site][:latitude].strip
     params[:site][:longitude] = params[:site][:longitude].strip
-    @vert_datum_global = Voeis::VerticalDatumCV.get(params[:vertical_datum_id])
-    @local_proj_global = Voeis::LocalProjectionCV.get(params[:local_projection_id])
+    @vert_datum_global = Voeis::VerticalDatumCV.get(params[:site][:vertical_datum_id].to_i)
+    @local_proj_global = Voeis::LocalProjectionCV.get(params[:site][:local_projection_id].to_i)
     
     parent.managed_repository do 
-      site = Voeis::Site.get(params[:id])
+      site = Voeis::Site.get(params[:site][:id])
       params[:site].each do |key, value|
         site[key] = value.empty? ? nil : value
       end
@@ -70,14 +81,22 @@ class Voeis::SitesController < Voeis::BaseController
       puts site.valid?
       puts site.errors.inspect()
       #### CV update -- global -> local
-      vert_datum = Voeis::VerticalDatumCV.first_or_create(:id=>@vert_datum_global.id,
+      if @vert_datum_global.nil?
+        site.vertical_datum = nil
+      else
+        site.vertical_datum = Voeis::VerticalDatumCV.first_or_create(:id=>@vert_datum_global.id,
                                                           :term=>@vert_datum_global.term,
                                                           :definition=>@vert_datum_global.definition)
-      site.vertical_datum = vert_datum
-      local_proj = Voeis::LocalProjectionCV.first_or_create(:id=>@local_proj_global.id,
+      end
+      #site.vertical_datum = vert_datum
+      if @local_proj_global.nil?
+        site.local_projection = nil
+      else
+        site.local_projection = Voeis::LocalProjectionCV.first_or_create(:id=>@local_proj_global.id,
                                                           :term=>@local_proj_global.term,
                                                           :definition=>@local_proj_global.definition)
-      site.local_projection = local_proj
+      end
+      #site.local_projection = local_proj
       if site.save
          flash[:notice] = "Site was Updated successfully."
          redirect_to project_url(parent)
@@ -91,15 +110,49 @@ class Voeis::SitesController < Voeis::BaseController
   end
 
   def create
+    @project = parent
+    
     # This should be handled by the framework, but isn't when using jruby.
     params[:site][:latitude] = params[:site][:latitude].strip
     params[:site][:longitude] = params[:site][:longitude].strip
-    params[:site].each_key do |key|
-      params[:site][key] = params[:site][key].empty? ? nil : params[:site][key]
-    end
-    create! do |success, failure|
-      success.html { redirect_to project_url(parent) }
-    end
+
+    @vert_datum_global = Voeis::VerticalDatumCV.get(params[:site][:vertical_datum_id].to_i)
+    @local_proj_global = Voeis::LocalProjectionCV.get(params[:site][:local_projection_id].to_i)
+    
+    @project.managed_repository{ 
+      site = Voeis::Site.new
+      #params[:site].each_key do |key|
+      logger.debug('PARAMS:')
+      params[:site].each do |key, value|
+        logger.debug('KEY: '+key+' / VALUE: '+value)
+        if key!='vertical_datum' && key!='local_projection'
+          site[key] = params[:site][key].empty? ? nil : params[:site][key]
+        end
+      end
+      site.updated_at = Time.now
+      #### CV update -- global -> local
+      if @vert_datum_global.nil?
+        site.vertical_datum = nil
+      else
+        site.vertical_datum = Voeis::VerticalDatumCV.first_or_create(:id=>@vert_datum_global.id,
+                                                          :term=>@vert_datum_global.term,
+                                                          :definition=>@vert_datum_global.definition)
+      end
+      if @local_proj_global.nil?
+        site.local_projection = nil
+      else
+        site.local_projection = Voeis::LocalProjectionCV.first_or_create(:id=>@local_proj_global.id,
+                                                          :term=>@local_proj_global.term,
+                                                          :definition=>@local_proj_global.definition)
+      end
+      if site.save
+         flash[:notice] = "New Site was saved successfully."
+         redirect_to project_url(parent)
+      end
+    }
+    #create! do |success, failure|
+    #  success.html { redirect_to project_url(parent) }
+    #end
   end
 
   def add_site

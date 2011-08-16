@@ -2,7 +2,7 @@ class LocalProjectionCVsController < ApplicationController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
 
-  # GET /variables/new
+  # LOCAL: GET /LocalProjection/new
   def new
     @local_projection = parent.managed_repository{Voeis::LocalProjectionCV.new}
 
@@ -11,9 +11,9 @@ class LocalProjectionCVsController < ApplicationController
     end
   end
   
-  # POST /variables
+  # POST /LocalProjection
   def create
-    @local_projection = parent.managed_repository{Voeis::LocalProjectionCV.new(params[:variable_name_c_v])}
+    @local_projection = parent.managed_repository{Voeis::LocalProjectionCV.new(params[:local_projection_c_v])}
     respond_to do |format|
       if @local_projection.save
         flash[:notice] = 'Local Projection was successfully created.'
@@ -26,6 +26,7 @@ class LocalProjectionCVsController < ApplicationController
       end
     end
   end
+  
   def show
     
   end
