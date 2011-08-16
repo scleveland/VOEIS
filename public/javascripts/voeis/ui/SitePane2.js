@@ -1,5 +1,9 @@
 dojo.provide("voeis.ui.SitePane2");
+dojo.require("dojox.layout.ContentPane");
+dojo.require("dijit.Dialog");
 dojo.require("dijit.layout.ContentPane");
+//changed to DOJOX.layout.ContentPane -- to allow JS
+//had to do this on openVarTab (in proj_show) as well
 
 dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	project: '',
@@ -7,12 +11,35 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	siteIdx: 0,
 	closable: true,
 	editMode: false,
-	paneDivId: 'site_pane_proto',
+	preload: true,
+	parseOnLoad: false,
+	cleanContent: true,
+	
+	protoDivId: 'site_pane_proto',
 	style: "margin-top:0;padding-top:0;",
 	test: '',
 	
-	constructor: function(site) {
-    //this.tabs = dijit.byId('tab_browser');
+	loaded: false,
+	executeScripts: true,
+	onLoad: function(){
+		console.log('load-done-NOW: ');
+		console.log('>>>parseOnLoad:',this.parseOnLoad);
+		//if(initSiteForm(this.site.id)) this.loaded = true;
+		//init_site_form(this.site);
+	},
+	
+	dialog: dijit.Dialog({
+		id: 'dialog ID',
+		title: "dialog title",
+		content: '',
+		style: 'width:400px;'
+		}),
+	
+	dialog_vertical_datum: '',
+	dialog_local_projection: '',
+	
+	constructor: function() {
+		//this.tabs = dijit.byId('tab_browser');
 		//this.tabs.site_tabs = this.tabs.site_tabs || [];
 		
 		//this.project = #{@project.to_json};
@@ -26,22 +53,23 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		var sitename = this.site.name.toString();
 		var sitename0 = sitename.slice(0,12);
 		if(sitename.length>12) sitename0+='...';
-		if(sitename.length>24) sitename0+=sitename.slice(-12);
+		if(sitename.length>20) sitename0+=sitename.slice(-8);
 		this.set("title", sitename0);
 		
 		var siteTag = this.id;
 		//var sitePane = document.getElementById(this.paneDivId).cloneNode(true);
 		//sitePane = sitePane.nodeValue;
-		var sitePane = $('#'+this.paneDivId).html();
-		sitePane = sitePane.replace(/site00/g, siteTag);
+		//var sitePaneContent = $('#'+this.protoDivId).html();
+		var sitePaneContent = pane_proto00;
 		
-		sitePane = sitePane.replace(/\$\$\$site-name\$\$\$/g, this.site.name);
+		sitePaneContent = sitePaneContent.replace(/site00/g, siteTag);
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-name\$\$\$/g, sitename);
 		
 		//PROPERTIES STUFF
 		//$('#'+siteTag+'-name-head').html(this.site.name);
 		//for(var prop in site_properties) 
 		for(var i=0;i<site_properties.length;i++) 
-			sitePane = sitePane.replace(new RegExp('\\$\\$\\$'+site_properties[i]+'\\$\\$\\$', 'g'), this.site[site_properties[i]]);
+			sitePaneContent = sitePaneContent.replace(new RegExp('\\$\\$\\$'+site_properties[i]+'\\$\\$\\$', 'g'), this.site[site_properties[i]]);
 			//$('#show-'+siteTag+' .show_'+site_properties[i]).text(this.site[site_properties[i]]);
 			//document.getElementById('show_'+site_properties[i]).value = this.site[site_proper
 
@@ -64,12 +92,12 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			//data = '<em>&nbsp;&nbsp;&nbsp; - no data available -</em></td><td></td><td></td><td>';
 			data = '</td><td colspan="2"><em>- no data available -</em></td><td>';
 		};
-		sitePane = sitePane.replace(/\$\$\$site-variable-data\$\$\$/, data);
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-variable-data\$\$\$/, data);
 		
 		//SHOW SAMPLE STUFF
 		data = '';
 		if(this.site_samps.length>0) {
-			sitePane = sitePane.replace(/\$\$\$export-style\$\$\$/, '');
+			sitePaneContent = sitePaneContent.replace(/\$\$\$export-style\$\$\$/, '');
 			for(var i=0;i<this.site_samps.length;i++) {
 				data += this.site_samps[i][0]+'</td><td>\n';
 				data += this.site_samps[i][1]+'</td><td>\n';
@@ -78,18 +106,17 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 				data += '<tr class="'+((i+1==this.site_samps.length)?'':'row'+(i+1)%2)+'"><td>'
 			};
 		} else {
-			sitePane = sitePane.replace(/\$\$\$export-style\$\$\$/, 'display:none');
-			//sitePane = sitePane.replace(/\$\$\$export-style\$\$\$/, '');
+			sitePaneContent = sitePaneContent.replace(/\$\$\$export-style\$\$\$/, 'display:none');
+			//sitePaneContent = sitePaneContent.replace(/\$\$\$export-style\$\$\$/, '');
 			//data = '<td><em>&nbsp;&nbsp;&nbsp; no data available</em></td>';
 			data = '</td><td colspan="2"><em>- no data available -</em></td><td>';
 		};
-		sitePane = sitePane.replace(/\$\$\$site-sample-data\$\$\$/, data);
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-sample-data\$\$\$/, data);
 		var json_samps = dojo.toJson(this.site_samps).replace(/"/g, '&quot;');
-		sitePane = sitePane.replace(/\$\$\$site-samps\$\$\$/, json_samps);
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-samps\$\$\$/, json_samps);
 		//console.log(json_samps);
 
-		this.set('content', sitePane);
-		//this.refresh();
+		//sitePaneContent = sitePaneContent.replace(/dojotype_dialog/g, 'dojoType="dijit.Dialog"');
 
 		/*
 		if(this.editMode) {
@@ -97,6 +124,13 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			$('#edit-site'+this.site.id).show();
 		};
 		*/
+
+		this.set('content', sitePaneContent);
+		//dojo.parser.parse(sitePaneContent);
+		//dojo.parser.parse(this.id);
+		
+		//this.refresh();
+		//if(this.loaded) initForm(siteTag);
 
 	},
 
@@ -120,7 +154,22 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		this.site_stats = site_stat_data[this.siteIdx];
 		this.site_var_stats = site_var_data[this.siteIdx];
 		this.site_samps = site_samp_data[this.siteIdx];
+		
+		this.dialog.attr('id', this.id+'_dialog');
+		
+		//### SETUP EDIT FORM
+		//init_site_form(this.site);
+		//if(!this.loaded) 
+		this.onUnload = function(){
+			this.onLoad = function(){
+				console.log('LOADED!');
+				//initSiteForm(this.site.id);
+				//init_site_form(this.site);
+			};
+		};
+		
 		this.siteUpdate();
+		
 	},
 	
 	getSite: function(siteId) {
@@ -129,26 +178,44 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 				return site_data[i];
 	},
 
-	siteSave: function(props) {
+	siteSave: function(update_props) {
 		var new_data = site_data[this.siteIdx];
-		for(prop in props) 
-			new_data[prop] = props[prop];
+		for(prop in update_props) 
+			new_data[prop] = update_props[prop];
 		site_data[this.siteIdx] = new_data;
 		this.siteUpdate();
+		window.scrollTo(0,0);
+    
 	},
 
 	siteFormSave: function(form) {
 		var new_data = site_data[this.siteIdx];
+		var new_ref_data = site_ref_data[this.siteIdx];
 		for(fn in new_data) {
-			console.log('FIELD >> '+fn)
-			var fld = form.elements['site['+fn+']']
+			//var fld = form.elements['site['+fn+']'];
+			var fld = form.elements['site_'+fn];
+			console.log('FIELD >> '+fn);
 			if(fld) {
 				new_data[fn] = fld.value;
-				console.log('UPDATE >> '+fn)
+				console.log('UPDATE >> '+fn+' = '+fld.value);
+				if(new_ref_data.hasOwnProperty(fn)) {
+					if(fld.type=='select-one' && fld.options.length) {
+						console.log('SELECT-FIELD:', fn, fld.options[fld.selectedIndex].value);
+						new_data[fn] = fld.options[fld.selectedIndex].text;
+						new_data[fn+'_id'] = fld.options[fld.selectedIndex].value;
+					};
+					//else handle other from.element types
+				};
 			};
 		};
-		site_data[this.siteIdx] = new_data;
-		this.siteUpdate();
+		this.siteSave(new_data);
+	},
+	
+	showDialog: function(contentDiv,title) {
+		this.dialog.attr('content', $('#'+contentDiv).html());
+		var ttl = title || $('#'+contentDiv).attr('title');
+		this.dialog.attr('title', ttl);
+		this.dialog.show();
 	}
 
 });

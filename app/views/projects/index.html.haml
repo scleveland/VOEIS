@@ -25,7 +25,7 @@
 
     function project_formatter(id) {
       var href = '/projects/'+id;
-      var img = '<img src="/images/view.gif" alt="SHOW project" title="SHOW project" />';
+      var img = '<img src="/images/view.gif" alt="SHOW project" title="Project Details" />';
       //var onclick = 'window.defaultStatus="LOADING...";return true;';
       //var link = '<a href="'+href+'" onclick="'+onclick+'">'+img+'</a>';
       var link = '<a href="'+href+'">'+img+'</a>';
@@ -48,10 +48,15 @@
 
 #proj_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"proj_store", :data=>"projects_json"}
 #tab_browser{:dojoType=>"dijit.layout.TabContainer"}
-  %table{:id=>'projects_table', :title=>"Projects", :dojoType=>"dojox.grid.EnhancedGrid", :store=>"projectsDataStore", :plugins=>"{indirectSelection: true}"}
+  %table{:id=>'projects_table', :title=>"Projects", :dojoType=>"dojox.grid.EnhancedGrid", 
+          :store=>"projectsDataStore", 
+          :clientSort=>true,
+          :sortInfo=>"-2",
+          :plugins=>"{indirectSelection: true}"}
     %thead
       %tr
         %th{:field=>"id", :width=>"45px", :filterable=>false, :formatter=>'project_formatter'} Show
+        -#%th{:field => "id", :width => "auto"} Proj.ID 
         %th{:field => "name", :width => "auto"} Project 
     %script{:type => "dojo/method", :event => "onRowDblClick", :args => "evt"}
       :plain

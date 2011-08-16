@@ -8,5 +8,5 @@ class Voeis::LocalProjectionCV
 
   yogo_versioned
 
-  
+  has n, :sites,             :model => "Voeis::Site",         :through => Resource, :required=>false
 end

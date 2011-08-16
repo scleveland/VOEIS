@@ -6,6 +6,7 @@ class SitePane2Widget < Apotomo::Widget
     @sites = options[:sites]
     @site = options[:projectSite]
     @current_user = options[:user]
+    @root_url = options[:root_url]
     #@id = UUIDTools::UUID.timestamp_create
     @auth = !@current_user.nil? && @current_user.projects.include?(@project)
     
@@ -48,6 +49,16 @@ class SitePane2Widget < Apotomo::Widget
       }
       @site_samps << @temp_array
     }
+    
+    #### CV stuff
+    @vertical_datum_items = [['-none-', nil]]
+    @local_projection_items = [['-none-', nil]]
+    @vertical_datums = Voeis::VerticalDatumCV.all(:order => [:term.asc])
+    #@vertical_datums_local = @project.managed_repository{Voeis::VerticalDatumCV.all(:order => [:term.asc])}
+    @local_projections = Voeis::LocalProjectionCV.all(:order => [:term.asc])
+    #@local_projections_local = @project.managed_repository{Voeis::LocalProjectionCV.all(:order => [:term.asc])}
+    @vertical_datums.each { |item| @vertical_datum_items << [item.term, item.id.to_s] }
+    @local_projections.each { |item| @local_projection_items << [item.term, item.id.to_s] }
     
     render
   end

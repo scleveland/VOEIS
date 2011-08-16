@@ -1,34 +1,210 @@
-%h2
-Add an existing to site to the project:
-= form_tag("save_site") do 
-  - site_options = "Hash.new"""
-  - @sites.all(:order => [:name.asc]).each do |site|
-    - site_options = site_options + "<option value="+site.id.to_s+">"+site.site_name+"</option>"
-  = select_tag("site", site_options.html_safe)
-  = submit_tag("Add Site", :onclick => "$('#loader').toggle();")
+:css
+  #content { margin:10px 50px }
+  #wrapper {
+    padding-bottom: 20px;
+    background-color: #ccb;
+    padding-top: 1px;
+  }
+  #wrapper img { margin-right:12px }
+  #wrapper p { margin:0 20px }
+
+  .dialog { width:600px; }
+
+  #form-table { width:600px; }
+  #form-table td { width:50%; }
+  .form_element { width:20em; }
+  #form-table input { width:18em; }
+  #form-table textarea { width:45em; }
+  #form-table select { width:21em; }
+  #site_name { width:24em !important; }
+  #site_submit { width:10em !important; }
+
+
+- content_for(:javascripts) do
+  :javascript
+    dojo.require("dijit.dijit");
+    dojo.require("dijit.Declaration");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dijit.Dialog");
+    dojo.require("dijit.form.Form");
+    dojo.require("dijit.form.TextBox");
+    dojo.require("dijit.form.Button");
+    dojo.require("dijit.form.ValidationTextBox");
+    dojo.require("dijit.Tooltip");
+
+    function submit_site_dialog(fn) {
+      var form0 = 'new-site-form';
+      var form = dojo.byId(form0);
+      console.log('create = ',fn);
+      data = {};
+      data[fn+'_c_v'] = {term: $('#site_'+fn+'_term').val(), definition: $('#site_'+fn+'_definition').val()};
+      $.post("/"+fn+"_c_vs.json", data, function(dat) {
+        //$.post("#{@root_url}/"+fn+"_c_vs.json", data, function(dat) {
+        //save//$('#site00_vertical_datum').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val() + ':' + $("#site00_vertical_datum_definition").val()));
+        $('#site_'+fn).append($("<option></option>").attr("value",dat['id']).text($('#site_'+fn+'_term').val()));
+        $('#site_'+fn).val(dat['id']);
+      });
+      //test//$('#site_'+fn).append($("<option></option>").attr("value",'10').text($('#site_'+fn+'_term').val()));
+      //test//$('#site_'+fn).val('10');
+      dijit.byId('site_new_'+fn).hide();
+    };
+
+
+%h2 Add new site to project: #{@project.name}
+
+-#Add an existing to site to the project:
+-#= form_tag("save_site") do 
+-#  - site_options = "Hash.new"""
+-#  - @sites.all(:order => [:name.asc]).each do |site|
+-#    - site_options = site_options + "<option value="+site.id.to_s+">"+site.site_name+"</option>"
+-#  = select_tag("site", site_options.html_safe)
+-#  = submit_tag("Add Site", :onclick => "$('#loader').toggle();")
+
+
+#site_new_vertical_datum{:title=>"NEW Vertical Datum", :dojoType=>"dijit.Dialog", :class=>"dialog"}
+  -#= form_for :local_projection, :url=>"", :html=>{:dojoType=>"dijit.form.Form", :id=>"site00_local_projection_form"} do |f|
+  -#%form(id="site00_local_projection_form" jsId="site00_local_projection_form" dojoType="dijit.form.Form" method="post")
+  %form(id="site_vertical_datum_form" method="post")
+    %label Term
+    %br
+    -#=f.text_field :quality_control_level_code, :size => 30
+    -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
+    %input{:type=>"text", :name=>"vertical_datum_term", :id=>"site_vertical_datum_term", :style=>"width:95%;"}
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    %label Definition
+    %br
+    -#=f.text_area :definition, :cols=>50, :rows=>3
+    -#%input{:type=>"text", :name=>"local_projection_definition", :id=>"site00_local_projection_definition", :dojoType=>"dijit.form.ValidationTextBox", :style=>"width:50em", :size=>50, :rows=>"3"}
+    %textarea{:type=>"text", :name=>"vertical_datum_definition", :id=>"site_vertical_datum_definition", :style=>"width:95%;", :rows=>"4"}
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    -#%button{:id=> 'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"site00_createLocalProjection();"}
+    -#%button{:id=>'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create'}
+    %button{:id=>'site_new_vertical_datum_button', :value=>"Create Vertical Datum", :onclick=>"submit_site_dialog('vertical_datum');return false;"}
+      Create Vertical Datum
+      -#%script{:type=>"dojo/method", :event=>"startup"}
+      -#  var form = dijit.byId("site00_local_projection_form");
+      -#  // set initial state
+      -#  //this.attr("disabled", !form.isValid());
+      -#  //this.connect(form, "onValidStateChange", function(state){
+      -#  //this.attr("disabled", !state);
+      -#  //});
+      -#  this.connect(form, "onClick", function(){
+      -#  //$.post("#{root_url}/local_projection_cvs.json?local_projection_c_vs[term]="+$("#site00_local_projection_term").val()+"&local_projection_c_vs[definition]="+$("#site00_local_projection_definition").val(),
+      -#  $.post("#{@root_url}/local_projection_c_vs.json", {local_projection_c_v: {term: $("#site00_local_projection_term").val(), definition: $("#site00_local_projection_definition").val()}},
+      -#  function(data) {
+      -#  //$('#site00_local_projection').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val() + ':' + $("#site00_vertical_datum_definition").val())); 
+      -#  $('#site00_local_projection').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val()));
+      -#  $('#site00_local_projection').val(data['id']);
+      -#  dijit.byId("site00_xnew_local_projection").hide();
+      -#  });
+      -#  };
+    &nbsp;&nbsp;
+    -#%button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"dijit.byNode(dojo.byId('site00')).dialog.hide();"} Cancel
+    %button{:onclick=>"dijit.byId('site_new_vertical_datum').hide();return false;", :value=>"Cancel"} Cancel
+
+#site_new_local_projection{:title=>"NEW Local Projection", :dojoType=>"dijit.Dialog", :class=>"dialog"}
+  -#= form_for :local_projection, :url=>"", :html=>{:dojoType=>"dijit.form.Form", :id=>"site00_local_projection_form"} do |f|
+  -#%form(id="site00_local_projection_form" jsId="site00_local_projection_form" dojoType="dijit.form.Form" method="post")
+  %form(id="site_local_projection_form" method="post")
+    %label Term
+    %br
+    -#=f.text_field :quality_control_level_code, :size => 30
+    -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
+    %input{:type=>"text", :name=>"local_projection_term", :id=>"site_local_projection_term", :style=>"width:95%;"}
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    %label Definition
+    %br
+    -#=f.text_area :definition, :cols=>50, :rows=>3
+    -#%input{:type=>"text", :name=>"local_projection_definition", :id=>"site00_local_projection_definition", :dojoType=>"dijit.form.ValidationTextBox", :style=>"width:50em", :size=>50, :rows=>"3"}
+    %textarea{:type=>"text", :name=>"local_projection_definition", :id=>"site_local_projection_definition", :style=>"width:95%;", :rows=>"4"}
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    -#%button{:id=> 'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"site00_createLocalProjection();"}
+    -#%button{:id=>'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create'}
+    %button{:id=>'site_new_local_projection_button', :value=>"Create Local Projection", :onclick=>"submit_site_dialog('local_projection');return false;"}
+      Create Local Projection
+      -#%script{:type=>"dojo/method", :event=>"startup"}
+      -#  var form = dijit.byId("site00_local_projection_form");
+      -#  // set initial state
+      -#  //this.attr("disabled", !form.isValid());
+      -#  //this.connect(form, "onValidStateChange", function(state){
+      -#  //this.attr("disabled", !state);
+      -#  //});
+      -#  this.connect(form, "onClick", function(){
+      -#  //$.post("#{root_url}/local_projection_cvs.json?local_projection_c_vs[term]="+$("#site00_local_projection_term").val()+"&local_projection_c_vs[definition]="+$("#site00_local_projection_definition").val(),
+      -#  $.post("#{@root_url}/local_projection_c_vs.json", {local_projection_c_v: {term: $("#site00_local_projection_term").val(), definition: $("#site00_local_projection_definition").val()}},
+      -#  function(data) {
+      -#  //$('#site00_local_projection').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val() + ':' + $("#site00_vertical_datum_definition").val())); 
+      -#  $('#site00_local_projection').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val()));
+      -#  $('#site00_local_projection').val(data['id']);
+      -#  dijit.byId("site00_xnew_local_projection").hide();
+      -#  });
+      -#  };
+    &nbsp;&nbsp;
+    -#%button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"dijit.byNode(dojo.byId('site00')).dialog.hide();"} Cancel
+    %button{:onclick=>"dijit.byId('site_new_local_projection').hide();return false;", :value=>"Cancel"} Cancel
 
   
 =clear_break
-Create a new site for the project:
-= form_for(:site, resource, :url => project_sites_path(@project), :builder => YogoFormBuilder, :html => {:onsubmit => "return checkform();"} )do |f|
-  
+-#Create a new site for the project:
 
-  = f.text_field("name")
-  = f.text_field("code")
-  = f.text_field("latitude")
-  = f.text_field("longitude")
-  = f.text_field("elevation_m")         
-  = f.text_field("vertical_datum")      
-  = f.text_field("local_x")             
-  = f.text_field("local_y")             
-  = f.text_field("local_projection_id") 
-  = f.text_field("pos_accuracy_m")      
-  = f.text_field("county")     
-  = f.text_field("state")         
-  = f.text_area("comments")            
-  = f.submit("Save Site", :onclick => "$('#loader').toggle();")
-  -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
+= form_for(:site, resource, :url => project_sites_path(@project), :builder => YogoFormBuilder, :html => {:onsubmit => "return checkform();", :id=>"new-site-form"} )do |f|
+
+  %table{:id=>"form-table"}
+    %tr
+      %td
+        = f.text_field("name")
+      %td
+        = f.text_field("code")
+    %tr
+      %td
+        = f.text_field("latitude")
+      %td
+        = f.text_field("longitude")
+    %tr
+      %td{:colspan=>"2"}
+        = f.text_field("elevation_m")         
+    %tr
+      %td
+        = f.text_field("local_x")             
+      %td
+        = f.text_field("local_y")             
+    %tr
+      %td
+        = f.select('vertical_datum',  options_for_select(@vertical_datum_items), :class=>"form-dropdown")
+      %td{:style=>"padding-top:20px;"}
+        = link_to('NEW', 'javascript:', :onclick=>"dijit.byId('site_new_local_projection').show();")
+        -#= link_to('NEW', 'javascript:', :onclick=>"$('#edit-site00 .hide-row').hide();$('#site00_new_vertical_datum_row').show();")
+    %tr
+      %td
+        = f.select('local_projection',  options_for_select(@local_projection_items), :class=>"form-dropdown")
+      %td{:style=>"padding-top:20px;"}
+        = link_to('NEW', 'javascript:', :onclick=>"dijit.byId('site_new_local_projection').show();")
+        -#= link_to('NEW', 'javascript:', :onclick=>"$('#edit-site00 .hide-row').hide();$('#site00_new_vertical_datum_row').show();")
+    %tr
+      %td{:colspan=>"2"}
+        = f.text_field("pos_accuracy_m")      
+    %tr
+      %td
+        = f.text_field("state")         
+      %td
+        = f.text_field("county")     
+    %tr
+      %td{:colspan=>"2"}
+        = f.text_area("description")            
+    %tr
+      %td{:colspan=>"2"}
+        = f.text_area("comments")            
+    %tr
+      %td{:colspan=>"2"}
+        = f.submit("Save Site", :onclick => "$('#loader').toggle();")
+        -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
+
 -#=render_widget :vertical_datum
+
 :javascript  
   function checkform()
   {if ($('#site_name').val() =="")

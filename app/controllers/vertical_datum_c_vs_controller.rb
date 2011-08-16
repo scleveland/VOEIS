@@ -2,9 +2,9 @@ class VerticalDatumCVsController < ApplicationController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
 
-  # LOCAL: GET /VerticalDatum/new
+  # GLOBAL: GET /VerticalDatum/new
   def new
-    @vertical_datum = parent.managed_repository{Voeis::VerticalDatumCV.new}
+    @vertical_datum = Voeis::VerticalDatumCV.new
 
     respond_to do |format|
       format.html # new.html.erb
@@ -13,8 +13,8 @@ class VerticalDatumCVsController < ApplicationController
   
   # POST /VerticalDatum
   def create
-    @vertical_datum = parent.managed_repository{Voeis::VerticalDatumCV.new(params[:vertical_datum_c_v])}
-    ###
+    @vertical_datum = Voeis::VerticalDatumCV.new(params[:vertical_datum_c_v])
+    #debugger
     respond_to do |format|
       if @vertical_datum.save
         flash[:notice] = 'Vertical Datum was successfully created.'
@@ -27,7 +27,7 @@ class VerticalDatumCVsController < ApplicationController
       end
     end
   end
-  
+
   def show
     
   end

@@ -56,13 +56,13 @@
 
   %br
   %table{:id => "property-table", :style=>'width:80%;float:left;'}
-    - @site.properties.each do |prop|
+    - @site_properties.each do |prop|
       %tr{:class=>"row#{cycle('1','0')}"}
         %td
           %b
-            #{prop.name.to_s.capitalize}
+            #{prop.capitalize}
         %td
-          #{@site[prop.name]}
+          #{@site[prop]}
 
   %br{:style=>'float:none; clear:both;'}
   %br
