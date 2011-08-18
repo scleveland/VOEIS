@@ -28,9 +28,14 @@ class Project
   has n, :roles, :through => :memberships
 
   after :create, :give_current_user_membership
+  after :create,  :upgrade_global_models
   before :destroy, :destroy_cleanup
   after :save, :publish_his
 
+
+  def upgrade_global_models
+    DataMapper.auto_upgrade!
+  end
   ##
   # Permissions on the object for the user that is passed in
   #
