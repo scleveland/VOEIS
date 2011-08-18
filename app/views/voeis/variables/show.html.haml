@@ -117,19 +117,17 @@
 
     :javascript
       TEST = 'TESTING ShowVariable';
-      TEST2 = '#{@TEST}';
-      var gdata = #{@graph_data.to_json};
       //var gdata = #{@variable.last_ten_values_graph(@site).to_json};
+      var gdata = #{@graph_data.to_json};
+      gdata = gdata ? gdata : {};
       //gdata = {};
 
       //graphInit();
       var graphInit = function(varId,varName) {
           console.log('SITE-ID= ', '#{@site.id}');
           console.log('VAR-ID= ', '#{@variable.id}');
-          //console.log('GDATA= ', '#{@variable.last_ten_values_graph(@site).as_json}');
           console.log('GDATA= ', gdata);
           console.log('TEST= ', TEST);
-          console.log('TEST2= ', TEST2);
           plotGraph();
           handleGraph(varName);
       };

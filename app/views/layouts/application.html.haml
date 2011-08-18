@@ -52,6 +52,7 @@
           }).play();
       }
       $(window).ready(function(){ 
+          if(window.pre_dojo_parse) pre_dojo_parse();
           dojo.parser.parse();
           //hideLoader();
       });

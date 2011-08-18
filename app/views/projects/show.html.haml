@@ -194,6 +194,12 @@
       //dojo.byId('SiteDisplayGrid').canSort = function(col,field){ return false; };
     });
     
+    function pre_dojo_parse() {
+      //STUFF HERE
+      console.log('PRE-PARSE!');
+      pane_proto00 = $('#site_pane_proto').html();
+    };
+    
     $(window).ready(function(){ 
       console.log('DONE LOADING!!');
       pmap_init();
@@ -231,7 +237,7 @@
       //  w.destroyRecursive(true);
       //});
       //console.log('PURGING WIDGETS??');
-      pane_proto00 = $('#site_pane_proto').html();
+      //pane_proto00 = $('#site_pane_proto').html();
       $('#site_pane_proto').find('*').each(function(idx){
         //console.log('EleID: '+this.id);
         //var wid = dijit.byNode(this);

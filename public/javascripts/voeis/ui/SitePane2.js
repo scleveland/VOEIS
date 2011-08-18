@@ -9,6 +9,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	project: '',
 	site: '',
 	siteIdx: 0,
+	newSite: false,
 	closable: true,
 	editMode: false,
 	preload: true,
@@ -125,9 +126,18 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		};
 		*/
 
+		//dojo.parser.parse(sitePaneContent);
 		this.set('content', sitePaneContent);
 		//dojo.parser.parse(sitePaneContent);
-		//dojo.parser.parse(this.id);
+		//dojo.parser.parse(dojo.byId(this.id));
+		
+		if(this.newSite || true) {
+			$('#show-'+siteTag).hide();$('#edit-'+siteTag).show();
+			$(siteTag+'-name-head').text('NEW SITE');
+			$(siteTag+'-edit-control').hide();
+			this.set("title", 'NEW SITE');
+			
+		}
 		
 		//this.refresh();
 		//if(this.loaded) initForm(siteTag);
@@ -139,21 +149,33 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	},
 
 	setSite: function(site) {
-		if(site && site.id && site.code && site.idx)
-			this.site = site;
-		else {
-			if(!site) this.site = site_data[0];
-			else {
+		if(parseInt(site)===site) {
+			if(parseInt(site)!=0) {
 				var siteId = parseInt(site);
 				this.site = this.getSite(siteId);
+			} else {
+				//NEW SITE
+				this.newSite = true;
+				this.site = {};
+				this.set('id', 'site0');
+				this.site_stats = [];
+				this.site_var_stats = [];
+				this.site_samps = [];
 			};
+		} else {
+			if(site && site.id && site.code && site.idx)
+				this.site = site;
+			else
+				this.site = site_data[0];
 		};
-		this.set('id', 'site'+this.site.id);
-		
-		this.siteIdx = this.site.idx;
-		this.site_stats = site_stat_data[this.siteIdx];
-		this.site_var_stats = site_var_data[this.siteIdx];
-		this.site_samps = site_samp_data[this.siteIdx];
+		if(!this.newSite) {
+			this.set('id', 'site'+this.site.id);
+
+			this.siteIdx = this.site.idx;
+			this.site_stats = site_stat_data[this.siteIdx];
+			this.site_var_stats = site_var_data[this.siteIdx];
+			this.site_samps = site_samp_data[this.siteIdx];
+		};
 		
 		this.dialog.attr('id', this.id+'_dialog');
 		

@@ -221,7 +221,7 @@
         -#%button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"dijit.byNode(dojo.byId('site00')).dialog.hide();"} Cancel
         %button{:onClick=>"dijit.byNode(dojo.byId('site00')).dialog.hide();return false;", :value=>"Cancel"} Cancel
 
-    %table
+    %table{:id=>"site00-edit-control"}
       %tr
         %td{:style=>"width:200px;"}
           %b EDITING
@@ -336,7 +336,7 @@
       //test//$('#site'+siteId+'_'+fn).append($("<option></option>").attr("value",'10').text($('#site'+siteId+'_'+fn+'_term').val()));
       //test//$('#site'+siteId+'_'+fn).val('10');
       };
-
+      
       function valid_site_change(siteId,btn) {
       var form = dijit.byId('site'+siteId+'-edit-form');
       // set initial state
@@ -390,14 +390,15 @@
               %span{:class=>'label'}
                 %label{:for=>"site_latitude"} Latitude
             -#= f.text_field("latitude", :value=>"$$$latitude$$$")
-            -#%input(name="site_latitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$latitude$$$")
-            %input(name="site_latitude" id="site00_latitude" type="text" value="$$$latitude$$$")
+            %input(name="site_latitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$latitude$$$" required="true")
+            -#%input(name="site_latitude" id="site00_latitude" type="text" value="$$$latitude$$$")
           %td
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_longitude"} Longitude
             -#= f.text_field("longitude", :value=>"$$$longitude$$$")
-            %input(name="site_longitude" id="site00_longitude" type="text" value="$$$longitude$$$")
+            %input(name="site_longitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$longitude$$$" required="true")
+            -#%input(name="site_longitude" id="site00_longitude" type="text" value="$$$longitude$$$")
         %tr
           %td{:colspan=>"2"}
             .from-element
@@ -420,36 +421,38 @@
             %input(name="site_local_y"  type="text" value="$$$local_y$$$")
 
         %tr
-          %td
+          %td{:colspan=>"2"}
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_vertical_datum"} Vertical Datum
+                %label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
+                  Vertical Datum
             -#= f.text_field("vertical_datum", :value=>"$$$vertical_datum_id$$$") 
             -#= f.select("site00_vertical_datum", options_for_select([]), :class=>"form-dropdown")
             -#= f.select('vertical_datum', options_for_select(@vertical_datum_items), :class=>"form-dropdown")
             %select(id="site00_vertical_datum" name="site_vertical_datum")
               - @vertical_datum_items.each do |item|
                 %option(value="#{item[1]}") #{item[0]}
-          %td{:style=>"padding-top:20px;"}
+            -#%td{:style=>"padding-top:20px;"}
             -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            = link_to('NEW', 'javascript:', :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');")
             -#= link_to('NEW', 'javascript:', :onclick=>"$('#edit-site00 .hide-row').hide();$('#site00_new_vertical_datum_row').show();")
+            -#= link_to('NEW', 'javascript:', :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');")
 
         %tr
-          %td
+          %td{:colspan=>"2"}
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_local_projection"} Local Projection
+                %label{:for=>"site_local_projection", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_local_projection');"}
+                  Local Projection
             -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
             -#= f.select('local_projection',  options_for_select(@local_projection_items, '$$$local_projection$$$'), :class=>"form-dropdown")
             %select(id="site00_local_projection" name="site_local_projection")
               - @local_projection_items.each do |item|
                 %option(value="#{item[1]}") #{item[0]}
-          %td{:style=>"padding-top:20px;"}
+            -#%td{:style=>"padding-top:20px;"}
             -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             -#= link_to('NEW', 'javascript:', :onclick=>"dijit.byId('site00_new_local_projection').show();")
-            = link_to('NEW', 'javascript:', :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_local_projection');")
             -#= link_to('NEW', 'javascript:', :onclick=>"$('#edit-site00 .hide-row').hide();$('#site00_new_local_projection_row').show();")
+            -#= link_to('NEW', 'javascript:', :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_local_projection');")
 
         %tr
           %td{:colspan=>"2"}
@@ -495,7 +498,7 @@
             -#%button(id="site00_voeis_site_submit" name="commit" dojoType="dijit.form.Button" onclick="if(formValid()){$('#loader').toggle();formSend();};")
             -#%button(id="site00_voeis_site_submit" name="commit" dojoType="dijit.form.Button" onclick="console.log('CLICK!');")
             -#%button(id="site00_voeis_site_submit" jsId="site00_voeis_site_submit" name="commit" dojoType="dijit.form.Button") Save Site
-            %button(id="site00_voeis_site_submit" name="commit" value="Save Site" onClick="submit_site_form($$$id$$$);return false;") Save Site
+            %button(dojoType="dijit.form.Button" id="site00_voeis_site_submit" name="commit" value="Save Site" onClick="submit_site_form($$$id$$$);return false;") Save Site
             -#%script{:type=>"text/javascript"}
             -#%script{:type=>"dojo/method", :event=>"onClick"}
             -#%script{:type=>"dojo/connect", :event=>"onClick"}
@@ -516,7 +519,7 @@
             &nbsp;&nbsp;
             -#%button(dojoType="dijit.form.Button" onclick="console.log('CANCEL!');$('#edit-site00').hide();$('#show-site00').show();") 
             -#%button(id="site00_voeis_cancel" dojoType="dijit.form.Button") Cancel
-            %button(id="site00_voeis_cancel" value="Cancel" onclick="cancel_site_form($$$id$$$)") Cancel
+            %button(dojoType="dijit.form.Button" id="site00_voeis_cancel" value="Cancel" onclick="cancel_site_form($$$id$$$)") Cancel
             -#&nbsp;&nbsp;
             -#= link_to('Cancel', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit-site00').hide();$('#show-site00').show();") 
             -#= link_to('TEST', 'javascript:', :class=>'icon icon-cancel', :onclick=>"dijit.byNode(dojo.byId('site00')).siteFormSave(this);") 
