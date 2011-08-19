@@ -431,7 +431,7 @@
         sitePane.setSite(siteId);
         //sitePane.editMode = editMode || false;
         tabs.addChild(sitePane);
-        console.log(sitePane);
+        //console.log(sitePane);
       };
       tabs.selectChild(sitePane);
     };
@@ -483,6 +483,14 @@
       tabs.addChild(sitesGrid);
       tabs.selectChild(sitesGrid);
     };
+
+    //#############
+
+    dojo.subscribe("voeis/project/site/new", function() {
+      console.log('NEW SITE');
+      var tabs = dijit.byId('tab_browser');
+      openSiteTab(tabs, 0, false);
+    });
 
     dojo.subscribe("voeis/project/site/select", function(siteId) {
       console.log(arguments);
