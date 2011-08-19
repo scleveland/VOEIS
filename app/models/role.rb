@@ -12,6 +12,8 @@ class Role
   include DataMapper::Resource
   include Facet::DataMapper::Resource
 
+  #because this is depricated we are doing this AWESOME aliasing
+  alias :update_attributes :update
   property :id, Serial
   property :name, String, :required => true, :unique => true
   property :description, Text
@@ -37,7 +39,26 @@ class Role
       Voeis::Sample,
       Voeis::SampleMaterial,
       Voeis::LabMethod,
-      Voeis::MetaTag]
+      Voeis::MetaTag,
+      Voeis::VerticalDatumCV,
+      Voeis::LocalProjectionCV,
+      Voeis::FieldMethod,
+      Voeis::GeneralCategoryCV,
+      Voeis::Lab,
+      Voeis::LoggerTypeCV,
+      Voeis::QualityControlLevel,
+      Voeis::SampleMediumCV,
+      Voeis::SensorTypeCV,
+      Voeis::SiteDataCatalog,
+      Voeis::Source,
+      Voeis::SpatialOffset,
+      Voeis::SpatialOffsetType,
+      Voeis::SpeciationCV,
+      Voeis::ValueTypeCV,
+      Voeis::VariableNameCV,
+      Voeis::Equipment,
+      Voeis::Visit,
+      Voeis::Campaign]
   end
 
   def self.available_permissions

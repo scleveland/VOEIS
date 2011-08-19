@@ -18,6 +18,7 @@
 #
 class Voeis::FieldMethod
   include DataMapper::Resource
+  include Facet::DataMapper::Resource
   include Yogo::Versioned::DataMapper::Resource
 
   property :id,                 Serial

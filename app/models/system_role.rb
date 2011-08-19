@@ -1,3 +1,5 @@
+#This is the Application Wide Role based access permissions
+#  Role is project specific permissions
 require 'dm-core'
 require 'dm-types/yaml'
 class SystemRole
