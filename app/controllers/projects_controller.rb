@@ -163,99 +163,99 @@ class ProjectsController < InheritedResources::Base
     @vartical_datum_items = Voeis::VerticalDatumCV.all(:order => [:term.asc])
     @local_projection_items = Voeis::LocalProjectionCV.all(:order => [:term.asc])
     
-    @current_data = Array.new
-    @items = Array.new
-    @start_time = nil
-    @end_time = nil
-    @label_array = ["Timestamp"]
-    if params.has_key?(:range)
-      @start_time = Date.civil(params[:range][:"start_date(1i)"].to_i,params[:range]      [:"start_date(2i)"].to_i,params[:range][:"start_date(3i)"].to_i)
-      @end_time = Date.civil(params[:range][:"end_date(1i)"].to_i,params[:range]    [:"end_date(2i)"].to_i,params[:range][:"end_date(3i)"].to_i)
-      @start_time = @start_time.to_datetime
-      @end_time = @end_time.to_datetime + 23.hour + 59.minute
-
-
-      # Create the Labels for the header
-      var_label=""
-      if params.has_key?(:variables)
-        params[:variables].keys.each do |site_id|
-          site = resource.managed_repository { Voeis::Site.get(site_id) }
-          if params[:variables][site_id].empty?
-            site.variables.each do |variable|
-              var_label = ""
-              var_label =  site.name if params[:site_display]
-              var_label = var_label +  variable.variable_name
-              var_label = var_label + variable.sample_medium if params[:sample_medium_display]
-              var_label = var_label + variable.data_type if params[:data_type_display]
-              var_label = var_label + Voeis::Unit.get(variable.variable_units_id).units_name if params[:units_display]
-
-              @label_array << var_label #"#{site.name} #{variable.variable_name}"
-              @items << [site, variable]
-            end
-          else
-            params[:variables][site_id].each do |variable_id|
-              variable = resource.managed_repository{ Voeis::Variable.get(variable_id) }
-              var_label = ""
-              var_label =  site.name + "|" if params[:site_display]
-              var_label = var_label +  variable.variable_name
-              var_label = var_label + "|" + variable.sample_medium if params[:sample_medium_display]
-              var_label = var_label + "|" + variable.data_type if params[:data_type_display]
-              var_label = var_label + "|" + Voeis::Unit.get(variable.variable_units_id).units_name if params[:units_display]
-              @label_array << var_label #{}"#{site.name} #{variable.variable_name}"
-              @items << [site, variable]
-            end
-          end
-        end
-      end
-
-      # Fill in the current data
-      data_lists = Hash.new
-      timestamps = Set.new
-      @items.each do |site, variable|
-        #get sensor data
-        if site.sensor_types.count > 0
-          sensor = site.sensor_types.select{|s| s.variables.include?(variable)}[0]
-          if !sensor.nil?
-            values = sensor.sensor_values.all(:timestamp.gte => @start_time, :timestamp.lte => @end_time)
-            data_lists[site] ||= Hash.new
-            data_lists[site][variable] ||= Hash.new
-            values.each do |v|
-              data_lists[site][variable][v.timestamp] = v.value
-            end
-            timestamps.merge(values.map {|v| v.timestamp})
-          end
-        end
-        #get sample data
-        if site.samples.count > 0
-          sample = site.samples.select{|s| s.variables.include?(variable)}[0]
-          if !sample.nil?
-            values = sample.data_values.all(:local_date_time.gte => @start_time, :local_date_time.lte => @end_time).intersection(variable.data_values)
-            data_lists[site] ||= Hash.new
-            data_lists[site][variable] ||= Hash.new
-            values.each do |v|
-
-                data_lists[site][variable][v.local_date_time] = v.data_value
-
-            end
-            timestamps.merge(values.map {|v| v.local_date_time})
-          end
-        end
-      end
-
-      timestamps.to_a.sort.each do |ts|
-        tmp_array = Array.new
-        tmp_array << ts
-        @items.each do |site, variable|
-          if data_lists[site][variable].has_key?(ts)
-            value = data_lists[site][variable][ts]
-          else
-            value = nil
-          end
-          tmp_array << value
-        end
-        @current_data << tmp_array
-      end
-    end
+    # @current_data = Array.new
+    #     @items = Array.new
+    #     @start_time = nil
+    #     @end_time = nil
+    #     @label_array = ["Timestamp"]
+    #     if params.has_key?(:range)
+    #       @start_time = Date.civil(params[:range][:"start_date(1i)"].to_i,params[:range]      [:"start_date(2i)"].to_i,params[:range][:"start_date(3i)"].to_i)
+    #       @end_time = Date.civil(params[:range][:"end_date(1i)"].to_i,params[:range]    [:"end_date(2i)"].to_i,params[:range][:"end_date(3i)"].to_i)
+    #       @start_time = @start_time.to_datetime
+    #       @end_time = @end_time.to_datetime + 23.hour + 59.minute
+    # 
+    # 
+    #       # Create the Labels for the header
+    #       var_label=""
+    #       if params.has_key?(:variables)
+    #         params[:variables].keys.each do |site_id|
+    #           site = resource.managed_repository { Voeis::Site.get(site_id) }
+    #           if params[:variables][site_id].empty?
+    #             site.variables.each do |variable|
+    #               var_label = ""
+    #               var_label =  site.name if params[:site_display]
+    #               var_label = var_label +  variable.variable_name
+    #               var_label = var_label + variable.sample_medium if params[:sample_medium_display]
+    #               var_label = var_label + variable.data_type if params[:data_type_display]
+    #               var_label = var_label + Voeis::Unit.get(variable.variable_units_id).units_name if params[:units_display]
+    # 
+    #               @label_array << var_label #"#{site.name} #{variable.variable_name}"
+    #               @items << [site, variable]
+    #             end
+    #           else
+    #             params[:variables][site_id].each do |variable_id|
+    #               variable = resource.managed_repository{ Voeis::Variable.get(variable_id) }
+    #               var_label = ""
+    #               var_label =  site.name + "|" if params[:site_display]
+    #               var_label = var_label +  variable.variable_name
+    #               var_label = var_label + "|" + variable.sample_medium if params[:sample_medium_display]
+    #               var_label = var_label + "|" + variable.data_type if params[:data_type_display]
+    #               var_label = var_label + "|" + Voeis::Unit.get(variable.variable_units_id).units_name if params[:units_display]
+    #               @label_array << var_label #{}"#{site.name} #{variable.variable_name}"
+    #               @items << [site, variable]
+    #             end
+    #           end
+    #         end
+    #       end
+    # 
+    #       # Fill in the current data
+    #       data_lists = Hash.new
+    #       timestamps = Set.new
+    #       @items.each do |site, variable|
+    #         #get sensor data
+    #         if site.sensor_types.count > 0
+    #           sensor = site.sensor_types.select{|s| s.variables.include?(variable)}[0]
+    #           if !sensor.nil?
+    #             values = sensor.sensor_values.all(:timestamp.gte => @start_time, :timestamp.lte => @end_time)
+    #             data_lists[site] ||= Hash.new
+    #             data_lists[site][variable] ||= Hash.new
+    #             values.each do |v|
+    #               data_lists[site][variable][v.timestamp] = v.value
+    #             end
+    #             timestamps.merge(values.map {|v| v.timestamp})
+    #           end
+    #         end
+    #         #get sample data
+    #         if site.samples.count > 0
+    #           sample = site.samples.select{|s| s.variables.include?(variable)}[0]
+    #           if !sample.nil?
+    #             values = sample.data_values.all(:local_date_time.gte => @start_time, :local_date_time.lte => @end_time).intersection(variable.data_values)
+    #             data_lists[site] ||= Hash.new
+    #             data_lists[site][variable] ||= Hash.new
+    #             values.each do |v|
+    # 
+    #                 data_lists[site][variable][v.local_date_time] = v.data_value
+    # 
+    #             end
+    #             timestamps.merge(values.map {|v| v.local_date_time})
+    #           end
+    #         end
+    #       end
+    # 
+    #       timestamps.to_a.sort.each do |ts|
+    #         tmp_array = Array.new
+    #         tmp_array << ts
+    #         @items.each do |site, variable|
+    #           if data_lists[site][variable].has_key?(ts)
+    #             value = data_lists[site][variable][ts]
+    #           else
+    #             value = nil
+    #           end
+    #           tmp_array << value
+    #         end
+    #         @current_data << tmp_array
+    #       end
+    #end
     super
   end
 
