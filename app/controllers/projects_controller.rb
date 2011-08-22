@@ -104,8 +104,8 @@ class ProjectsController < InheritedResources::Base
     
     #### CV referenced fields
     @sites.each{ |site| 
-      vert_datum = site.vertical_datum_id.nil? ? '' : site.vertical_datum.term.to_s
-      local_proj = site.local_projection_id.nil? ? '' : site.local_projection.term.to_s
+      vert_datum = site.vertical_datum.nil? ? '' : site.vertical_datum.term.to_s
+      local_proj = site.local_projection.nil? ? '' : site.local_projection.term.to_s
       @site_ref << {:vertical_datum=>vert_datum, :local_projection=>local_proj}
     }
     
