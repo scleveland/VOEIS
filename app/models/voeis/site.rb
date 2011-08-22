@@ -62,8 +62,8 @@ class Voeis::Site
   has n, :samples,       :model => "Voeis::Sample",      :through => Resource
   has n, :variables,     :model => "Voeis::Variable",    :through => Resource
 
-  belongs_to  :vertical_datum,    :model => "Voeis::VerticalDatumCV", :required=>false
-  belongs_to  :local_projection,  :model => "Voeis::LocalProjectionCV", :required=>false
+  belongs_to  :vertical_datum,    :model => "Voeis::VerticalDatumCV", :child_key=>"vertical_datum_id", :required=>false
+  belongs_to  :local_projection,  :model => "Voeis::LocalProjectionCV", :child_key=>"local_projection_id", :required=>false
   #has 1,  :vertical_datum,    :model => "Voeis::VerticalDatumCV",    :child_key=>"vertical_datum_id"
   #has 1,  :local_projection,  :model => "Voeis::LocalProjectionCV",  :child_key=>"local_projection_id"
 
@@ -74,7 +74,29 @@ class Voeis::Site
   alias :site_code  :code
   alias :site_code= :code=
 
-
+  before :save, :update_associations
+  
+  def update_associations
+    if self.vertical_datum_id
+      puts "Booyah" 
+      @vert_datum_global = DataMapper.repository(:default){Voeis::VerticalDatumCV.get(self.vertical_datum_id)}
+      self.vertical_datum = Voeis::VerticalDatumCV.first_or_create(:id=>@vert_datum_global.id,
+                                             :term=>@vert_datum_global.term,
+                                             :definition=>@vert_datum_global.definition)
+    end
+    
+    puts "HHEYE"
+    puts self.code
+    puts self.vertical_datum
+    if self.local_projection_id
+      puts "HECKYA"
+      @local_proj_global = DataMapper.repository(:default){Voeis::LocalProjectionCV.get(self.local_projection_id)}
+      self.local_projection = Voeis::LocalProjectionCV.first_or_create(:id=>@local_proj_global.id,
+                                          :term=>@local_proj_global.term,
+                                          :definition=>@local_proj_global.definition)
+    end
+  end
+  
   def fetch_time_zone_offset
     require "geonames"
     zone = Geonames::WebService.timezone self.latitude, self.longitude
