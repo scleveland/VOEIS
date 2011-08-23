@@ -77,7 +77,8 @@ class Voeis::Site
   before :save, :update_associations
   
   def update_associations
-    if self.vertical_datum_id
+    debugger
+    if !self.vertical_datum_id.nil? && self.vertical_datum_id != 0
       puts "Booyah" 
       @vert_datum_global = DataMapper.repository(:default){Voeis::VerticalDatumCV.get(self.vertical_datum_id)}
       self.vertical_datum = Voeis::VerticalDatumCV.first_or_create(:id=>@vert_datum_global.id,
@@ -88,7 +89,7 @@ class Voeis::Site
     puts "HHEYE"
     puts self.code
     puts self.vertical_datum
-    if self.local_projection_id
+    if !self.local_projection_id.nil? && self.vertical_datum_id !=0
       puts "HECKYA"
       @local_proj_global = DataMapper.repository(:default){Voeis::LocalProjectionCV.get(self.local_projection_id)}
       self.local_projection = Voeis::LocalProjectionCV.first_or_create(:id=>@local_proj_global.id,
