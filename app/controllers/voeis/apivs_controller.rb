@@ -245,6 +245,7 @@ class Voeis::ApivsController < Voeis::BaseController
             logger.info {"File does not match the data_templates number of columns."}
           end
         rescue   Exception => e
+            email_exception(e,request.env)
             logger.info {e.to_s}
             logger.info {"YEAH"}
           #problem parsing file
@@ -682,12 +683,14 @@ class Voeis::ApivsController < Voeis::BaseController
   def create_project_site
     @site = ""
     parent.managed_repository do
-      @site = Voeis::Site.new(:name => params[:name], 
-                                     :code => params[:code],
-                                     :latitude => params[:latitude],
-                                     :longitude => params[:longitude],
-                                     :state => params[:state])#,
-                                     #:country => params[:country])
+      @site = Voeis::Site.new
+      Voeis::Site.properties.each do |prop|
+        if prop.name.to_s != "id"
+          if !params[prop.name].nil?
+            @site[prop.name.to_s] = params[prop.name.to_s]
+          end #endif
+        end#endif
+      end#end loop
       begin
        @site.save
       rescue
