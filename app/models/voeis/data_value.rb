@@ -17,7 +17,8 @@ class Voeis::DataValue
   property :quality_control_level,      Integer,  :required=>true, :default=>0
   property :datatype,                  String,   :required =>false, :default =>"Sample"
   property :published,                  Boolean,  :required => false
-  
+  property :site_id,                    Integer, :required=>false
+  property :variable_id,                Integer, :required=>false
   yogo_versioned
   #timestamps :at
   
