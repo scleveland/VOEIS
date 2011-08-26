@@ -273,6 +273,7 @@ class Voeis::ApivsController < Voeis::BaseController
         end
         if flash_error[:error].nil?
           flash_error[:success] = "File was parsed succesfully."
+          data_stream_template.sites.first.update_site_data_catalog
           #flash_error = flash_error.merge({:last_record => data_stream_template.data_stream_columns.sensor_types.sensor_values.last(:order =>[:id.asc]).as_json}) 
         end
         format.json do
