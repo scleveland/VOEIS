@@ -15,10 +15,10 @@ class Voeis::DataValue
   property :end_vertical_offset,        Float,    :required=>false
   property :string_value,               String,   :required => true, :default => "Unknown"
   property :quality_control_level,      Integer,  :required=>true, :default=>0
-  property :datatype,                  String,   :required =>false, :default =>"Sample"
+  property :datatype,                  String,    :default =>"Sample", :index =>true
   property :published,                  Boolean,  :required => false
-  property :site_id,                    Integer, :required=>false
-  property :variable_id,                Integer, :required=>false
+  property :site_id,                    Integer,  :index => true
+  property :variable_id,                Integer, :index => true
   yogo_versioned
   #timestamps :at
   
@@ -168,7 +168,7 @@ class Voeis::DataValue
                    sample_datetime.sec, (data_stream.utc_offset+dst_time)/24.to_f)
     #if t = Date.parse(timestamp) rescue nil?
     #if (Voeis::DataValue.first(:local_date_time => timestamp) & 
-    if Voeis::Variable.get(data_col_array[variable_cols[0]][variable].id).data_values.first(:datatype=>data_stream.type, :local_date_time=>timestamp).nil?
+    if Voeis::DataValue.first(:datatype=>data_stream.type, :local_date_time=>timestamp, :site_id=> site_id, :variable_id => data_col_array[variable_cols[0]][variable].id).nil?
           created_at = updated_at = Time.now.strftime("%Y-%m-%dT%H:%M:%S%z")
           row_values = []
           (0..row.size-1).each do |i|
