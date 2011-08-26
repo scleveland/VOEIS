@@ -54,7 +54,7 @@ Yogo::Application.routes.draw do
           get :dojo_variables_for_tree
           post :create_project_site
           post :create_project_variable
-          put :update_project_site
+          post :update_project_site
           put :update_project_variable
           put :update_voeis_variable
           get :get_project_sites
