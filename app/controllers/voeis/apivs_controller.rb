@@ -502,8 +502,8 @@ class Voeis::ApivsController < Voeis::BaseController
        @site.variables. each do |var|
          @var_hash = Hash.new
          @var_hash = var.as_json
-         @var_hash = @var_hash.merge({'time_series_data' => @site.data_values.all(:datatype=>"Sensor",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)}) 
-         @var_hash = @var_hash.merge({'sample_data' => @site.data_values.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+         @var_hash = @var_hash.merge({'time_series_data' => Voeis::DataValue.all(:datatype=>"Sensor",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => var.id)}) 
+         @var_hash = @var_hash.merge({'sample_data' => Voeis::DataValue.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => var.id)})
          @values << @var_hash
        end
        @data_values[:variables] = @values
@@ -541,7 +541,7 @@ class Voeis::ApivsController < Voeis::BaseController
          #var = sensor.variables.first
          @var_hash = Hash.new
          @var_hash = var.as_json
-         @var_hash = @var_hash.merge({'data' => (var.data_values(:datatype=>"Sensor",:order => [:local_date_time.asc]) & @site.data_values).last.as_json}) 
+         @var_hash = @var_hash.merge({'data' =>  Voeis::DataValue.last(:datatype=>"Sensor",:order => [:local_date_time.asc], :site_id => @site.id, :variable_id => var.id).as_json}) 
          @values << @var_hash
        end
        @data_values[:variables] = @values
@@ -579,7 +579,7 @@ class Voeis::ApivsController < Voeis::BaseController
          #var = sensor.variables.first
          @var_hash = Hash.new
          @var_hash = var.as_json
-         @var_hash = @var_hash.merge({'data' => (var.data_values(:datatype=>"Sample",:order => [:local_date_time.asc]) & @site.data_values).last.as_json}) 
+         @var_hash = @var_hash.merge({'data' => Voeis::DataValue.all(:datatype=>"Sample",:order => [:local_date_time.asc], :site_id => @site.id, :variable_id => var.id).last.as_json}) 
          @values << @var_hash
        end
        @data_values[:variables] = @values
