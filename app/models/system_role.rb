@@ -6,6 +6,7 @@ class SystemRole
   include DataMapper::Resource
   include Facet::DataMapper::Resource
 
+  alias :update_attributes :update
   property :id, Serial
   property :name, String, :required => true
   property :description, String, :length => 250
