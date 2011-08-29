@@ -627,7 +627,7 @@ class Voeis::ApivsController < Voeis::BaseController
       #  @data_values[:error] = "There are no Sensor Value for this site and variable combination"
       # else
          @data_values[:variable] = @variable.as_json
-         @data_values[:data] = (@site.data_values & @variable.data_values).all(:datatype=>"Sensor", :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :order => [:local_date_time.asc]).as_json 
+         @data_values[:data] = Voeis::DataValue.all(:datatype=>"Sensor", :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => @variable.id,:order => [:local_date_time.asc]).as_json 
        #end
      end
      respond_to do |format|
@@ -672,7 +672,7 @@ class Voeis::ApivsController < Voeis::BaseController
       #  @data_values[:error] = "There are no Sensor Value for this site and variable combination"
       # else
          @data_values[:variable] = @variable.as_json
-         @data_values[:data] = (@site.data_values & @variable.data_values).all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :order => [:local_date_time.asc]).as_json 
+         @data_values[:data] = Voeis::DataValue.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id=>@site.id, :variable_id => @variable.id, :order => [:local_date_time.asc]).as_json 
        #end
      end
      respond_to do |format|
