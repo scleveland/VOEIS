@@ -63,7 +63,8 @@ class Voeis::Site
   has n, :variables,     :model => "Voeis::Variable",    :through => Resource
 
   belongs_to  :vertical_datum,    :model => "Voeis::VerticalDatumCV", :child_key=>"vertical_datum_id", :required=>false
-  belongs_to  :local_projection,  :model => "Voeis::LocalProjectionCV", :child_key=>"local_projection_id", :required=>false
+  belongs_to  :local_projection,  :model => "Voeis::SpatialReference", :child_key=>"local_projection_id", :required=>false
+  belongs_to :lat_long_datum, :model => "Voeis::SpatialReference", :child_key=>"lat_long_datum_id", :required=>false
   #has 1,  :vertical_datum,    :model => "Voeis::VerticalDatumCV",    :child_key=>"vertical_datum_id"
   #has 1,  :local_projection,  :model => "Voeis::LocalProjectionCV",  :child_key=>"local_projection_id"
 
@@ -89,12 +90,23 @@ class Voeis::Site
     puts "HHEYE"
     puts self.code
     puts self.vertical_datum
-    if !self.local_projection_id.nil? && self.vertical_datum_id !=0
+    if !self.local_projection_id.nil? && self.local_projection_id !=0
       puts "HECKYA"
-      @local_proj_global = DataMapper.repository(:default){Voeis::LocalProjectionCV.get(self.local_projection_id)}
-      self.local_projection = Voeis::LocalProjectionCV.first_or_create(:id=>@local_proj_global.id,
-                                          :term=>@local_proj_global.term,
-                                          :definition=>@local_proj_global.definition)
+      @spat_ref_global = DataMapper.repository(:default){Voeis::SpatialReference.get(self.local_projection_id)}
+      self.local_projection = Voeis::SpatialReference.first_or_create(:id=>@spat_ref_global.id,
+                                          :srs_id => @spat_ref_global.srs_id,
+                                          :srs_name=>@spat_ref_global.srs_name,
+                                          :is_geographic =>@spat_ref_global.is_geographic,
+                                          :notes=>@spat_ref_global.notes)
+    end
+    if !self.lat_long_datum_id.nil? && self.lat_long_datum_id !=0
+      puts "HECKYA"
+      @spat_ref_global = DataMapper.repository(:default){Voeis::SpatialReference.get(self.local_projection_id)}
+      self.lat_long_datum = Voeis::SpatialReference.first_or_create(:id=>@spat_ref_global.id,
+                                          :srs_id => @spat_ref_global.srs_id,
+                                          :srs_name=>@spat_ref_global.srs_name,
+                                          :is_geographic =>@spat_ref_global.is_geographic,
+                                          :notes=>@spat_ref_global.notes)
     end
   end
   

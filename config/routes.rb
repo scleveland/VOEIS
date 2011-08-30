@@ -176,7 +176,7 @@ Yogo::Application.routes.draw do
   resources :settings
   resources :search
   resources :vertical_datum_c_vs
-  resources :local_projection_c_vs
+  resources :spatial_references
   resources :variable_name_c_vs
   resources :sample_medium_c_vs
   resources :value_type_c_vs

@@ -55,10 +55,10 @@ class SitePane2Widget < Apotomo::Widget
     @local_projection_items = [['-none-', nil]]
     @vertical_datums = Voeis::VerticalDatumCV.all(:order => [:term.asc])
     #@vertical_datums_local = @project.managed_repository{Voeis::VerticalDatumCV.all(:order => [:term.asc])}
-    @local_projections = Voeis::LocalProjectionCV.all(:order => [:term.asc])
+    @local_projections = Voeis::SpatialReference.all(:order => [:srs_name.asc])
     #@local_projections_local = @project.managed_repository{Voeis::LocalProjectionCV.all(:order => [:term.asc])}
     @vertical_datums.each { |item| @vertical_datum_items << [item.term, item.id.to_s] }
-    @local_projections.each { |item| @local_projection_items << [item.term, item.id.to_s] }
+    @local_projections.each { |item| @local_projection_items << [item.srs_name, item.id.to_s] }
     
     render
   end

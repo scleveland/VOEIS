@@ -105,7 +105,7 @@ class ProjectsController < InheritedResources::Base
     #### CV referenced fields
     @sites.each{ |site| 
       vert_datum = site.vertical_datum.nil? ? '' : site.vertical_datum.term.to_s
-      local_proj = site.local_projection.nil? ? '' : site.local_projection.term.to_s
+      local_proj = site.local_projection.nil? ? '' : site.local_projection.srs_id.to_s
       @site_ref << {:vertical_datum=>vert_datum, :local_projection=>local_proj}
     }
     
@@ -161,7 +161,7 @@ class ProjectsController < InheritedResources::Base
     
     #### CV stuff
     @vartical_datum_items = Voeis::VerticalDatumCV.all(:order => [:term.asc])
-    @local_projection_items = Voeis::LocalProjectionCV.all(:order => [:term.asc])
+    @local_projection_items = Voeis::SpatialReference.all(:order => [:srs_name.asc])
     
     # @current_data = Array.new
     #     @items = Array.new
