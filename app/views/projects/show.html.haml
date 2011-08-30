@@ -25,7 +25,7 @@
     dojo.require("dojo.data.ItemFileWriteStore");
     dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
     dojo.require("dojo.parser");
-    dojo.require ("voeis.Server");
+    dojo.require("voeis.Server");
     dojo.require("voeis.ui.SitePane2");
 
     var projectsDataStore = voeis.Server.DEFAULT.projectsDataStore();
@@ -106,18 +106,20 @@
         },
         onError: function(error,request) {
           console.log('ERROR: '+error);
-          site = false;
+          //site = false;
         }
       });
       return site;
     }
     
-    function pmap_clear() {
-      //CLEAR ALL MAP BALLOONS
+    function pmap_clear(siteId) {
+      //CLEAR A MAP BALLOON
+      //OR ALL IF NO SITEID
       for(var i=0;i<pmarkers.length;i++) {
-        if(pmarkers[i].window.close)
+        if(pmarkers[i].window.close && (!siteId || pmarkers[i].id==parseInt(siteId))) {
           pmarkers[i].window.close();
-        pmarkers[i].setIcon(icon_default);
+          pmarkers[i].setIcon(icon_default);
+        }
       };
       var grid = dijit.byId('project_sites');
       grid.selection.clear();
@@ -143,20 +145,6 @@
       //var link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+item.id+']);">';
       marker.idx = item.idx;
       marker.id = parseInt(item.id);
-      //marker.info = '<p style="margin:0 15px;">';
-      //marker.info += link+'<strong>'+item.name+'</strong></a><br/>&nbsp;&nbsp;&nbsp;';
-      //marker.info += '(click for '+link+'<strong>SITE DETAILS</strong></a>)<br/>';
-      //marker.info += '&nbsp;&nbsp; <strong>Code:</strong> '+item.code+'<br/>';
-      //marker.info += '&nbsp;&nbsp; <strong>Site ID:</strong> '+item.id+'&nbsp;&nbsp;';
-      //marker.info += '&nbsp;&nbsp; <strong>State:</strong> '+item.state+'<br/>';
-      //marker.info += '&nbsp;&nbsp; <strong>Lat/Long:</strong> '+item.latitude+', '+item.longitude;
-      //marker.info += '<br/>&nbsp;&nbsp; <strong>Variables:</strong> '+stats.vars+' &mdash; ';
-      //marker.info += '<strong>Data collected:</strong> '+stats.count+'<br/>';
-      //marker.info += '&nbsp;&nbsp; <strong>Starting:</strong> '+stats.first;
-      //marker.info += ' &mdash; <strong>Ending:</strong> '+stats.last+'<br/>';
-      //##marker.info += item.code+'<br/>Elevation: '+item.elevation_m+'<br/>'
-      //##marker.info += item.county+', '+item.state+'</p>';
-      //marker.info += '</p>';
       marker.getSite = function(id) {
         //GET SITE FROM STORE
         var siteId = parseInt(id || this.id);
@@ -614,14 +602,27 @@
       //table1.render();
     });
 
-    dojo.subscribe("voeis/project/map/clear", function() {
+    dojo.subscribe("voeis/project/map/clear", function(siteId) {
       console.log('CLEAR MAP');
-      pmap_clear();
+      pmap_clear(siteId);
     });
 
     dojo.subscribe("voeis/project/map/new", function(siteId) {
       console.log('NEW MAP MARKER');
       pmap_new(siteId);
+    });
+
+    dojo.subscribe("voeis/project/site/close", function(siteId) {
+      console.log('CLOSE SITE TAB:',siteId);
+      var tabs = dijit.byId('tab_browser');
+      var sitePane = dojo.byId('site'+siteId);
+      if(sitePane) {
+        sitePane = dijit.byNode(sitePane);
+        tabs.removeChild(sitePane);
+        sitePane.onClose();
+        sitePane.destroyRecursive();  
+        pmap_clear(siteId);
+      };
     });
 
     dojo.subscribe("voeis/project/siteTables/refresh", function() {

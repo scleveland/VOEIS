@@ -26,7 +26,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		console.log('load-done-NOW: ');
 		console.log('>>>parseOnLoad:',this.parseOnLoad);
 		//if(initSiteForm(this.site.id)) this.loaded = true;
-		//init_site_form(this.site);
+		if(window.init_site_form) init_site_form(this.site.id);
 	},
 	
 	dialog: dijit.Dialog({

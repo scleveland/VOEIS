@@ -65,7 +65,8 @@
         -#-if !@current_user.nil? && @current_user.projects.include?(@project)
         -if @auth
           &nbsp;&nbsp;&nbsp;
-          = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"init_site_form($$$id$$$);$('#show-site00').hide();$('#edit-site00').show();")
+          -#= link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"init_site_form($$$id$$$);$('#show-site00').hide();$('#edit-site00').show();")
+          = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show-site00').hide();$('#edit-site00').show();")
           -#%br
           -#&nbsp;&nbsp;&nbsp;
           -#= link_to('TEST', 'javascript:', :class=>'icon icon-edit', :onclick=>"alert('EDIT>>> '+site_pane2.editMode);") 
@@ -316,10 +317,12 @@
       data['site']['local_projection'] = local_projection_dd.text;
       pane.siteSave(data['site']);
       //dojo.publish('voeis/project/siteTables/refresh');
-      var tabs = dijit.byId('tab_browser');
-      tabs.removeChild(pane);
-      pane.onClose();
-      pane.destroyRecursive();  
+      dojo.publish('voeis/project/site/close',[0]);
+      dojo.publish('voeis/project/map/new',[newValue.id]);
+      //var tabs = dijit.byId('tab_browser');
+      //tabs.removeChild(pane);
+      //pane.onClose();
+      //pane.destroyRecursive();  
       });
       } else {
       data['site']['id'] = siteId;
@@ -337,16 +340,19 @@
       data['site']['local_projection'] = local_projection_dd.text;
       pane.siteSave(data['site']);
       //dojo.publish('voeis/project/siteTables/refresh');
-      dojo.publish('voeis/project/map/clear');
+      dojo.publish('voeis/project/map/clear',[siteId]);
       };
       return false;
       };
       };
       
       function cancel_site_form(siteId) {
+      if(parseInt(siteId)) {
       $('#edit-site'+siteId).hide();
       $('#show-site'+siteId).show();
-      //window.scrollTo(0,0);
+      return
+      }
+      dojo.publish('voeis/project/site/close',[0]);
       };
 
       function submit_site_dialog(siteId,fn) {
@@ -376,10 +382,11 @@
       });
       };
       
-      function init_site_form(siteId) {
+      function init_site_form(siteId) { setTimeout(function() {
       var siteTag = 'site'+siteId;
       var form0 = siteTag+'-edit-form';
       var form = dijit.byId(form0);
+      console.log('INIT-FORM:',form0,form);
       form0 = form.domNode;
       var pane = dijit.byNode(dojo.byId(siteTag));
       var site = pane.site;
@@ -392,18 +399,19 @@
       //var submit_button = dijit.byNode(form0.elements['commit']);
       var submit_button = dijit.byId('site'+siteId+'_voeis_site_submit');
       // set initial state: submit button
-      submit_button.attr("disabled", !form.validate());
+      if(!pane.newSite) submit_button.attr("disabled", !form.validate());
       //submit_button.attr("disabled", !this.isValid());
       form0.elements['site_name'].focus();
-      
+
       //IS FORM VALID?
+      console.log('FORM-CONNECT:',siteId,form);
       form.connect(form, "onValidStateChange", function(state){
       console.log('formStateChange:',state);
       submit_button.attr("disabled", !state);
       });
+      }, 200)};
       
-      };
-
+      
 
     -#= form_for(:site, @site, :remote=>true, :url=>project_site_path(@project, @site), :builder=>YogoFormBuilder, :html=>{:method=>"put", :onsubmit=>"return checkform();"} )do |f|
     -#= form_for(:site, @site, :remote=>true, :url=>"/projects/#{@project.id}/sites/$$$id$$$/", :html=>{:method=>:put, :id=>"site00-edit-form", :onsubmit=>"dijit.byNode(dojo.byId('site00')).siteFormSave(this);return true;"} )do |f|
@@ -481,7 +489,7 @@
                 %label{:for=>"site_elevation_m"} Elevation
               -#= f.text_field("elevation_m", :value=>"$$$elevation_m$$$")
               -#%input(name="site_elevation_m" type="text" value="$$$elevation_m$$$")
-              %input(name="site_elevation_m" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$elevation_m$$$")
+              %input(name="site_elevation_m" dojoType="dijit.form.NumberTextBox" type="text" value="$$$elevation_m$$$")
         %tr
           %td 
             .from-element
@@ -489,14 +497,31 @@
                 %label{:for=>"site_local_x"} Local X
               -#= f.text_field("local_x", :value=>"$$$local_x$$$")
               -#%input(name="site_local_x"  type="text" value="$$$local_x$$$")
-              %input(name="site_local_x" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$local_x$$$")
+              %input(name="site_local_x" dojoType="dijit.form.NumberTextBox" type="text" value="$$$local_x$$$")
           %td 
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_local_y"} Local Y
               -#= f.text_field("local_y", :value=>"$$$local_y$$$")
               -#%input(name="site_local_y"  type="text" value="$$$local_y$$$")
-              %input(name="site_local_y" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$local_y$$$")
+              %input(name="site_local_y" dojoType="dijit.form.NumberTextBox" type="text" value="$$$local_y$$$")
+
+        %tr
+          %td{:colspan=>"2"}
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_local_projection", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00ref.showDialog('site00_xnew_local_projection');"}
+                  Local Projection
+            -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
+            -#= f.select('local_projection',  options_for_select(@local_projection_items, '$$$local_projection$$$'), :class=>"form-dropdown")
+            %select(id="site00_local_projection" name="site_local_projection")
+              - @local_projection_items.each do |item|
+                %option(value="#{item[1]}") #{item[0]}
+            -#%td{:style=>"padding-top:20px;"}
+            -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            -#= link_to('NEW', 'javascript:', :onclick=>"dijit.byId('site00_new_local_projection').show();")
+            -#= link_to('NEW', 'javascript:', :onclick=>"$('#edit-site00 .hide-row').hide();$('#site00_new_local_projection_row').show();")
+            -#= link_to('NEW', 'javascript:', :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_local_projection');")
 
         %tr
           %td{:colspan=>"2"}
@@ -520,27 +545,10 @@
           %td{:colspan=>"2"}
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_local_projection", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00ref.showDialog('site00_xnew_local_projection');"}
-                  Local Projection
-            -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
-            -#= f.select('local_projection',  options_for_select(@local_projection_items, '$$$local_projection$$$'), :class=>"form-dropdown")
-            %select(id="site00_local_projection" name="site_local_projection")
-              - @local_projection_items.each do |item|
-                %option(value="#{item[1]}") #{item[0]}
-            -#%td{:style=>"padding-top:20px;"}
-            -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            -#= link_to('NEW', 'javascript:', :onclick=>"dijit.byId('site00_new_local_projection').show();")
-            -#= link_to('NEW', 'javascript:', :onclick=>"$('#edit-site00 .hide-row').hide();$('#site00_new_local_projection_row').show();")
-            -#= link_to('NEW', 'javascript:', :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_local_projection');")
-
-        %tr
-          %td{:colspan=>"2"}
-            .from-element
-              %span{:class=>'label'}
                 %label{:for=>"site_pos_accuracy_m"} Position Accuracy
             -#= f.text_field("pos_accuracy_m", :value=>"$$$pos_accuracy_m$$$")
             -#%input(name="site_pos_accuracy_m" type="text" value="$$$pos_accuracy_m$$$")
-            %input(name="site_pos_accuracy_m" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$pos_accuracy_m$$$")
+            %input(name="site_pos_accuracy_m" dojoType="dijit.form.NumberTextBox" type="text" value="$$$pos_accuracy_m$$$")
         %tr
           %td 
             .from-element
@@ -555,7 +563,7 @@
                 %label{:for=>"site_county"} County
             -#= f.text_field("county", :value=>"$$$county$$$")
             -#%input(name="site_county" type="text" value="$$$county$$$")
-            %input(name="site_county" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$county$$$" required="true")
+            %input(name="site_county" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$county$$$")
         %tr
           %td{:colspan=>"2"}
             .from-element
