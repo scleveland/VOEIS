@@ -22,9 +22,10 @@
     dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
     dojo.require("dojox.grid.enhanced.plugins.Filter");
     dojo.require("dojo.data.ItemFileReadStore");
+    dojo.require("dojo.data.ItemFileWriteStore");
     dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
     dojo.require("dojo.parser");
-    dojo.require ("voeis.Server");
+    dojo.require("voeis.Server");
     dojo.require("voeis.ui.SitePane2");
 
     var projectsDataStore = voeis.Server.DEFAULT.projectsDataStore();
@@ -74,9 +75,13 @@
       //site_data[i]['local_projection'] = site_ref_data[i].local_proj;
     };
     var psites_json = {
-        identifier: 'id',
-        label: 'name',
-        items: site_data };
+      identifier: 'id',
+      label: 'name',
+      items: site_data };
+
+    var psites = new dojo.data.ItemFileWriteStore({
+      data: psites_json
+    });
         
     function edit_formatter(id) {
       var link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/pop\', ['+id+']);"><img src="/images/icons/blue-dot16.png" alt="MAP site" title="MAP" /></a>';
@@ -87,11 +92,141 @@
     }
     
     function get_site(siteId) {
-      for(var i=0;i<site_data.length;i++) 
-        if(site_data[i].id==siteId) 
-          return site_data[i];
+      //for(var i=0;i<site_data.length;i++) 
+      //  if(site_data[i].id==siteId) 
+      //    return site_data[i];
+      console.log('GET-SITE-ID: '+siteId);
+      var site = {};
+      psites.fetch({query: {id: siteId},
+        onItem: function(item) {
+          //site = $.extend({},item);
+          //site = item;
+          for(prop in item) 
+            site[prop] = item[prop].toString();
+        },
+        onError: function(error,request) {
+          console.log('ERROR: '+error);
+          //site = false;
+        }
+      });
+      return site;
     }
     
+    function pmap_clear(siteId) {
+      //CLEAR A MAP BALLOON
+      //OR ALL IF NO SITEID
+      for(var i=0;i<pmarkers.length;i++) {
+        if(pmarkers[i].window.close && (!siteId || pmarkers[i].id==parseInt(siteId))) {
+          pmarkers[i].window.close();
+          pmarkers[i].setIcon(icon_default);
+        }
+      };
+      var grid = dijit.byId('project_sites');
+      grid.selection.clear();
+    }
+    
+    function pmap_new(siteId) {
+      //ADD NEW MAP MARKER
+      var item = get_site(siteId);
+      pmap_add_item(item);
+    }
+    
+    function pmap_add_item(item) {
+      //ADD ITEM MARKER TO MAP
+      var site_name = item.name.toString();
+      var point = new google.maps.LatLng(item.latitude, item.longitude);
+      var marker = new google.maps.Marker({map:pmap, position:point, icon:icon_default, title:site_name});
+      //##var link = '<a href="'+(window.location+'/sites/'+item.id)+'"><strong>'+item.name+'</strong></a>';
+      //##var link2 = '<a href="'+(window.location+'/sites/'+item.id)+'"><strong>SITE DETAILS HERE</strong></a>';
+      //##var edlink = '<a href="'+(window.location+'/sites/'+item.id)+'/edit/"><strong>EDIT SITE HERE</strong></a>';
+      //##var link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+item.id+']);"><strong>'+item.name+'</strong></a>';
+      //##var link2 = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+item.id+']);"><strong>SITE DETAILS HERE</strong></a>';
+      //##var edlink = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/edit\', ['+item.id+']);"><strong>EDIT SITE HERE</strong></a>';
+      //var link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+item.id+']);">';
+      marker.idx = item.idx;
+      marker.id = parseInt(item.id);
+      marker.getSite = function(id) {
+        //GET SITE FROM STORE
+        var siteId = parseInt(id || this.id);
+        console.log('GET-SITEID:',siteId);
+        var site = get_site(siteId);
+        return site;
+      };
+      marker.getInfo = function() {
+        var item = this.getSite();
+        var stats = site_stat_data[this.idx];
+        console.log('SITE:',item)
+        var link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+item.id+']);">';
+        var info = '<p style="margin:0 15px;">';
+        info += link+'<strong>'+item.name+'</strong></a><br/>&nbsp;&nbsp;&nbsp;';
+        info += '(click for '+link+'<strong>SITE DETAILS</strong></a>)<br/>';
+        info += '&nbsp;&nbsp; <strong>Code:</strong> '+item.code+'<br/>';
+        info += '&nbsp;&nbsp; <strong>Site ID:</strong> '+item.id+'&nbsp;&nbsp;';
+        info += '&nbsp;&nbsp; <strong>State:</strong> '+item.state+'<br/>';
+        info += '&nbsp;&nbsp; <strong>Lat/Long:</strong> '+item.latitude+', '+item.longitude;
+        info += '<br/>&nbsp;&nbsp; <strong>Variables:</strong> '+stats.vars+' &mdash; ';
+        info += '<strong>Data collected:</strong> '+stats.count+'<br/>';
+        info += '&nbsp;&nbsp; <strong>Starting:</strong> '+stats.first;
+        info += ' &mdash; <strong>Ending:</strong> '+stats.last+'<br/>';
+        //info += item.code+'<br/>Elevation: '+item.elevation_m+'<br/>'
+        //info += item.county+', '+item.state+'</p>';
+        info += '</p>';
+        return info;
+      };
+      marker.window = {};
+      marker.pop = function() {
+        // this.setIcon(); this.getIcon();
+        //var tabs = dijit.byId('tab_browser');
+        //tabs.selectChild("#{@project.id}");
+        pmap_clear();
+        this.setIcon(icon_pop);
+        this.window = new google.maps.InfoWindow({content:marker.getInfo()});
+        this.window.open(pmap,this);
+      };
+      marker.selsite = function() {
+        // click site table
+        //var item = site_data[this.idx];
+        var item = marker.getSite();
+        var grid = dijit.byId('project_sites');
+        var col = grid.layout.cells[0];
+        for(var i=0; i<grid.rowCount; i++)
+          if(item.id==grid.getItem(i).id) {
+            grid.scrollToRow(i);
+            grid.focus.setFocusCell(col,i);
+            grid.focus.focusGrid();
+            break;
+          };
+      };
+      marker.seltable = function() {
+        // click SiteDisplayGrid
+        //var map = dijit.byId("overview");
+        //var tabs = dijit.byId('tab_browser');
+        //tabs.selectChild(map);
+        //tabs.selectChild("#{@project.id}");
+        //var item = site_data[this.idx];
+        var item = marker.getSite();
+        var grid = dijit.byId('SiteDisplayGrid');
+        var col = grid.layout.cells[1];
+        grid.selection.clear();
+        //grid.selection.addToSelection(item);
+        for(var i=0; i<grid.rowCount; i++)
+          if(item.id==grid.getItem(i).id) {
+            grid.scrollToRow(i);
+            grid.focus.setFocusCell(col,i);
+            grid.focus.focusGrid();
+            break;
+          };
+        grid.selection.addToSelection(item);
+      };
+      marker.click = function(){
+        this.selsite();
+        //this.seltable();
+        this.pop();
+      };
+      google.maps.event.addListener(marker, 'click', marker.click);
+      pmarkers.push(marker);
+    };
+
     function pmap_init() {
       var map_opts = {
         scaleControl: true, 
@@ -105,125 +240,26 @@
       var bounds = new google.maps.LatLngBounds();
       for(var i=0;i<site_data.length;i++) {
         var item = site_data[i];
-        var site_name = item.name.toString();
-        var stats = site_stat_data[i];
         var point = new google.maps.LatLng(item.latitude, item.longitude);
-        var marker = new google.maps.Marker({map:pmap, position:point, icon:icon_default, title:site_name});
-        //var link = '<a href="'+(window.location+'/sites/'+item.id)+'"><strong>'+item.name+'</strong></a>';
-        //var link2 = '<a href="'+(window.location+'/sites/'+item.id)+'"><strong>SITE DETAILS HERE</strong></a>';
-        //var edlink = '<a href="'+(window.location+'/sites/'+item.id)+'/edit/"><strong>EDIT SITE HERE</strong></a>';
-        //var link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+item.id+']);"><strong>'+item.name+'</strong></a>';
-        //var link2 = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+item.id+']);"><strong>SITE DETAILS HERE</strong></a>';
-        //var edlink = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/edit\', ['+item.id+']);"><strong>EDIT SITE HERE</strong></a>';
-        var link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+item.id+']);">';
-        marker.idx = item.idx;
-        marker.id = item.id;
-        marker.info = '<p style="margin:0 15px;">';
-        marker.info += link+'<strong>'+item.name+'</strong></a><br/>&nbsp;&nbsp;&nbsp;';
-        marker.info += '(click for '+link+'<strong>SITE DETAILS</strong></a>)<br/>';
-        marker.info += '&nbsp;&nbsp; <strong>Code:</strong> '+item.code+'<br/>';
-        marker.info += '&nbsp;&nbsp; <strong>Site ID:</strong> '+item.id+'&nbsp;&nbsp;';
-        marker.info += '&nbsp;&nbsp; <strong>State:</strong> '+item.state+'<br/>';
-        marker.info += '&nbsp;&nbsp; <strong>Lat/Long:</strong> '+item.latitude+', '+item.longitude;
-        marker.info += '<br/>&nbsp;&nbsp; <strong>Variables:</strong> '+stats.vars+' &mdash; ';
-        marker.info += '<strong>Data collected:</strong> '+stats.count+'<br/>';
-        marker.info += '&nbsp;&nbsp; <strong>Starting:</strong> '+stats.first;
-        marker.info += ' &mdash; <strong>Ending:</strong> '+stats.last+'<br/>';
-        //marker.info += item.code+'<br/>Elevation: '+item.elevation_m+'<br/>'
-        //marker.info += item.county+', '+item.state+'</p>';
-        marker.info += '</p>';
-        marker.window = new google.maps.InfoWindow({content:marker.info});
-        marker.pop = function() {
-          // this.setIcon(); this.getIcon();
-          //var tabs = dijit.byId('tab_browser');
-          //tabs.selectChild("#{@project.id}");
-          for(var i=0;i<pmarkers.length;i++) {
-            pmarkers[i].window.close();
-            pmarkers[i].setIcon(icon_default);
-          };
-          this.setIcon(icon_pop);
-          this.window.open(pmap,this);
-        };
-        marker.selsite = function() {
-          // click site table
-          var item = site_data[this.idx];
-          var grid = dijit.byId('project_sites');
-          var col = grid.layout.cells[0];
-          for(var i=0; i<grid.rowCount; i++)
-            if(item.id==grid.getItem(i).id) {
-              grid.scrollToRow(i);
-              grid.focus.setFocusCell(col,i);
-              grid.focus.focusGrid();
-              break;
-            };
-        };
-        marker.seltable = function() {
-          // click SiteDisplayGrid
-          //var map = dijit.byId("overview");
-          //var tabs = dijit.byId('tab_browser');
-          //tabs.selectChild(map);
-          //tabs.selectChild("#{@project.id}");
-          var item = site_data[this.idx];
-          var grid = dijit.byId('SiteDisplayGrid');
-          var col = grid.layout.cells[1];
-          grid.selection.clear();
-          //grid.selection.addToSelection(item);
-          for(var i=0; i<grid.rowCount; i++)
-            if(item.id==grid.getItem(i).id) {
-              grid.scrollToRow(i);
-              grid.focus.setFocusCell(col,i);
-              grid.focus.focusGrid();
-              break;
-            };
-          grid.selection.addToSelection(item);
-        };
-        marker.click = function(){
-          this.selsite();
-          //this.seltable();
-          this.pop();
-        };
-        google.maps.event.addListener(marker, 'click', marker.click);
-        pmarkers.push(marker);
+        pmap_add_item(item);
         bounds.extend(point);
       };
       pmap.fitBounds(bounds);
-      
     };
 
     dojo.addOnLoad(function(){
       //dojo.byId('SiteDisplayGrid').canSort = function(col,field){ return false; };
     });
     
-    $(window).ready(function(){ 
-      console.log('DONE LOADING!!');
-      pmap_init();
-      //dojo.parser.parse();
-      //dijit.byId('SiteDisplayGrid').canSort = function(col,field){ return (col>1 && field=='name'); };
-      //dijit.byId('SiteDisplayGrid').canSort = function(col,field){ return false; };
-      
-      /*
-      var tabs = dijit.byId('tab_browser');
-      tabs.isTab = function(siteId) {
-        var tabs = dijit.byId('tab_browser');
-        tabs.site_tabs = tabs.site_tabs || [];
-        for(var i=0;i<tabs.site_tabs.length;i++) 
-          if(tabs.site_tabs[i]==siteId) return true;
-        return false;
-      };
-      tabs.showSiteTabs = function(elId) {
-        var tabs = dijit.byId('tab_browser');
-        var out = '';
-    		tabs.site_tabs = tabs.site_tabs || [];
-        for(var i=0;i<tabs.site_tabs.length;i++) 
-          out += tabs.site_tabs[i];
-        if(elId) $('#'+elId).text(out);
-        return out;
-      };
-      function proj_pop() {
-        dijit.byId('overview_dialog').show();
-        dijit.byId('SiteDisplayGrid').show();
-      };
-      */
+    function pre_dojo_parse() {
+      //PRE DOJO PARSE STUFF HERE
+      console.log('PRE-PARSE!');
+      pane_proto00 = $('#site_pane_proto').html();
+    };
+    
+    function post_dojo_parse() {
+      //POST DOJO PARSE STUFF HERE
+      //console.log('POST-PARSE!');
       
       //### DESTROY DOJO WIDGETS FOR TAB PROTO
       //var proto = dojo.byId('site_pane_proto');
@@ -231,22 +267,54 @@
       //  w.destroyRecursive(true);
       //});
       //console.log('PURGING WIDGETS??');
-      pane_proto00 = $('#site_pane_proto').html();
       $('#site_pane_proto').find('*').each(function(idx){
         //console.log('EleID: '+this.id);
-        //var wid = dijit.byNode(this);
-        //if(wid) wid.destroy();
-        //wid = dijit.byId(this.id);
-        //if(wid) wid.destroy();
+        var wid = dijit.byNode(this);
+        if(wid) wid.destroyRecursive();
+        wid = dijit.byId(this.id);
+        if(wid) wid.destroyRecursive();
       });
-      //$('#site_pane_proto').find('*').each(function(i){ if(dijit.byNode(this)) console.log('NODE: '+this.id); if(dijit.byId(this.id)) console.log('WIDGET: '+this.id); })
       
+    };
+    
+    $(window).ready(function(){ 
+      console.log('DONE LOADING!!');
+      pmap_init();
+
+      //dojo.parser.parse();
+      //dijit.byId('SiteDisplayGrid').canSort = function(col,field){ return (col>1 && field=='name'); };
+      //dijit.byId('SiteDisplayGrid').canSort = function(col,field){ return false; };
+      
+      //### DESTROY DOJO WIDGETS FOR TAB PROTO
+      //var proto = dojo.byId('site_pane_proto');
+      //dojo.forEach(dijit.findWidgets(proto), function(w){
+      //  w.destroyRecursive(true);
+      //});
+      /*
+      console.log('STILL DONE LOADING!!!');
+      console.log('PURGING WIDGETS??');
+      pane_proto00 = $('#site_pane_proto').html();
+      $('#site_pane_proto').find('*').each(function(idx){
+        console.log('EleID: '+this.id);
+        var wid = dijit.byNode(this);
+        if(wid) wid.destroy();
+        wid = dijit.byId(this.id);
+        if(wid) wid.destroy();
+      });
+      $('#site_pane_proto').find('*').each(function(i){ if(dijit.byNode(this)) console.log('NODE: '+this.id); if(dijit.byId(this.id)) console.log('WIDGET: '+this.id); })
+      */
 
     });
     
 -#{@sites_data.each_with_index{|data,idx| "    site_data[%s].stats = %s;"%[idx,data.to_json]}.join("\n")}
     
 - content_for(:toolbar) do
+  -##dataButton{:dojoType => "dijit.form.DropDownButton"}
+  -#  %span{:style => "font-weight:bold"}
+  -#    TESTING
+  -#  %div{:dojoType => "dijit.Menu"}
+  -#    = link_to("TEST-STORE", "javascript:", :dojoType => "yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/site/test');")
+
   -##projectButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
   -#  %span 
   -#    = @project.name
@@ -283,6 +351,7 @@
   -#        %div{:dojoType=>"dijit.Menu", :id=>"dataSubMenu"}
   -#          = render_cell(:data_menu, :display, :current_user => current_user)
 
+
 #overview_dialog{:dojoType=>"dijit.Dialog", :disableCloseButton=>true, :title=>"Project Overview", :style=>"width:640px;"}
   - if @project.description && @project.description.length > 0
     = @project.description
@@ -296,7 +365,7 @@
                                           :user=>current_user,
                                           :root_url=>root_url
 
-#site_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"psites", :data=>"psites_json"}
+-#site_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"psites", :data=>"psites_json"}
 
             
 #content-title{:style=>"margin:0;margin-bottom:0;padding:0;"} 
@@ -311,6 +380,11 @@
         = @project.name
     %span{:style=>"font-size:10px;"}
       &nbsp;&nbsp; (click for Project Overview)
+  -#&nbsp;&nbsp;&nbsp;&nbsp;
+  -#&nbsp;&nbsp;&nbsp;&nbsp;
+  -#%strong
+  -#  = link_to("TEST-STORE", "javascript:", :onclick=>"dojo.publish('voeis/project/siteTables/test');")
+
 
 = clear_break
 
@@ -322,7 +396,7 @@
     -#= render(:partial => 'overview_map', :locals => { :project => @project,
     -#                                                  :sites => @sites,
     -#                                                  :class_name => 'show-map' } )
-    %table{:id=>'project_sites', :dojoType=>"dojox.grid.EnhancedGrid", :store=>"psites", 
+    %table{:id=>'project_sites', :dojoType=>"dojox.grid.EnhancedGrid", :store=>"psites", :autoWidth=>"false",
             :style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
       -#:style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
       %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
@@ -425,7 +499,7 @@
         sitePane.setSite(siteId);
         //sitePane.editMode = editMode || false;
         tabs.addChild(sitePane);
-        console.log(sitePane);
+        //console.log(sitePane);
       };
       tabs.selectChild(sitePane);
     };
@@ -477,6 +551,116 @@
       tabs.addChild(sitesGrid);
       tabs.selectChild(sitesGrid);
     };
+
+    //#############
+
+    dojo.subscribe("voeis/project/siteTables/test", function() {
+      console.log('TABLES TEST');
+      var tabs = dijit.byId('tab_browser');
+      var table0 = dijit.byId('project_sites');
+      var table1 = dijit.byId('SiteDisplayGrid');
+      var lastId = 0;
+      
+      psites.fetch({query: {},
+        count: 1, sort: [{attribute: 'id', descending: true}],
+        onItem: function(item) {
+          lastId = parseInt(psites.getValue(item, 'id'));
+          //siteName += '-TESTING!!!';
+          //psites.setValue(item, 'name', siteName);
+        }
+      });
+      console.log('LAST-ID:',lastId);
+      lastId++;
+      
+      try {
+      psites.newItem({
+        id:''+lastId,
+        name:'This is a TEST--'+lastId,
+        code:'this-is-a-test-1234567-'+lastId,
+        latitude:'45.2698',
+        longitude:'-111.2788',
+        lat_long_datum_id:'',
+        elevation_m:'12',
+        vertical_datum_id:'',
+        local_x:'',
+        local_y:'',
+        local_projection_id:'',
+        pos_accuracy_m:'',
+        state:'Montana',
+        county:'Gallatin',
+        comments:'this is a test... on ID:'+lastId,
+        description:'',
+      });
+      }
+      catch (e) { 
+        console.log('ERROR: DUPLICATE KEY')
+      };
+      
+      //psites.data = psites_json;
+      //psites.close();
+      //table0.render();
+      //table1.render();
+    });
+
+    dojo.subscribe("voeis/project/map/clear", function(siteId) {
+      console.log('CLEAR MAP');
+      pmap_clear(siteId);
+    });
+
+    dojo.subscribe("voeis/project/map/new", function(siteId) {
+      console.log('NEW MAP MARKER');
+      pmap_new(siteId);
+    });
+
+    dojo.subscribe("voeis/project/site/close", function(siteId) {
+      console.log('CLOSE SITE TAB:',siteId);
+      var tabs = dijit.byId('tab_browser');
+      var sitePane = dojo.byId('site'+siteId);
+      if(sitePane) {
+        sitePane = dijit.byNode(sitePane);
+        tabs.removeChild(sitePane);
+        sitePane.onClose();
+        sitePane.destroyRecursive();  
+        pmap_clear(siteId);
+      };
+    });
+
+    dojo.subscribe("voeis/project/siteTables/refresh", function() {
+      console.log('REFRESH TABLES');
+      var tabs = dijit.byId('tab_browser');
+      var table0 = dijit.byId('project_sites');
+      var table1 = dijit.byId('SiteDisplayGrid');
+      psites.data = psites_json;
+      psites.close();
+      //table0.render();
+      //table1.render();
+    });
+
+    dojo.subscribe("voeis/project/siteTables/add", function(siteId,siteName,siteCode,siteState) {
+      console.log('UPDATE TABLES NEW');
+      var tabs = dijit.byId('tab_browser');
+      var table0 = dijit.byId('project_sites');
+      var table1 = dijit.byId('SiteDisplayGrid');
+      //var psites = dijit.byId('psites');
+      //psites
+      //pmarkers
+      psites.data = psites_json;
+      psites.close();
+    });
+
+    dojo.subscribe("voeis/project/siteTables/update", function(siteId,siteName,siteCode,siteState) {
+      console.log('UPDATE TABLES');
+      var tabs = dijit.byId('tab_browser');
+      var table0 = dijit.byId('project_sites');
+      var table1 = dijit.byId('SiteDisplayGrid');
+      
+    });
+
+    dojo.subscribe("voeis/project/site/new", function() {
+      console.log('NEW SITE');
+      var tabs = dijit.byId('tab_browser');
+      openSiteTab(tabs, 0, false);
+    });
 
     dojo.subscribe("voeis/project/site/select", function(siteId) {
       console.log(arguments);

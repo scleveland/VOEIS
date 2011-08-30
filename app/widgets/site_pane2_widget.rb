@@ -10,6 +10,7 @@ class SitePane2Widget < Apotomo::Widget
     #@id = UUIDTools::UUID.timestamp_create
     @auth = !@current_user.nil? && @current_user.projects.include?(@project)
     
+    #@newSite = Voies::
     @site_stats = []
     @site_samps = []
     @variable_labels = Array["Variable Data","Count","Start","End"]

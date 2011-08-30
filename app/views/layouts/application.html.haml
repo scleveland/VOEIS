@@ -52,7 +52,9 @@
           }).play();
       }
       $(window).ready(function(){ 
+          if(window.pre_dojo_parse) pre_dojo_parse();
           dojo.parser.parse();
+          if(window.post_dojo_parse) post_dojo_parse();
           //hideLoader();
       });
 
@@ -162,7 +164,9 @@
               - else
                 = link_to("Project Home", project_path(@project), :dojoType => "yogo.ui.MenuLink")
               -if !current_user.nil? && current_user.projects.include?(@project)
-                = link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
+                -#= link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
+                = link_to("Add Site", "javascript:", :dojoType => "yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/site/new');")
+                
                 - if !@sites.nil? && @sites.count > 0
                   -#= link_to("Add Variable", new_project_variable_path(@project), :dojoType => "yogo.ui.MenuLink")
                   -#= link_to("Add Unit", new_project_unit_path(@project), :dojoType => "yogo.ui.MenuLink")
@@ -176,6 +180,7 @@
                 - if @project.managed_repository { Voeis::DataStream.all.count } > 0
                   -#= link_to("Add Data", add_project_data_streams_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
                 = link_to("Settings...", edit_project_path(@project), :dojoType => "yogo.ui.MenuLink")
+
           - if !@sites.nil? && @sites.count > 0
             #dataButton{:dojoType => "dijit.form.DropDownButton"}
               %span{:style => "font-weight:bold"}
@@ -191,7 +196,7 @@
                     %span My Saved Searches
                     %div{:dojoType=>"dijit.Menu", :id=>"dataSubMenu"}
                       = render_cell(:data_menu, :display, :current_user => current_user)
-
+        
         -##dataButton{:dojoType => "dijit.form.DropDownButton"}
         -#  %span{:style => "font-weight:bold"}
         -#    Data
