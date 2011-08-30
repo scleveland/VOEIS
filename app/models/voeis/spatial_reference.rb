@@ -1,11 +1,13 @@
-class Voeis::VerticalDatumCV
+class Voeis::SpatialReference
   include DataMapper::Resource
   include Facet::DataMapper::Resource
   include Yogo::Versioned::DataMapper::Resource
 
   property :id,         Serial
-  property :term,       String, :required => true, :index => true, :length => 512
-  property :definition, Text
+  property :srs_id,      Integer
+  property :srs_name,       String, :required => true, :index => true, :length => 512
+  property :is_geographic, Boolean
+  property :notes, Text
 
   yogo_versioned
 

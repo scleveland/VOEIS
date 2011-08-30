@@ -1,10 +1,10 @@
-class Voeis::LocalProjectionCVsController < Voeis::BaseController
+class Voeis::SpatialReferencesController < Voeis::BaseController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
 
   # LOCAL: GET /LocalProjection/new
   def new
-    @local_projection = parent.managed_repository{Voeis::LocalProjectionCV.new}
+    @spatial_reference = parent.managed_repository{Voeis::SpatialReference.new}
 
     respond_to do |format|
       format.html # new.html.erb
@@ -13,13 +13,13 @@ class Voeis::LocalProjectionCVsController < Voeis::BaseController
   
   # POST /LocalProjection
   def create
-    @local_projection = parent.managed_repository{Voeis::LocalProjectionCV.new(params[:local_projection_c_v])}
+    @spatial_reference = parent.managed_repository{Voeis::SpatialReference.new(params[:spatial_reference_c_v])}
     respond_to do |format|
-      if @local_projection.save
+      if @spatial_reference.save
         flash[:notice] = 'Local Projection was successfully created.'
-        format.html { (redirect_to(new_local_projection_c_v_path())) }
+        format.html { (redirect_to(new_spatial_reference_path())) }
         format.json do
-          render :json => @local_projection.as_json, :callback => params[:jsoncallback]
+          render :json => @spatial_reference.as_json, :callback => params[:jsoncallback]
         end
       else
         format.html { render :action => "new" }

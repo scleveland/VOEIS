@@ -172,7 +172,9 @@ class Voeis::ApivsController < Voeis::BaseController
    #   end
    #   
    # end
-  # 
+  #
+  #curl -F datafile=@NFork_tail.csv	 -F data_template_id=12 http://localhost:3000/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_logger_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
+   
   #curl -F datafile=@CR1000_2_BigSky_NFork.csv	 -F data_template_id=2 http://localhost:3000/projects/cfee5aec-c520-11e0-a45c-c82a14fffebf/apivs/upload_logger_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
   # curl -F datafile=@matt1item.csv -F data_template_id=19 -F start_line=1 -F  api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_logger_data.json?
   # curl -F datafile=@YB_Hill.csv -F data_template_id=26 http://voeis.msu.montana.edu/projects/a459c38c-f288-11df-b176-6e9ffb75bc80/apivs/upload_logger_data.json?api_key=3b62ef7eda48955abc77a7647b4874e543edd7ffc2bb672a40215c8da51f6d09
@@ -221,6 +223,18 @@ class Voeis::ApivsController < Voeis::BaseController
             else
               start_line = params[:start_line].to_i
             end
+            if data_stream_template.utc_offset.nil?
+              site = data_stream_template.sites.first
+              if site.time_zone_offset.nil? || site.time_zone_offset == "unknown"
+                begin
+                  site.fetch_time_zone_offset
+                rescue
+                  #do nothing
+                end
+              end
+              data_stream_template.utc_offset = site.time_zone_offset
+              data_stream_template.save!
+            end
             lines =0
             CSV.foreach(@new_file){|row| lines +=1}
             # File.open(@new_file, 'r') do |file|
@@ -245,6 +259,7 @@ class Voeis::ApivsController < Voeis::BaseController
             logger.info {"File does not match the data_templates number of columns."}
           end
         rescue   Exception => e
+            email_exception(e,request.env)
             logger.info {e.to_s}
             logger.info {"YEAH"}
           #problem parsing file
@@ -258,6 +273,7 @@ class Voeis::ApivsController < Voeis::BaseController
         end
         if flash_error[:error].nil?
           flash_error[:success] = "File was parsed succesfully."
+          data_stream_template.sites.first.update_site_data_catalog
           #flash_error = flash_error.merge({:last_record => data_stream_template.data_stream_columns.sensor_types.sensor_values.last(:order =>[:id.asc]).as_json}) 
         end
         format.json do
@@ -486,8 +502,8 @@ class Voeis::ApivsController < Voeis::BaseController
        @site.variables. each do |var|
          @var_hash = Hash.new
          @var_hash = var.as_json
-         @var_hash = @var_hash.merge({'time_series_data' => @site.data_values.all(:datatype=>"Sensor",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)}) 
-         @var_hash = @var_hash.merge({'sample_data' => @site.data_values.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+         @var_hash = @var_hash.merge({'time_series_data' => Voeis::DataValue.all(:datatype=>"Sensor",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => var.id)}) 
+         @var_hash = @var_hash.merge({'sample_data' => Voeis::DataValue.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => var.id)})
          @values << @var_hash
        end
        @data_values[:variables] = @values
@@ -525,7 +541,7 @@ class Voeis::ApivsController < Voeis::BaseController
          #var = sensor.variables.first
          @var_hash = Hash.new
          @var_hash = var.as_json
-         @var_hash = @var_hash.merge({'data' => (var.data_values(:datatype=>"Sensor",:order => [:local_date_time.asc]) & @site.data_values).last.as_json}) 
+         @var_hash = @var_hash.merge({'data' =>  Voeis::DataValue.last(:datatype=>"Sensor",:order => [:local_date_time.asc], :site_id => @site.id, :variable_id => var.id).as_json}) 
          @values << @var_hash
        end
        @data_values[:variables] = @values
@@ -563,7 +579,7 @@ class Voeis::ApivsController < Voeis::BaseController
          #var = sensor.variables.first
          @var_hash = Hash.new
          @var_hash = var.as_json
-         @var_hash = @var_hash.merge({'data' => (var.data_values(:datatype=>"Sample",:order => [:local_date_time.asc]) & @site.data_values).last.as_json}) 
+         @var_hash = @var_hash.merge({'data' => Voeis::DataValue.all(:datatype=>"Sample",:order => [:local_date_time.asc], :site_id => @site.id, :variable_id => var.id).last.as_json}) 
          @values << @var_hash
        end
        @data_values[:variables] = @values
@@ -611,7 +627,7 @@ class Voeis::ApivsController < Voeis::BaseController
       #  @data_values[:error] = "There are no Sensor Value for this site and variable combination"
       # else
          @data_values[:variable] = @variable.as_json
-         @data_values[:data] = (@site.data_values & @variable.data_values).all(:datatype=>"Sensor", :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :order => [:local_date_time.asc]).as_json 
+         @data_values[:data] = Voeis::DataValue.all(:datatype=>"Sensor", :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => @variable.id,:order => [:local_date_time.asc]).as_json 
        #end
      end
      respond_to do |format|
@@ -656,7 +672,7 @@ class Voeis::ApivsController < Voeis::BaseController
       #  @data_values[:error] = "There are no Sensor Value for this site and variable combination"
       # else
          @data_values[:variable] = @variable.as_json
-         @data_values[:data] = (@site.data_values & @variable.data_values).all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :order => [:local_date_time.asc]).as_json 
+         @data_values[:data] = Voeis::DataValue.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id=>@site.id, :variable_id => @variable.id, :order => [:local_date_time.asc]).as_json 
        #end
      end
      respond_to do |format|
@@ -682,12 +698,14 @@ class Voeis::ApivsController < Voeis::BaseController
   def create_project_site
     @site = ""
     parent.managed_repository do
-      @site = Voeis::Site.new(:name => params[:name], 
-                                     :code => params[:code],
-                                     :latitude => params[:latitude],
-                                     :longitude => params[:longitude],
-                                     :state => params[:state])#,
-                                     #:country => params[:country])
+      @site = Voeis::Site.new
+      Voeis::Site.properties.each do |prop|
+        if prop.name.to_s != "id"
+          if !params[prop.name].nil?
+            @site[prop.name.to_s] = params[prop.name.to_s]
+          end #endif
+        end#endif
+      end#end loop
       begin
        @site.save
       rescue
@@ -822,8 +840,8 @@ class Voeis::ApivsController < Voeis::BaseController
       else
         @var_hash = Hash.new
         @var_hash = @var.as_json
-        @var_hash = @var_hash.merge({'time_series_data'=>  @var.data_values.all(:datatype=>"Sensor", :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
-        @var_hash = @var_hash.merge({'sample_data' => @var.data_values.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+        @var_hash = @var_hash.merge({'time_series_data'=>  Voeis::DataValue.all(:datatype=>"Sensor", :variable_id=> @var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+        @var_hash = @var_hash.merge({'sample_data' => Voeis::DataValues.all(:datatype=>"Sample", :variable_id=> @var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
         @values << @var_hash
         @data_values[:variable] = @values
         @data_values[:project] = parent.as_json
@@ -867,8 +885,8 @@ class Voeis::ApivsController < Voeis::BaseController
           @var_hash = Hash.new
           @var_hash = @var.as_json
           #if !@var.sensor_types.first.nil?
-          @var_hash = @var_hash.merge({'time_series_data'=>  (@var.data_values + @site.data_values).all(:datatype=>"Sensor", :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
-          @var_hash = @var_hash.merge({'sample_data' => (@var.data_values + @site.data_values).all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+          @var_hash = @var_hash.merge({'time_series_data'=>  Voeis::DataValue.all(:datatype=>"Sensor", :site_id=>@site.id, :variable_id=>@var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+          @var_hash = @var_hash.merge({'sample_data' => Voeis::DataValue.all(:site_id=>@site.id, :variable_id=>@var.id,:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
             #@var_hash = @var_hash.merge({'data' => @var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time) & @site.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})  
         end
           @values << @var_hash

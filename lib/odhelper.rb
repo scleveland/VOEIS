@@ -336,7 +336,80 @@ module Odhelper
       end
     end
   end
+  def set_created_at 
+    today = Time.now
+    DataMapper::Model.descendants.each do |model|
+      begin
+        sql = "UPDATE #{model.storage_name} SET created_at = now() WHERE created_at IS NULL"
+        results  = repository.adapter.execute(sql)
+      rescue  => e
+        puts model.name+": #{e}"
+      end
+      begin
+       sql = "UPDATE #{model::Version.storage_name} SET created_at = now() WHERE created_at IS NULL"
+       repository.adapter.execute(sql)
+      rescue  => e
+         puts model.name+": #{e}"
+       end
+    end
+    Project.all.each do |project|
+      project.managed_repository do
+        puts project.name
+        DataMapper::Model.descendants.each do |model|
+          begin
+            sql = "UPDATE #{model.storage_name} SET created_at = now() WHERE created_at IS NULL"
+            repository.adapter.execute(sql)
+          rescue => e
+            puts model.name+": #{e}"
+          end
+          begin
+            sql = "UPDATE #{model::Version.storage_name} SET created_at = now() WHERE created_at IS NULL"
+            repository.adapter.execute(sql)
+           rescue  => e
+              puts model.name+": #{e}"
+           end
+        end
+      end
+    end
+   end
   
+  
+  def set_updated_at 
+   today = Time.now
+   DataMapper::Model.descendants.each do |model|
+     begin
+       sql = "UPDATE #{model.storage_name} SET updated_at = now() WHERE updated_at IS NULL"
+       results  = repository.adapter.execute(sql)
+     rescue  => e
+       puts model.name+": #{e}"
+     end
+     begin
+      sql = "UPDATE #{model::Version.storage_name} SET updated_at = now() WHERE updated_at IS NULL"
+      repository.adapter.execute(sql)
+     rescue  => e
+        puts model.name+": #{e}"
+      end
+   end
+   Project.all.each do |project|
+     project.managed_repository do
+       puts project.name
+       DataMapper::Model.descendants.each do |model|
+         begin
+           sql = "UPDATE #{model.storage_name} SET updated_at = now() WHERE updated_at IS NULL"
+           repository.adapter.execute(sql)
+         rescue => e
+           puts model.name+": #{e}"
+         end
+         begin
+           sql = "UPDATE #{model::Version.storage_name} SET updated_at = now() WHERE updated_at IS NULL"
+           repository.adapter.execute(sql)  
+          rescue  => e
+             puts model.name+": #{e}"
+          end
+       end
+     end
+   end
+  end
   
   def set_data_stream_source
     Project.all.each do |project|
@@ -349,33 +422,66 @@ module Odhelper
     end
   end
   
+  def slow_set_site_and_variables(project)
+    project.managed_repository do
+      Voeis::Site.each do |site|
+        puts site.name
+        site.variables.each do |var|
+          puts site.name + ':' + var.variable_name
+          var.data_values.all.update!(:site_id => site.id, :variable_id => var.id)
+        end
+      end
+    end
+  end
+  
+  def set_sites(project)
+    project.managed_repository do
+      Voeis::Site.all.each do |site|
+        if site.data_values.count > 0
+          sql = "SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{site.id}"
+          results = repository.adapter.select(sql)
+          sql ="UPDATE voeis_data_values SET site_id = #{site.id} WHERE  "
+          sql << (0..results.length-1).collect{|i|
+            "id = #{results[i]}"
+          }.join(' OR ')
+         results = repository.adapter.execute(sql)
+        end
+      end
+    end
+  end
+  
+  def set_variables(project)
+    project.managed_repository do
+      Voeis::Variable.all.each do |var|
+        if var.data_values.count > 0
+          sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{var.id}"
+          @results = repository.adapter.select(sql)
+          hundreth = (@results.length/100).to_i
+          (0..9).each do |c|
+            start_id = (c*hundreth)
+            end_id = start_id + hundreth-1
+            sql ="UPDATE voeis_data_values SET variable_id = #{var.id} WHERE "
+            sql << (start_id..end_id).collect{|i|
+              "id = #{@results[i]}"
+            }.join(' OR ')
+            begin
+              results = repository.adapter.execute(sql)
+            rescue => e
+              puts e
+            end
+          end
+        end
+      end
+    end
+  end
+  
   # sql ="SELECT * FROM voeis_data_values WHERE type IS NULL LIMIT 1"
   # results =repository.adapter.select(sql)
 end
 
+#= javascript_include_tag("http://ajax.googleapis.com/ajax/libs/dojo/1.6.0/dojo/dojo.xd.js",'underscore.js','backbone.js','yogo/ui/MenuLink.js', 'yogo/maps/google.js', 'yogo/maps/google/Map.js', 'yogo/maps/google/DataMap.js','voeis/store/Projects.js','voeis/store/Sites.js','yogo/xhr/csrf','voeis/Server.js','voeis/Collection.js','voeis/model/Project.js', 'voeis/model/Site.js','dojo/store/JsonRest.js', 'voeis/maps/google/ProjectsMap.js','voeis/collection/Projects.js','voeis/collection/Sites.js','voeis/Model.js','voeis/ui/ProjectSitesGrid.js','voeis/ui/SitePane.js', 'voeis/ui/SitePane2.js')
 
+# Project.all.each do |proj|
 # 
-# DataMapper::Model.descendants.each do |model|
-#   begin
-#     model::Version
-#   rescue
-#   end
-# end
-# Project.all.each do |project|
-#   project.managed_repository do
-#     puts project.name
-# 
-#     DataMapper::Model.descendants.each do |model|
-#       begin
-#         model.all.each do |m|
-#           m.updated_at = m.created_at
-#           m.save!
-#         end
-#         model.auto_upgrade!
-#       rescue => e
-#         puts model.name+": #{e}"
-#       end
-#     end
-#   end
-# end
-# DataMapper.auto_upgrade!
+#     Membership.first_or_create(:user => User.current, :project => proj, :role => Role.get(5))
+#end

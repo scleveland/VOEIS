@@ -1,9 +1,12 @@
+#This is the Application Wide Role based access permissions
+#  Role is project specific permissions
 require 'dm-core'
 require 'dm-types/yaml'
 class SystemRole
   include DataMapper::Resource
   include Facet::DataMapper::Resource
 
+  alias :update_attributes :update
   property :id, Serial
   property :name, String, :required => true
   property :description, String, :length => 250

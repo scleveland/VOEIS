@@ -54,7 +54,7 @@ Yogo::Application.routes.draw do
           get :dojo_variables_for_tree
           post :create_project_site
           post :create_project_variable
-          put :update_project_site
+          post :update_project_site
           put :update_project_variable
           put :update_voeis_variable
           get :get_project_sites
@@ -176,7 +176,7 @@ Yogo::Application.routes.draw do
   resources :settings
   resources :search
   resources :vertical_datum_c_vs
-  resources :local_projection_c_vs
+  resources :spatial_references
   resources :variable_name_c_vs
   resources :sample_medium_c_vs
   resources :value_type_c_vs

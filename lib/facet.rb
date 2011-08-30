@@ -170,6 +170,7 @@ module Facet
       super + [:new, :create, :all, :first, :last, :get, :count]
     end
     
+    #Why is this not just in ResourceSecureMethods? -Sean
     def secured_instance_methods
       [:attributes, :attributes=, :save, :destroy]
     end
@@ -204,6 +205,7 @@ module Facet
       permissions.map { |perm, meths| "#{permission_base_name}$#{perm}" }
     end
     
+    #perhaps does not work? and not being used?
     def methods_permitted_for(*perms)
       methods = []
       perms.each do |pstring|
@@ -213,7 +215,8 @@ module Facet
       end
       methods.flatten.uniq
     end
-       
+    
+    #perhaps does not work? and not being used?
     def actions_permitted_for(*perms)
       actions = []
       perms.each do |pstring|
@@ -233,6 +236,7 @@ module Facet
   module ModelPermissions
     include Permissions
     
+    #all the possible permissions
     def permissions
       {
         :create => [:new, :create],
@@ -244,7 +248,8 @@ module Facet
         :destroy => [:destroy]
       }
     end
-        
+      
+    #the string used in the permissions array to id the model
     def permission_base_name
       self.name.underscore
     end

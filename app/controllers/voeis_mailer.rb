@@ -30,4 +30,10 @@ class VoeisMailer < ActionMailer::Base
          :subject => "Caught Exception Error",
          :body => "\n\nMessage\n__________\n"+e.message+"\n\nRequest\n__________\n"+req+"\n\nBacktrace\n_________\n"+e.backtrace * "\n").deliver
   end
+  
+  def email_facet_exception(e)
+    mail(:to =>%w{ sean.b.cleveland@gmail.com pol.llovet@gmail.com thomasheetderks@gmail.com},
+         :subject => "Caught FACET Exception Error",
+         :body => "\n\nMessage\n__________\n"+e.message+"\n\nBacktrace\n_________\n"+e.backtrace * "\n").deliver
+  end
 end

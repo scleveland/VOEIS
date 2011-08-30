@@ -1,6 +1,7 @@
 class Voeis::SiteDataCatalog
   include DataMapper::Resource
   include Facet::DataMapper::Resource
+  include Facet::DataMapper::Resource
   
   property :site_id,             Integer,  :required => true, :key => true
   property :variable_id,         Integer,  :required => true, :key => true

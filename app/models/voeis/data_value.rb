@@ -15,9 +15,10 @@ class Voeis::DataValue
   property :end_vertical_offset,        Float,    :required=>false
   property :string_value,               String,   :required => true, :default => "Unknown"
   property :quality_control_level,      Integer,  :required=>true, :default=>0
-  property :datatype,                  String,   :required =>false, :default =>"Sample"
+  property :datatype,                  String,    :default =>"Sample", :index =>true
   property :published,                  Boolean,  :required => false
-  
+  property :site_id,                    Integer,  :index => true
+  property :variable_id,                Integer, :index => true
   yogo_versioned
   #timestamps :at
   
@@ -48,6 +49,7 @@ class Voeis::DataValue
   # @api publicsenosr
   def self.parse_logger_csv(csv_file, data_stream_template_id, site_id, start_line, sample_type, sample_medium)
     #Determine how the time is stored
+    
     if !Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "Timestamp").nil?
       data_timestamp_col = Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "Timestamp").column_number
       date_col=""
@@ -154,29 +156,30 @@ class Voeis::DataValue
   end_vertical_offset = end_vertical_offset_col == "" ? 0.0 : row[end_vertical_offset_col.to_i].to_f
     data_stream = Voeis::DataStream.get(data_stream_id)
     source = data_stream.source
+    dst_time = 0
+    dst = false
     if data_stream.DST
        dst_time = 1
-     else
-      dst_time = 0
-     end
-     sample_datetime = Chronic.parse(row[data_timestamp_col]).to_datetime
-     timestamp = DateTime.civil(sample_datetime.year,sample_datetime.month,
+       dst = true
+    end
+    sample_datetime = Chronic.parse(row[data_timestamp_col]).to_datetime
+    timestamp = DateTime.civil(sample_datetime.year,sample_datetime.month,
                    sample_datetime.day,sample_datetime.hour,sample_datetime.min,
                    sample_datetime.sec, (data_stream.utc_offset+dst_time)/24.to_f)
     #if t = Date.parse(timestamp) rescue nil?
     #if (Voeis::DataValue.first(:local_date_time => timestamp) & 
-    if Voeis::Variable.get(data_col_array[variable_cols[0]][variable].id).data_values.first(:datatype=>data_stream.type, :local_date_time=>timestamp).nil?
+    if Voeis::DataValue.first(:datatype=>data_stream.type, :local_date_time=>timestamp, :site_id=> site_id, :variable_id => data_col_array[variable_cols[0]][variable].id).nil?
           created_at = updated_at = Time.now.strftime("%Y-%m-%dT%H:%M:%S%z")
           row_values = []
           (0..row.size-1).each do |i|
             if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID"
                 cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
-                row_values << "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{data_stream.DST}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}' )"
-                                
+                row_values << "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id} )"
+                puts  "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id}, #{data_col_array[i][variable].id} )"       
               end #end if
           end #end loop
           if !row_values.empty?
-            sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\") VALUES "
+            sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\", \"site_id\", \"variable_id\") VALUES "
             sql << row_values.join(',')
             sql << " RETURNING \"id\""
             result_ids = repository.adapter.select(sql)

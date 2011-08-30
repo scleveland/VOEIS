@@ -73,7 +73,7 @@ namespace :db do
 
   desc  "Clear out test data"
   task :clear, :roles => :app do
-    run "bash -c 'cd #{current_path} && rake db:drop:all'"
+    run "bash -c 'cd #{current_path} && bundle exec rake db:drop:all'"
   end
 
   task :symlink do
@@ -91,7 +91,7 @@ namespace :db do
   end
   
   task :run_backup_task do
-    run "cd #{current_path}; rake yogo:db:backup RAILS_ENV=production"
+    run "cd #{current_path}; bundle exec rake yogo:db:backup RAILS_ENV=production"
   end
   
   task :auto_upgrade do
