@@ -10,11 +10,14 @@
 
   #form-table { width:600px; }
   #form-table td { width:50%; }
-  .form_element { width:20em }
-  .new_voeis_site input { width:18em }
-  .new_voeis_site textarea { width:45em }
-  .new_voeis_site select { width:21em }
-  #site00_name { width:24em }
+  .form_element { width:20em; }
+  
+  .dijitTextBox { width:18em !important; }
+  .TextBox_name { width:25em !important; }
+  
+  .new_voeis_site input { width:18em; }
+  .new_voeis_site textarea { width:45em; }
+  .new_voeis_site select { width:21em; }
 
 
 - content_for(:javascripts) do
@@ -268,6 +271,7 @@
       function validate_site_form() {
       return true;
       }
+      
       function submit_site_form(siteId) {
       if(validate_site_form(siteId)) {
       console.log('CREATE SITE: '+siteId);
@@ -276,7 +280,9 @@
       console.log('FORM ID:',form0);
       //var form = dijit.byNode(dojo.byId(form0));
       var form = dojo.byId(form0);
-      pane.siteFormSave(form);
+      //pane.siteFormSave(form);
+      //dojo.publish('voeis/project/siteTables/refresh');
+      
       console.log(pane,form);
 
       var vertical_datum_dd = drop_down(form,'site_vertical_datum');
@@ -302,10 +308,21 @@
       local_projection_id:local_projection_dd.value
       }};
       if(pane.newSite) {
-      $.post('/projects/#{@project.id}/sites.json', data);
-        
+      $.post('/projects/#{@project.id}/sites.json', data, function(newValue) {
+      //
+      console.log('NEW ID: '+newValue);
+      data['site']['id'] = newValue.id;
+      data['site']['vertical_datum'] = vertical_datum_dd.text;
+      data['site']['local_projection'] = local_projection_dd.text;
+      pane.siteSave(data['site']);
+      //dojo.publish('voeis/project/siteTables/refresh');
+      var tabs = dijit.byId('tab_browser');
+      tabs.removeChild(pane);
+      pane.onClose();
+      pane.destroyRecursive();  
+      });
       } else {
-      data[site][id] = siteId;
+      data['site']['id'] = siteId;
       //save//$.post('#{@root_url}/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/sites/'+siteId,{site:{id:''+siteId, name:form.elements['site_name'].value, code:form.elements['site_code'].value, latitude:form.elements['site_latitude'].value, longitude:form.elements['site_longitude'].value, lat_long_datum_id:form.elements['site_lat_long_datum_id'].value, elevation_m:form.elements['site_elevation_m'].value, vertical_datum_id:form.elements['site_vertical_datum_id'].value, local_x:form.elements['site_local_x'].value, local_y:form.elements['site_local_y'].value, local_projection_id:form.elements['site_local_projection_id'].value, pos_accuracy_m:form.elements['site_pos_accuracy_m'].value, state:form.elements['site_state'].value, county:form.elements['site_county'].value, comments:form.elements['site_comments'].value, description:form.elements['site_description'].value}});
       //$.post('#{@root_url}/projects/#{@project.id}/sites/'+siteId, data);
       //$.post('/projects/#{@project.id}/sites/'+siteId+'.json', data);
@@ -316,10 +333,16 @@
       success: '',
       dataType: 'json'
       });
-      }
+      data['site']['vertical_datum'] = vertical_datum_dd.text;
+      data['site']['local_projection'] = local_projection_dd.text;
+      pane.siteSave(data['site']);
+      //dojo.publish('voeis/project/siteTables/refresh');
+      dojo.publish('voeis/project/map/clear');
+      };
       return false;
       };
       };
+      
       function cancel_site_form(siteId) {
       $('#edit-site'+siteId).hide();
       $('#show-site'+siteId).show();
@@ -356,14 +379,28 @@
       function init_site_form(siteId) {
       var siteTag = 'site'+siteId;
       var form0 = siteTag+'-edit-form';
-      var form = dojo.byId(form0);
+      var form = dijit.byId(form0);
+      form0 = form.domNode;
       var pane = dijit.byNode(dojo.byId(siteTag));
       var site = pane.site;
-      console.log('INIT:',form0);
-      var vertical_datum_dd = drop_down(form,'site_vertical_datum',site.vertical_datum_id).element;
-      var local_projection_dd = drop_down(form,'site_local_projection',site.local_projection_id).element;
+      //console.log('INIT:',form0);
+      var vertical_datum_dd = drop_down(form0,'site_vertical_datum',site.vertical_datum_id).element;
+      var local_projection_dd = drop_down(form0,'site_local_projection',site.local_projection_id).element;
       console.log('VerticalDatum ID:',site.vertical_datum_id);
       console.log('LocalProjection ID:',site.local_projection_id);
+      //var submit_button = dijit.byId('site00_voeis_site_submit');
+      //var submit_button = dijit.byNode(form0.elements['commit']);
+      var submit_button = dijit.byId('site'+siteId+'_voeis_site_submit');
+      // set initial state: submit button
+      submit_button.attr("disabled", !form.validate());
+      //submit_button.attr("disabled", !this.isValid());
+      form0.elements['site_name'].focus();
+      
+      //IS FORM VALID?
+      form.connect(form, "onValidStateChange", function(state){
+      console.log('formStateChange:',state);
+      submit_button.attr("disabled", !state);
+      });
       
       };
 
@@ -375,7 +412,32 @@
     -#%form(accept-charset="UTF-8" action="/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/sites/$$$id$$$" class="new_voeis_site" data-remote="true" id="site00-edit-form" dojoType="dijit.form.Form" method="put")
     -#%form(accept-charset="UTF-8" action="/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/sites/$$$id$$$" class="new_voeis_site" data-remote="true" id="site00-edit-form" jsId="site00_edit_form" dojoType="dijit.form.Form" method="put")
     -#%form(accept-charset="UTF-8" action="/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/sites/$$$id$$$" class="new_voeis_site" data-remote="true" id="site00-edit-form" method="put")
-    %form(accept-charset="UTF-8" class="new_voeis_site" data-remote="true" id="site00-edit-form")
+    
+    -#%form(accept-charset="UTF-8" action="/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/sites/$$$id$$$" class="new_voeis_site" data-remote="true" id="site00-edit-form" method="put")
+    %form(accept-charset="UTF-8" class="new_voeis_site" data-remote="true" id="site00-edit-form" jsId="site00_edit_form" dojoType="dijit.form.Form")
+      %script{:type=>"dojo/method", :event=>"onKeyPress", :args=>"key"}
+        console.log('KEYPRESS:',key);
+        //var submit_button = dijit.byId('site00_voeis_site_submit');
+        // set changed state
+        //submit_button.attr("disabled", !state);
+      -#--%script{:type=>"dojo/method", :event=>"onValidStateChange", :args=>"state"}
+      -#--var submit_button = dijit.byId('site00_voeis_site_submit');
+      -#--// set changed state
+      -#--console.log('formStateChange:',state);
+      -#--submit_button.attr("disabled", !state);
+      -#--%script{:type=>"dojo/method", :event=>"startup"}
+      -#--var submit_button = dijit.byId('site00_voeis_site_submit');
+      -#--// set initial state
+      -#--//submit_button.attr("disabled", !this.validate());
+      -#--//submit_button.attr("disabled", !this.isValid());
+      -#--//this.connect(this, "onValidStateChange", function(state){
+      -#--//submit_button.attr("disabled", !this.validate());
+      -#--//this.domNode.elements['site_name'].focus()
+      -#--//});
+      -#%script{:type=>"dojo/method", :event=>"onValidStateChange", :args=>"state"}
+      -#  var submit_button = dijit.byId('site00_voeis_site_submit');
+      -#  // set changed state
+      -#  submit_button.attr("disabled", !state);
 
       %table{:id=>"form-table"}
         %tr
@@ -385,49 +447,56 @@
                 %label{:for=>"site_name"} Name
               -#= f.text_field("name", :value=>"$$$name$$$")
               -#%input(name="site_name" dojoType="dijit.form.ValidationTextBox" size="50" type="text" value="$$$name$$$" required="true")
-              %input(name="site_name" id="site00_name" type="text" value="$$$name$$$")
+              -#%input(name="site_name" id="site00_name" type="text" value="$$$name$$$")
+              %input(name="site_name" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" id="site00_name" type="text" value="$$$name$$$" required="true")
           %td
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_code"} Code
-            -#= f.text_field("code", :value=>"$$$code$$$")
-            -#%input(name="site_code"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$code$$$" required="true")
-            %input(name="site_code"  type="text" value="$$$code$$$")
+              -#= f.text_field("code", :value=>"$$$code$$$")
+              -#%input(name="site_code"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$code$$$" required="true")
+              -#%input(name="site_code"  type="text" value="$$$code$$$")
+              %input(name="site_code" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$code$$$" required="true")
         %tr
           %td
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_latitude"} Latitude
-            -#= f.text_field("latitude", :value=>"$$$latitude$$$")
-            -#%input(name="site_latitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$latitude$$$" required="true")
-            %input(name="site_latitude" id="site00_latitude" type="text" value="$$$latitude$$$")
+              -#= f.text_field("latitude", :value=>"$$$latitude$$$")
+              -#%input(name="site_latitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$latitude$$$" required="true")
+              -#%input(name="site_latitude" id="site00_latitude" type="text" value="$$$latitude$$$")
+              %input(name="site_latitude" dojoType="dijit.form.NumberTextBox" id="site00_latitude" type="text" value="$$$latitude$$$" required="true")
           %td
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_longitude"} Longitude
-            -#= f.text_field("longitude", :value=>"$$$longitude$$$")
-            -#%input(name="site_longitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$longitude$$$" required="true")
-            %input(name="site_longitude" id="site00_longitude" type="text" value="$$$longitude$$$")
+              -#= f.text_field("longitude", :value=>"$$$longitude$$$")
+              -#%input(name="site_longitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$longitude$$$" required="true")
+              -#%input(name="site_longitude" id="site00_longitude" type="text" value="$$$longitude$$$")
+              %input(name="site_longitude" dojoType="dijit.form.NumberTextBox" id="site00_longidude" type="text" value="$$$longitude$$$" required="true")
         %tr
           %td{:colspan=>"2"}
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_elevation_m"} Elevation
-            -#= f.text_field("elevation_m", :value=>"$$$elevation_m$$$")
-            %input(name="site_elevation_m" type="text" value="$$$elevation_m$$$")
+              -#= f.text_field("elevation_m", :value=>"$$$elevation_m$$$")
+              -#%input(name="site_elevation_m" type="text" value="$$$elevation_m$$$")
+              %input(name="site_elevation_m" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$elevation_m$$$")
         %tr
           %td 
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_local_x"} Local X
-            -#= f.text_field("local_x", :value=>"$$$local_x$$$")
-            %input(name="site_local_x"  type="text" value="$$$local_x$$$")
+              -#= f.text_field("local_x", :value=>"$$$local_x$$$")
+              -#%input(name="site_local_x"  type="text" value="$$$local_x$$$")
+              %input(name="site_local_x" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$local_x$$$")
           %td 
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_local_y"} Local Y
-            -#= f.text_field("local_y", :value=>"$$$local_y$$$")
-            %input(name="site_local_y"  type="text" value="$$$local_y$$$")
+              -#= f.text_field("local_y", :value=>"$$$local_y$$$")
+              -#%input(name="site_local_y"  type="text" value="$$$local_y$$$")
+              %input(name="site_local_y" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$local_y$$$")
 
         %tr
           %td{:colspan=>"2"}
@@ -470,26 +539,31 @@
               %span{:class=>'label'}
                 %label{:for=>"site_pos_accuracy_m"} Position Accuracy
             -#= f.text_field("pos_accuracy_m", :value=>"$$$pos_accuracy_m$$$")
-            %input(name="site_pos_accuracy_m" type="text" value="$$$pos_accuracy_m$$$")
+            -#%input(name="site_pos_accuracy_m" type="text" value="$$$pos_accuracy_m$$$")
+            %input(name="site_pos_accuracy_m" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$pos_accuracy_m$$$")
         %tr
           %td 
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_state"} State
             -#= f.text_field("state", :value=>"$$$state$$$")
-            %input(name="site_state" type="text" value="$$$state$$$")
+            -#%input(name="site_state" type="text" value="$$$state$$$")
+            %input(name="site_state" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$state$$$" required="true")
           %td 
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_county"} County
             -#= f.text_field("county", :value=>"$$$county$$$")
-            %input(name="site_county" type="text" value="$$$county$$$")
+            -#%input(name="site_county" type="text" value="$$$county$$$")
+            %input(name="site_county" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$county$$$" required="true")
         %tr
           %td{:colspan=>"2"}
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_description"} Description
             -#= f.text_area("description", :value=>"$$$description$$$")
+            -#%textarea( name="site_description" id="site00_description" rows="5")
+            -#site00-description(name="site_description" dojoType="dijit.form.Textarea")
             %textarea( name="site_description" id="site00_description" rows="5")
               $$$description$$$
         %tr
@@ -498,6 +572,8 @@
               %span{:class=>'label'}
                 %label{:for=>"site_comments"} Comments
             -#= f.text_area("comments", :value=>"$$$comments$$$")
+            -#%textarea( name="site_comments" id="site00_comments" rows="5")
+            -#site00-comments(name="site_comments" dojoType="dijit.form.Textarea")
             %textarea( name="site_comments" id="site00_comments" rows="5")
               $$$comments$$$
 
@@ -508,7 +584,16 @@
             -#%button(id="site00_voeis_site_submit" name="commit" dojoType="dijit.form.Button" onclick="if(formValid()){$('#loader').toggle();formSend();};")
             -#%button(id="site00_voeis_site_submit" name="commit" dojoType="dijit.form.Button" onclick="console.log('CLICK!');")
             -#%button(id="site00_voeis_site_submit" jsId="site00_voeis_site_submit" name="commit" dojoType="dijit.form.Button") Save Site
-            %button(dojoType="dijit.form.Button" id="site00_voeis_site_submit" name="commit" value="Save Site" onClick="submit_site_form($$$id$$$);return false;") Save Site
+            %button(dojoType="dijit.form.Button" id="site00_voeis_site_submit" name="commit" value="Save Site" onClick="submit_site_form($$$id$$$);return false;" disabled="true") 
+              Save Site
+              -#%script{:type=>"dojo/method", :event=>"startup"}
+              -#  var form = dijit.byNode(dojo.byId('site00-edit-form'));
+              -#  // set initial state
+              -#  this.attr("disabled", !form.isValid());
+              -#  this.connect(form, "onValidStateChange", function(state){
+              -#  this.attr("disabled", !state);
+              -#  });
+            -#%script{:type=>"dojo/method", :event=>"onClick"}
             -#%script{:type=>"text/javascript"}
             -#%script{:type=>"dojo/method", :event=>"onClick"}
             -#%script{:type=>"dojo/connect", :event=>"onClick"}

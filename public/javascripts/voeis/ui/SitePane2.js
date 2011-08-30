@@ -52,7 +52,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	siteUpdate: function() {
 
 		if(this.newSite) {
-			this.set("title", 'NEW SITE');
+			var sitename = 'NEW SITE';
+			this.set("title", sitename);
 		} else {
 			var sitename = this.site.name.toString();
 			var sitename0 = sitename.slice(0,12);
@@ -73,6 +74,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		//PROPERTIES STUFF
 		//$('#'+siteTag+'-name-head').html(this.site.name);
 		//for(var prop in site_properties) 
+		if(this.newSite) sitePaneContent = sitePaneContent.replace(/\$\$\$id\$\$\$/g, '0');
 		for(var i=0;i<site_properties.length;i++) 
 			sitePaneContent = sitePaneContent.replace(new RegExp('\\$\\$\\$'+site_properties[i]+'\\$\\$\\$', 'g'), this.site[site_properties[i]]);
 			//$('#show-'+siteTag+' .show_'+site_properties[i]).text(this.site[site_properties[i]]);
@@ -137,7 +139,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			//this.set("title", 'NEW SITE');
 			$(this.domNode).find('#show-'+siteTag).hide();
 			$(this.domNode).find('#edit-'+siteTag).show();
-			$(this.domNode).find('#'+siteTag+'-name-head').text('NEW SITE');
+			//$(this.domNode).find('#'+siteTag+'-name-head').text('NEW SITE');
 			$(this.domNode).find('#'+siteTag+'-edit-control').hide();
 			console.log('NewSite:',siteTag);
 			console.log('domNode.id:',this.domNode.id);
@@ -149,10 +151,6 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 
 	},
 
-	onClose: function() {
-		return true;
-	},
-
 	setSite: function(site) {
 		if(parseInt(site)===site) {
 			if(parseInt(site)!=0) {
@@ -161,7 +159,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			} else {
 				//NEW SITE
 				this.newSite = true;
-				this.site = {name:'',
+				this.site = {id:0,
+										name:'',
 										code:'',
 										latitude:'',
 										longitude:'',
@@ -186,7 +185,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			if(site && site.id && site.code && site.idx)
 				this.site = site;
 			else
-				this.site = site_data[0];
+				this.site = this.getSite(0);
 		};
 		if(!this.newSite) {
 			this.set('id', 'site'+this.site.id);
@@ -208,19 +207,86 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	},
 	
 	getSite: function(siteId) {
+		/*
 		for(var i=0;i<site_data.length;i++)
 			if(site_data[i].id==siteId) 
 				return site_data[i];
+		*/
+		console.log('GET-SITE: '+siteId);
+		//console.log('TYPE-OF: '+(typeof siteId));
+		siteId = parseInt(siteId);
+		var site;
+		psites.fetch({query: {id: siteId},
+			onItem: function(item) {
+				site = $.extend({},item);
+				//site = item;
+			},
+			onError: function(error,request) {
+				console.log('ERROR: '+error);
+				site = false;
+			}
+    });
+		return site;
 	},
 
 	siteSave: function(update_props) {
+		console.log('SAVE-SITE:',update_props);
+		if(!update_props.hasOwnProperty('id')) {
+			console.log('ERROR: MUST HAVE "ID"');
+			return false;
+		}
+		if(this.newSite) 
+			this.site['id'] = 0;
+		for(prop in update_props) 
+			if(this.site.hasOwnProperty(prop)) 
+				this.site[prop] = update_props[prop];
+		if(!this.site.id) {
+			console.log('ERROR: ID=0');
+			return false;
+		};
+		if(this.newSite) {
+			try {
+				psites.newItem(this.site);
+			}
+			catch (e) { 
+				console.log('ERROR: DUPLICATE KEY');
+			};
+		} else {
+			//var update = this.getSite(parseInt(update_props.id));
+			console.log('UPDATE:',update_props.id);
+			psites.fetch({query: {id: update_props.id},
+				onComplete: function(items,request) {
+					var onSaveError = function(error) {
+						console.log('SAVE-ERROR: '+error);
+					};
+					//### UPDATE ATTRIBUTES
+					for(prop in items[0])
+						if(update_props.hasOwnProperty(prop) && prop!='id')
+							psites.setValue(items[0], prop, update_props[prop])
+				},
+				onError: function(error,request) {
+					console.log('ERROR: '+error);
+				}
+			});
+		};
+		this.siteUpdate();
+		return this.site.id;
+		/*
 		var new_data = site_data[this.siteIdx];
 		for(prop in update_props) 
-			new_data[prop] = update_props[prop];
-		site_data[this.siteIdx] = new_data;
+			if(new_data.hasOwnProperty(prop)) 
+				new_data[prop] = update_props[prop];
+		if(this.newSite) {
+			site_data.push(new_data);
+			site_stat_data.push({'vars':0,'count':'NA','first':'NA','last':'NA'});
+			site_var_data.push([]);
+			site_samp_data.push([]);
+		} else {
+			site_data[this.siteIdx] = new_data;
+		};
 		this.siteUpdate();
 		window.scrollTo(0,0);
-    
+		*/
 	},
 
 	siteFormSave: function(form) {
