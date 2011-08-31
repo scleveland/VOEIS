@@ -15,6 +15,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	preload: true,
 	parseOnLoad: false,
 	cleanContent: true,
+	parsedWidgets: [],
 	
 	protoDivId: 'site_pane_proto',
 	style: "margin-top:0;padding-top:0;",
@@ -74,9 +75,9 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		//PROPERTIES STUFF
 		//$('#'+siteTag+'-name-head').html(this.site.name);
 		//for(var prop in site_properties) 
-		if(this.newSite) sitePaneContent = sitePaneContent.replace(/\$\$\$id\$\$\$/g, '0');
+		//if(this.newSite) sitePaneContent = sitePaneContent.replace(/\$\$\$id\$\$\$/g, '0');
 		for(var i=0;i<site_properties.length;i++) 
-			sitePaneContent = sitePaneContent.replace(new RegExp('\\$\\$\\$'+site_properties[i]+'\\$\\$\\$', 'g'), this.site[site_properties[i]]);
+			sitePaneContent = sitePaneContent.replace(new RegExp('\\$\\$\\$'+site_properties[i]['name']+'\\$\\$\\$', 'g'), this.site[site_properties[i]['name']]);
 			//$('#show-'+siteTag+' .show_'+site_properties[i]).text(this.site[site_properties[i]]);
 			//document.getElementById('show_'+site_properties[i]).value = this.site[site_proper
 
@@ -133,7 +134,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		*/
 
 		this.set('content', sitePaneContent);
-		dojo.parser.parse(this.domNode);
+		this.parsedWidgets = dojo.parser.parse(this.domNode);
 		
 		if(this.newSite) {
 			//this.set("title", 'NEW SITE');
@@ -322,14 +323,25 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	onClose: function() {
 		//REMOVE Global Ref
 		eval('delete '+this.id+'ref');
+		console.log('CLOSE:',this.domNode,this.containerNode)
 		//REMOVE dijit widgets
-		$(this.domNode).find('*').each(function(i){
-      //console.log('EleID: '+this.id);
-      var wid = dijit.byNode(this);
-      if(wid) wid.destroy();
-      wid = dijit.byId(this.id);
-      if(wid) wid.destroy();
-    });
+		if(this.parsedWidgets) 
+			for(var i=0;i<this.parsedWidgets.length;i++) {
+				console.log('Wid ID: '+this.parsedWidgets[i].id);
+				this.parsedWidgets[i].destroyRecursive(false);
+			};
+		//REMOVE any dom nodes left
+		//NOTE: this may not be needed-- DOJO by handle
+		var toDel = this.containerNode.childNodes;
+		if(toDel) 
+			for(var i=0;i<toDel.length;i++) {
+				console.log('Node: '+toDel[i].nodeName+' ('+toDel[i].id+')');
+				this.containerNode.removeChild(toDel[i]);
+			};
+		
+		//dojo.byId(this.id);
+		//dijit.byId(this.id)
+		//this.destroyRecursive();
 		return true;
 	}
 

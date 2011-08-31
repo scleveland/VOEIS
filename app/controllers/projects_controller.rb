@@ -92,21 +92,46 @@ class ProjectsController < InheritedResources::Base
     @sample_labels = Array["Sample Type","Lab Sample Code","Sample Medium","Timestamp"]
     @sample_fields = Array["sample_type","lab_sample_code","material","local_date_time"]
     @site_ref_props = []
-    @site_properties = @site.class.properties.map{ |prop| 
-      #prop = prop.name.to_s
-      if prop.name.to_s[-3..-1]=='_id'
-        prop.name.to_s[0..-4]
-        #@site_ref_props << prop
-      else
-        prop.name.to_s
-      end
-    }
+    #@site_properties = @site.class.properties.map{ |prop| 
+    #  #prop = prop.name.to_s
+    #  if prop.name.to_s[-3..-1]=='_id'
+    #    prop.name.to_s[0..-4]
+    #    #@site_ref_props << prop
+    #  else
+    #    prop.name.to_s
+    #  end
+    #}
+    @site_properties = [
+      {:label=>"Site ID", :name=>"id"},
+      {:label=>"Name", :name=>"name"},
+      {:label=>"Code", :name=>"code"},
+      {:label=>"Latitude", :name=>"latitude"},
+      {:label=>"Longitude", :name=>"longitude"},
+      {:label=>"Lat/Long Datum", :name=>"lat_long_datum"},
+      {:label=>"Elevation", :name=>"elevation_m"},
+      {:label=>"Local X", :name=>"local_x"},
+      {:label=>"Local Y", :name=>"local_y"},
+      {:label=>"Local Projection", :name=>"local_projection"},
+      {:label=>"Vertical Datum", :name=>"vertical_datum"},
+      {:label=>"Position Accuracy", :name=>"pos_accuracy_m"},
+      {:label=>"State", :name=>"state"},
+      {:label=>"County", :name=>"county"},
+      {:label=>"Description", :name=>"description"},
+      {:label=>"Comments", :name=>"comments"},
+      {:label=>"HIS ID", :name=>"his_id"},
+      {:label=>"Time Zone Offset", :name=>"time_zone_offset"},
+      {:label=>"Updated", :name=>"updated_at"},
+      {:label=>"Updated By", :name=>"updated_by"},
+      {:label=>"Update Comment", :name=>"updated_comment"},
+      {:label=>"Created", :name=>"created_at"}
+      ]
     
     #### CV referenced fields
     @sites.each{ |site| 
+      lat_long_datum = site.lat_long_datum.nil? ? '' : site.lat_long_datum.srs_name.to_s
+      local_proj = site.local_projection.nil? ? '' : site.local_projection.srs_name.to_s
       vert_datum = site.vertical_datum.nil? ? '' : site.vertical_datum.term.to_s
-      local_proj = site.local_projection.nil? ? '' : site.local_projection.srs_id.to_s
-      @site_ref << {:vertical_datum=>vert_datum, :local_projection=>local_proj}
+      @site_ref << {:lat_long_datum=>lat_long_datum, :local_projection=>local_proj, :vertical_datum=>vert_datum}
     }
     
     @sites.each{ |site| 

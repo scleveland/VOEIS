@@ -79,6 +79,7 @@ class Voeis::SitesController < Voeis::BaseController
         site[key] = value.empty? ? nil : value
       end
       site.updated_at = Time.now
+      site.lat_long_datum_id = params[:site][:lat_long_datum_id] == "NaN" ? nil : params[:site][:lat_long_datum_id].to_i
       site.vertical_datum_id = params[:site][:vertical_datum_id] == "NaN" ? nil : params[:site][:vertical_datum_id].to_i
       site.local_projection_id = params[:site][:local_projection_id] == "NaN" ? nil : params[:site][:local_projection_id].to_i
       puts site.valid?

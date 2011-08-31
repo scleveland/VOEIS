@@ -77,9 +77,9 @@
       %tr{:class=>"row#{cycle('1','0')}"}
         %td
           %b
-            #{prop.capitalize}
-        %td{:class=>"show_#{prop}"}
-          $$$#{prop}$$$
+            #{prop[:label]}
+        %td{:class=>"show_#{prop[:name]}"}
+          $$$#{prop[:name]}$$$
 
   -#%br{:style=>'float:none; clear:both;'}
   -#%br
@@ -138,92 +138,193 @@
     -#  TESTING Local Projection
     -##site00_new_vertical_datum{:dojoType=>"dijit.Dialog", :jsId=>"site00_new_local_projection", :title=>"NEW Local Projection"}
     -#  TESTING Vertical Datum
-    
-    #site00_xnew_local_projection{:title=>"NEW Local Projection", :style=>"display:none;"}
-      -#= form_for :local_projection, :url=>"", :html=>{:dojoType=>"dijit.form.Form", :id=>"site00_local_projection_form"} do |f|
-      -#%form(id="site00_local_projection_form" jsId="site00_local_projection_form" dojoType="dijit.form.Form" method="post")
-      %form(id="site00_local_projection_form" method="post")
+
+    #site00_new_vertical_datum{:dojoType=>"dijit.Dialog", :jsId=>"site00_new_vertical_datum", :title=>"NEW Vertical Datum", :style=>"width:400px;"}
+      %form(id="site00_vertical_datum_form" jsId="site00_vertical_datum_form" dojoType="dijit.form.Form" method="post")
         %label Term
         %br
-        -#=f.text_field :quality_control_level_code, :size => 30
-        -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
-        %input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :style=>"width:95%;"}
+        %input(name="vertical_datum_term" dojoType="dijit.form.ValidationTextBox" id="site00_vertical_datum_term" size="30" required="true")
         %br{:style=>'float:none; clear:both;'}
         %br
         %label Definition
         %br
+        %textarea{:type=>"text", :name=>"vertical_datum_definition", :id=>"site00_vertical_datum_definition", :style=>"width:95%;", :rows=>"4"}
+        %br{:style=>'float:none; clear:both;'}
+        %br
+        %button{:id=>"site00_vertical_datum_submit_button",:dojoType=>"dijit.form.Button", :title=>'Create'}
+          Create Vertical Datum
+          %script{:type=>"dojo/method", :event=>"startup"}
+            var form = dijit.byId("site00_vertical_datum_form");
+            //var form = dijit.byId("site00_vertical_datum_form");
+            // set initial state
+            this.attr("disabled", !form.isValid());
+            this.connect(form, "onValidStateChange", function(state){
+            this.attr("disabled", !state);
+            });
+            this.connect(form, "onClick", function(){
+            var data = {vertical_datum_c_v: {
+            term: $("#site00_vertical_datum_term").val(),
+            definition: $("#site00_vertical_datum_definition").val()}};
+            console.log('POST:',data);
+            $.post("/vertical_datum_c_vs.json", data, function(dat) {
+            $('#site00_vertical_datum').append($("<option></option>").attr("value",dat['id']).text($('#site00_vertical_datum_term').val()));
+            $('#site00_vertical_datum').val(dat['id']);
+            site00_new_vertical_datum.hide();
+            });
+            });
+            
+        &nbsp;&nbsp;
+        %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"site00_new_vertical_datum.hide();"} Cancel
+    
+    -#site00_xnew_local_projection{:title=>"NEW Local Projection", :style=>"display:none;"}
+    #site00_new_spatial_reference{:dojoType=>"dijit.Dialog", :jsId=>"site00_new_spatial_reference", :title=>"NEW Spatial Reference", :style=>"width:400px;"}
+      %form(id="site00_spatial_reference_form" jsId="site00_spatial_reference_form" dojoType="dijit.form.Form" method="post")
+        %label Source ID
+        %br
+        -#=f.text_field :quality_control_level_code, :size => 30
+        -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
+        -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :style=>"width:95%;"}
+        %input(name="source_id" dojoType="dijit.form.NumberTextBox" id="site00_source_id" size="30" required="true")
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        %input(name="source_geographic" dojoType="dijit.form.CheckBox" id="site00_source_geographic")
+        Geographic
+        %br{:style=>'float:none; clear:both;'}
+        %br
+        %label Source Name
+        %br
+        -#=f.text_field :quality_control_level_code, :size => 30
+        -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
+        -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :style=>"width:95%;"}
+        %input(name="source_name" dojoType="dijit.form.ValidationTextBox" id="site00_source_name" size="50" required="true")
+        
+        %br{:style=>'float:none; clear:both;'}
+        %br
+        %label Notes
+        %br
         -#=f.text_area :definition, :cols=>50, :rows=>3
         -#%input{:type=>"text", :name=>"local_projection_definition", :id=>"site00_local_projection_definition", :dojoType=>"dijit.form.ValidationTextBox", :style=>"width:50em", :size=>50, :rows=>"3"}
-        %textarea{:type=>"text", :name=>"local_projection_definition", :id=>"site00_local_projection_definition", :style=>"width:95%;", :rows=>"4"}
+        %textarea{:type=>"text", :name=>"source_notes", :id=>"site00_source_notes", :style=>"width:95%;", :rows=>"4"}
         %br{:style=>'float:none; clear:both;'}
         %br
         -#%button{:id=> 'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"site00_createLocalProjection();"}
         -#%button{:id=>'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create'}
-        %button{:id=>'site00_new_local_projection_button', :value=>"Create Local Projection", :onclick=>"submit_site_dialog($$$id$$$,'local_projection');site00ref.dialog.hide();return false;"}
-          Create Local Projection
-          -#%script{:type=>"dojo/method", :event=>"startup"}
-          -#  var form = dijit.byId("site00_local_projection_form");
-          -#  // set initial state
-          -#  //this.attr("disabled", !form.isValid());
-          -#  //this.connect(form, "onValidStateChange", function(state){
-          -#  //this.attr("disabled", !state);
-          -#  //});
-          -#  this.connect(form, "onClick", function(){
-          -#  //$.post("#{root_url}/local_projection_cvs.json?local_projection_c_vs[term]="+$("#site00_local_projection_term").val()+"&local_projection_c_vs[definition]="+$("#site00_local_projection_definition").val(),
-          -#  $.post("#{@root_url}/local_projection_c_vs.json", {local_projection_c_v: {term: $("#site00_local_projection_term").val(), definition: $("#site00_local_projection_definition").val()}},
-          -#  function(data) {
-          -#  //$('#site00_local_projection').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val() + ':' + $("#site00_vertical_datum_definition").val())); 
-          -#  $('#site00_local_projection').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val()));
-          -#  $('#site00_local_projection').val(data['id']);
-          -#  dijit.byId("site00_xnew_local_projection").hide();
-          -#  });
-          -#  };
+        -#%button{:id=>'site00_new_local_projection_button', :value=>"Create Local Projection", :onclick=>"submit_site_dialog($$$id$$$,'local_projection');site00ref.dialog.hide();return false;"}
+        %button{:id=>"site00_source_submit_button",:dojoType=>"dijit.form.Button", :title=>'Create'}
+          Create Spatial Reference
+          %script{:type=>"dojo/method", :event=>"startup"}
+            var form = dijit.byId("site00_spatial_reference_form");
+            // set initial state
+            this.attr("disabled", !form.isValid());
+            this.connect(form, "onValidStateChange", function(state){
+            this.attr("disabled", !state);
+            });
+            this.connect(form, "onClick", function(){
+            var is_geo = (dojo.byId("site00_source_geographic").checked) ? true : false;
+            var data = {spatial_reference: {
+            srs_id: parseInt($("#site00_source_id").val()),
+            srs_name: $("#site00_source_name").val(),
+            is_geographic: is_geo,
+            notes: $("#site00_source_notes").val()}};
+            console.log('POST:',data);
+            $.post("/spatial_references.json", data, function(dat) {
+            $('#site00_lat_long_datum').append($("<option></option>").attr("value",dat['id']).text($('#site00_source_name').val()));
+            if(SRfrom=='LLD') $('#site00_lat_long_datum').val(dat['id']);
+            $('#site00_local_projection').append($("<option></option>").attr("value",dat['id']).text($('#site00_source_name').val()));
+            if(SRfrom='LP') $('#site00_local_projection').val(dat['id']);
+            site00_new_spatial_reference.hide();
+            });
+            });
         &nbsp;&nbsp;
-        -#%button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"dijit.byNode(dojo.byId('site00')).dialog.hide();"} Cancel
-        %button{:onclick=>"site00ref.dialog.hide();return false;", :value=>"Cancel"} Cancel
-
-    #site00_xnew_vertical_datum{:title=>"NEW Vertical Datum", :style=>"display:none;"}
-      -#= form_for :vertical_datum_c_vs, :url=>"", :html=>{:dojoType=>"dijit.form.Form", :id=>"site00_vertical_datum_form"} do |f|
-      -#%form(id="site00_vertical_datum_form" jsId="site00_vertical_datum_form" dojoType="dijit.form.Form" method="post")
-      %form(id="site00_vertical_datum_form" method="post")
-        %label Term
-        %br
-        -#=f.text_field :quality_control_level_code, :size => 30
-        -#%input{:type=>"text", :name=>"vertical_datum_term", :id=>"site00_vertical_datum_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
-        %input{:type=>"text", :name=>"vertical_datum_term", :id=>"site00_vertical_datum_term", :style=>"width:95%;"}
-        %br{:style=>'float:none; clear:both;'}
-        %br
-        %label Definition
-        %br
-        -#=f.text_area :definition, :cols=>50, :rows=>3
-        -#%input{:type=>"text", :name=>"vertical_datum_definition", :id=>"site00_vertical_datum_definition", :dojoType=>"dijit.form.ValidationTextBox", :style=>"width:50em", :size=>50, :rows=>"3", :required=>"true"}
-        %textarea{:type=>"text", :name=>"vertical_datum_definition", :id=>"site00_vertical_datum_definition", :style=>"width:95%;", :rows=>"4"}
-        %br{:style=>'float:none; clear:both;'}
-        %br
-        -#%button{:id=> 'site00_new_vertical_datum_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"site00_createVerticalDatum();return false;"}
-        -#%button{:id=> 'site00_new_vertical_datum_button',:dojoType=>"dijit.form.Button", :title=>'Create'}
-        %button{:id=> 'site00_new_vertical_datum_button', :value=>"Create Vertical Datum", :onClick=>"submit_site_dialog($$$id$$$,'vertical_datum');site00ref.dialog.hide();return false;"}
-          Create Vertical Datum
-          -#%script{:type=>"dojo/method", :event=>"startup"}
-          -#  var form = dijit.byNode(dojo.byId("site00_vertical_datum_form"));
-          -#  // set initial state
-          -#  this.attr("disabled", !form.isValid());
-          -#  this.connect(form, "onValidStateChange", function(state){
-          -#  this.attr("disabled", !state);
-          -#  });
-          -#  this.connect(form, "onClick", function(){
-          -#  console.log('create Vert Datum CV');
-          -#  $.post("#{@root_url}/vertical_datum_c_vs.json", {vertical_datum_c_v: {term: $("#site00_vertical_datum_term").val(), definition: $("#site00_vertical_datum_definition").val()}},
-          -#  function(data) {
-          -#  //$('#site00_vertical_datum').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val() + ':' + $("#site00_vertical_datum_definition").val()));
-          -#  $('#site00_vertical_datum').append($("<option></option>").attr("value",data['id']).text($("#vertical_datum_term").val()));
-          -#  $('#site00_vertical_datum').val(data['id']);
-          -#  dijit.byId("site00_xnew_vertical_datum").hide();
-          -#  });
-          -#  };
-        &nbsp;&nbsp;
-        -#%button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"dijit.byNode(dojo.byId('site00')).dialog.hide();"} Cancel
-        %button{:onClick=>"site00ref.dialog.hide();return false;", :value=>"Cancel"} Cancel
+        -#%button{:onclick=>"site00ref.dialog.hide();return false;", :value=>"Cancel"} Cancel
+        %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"site00_new_spatial_reference.hide();"} Cancel
+    
+    
+    -##site00_xnew_local_projection{:title=>"NEW Local Projection", :style=>"display:none;"}
+    -#  -#= form_for :local_projection, :url=>"", :html=>{:dojoType=>"dijit.form.Form", :id=>"site00_local_projection_form"} do |f|
+    -#  -#%form(id="site00_local_projection_form" jsId="site00_local_projection_form" dojoType="dijit.form.Form" method="post")
+    -#  %form(id="site00_local_projection_form" method="post")
+    -#    %label Term
+    -#    %br
+    -#    -#=f.text_field :quality_control_level_code, :size => 30
+    -#    -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
+    -#    %input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :style=>"width:95%;"}
+    -#    %br{:style=>'float:none; clear:both;'}
+    -#    %br
+    -#    %label Definition
+    -#    %br
+    -#    -#=f.text_area :definition, :cols=>50, :rows=>3
+    -#    -#%input{:type=>"text", :name=>"local_projection_definition", :id=>"site00_local_projection_definition", :dojoType=>"dijit.form.ValidationTextBox", :style=>"width:50em", :size=>50, :rows=>"3"}
+    -#    %textarea{:type=>"text", :name=>"local_projection_definition", :id=>"site00_local_projection_definition", :style=>"width:95%;", :rows=>"4"}
+    -#    %br{:style=>'float:none; clear:both;'}
+    -#    %br
+    -#    -#%button{:id=> 'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"site00_createLocalProjection();"}
+    -#    -#%button{:id=>'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create'}
+    -#    %button{:id=>'site00_new_local_projection_button', :value=>"Create Local Projection", :onclick=>"submit_site_dialog($$$id$$$,'local_projection');site00ref.dialog.hide();return false;"}
+    -#      Create Local Projection
+    -#      -#%script{:type=>"dojo/method", :event=>"startup"}
+    -#      -#  var form = dijit.byId("site00_local_projection_form");
+    -#      -#  // set initial state
+    -#      -#  //this.attr("disabled", !form.isValid());
+    -#      -#  //this.connect(form, "onValidStateChange", function(state){
+    -#      -#  //this.attr("disabled", !state);
+    -#      -#  //});
+    -#      -#  this.connect(form, "onClick", function(){
+    -#      -#  //$.post("#{root_url}/local_projection_cvs.json?local_projection_c_vs[term]="+$("#site00_local_projection_term").val()+"&local_projection_c_vs[definition]="+$("#site00_local_projection_definition").val(),
+    -#      -#  $.post("#{@root_url}/local_projection_c_vs.json", {local_projection_c_v: {term: $("#site00_local_projection_term").val(), definition: $("#site00_local_projection_definition").val()}},
+    -#      -#  function(data) {
+    -#      -#  //$('#site00_local_projection').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val() + ':' + $("#site00_vertical_datum_definition").val())); 
+    -#      -#  $('#site00_local_projection').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val()));
+    -#      -#  $('#site00_local_projection').val(data['id']);
+    -#      -#  dijit.byId("site00_xnew_local_projection").hide();
+    -#      -#  });
+    -#      -#  };
+    -#    &nbsp;&nbsp;
+    -#    -#%button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"dijit.byNode(dojo.byId('site00')).dialog.hide();"} Cancel
+    -#    %button{:onclick=>"site00ref.dialog.hide();return false;", :value=>"Cancel"} Cancel
+    -#
+    -##site00_xnew_vertical_datum{:title=>"NEW Vertical Datum", :style=>"display:none;"}
+    -#  -#= form_for :vertical_datum_c_vs, :url=>"", :html=>{:dojoType=>"dijit.form.Form", :id=>"site00_vertical_datum_form"} do |f|
+    -#  -#%form(id="site00_vertical_datum_form" jsId="site00_vertical_datum_form" dojoType="dijit.form.Form" method="post")
+    -#  %form(id="site00_vertical_datum_formXX" method="post")
+    -#    %label Term
+    -#    %br
+    -#    -#=f.text_field :quality_control_level_code, :size => 30
+    -#    -#%input{:type=>"text", :name=>"vertical_datum_term", :id=>"site00_vertical_datum_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
+    -#    %input{:type=>"text", :name=>"vertical_datum_term", :id=>"site00_vertical_datum_termXX", :style=>"width:95%;"}
+    -#    %br{:style=>'float:none; clear:both;'}
+    -#    %br
+    -#    %label Definition
+    -#    %br
+    -#    -#=f.text_area :definition, :cols=>50, :rows=>3
+    -#    -#%input{:type=>"text", :name=>"vertical_datum_definition", :id=>"site00_vertical_datum_definition", :dojoType=>"dijit.form.ValidationTextBox", :style=>"width:50em", :size=>50, :rows=>"3", :required=>"true"}
+    -#    %textarea{:type=>"text", :name=>"vertical_datum_definition", :id=>"site00_vertical_datum_definitionXX", :style=>"width:95%;", :rows=>"4"}
+    -#    %br{:style=>'float:none; clear:both;'}
+    -#    %br
+    -#    -#%button{:id=> 'site00_new_vertical_datum_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"site00_createVerticalDatum();return false;"}
+    -#    -#%button{:id=> 'site00_new_vertical_datum_button',:dojoType=>"dijit.form.Button", :title=>'Create'}
+    -#    %button{:id=> 'site00_new_vertical_datum_buttonXX', :value=>"Create Vertical Datum", :onClick=>"submit_site_dialog($$$id$$$,'vertical_datum');site00ref.dialog.hide();return false;"}
+    -#      Create Vertical Datum
+    -#      -#%script{:type=>"dojo/method", :event=>"startup"}
+    -#      -#  var form = dijit.byNode(dojo.byId("site00_vertical_datum_form"));
+    -#      -#  // set initial state
+    -#      -#  this.attr("disabled", !form.isValid());
+    -#      -#  this.connect(form, "onValidStateChange", function(state){
+    -#      -#  this.attr("disabled", !state);
+    -#      -#  });
+    -#      -#  this.connect(form, "onClick", function(){
+    -#      -#  console.log('create Vert Datum CV');
+    -#      -#  $.post("#{@root_url}/vertical_datum_c_vs.json", {vertical_datum_c_v: {term: $("#site00_vertical_datum_term").val(), definition: $("#site00_vertical_datum_definition").val()}},
+    -#      -#  function(data) {
+    -#      -#  //$('#site00_vertical_datum').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val() + ':' + $("#site00_vertical_datum_definition").val()));
+    -#      -#  $('#site00_vertical_datum').append($("<option></option>").attr("value",data['id']).text($("#vertical_datum_term").val()));
+    -#      -#  $('#site00_vertical_datum').val(data['id']);
+    -#      -#  dijit.byId("site00_xnew_vertical_datum").hide();
+    -#      -#  });
+    -#      -#  };
+    -#    &nbsp;&nbsp;
+    -#    -#%button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"dijit.byNode(dojo.byId('site00')).dialog.hide();"} Cancel
+    -#    %button{:onClick=>"site00ref.dialog.hide();return false;", :value=>"Cancel"} Cancel
 
     %table{:id=>"site00-edit-control"}
       %tr
@@ -286,6 +387,7 @@
       
       console.log(pane,form);
 
+      var lat_long_datum_dd = drop_down(form,'site_lat_long_datum');
       var vertical_datum_dd = drop_down(form,'site_vertical_datum');
       var local_projection_dd = drop_down(form,'site_local_projection');
       //console.log(vertical_datum_dd, local_projection_dd);
@@ -296,7 +398,6 @@
       code:form.elements['site_code'].value, 
       latitude:form.elements['site_latitude'].value, 
       longitude:form.elements['site_longitude'].value, 
-      //lat_long_datum_id:form.elements['site_lat_long_datum_id'].value, 
       elevation_m:form.elements['site_elevation_m'].value, 
       local_x:form.elements['site_local_x'].value, 
       local_y:form.elements['site_local_y'].value, 
@@ -305,6 +406,7 @@
       county:form.elements['site_county'].value, 
       comments:form.elements['site_comments'].value, 
       description:form.elements['site_description'].value,
+      lat_long_datum_id:lat_long_datum_dd.value, 
       vertical_datum_id:vertical_datum_dd.value,
       local_projection_id:local_projection_dd.value
       }};
@@ -383,6 +485,7 @@
       };
       
       function init_site_form(siteId) { setTimeout(function() {
+      var SRfrom = '';
       var siteTag = 'site'+siteId;
       var form0 = siteTag+'-edit-form';
       var form = dijit.byId(form0);
@@ -391,8 +494,9 @@
       var pane = dijit.byNode(dojo.byId(siteTag));
       var site = pane.site;
       //console.log('INIT:',form0);
-      var vertical_datum_dd = drop_down(form0,'site_vertical_datum',site.vertical_datum_id).element;
+      var lat_long_datum_dd = drop_down(form0,'site_lat_long_datum',site.lat_long_datum_id).element;
       var local_projection_dd = drop_down(form0,'site_local_projection',site.local_projection_id).element;
+      var vertical_datum_dd = drop_down(form0,'site_vertical_datum',site.vertical_datum_id).element;
       console.log('VerticalDatum ID:',site.vertical_datum_id);
       console.log('LocalProjection ID:',site.local_projection_id);
       //var submit_button = dijit.byId('site00_voeis_site_submit');
@@ -482,6 +586,19 @@
               -#%input(name="site_longitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$longitude$$$" required="true")
               -#%input(name="site_longitude" id="site00_longitude" type="text" value="$$$longitude$$$")
               %input(name="site_longitude" dojoType="dijit.form.NumberTextBox" id="site00_longidude" type="text" value="$$$longitude$$$" required="true")
+
+        %tr
+          %td{:colspan=>"2"}
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_lat_long_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"SRfrom='LLD';site00_new_spatial_reference.show();"}
+                  Latitude Longitude Datum
+            -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
+            -#= f.select('local_projection',  options_for_select(@local_projection_items, '$$$local_projection$$$'), :class=>"form-dropdown")
+            %select(id="site00_lat_long_datum" name="site_lat_long_datum")
+              - @local_projection_items.each do |item|
+                %option(value="#{item[1]}") #{item[0]}
+
         %tr
           %td{:colspan=>"2"}
             .from-element
@@ -510,7 +627,7 @@
           %td{:colspan=>"2"}
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_local_projection", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00ref.showDialog('site00_xnew_local_projection');"}
+                %label{:for=>"site_local_projection", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"SRfrom='LP';site00_new_spatial_reference.show();"}
                   Local Projection
             -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
             -#= f.select('local_projection',  options_for_select(@local_projection_items, '$$$local_projection$$$'), :class=>"form-dropdown")
@@ -528,7 +645,7 @@
             .from-element
               %span{:class=>'label'}
                 -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
-                %label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00ref.showDialog('site00_xnew_vertical_datum');"}
+                %label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
                   Vertical Datum
             -#= f.text_field("vertical_datum", :value=>"$$$vertical_datum_id$$$") 
             -#= f.select("site00_vertical_datum", options_for_select([]), :class=>"form-dropdown")

@@ -59,7 +59,7 @@
       #{@site_samps.map{|site| "        "+site.to_json}.join(",\n")}
     ];
     var site_properties = [
-      #{@site_properties.map{|prop| "'"+prop.to_s+"'"}.join(",\n")}
+      #{@site_properties.map{|prop| "       "+prop.to_json}.join(",\n")}
     ];
 	  
     for(var i=0;i<site_data.length;i++) {
@@ -68,7 +68,7 @@
       site_data[i]['data_count'] = site_stat_data[i].count;
       site_data[i]['data_start'] = site_stat_data[i].first;
       site_data[i]['data_end'] = site_stat_data[i].last;
-      site_data[i]['lat_long_datum'] = '-unknow-';
+      //site_data[i]['lat_long_datum'] = '-unknow-';
       for(prop in site_ref_data[i])
         site_data[i][prop] = site_ref_data[i][prop];
       //site_data[i]['vertical_datum'] = site_ref_data[i].vert_datum;
@@ -362,6 +362,7 @@
   = render_widget :site_pane2, :display, :project=>@project, 
                                           :sites=>@sites, 
                                           :projectSite=>@site, 
+                                          :siteProperties=>@site_properties,
                                           :user=>current_user,
                                           :root_url=>root_url
 

@@ -101,7 +101,7 @@ class Voeis::Site
     end
     if !self.lat_long_datum_id.nil? && self.lat_long_datum_id !=0
       puts "HECKYA"
-      @spat_ref_global = DataMapper.repository(:default){Voeis::SpatialReference.get(self.local_projection_id)}
+      @spat_ref_global = DataMapper.repository(:default){Voeis::SpatialReference.get(self.lat_long_datum_id)}
       self.lat_long_datum = Voeis::SpatialReference.first_or_create(:id=>@spat_ref_global.id,
                                           :srs_id => @spat_ref_global.srs_id,
                                           :srs_name=>@spat_ref_global.srs_name,

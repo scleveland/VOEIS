@@ -13,7 +13,7 @@ class Voeis::SpatialReferencesController < Voeis::BaseController
   
   # POST /LocalProjection
   def create
-    @spatial_reference = parent.managed_repository{Voeis::SpatialReference.new(params[:spatial_reference_c_v])}
+    @spatial_reference = parent.managed_repository{Voeis::SpatialReference.new(params[:spatial_reference])}
     respond_to do |format|
       if @spatial_reference.save
         flash[:notice] = 'Local Projection was successfully created.'

@@ -5,6 +5,7 @@ class SitePane2Widget < Apotomo::Widget
     @project = options[:project]
     @sites = options[:sites]
     @site = options[:projectSite]
+    @site_properties = options[:siteProperties]
     @current_user = options[:user]
     @root_url = options[:root_url]
     #@id = UUIDTools::UUID.timestamp_create
@@ -16,16 +17,6 @@ class SitePane2Widget < Apotomo::Widget
     @variable_labels = Array["Variable Data","Count","Start","End"]
     @sample_labels = Array["Sample Type","Lab Sample Code","Sample Medium","Timestamp"]
     @sample_fields = Array["sample_type","lab_sample_code","material","local_date_time"]
-
-    @site_properties = @site.properties.map{ |prop| 
-      #prop = prop.name.to_s
-      if prop.name.to_s[-3..-1]=='_id'
-        prop.name.to_s[0..-4]
-        #@site_ref_props << prop
-      else
-        prop.name.to_s
-      end
-    }
 
     @sites.map{ |site| 
       stats = @project.managed_repository{Voeis::SiteDataCatalog.all(:site_id=>site.id)}.aggregate(:record_number.sum, :starting_timestamp.min, :ending_timestamp.max)
