@@ -174,7 +174,7 @@
             });
             
         &nbsp;&nbsp;
-        %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"site00_new_vertical_datum.hide();"} Cancel
+        %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"site00_new_vertical_datum.hide();return false;"} Cancel
     
     -#site00_xnew_local_projection{:title=>"NEW Local Projection", :style=>"display:none;"}
     #site00_new_spatial_reference{:dojoType=>"dijit.Dialog", :jsId=>"site00_new_spatial_reference", :title=>"NEW Spatial Reference", :style=>"width:400px;"}
@@ -237,7 +237,7 @@
             });
         &nbsp;&nbsp;
         -#%button{:onclick=>"site00ref.dialog.hide();return false;", :value=>"Cancel"} Cancel
-        %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"site00_new_spatial_reference.hide();"} Cancel
+        %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"site00_new_spatial_reference.hide();return false;"} Cancel
     
     
     -##site00_xnew_local_projection{:title=>"NEW Local Projection", :style=>"display:none;"}
