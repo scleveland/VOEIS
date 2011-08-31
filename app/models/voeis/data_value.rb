@@ -162,6 +162,8 @@ class Voeis::DataValue
        dst_time = 1
        dst = true
     end
+    user_id = User.current.id
+    create_comment = "Created at #{created_at} by #{User.current.first_name} #{User.current.last_name} [#{User.current.login}]"
     sample_datetime = Chronic.parse(row[data_timestamp_col]).to_datetime
     timestamp = DateTime.civil(sample_datetime.year,sample_datetime.month,
                    sample_datetime.day,sample_datetime.hour,sample_datetime.min,
@@ -172,14 +174,15 @@ class Voeis::DataValue
           created_at = updated_at = Time.now.strftime("%Y-%m-%dT%H:%M:%S%z")
           row_values = []
           (0..row.size-1).each do |i|
-            if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID"
+            if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore" 
                 cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
-                row_values << "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id} )"
-                puts  "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id}, #{data_col_array[i][variable].id} )"       
+
+                row_values << "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id} )"
+                puts "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id} )"
               end #end if
           end #end loop
           if !row_values.empty?
-            sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\", \"site_id\", \"variable_id\") VALUES "
+            sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\", \"site_id\", \"variable_id\") VALUES "
             sql << row_values.join(',')
             sql << " RETURNING \"id\""
             result_ids = repository.adapter.select(sql)
@@ -206,8 +209,8 @@ class Voeis::DataValue
             
             if sample_id != -1
               sample_value=[]
-              sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\") VALUES "
-              sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}')"
+              sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\") VALUES "
+              sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}','#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}')"
               #sql << sample_value.join(',')
               sql << " RETURNING \"id\""
               newsample_id = repository.adapter.execute(sql)

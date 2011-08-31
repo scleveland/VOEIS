@@ -34,7 +34,8 @@ class His::VariablesController < ApplicationController
   # POST /variables
   def create
     @variable = His::Variable.new(params[:variable])
-
+    @variable.valid?
+    puts @variable.errors.inspect()
     respond_to do |format|
       if @variable.save
         flash[:notice] = 'His::Variable was successfully created.'

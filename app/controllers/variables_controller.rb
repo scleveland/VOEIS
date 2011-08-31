@@ -40,7 +40,9 @@ class VariablesController < InheritedResources::Base
      if params[:variable][:spatial_offset_type].empty?
        @variable.spatial_offset_type = nil
      end
-
+     @variable.valid?
+     puts "**************************************************************************************"
+     puts @variable.errors.inspect()
     respond_to do |format|
       if @variable.save
         flash[:notice] = 'Variables was successfully created.'
