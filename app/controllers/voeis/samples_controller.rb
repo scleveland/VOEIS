@@ -206,8 +206,8 @@ class Voeis::SamplesController < Voeis::BaseController
           @column_array << ["Timestamp", 'datetime']
           @column_array << ["Vertical Offset", 'number']
           @column_array << [variable.variable_name, 'number']
-          # @data_vals = (variable.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & site.data_values)
-          @data_vals =parent.managed_repository{Voeis::DataValue.all(:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date)}
+          @data_vals = (variable.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & site.data_values)
+          #@data_vals =parent.managed_repository{Voeis::DataValue.all(:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date)}
           @data_vals.all(:order=>[:local_date_time.asc]).each do |data_val|
             temp_array = Array.new
             row_hash = Hash.new
