@@ -84,6 +84,7 @@ class ProjectsController < InheritedResources::Base
     @site = @project.managed_repository{ Voeis::Site.new }
     @sites = @project.managed_repository{ Voeis::Site.all }
     @site1 = @sites[0]
+    @today = DateTime.now.strftime('%m/%d/%Y')
     @site_stats = []
     @site_var_stats = []
     @site_ref = []

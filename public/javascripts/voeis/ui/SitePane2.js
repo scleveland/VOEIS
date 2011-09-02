@@ -60,6 +60,10 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			var sitename0 = sitename.slice(0,12);
 			if(sitename.length>12) sitename0+='...';
 			if(sitename.length>20) sitename0+=sitename.slice(-8);
+			else {
+				sitename0 = sitename.slice(0,8)+'...';
+				sitename0 += sitename.slice(-6);
+			}
 			this.set("title", sitename0);
 		};
 		
@@ -133,6 +137,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		};
 		*/
 
+		this.purgeContent();
 		this.set('content', sitePaneContent);
 		this.parsedWidgets = dojo.parser.parse(this.domNode);
 		
@@ -165,22 +170,34 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 										code:'',
 										latitude:'',
 										longitude:'',
-										lat_long_datum_id:'',
-										elevation_m:'',
-										vertical_datum_id:'',
-										local_x:'',
-										local_y:'',
-										local_projection_id:'',
-										pos_accuracy_m:'',
+										lat_long_datum:'',
+										lat_long_datum_id:null,
+										elevation_m:null,
+										vertical_datum:'',
+										vertical_datum_id:null,
+										local_x:null,
+										local_y:null,
+										local_projection:'',
+										local_projection_id:null,
+										pos_accuracy_m:null,
 										state:'',
 										county:'',
 										comments:'',
 										description:'',
+										his_id:null,
+										time_zone_offset:'-7.0',
+										updated_at:pnow,
+										updated_by:puser,
+										updated_comment:'--',
+										created_at:pnow,
+										deleted_at:null,
+										idx:0,
+										data_vars:0,
+										data_count:'NA',
+										data_start:'NA',
+										data_end:'NA'
 										};
 				this.set('id', 'site0');
-				this.site_stats = [];
-				this.site_var_stats = [];
-				this.site_samps = [];
 			};
 		} else {
 			if(site && site.id && site.code && site.idx)
@@ -188,13 +205,16 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			else
 				this.site = this.getSite(0);
 		};
+		this.siteIdx = this.site.idx;
+		this.site_stats = [];
+		this.site_var_stats = [];
+		this.site_samps = [];
 		if(!this.newSite) {
 			this.set('id', 'site'+this.site.id);
 
-			this.siteIdx = this.site.idx;
-			this.site_stats = site_stat_data[this.siteIdx];
-			this.site_var_stats = site_var_data[this.siteIdx];
-			this.site_samps = site_samp_data[this.siteIdx];
+			if(site_stat_data[this.siteIdx]) this.site_stats = site_stat_data[this.siteIdx];
+			if(site_var_data[this.siteIdx]) this.site_var_stats = site_var_data[this.siteIdx];
+			if(site_samp_data[this.siteIdx]) this.site_samps = site_samp_data[this.siteIdx];
 		};
 		
 		this.dialog.attr('id', this.id+'_dialog');
@@ -232,27 +252,40 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 
 	siteSave: function(update_props) {
 		console.log('SAVE-SITE:',update_props);
-		if(!update_props.hasOwnProperty('id')) {
+		if(!update_props.hasOwnProperty('id') || update_props.id==0) {
 			console.log('ERROR: MUST HAVE "ID"');
 			return false;
 		}
-		if(this.newSite) 
-			this.site['id'] = 0;
+		if(!this.newSite && this.site.id!=update_props.id) {
+			console.log('ERROR: WRONG "ID"');
+			return false;
+		}
+		//UPDATE LOCAL SITE
 		for(prop in update_props) 
 			if(this.site.hasOwnProperty(prop)) 
 				this.site[prop] = update_props[prop];
-		if(!this.site.id) {
-			console.log('ERROR: ID=0');
-			return false;
-		};
+		//UPDATE STORE
 		if(this.newSite) {
+			//###NEW SITE
+			this.site.idx = site_data.length;
+			this.siteIdx = this.site.idx;
+			console.log('NEW:',update_props.id,this.siteIdx);
 			try {
 				psites.newItem(this.site);
 			}
 			catch (e) { 
 				console.log('ERROR: DUPLICATE KEY');
 			};
+			//##UPDATE STORE ARRAY
+			//site_data.push(this.site);
+			site_stat_data.push({'vars':0,'count':'NA','first':'NA','last':'NA'});
+			site_var_data.push([]);
+			site_samp_data.push([]);
+			//##UPDATE PMARKERS
+			dojo.publish('voeis/project/map/new',[update_props.id]);
+			//dojo.publish('voeis/project/map/clear',[]);
 		} else {
+			//###UPDATE SITE
 			//var update = this.getSite(parseInt(update_props.id));
 			console.log('UPDATE:',update_props.id);
 			psites.fetch({query: {id: update_props.id},
@@ -269,25 +302,12 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 					console.log('ERROR: '+error);
 				}
 			});
+			//##UPDATE STORE ARRAY
+			//site_data[this.siteIdx] = this.site;
 		};
 		this.siteUpdate();
+		//window.scrollTo(0,0);
 		return this.site.id;
-		/*
-		var new_data = site_data[this.siteIdx];
-		for(prop in update_props) 
-			if(new_data.hasOwnProperty(prop)) 
-				new_data[prop] = update_props[prop];
-		if(this.newSite) {
-			site_data.push(new_data);
-			site_stat_data.push({'vars':0,'count':'NA','first':'NA','last':'NA'});
-			site_var_data.push([]);
-			site_samp_data.push([]);
-		} else {
-			site_data[this.siteIdx] = new_data;
-		};
-		this.siteUpdate();
-		window.scrollTo(0,0);
-		*/
 	},
 
 	siteFormSave: function(form) {
@@ -315,15 +335,12 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	
 	showDialog: function(contentDiv,title) {
 		this.dialog.attr('content', $('#'+contentDiv).html());
-		var ttl = title || $('#'+contentDiv).attr('title');
+		var ttl = title || $('#'+contentDiv).attr('title') || 'unamed DIALOG';
 		this.dialog.attr('title', ttl);
 		this.dialog.show();
 	},
 	
-	onClose: function() {
-		//REMOVE Global Ref
-		eval('delete '+this.id+'ref');
-		console.log('CLOSE:',this.domNode,this.containerNode)
+	purgeContent: function() {
 		//REMOVE dijit widgets
 		if(this.parsedWidgets) 
 			for(var i=0;i<this.parsedWidgets.length;i++) {
@@ -338,6 +355,13 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 				console.log('Node: '+toDel[i].nodeName+' ('+toDel[i].id+')');
 				this.containerNode.removeChild(toDel[i]);
 			};
+	},
+	
+	onClose: function() {
+		//REMOVE Global Ref
+		eval('delete '+this.id+'ref');
+		console.log('CLOSE:',this.domNode,this.containerNode)
+		this.purgeContent();
 		
 		//dojo.byId(this.id);
 		//dijit.byId(this.id)

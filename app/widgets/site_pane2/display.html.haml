@@ -71,8 +71,9 @@
           -#&nbsp;&nbsp;&nbsp;
           -#= link_to('TEST', 'javascript:', :class=>'icon icon-edit', :onclick=>"alert('EDIT>>> '+site_pane2.editMode);") 
   %br
+  %br
 
-  %table{:id=>"site00-property-table", :style=>"width:46%;margin-right:20px;float:left;"}
+  %table{:id=>"site00-property-table", :style=>"width:46%;margin-right:20px;margin-bottom:30px;float:left;"}
     - @site_properties.each do |prop|
       %tr{:class=>"row#{cycle('1','0')}"}
         %td
@@ -161,7 +162,7 @@
             this.connect(form, "onValidStateChange", function(state){
             this.attr("disabled", !state);
             });
-            this.connect(form, "onClick", function(){
+            this.connect(this, "onClick", function(){
             var data = {vertical_datum_c_v: {
             term: $("#site00_vertical_datum_term").val(),
             definition: $("#site00_vertical_datum_definition").val()}};
@@ -219,7 +220,7 @@
             this.connect(form, "onValidStateChange", function(state){
             this.attr("disabled", !state);
             });
-            this.connect(form, "onClick", function(){
+            this.connect(this, "onClick", function(){
             var is_geo = (dojo.byId("site00_source_geographic").checked) ? true : false;
             var data = {spatial_reference: {
             srs_id: parseInt($("#site00_source_id").val()),
@@ -339,25 +340,6 @@
     %script{:type=>"text/javascript"}
       console.log('DOJO/METHOD');
       
-      function initForm2(siteTag) {
-      console.log('onLoad FIRED!');
-      //var form = dijit.byNode(dojo.byId(siteTag+'-edit-form'));
-      var form = dijit.byId(siteTag+'-edit-form');
-      //var pane = dijit.byNode(dojo.byId('site00'));
-      //var submit_button = dijit.byNode(dojo.byId(siteTag+'_voeis_site_submit'));
-      var submit_button = dijit.byId(siteTag+'_voeis_site_submit');
-      //var submit_button = "TEST";
-      console.log('form ('+siteTag+'-edit-form'+') = ',form);
-      console.log('submit_button ('+siteTag+'_voeis_site_submit'+') = ',submit_button);
-      submit_button.connect(form, "onClick", function(evt){
-      console.log('SAVE FORM');
-      //pane.siteFormSave(form);
-      //$.post('#{@root_url}/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/sites/$$$id$$$',{site:{id:$$$id$$$, name:form.elements['site_name'].value, code:form.elements['site_code'].value, latitude:form.elements['site_latitude'].value, longitude:form.elements['site_longitude'].value, lat_long_datum_id:form.elements['site_lat_long_datum_id'].value, elevation_m:form.elements['site_elevation_m'].value, vertical_datum_id:form.elements['site_vertical_datum_id'].value, local_x:form.elements['site_local_x'].value, local_y:form.elements['site_local_y'].value, local_projection_id:form.elements['site_local_projection_id'].value, pos_accuracy_m:form.elements['site_pos_accuracy_m'].value, state:form.elements['site_state'].value, county:form.elements['site_county'].value, comments:form.elements['site_comments'].value, description:form.elements['site_description'].value}});
-      return false;
-      });
-      console.log('onLoad DONE!');
-      };
-      
       function drop_down(form,fn,value) {
       var fld = form.elements[fn];
       if(!fld) return null;
@@ -373,80 +355,6 @@
       function validate_site_form() {
       return true;
       }
-      
-      function submit_site_form(siteId) {
-      if(validate_site_form(siteId)) {
-      console.log('CREATE SITE: '+siteId);
-      var pane = dijit.byNode(dojo.byId('site'+siteId));
-      var form0 = 'site'+siteId+'-edit-form';
-      console.log('FORM ID:',form0);
-      //var form = dijit.byNode(dojo.byId(form0));
-      var form = dojo.byId(form0);
-      //pane.siteFormSave(form);
-      //dojo.publish('voeis/project/siteTables/refresh');
-      
-      console.log(pane,form);
-
-      var lat_long_datum_dd = drop_down(form,'site_lat_long_datum');
-      var vertical_datum_dd = drop_down(form,'site_vertical_datum');
-      var local_projection_dd = drop_down(form,'site_local_projection');
-      //console.log(vertical_datum_dd, local_projection_dd);
-      //vertical_datum_id:form.elements['site_vertical_datum'].options[form.elements['site_vertical_datum'].selectedIndex], 
-      //local_projection_id:form.elements['site_local_projection'].value
-      var data = {site:{
-      name:form.elements['site_name'].value, 
-      code:form.elements['site_code'].value, 
-      latitude:form.elements['site_latitude'].value, 
-      longitude:form.elements['site_longitude'].value, 
-      elevation_m:form.elements['site_elevation_m'].value, 
-      local_x:form.elements['site_local_x'].value, 
-      local_y:form.elements['site_local_y'].value, 
-      pos_accuracy_m:form.elements['site_pos_accuracy_m'].value, 
-      state:form.elements['site_state'].value, 
-      county:form.elements['site_county'].value, 
-      comments:form.elements['site_comments'].value, 
-      description:form.elements['site_description'].value,
-      lat_long_datum_id:lat_long_datum_dd.value, 
-      vertical_datum_id:vertical_datum_dd.value,
-      local_projection_id:local_projection_dd.value
-      }};
-      if(pane.newSite) {
-      $.post('/projects/#{@project.id}/sites.json', data, function(newValue) {
-      //
-      console.log('NEW ID: '+newValue);
-      data['site']['id'] = newValue.id;
-      data['site']['vertical_datum'] = vertical_datum_dd.text;
-      data['site']['local_projection'] = local_projection_dd.text;
-      pane.siteSave(data['site']);
-      //dojo.publish('voeis/project/siteTables/refresh');
-      dojo.publish('voeis/project/site/close',[0]);
-      dojo.publish('voeis/project/map/new',[newValue.id]);
-      //var tabs = dijit.byId('tab_browser');
-      //tabs.removeChild(pane);
-      //pane.onClose();
-      //pane.destroyRecursive();  
-      });
-      } else {
-      data['site']['id'] = siteId;
-      //save//$.post('#{@root_url}/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/sites/'+siteId,{site:{id:''+siteId, name:form.elements['site_name'].value, code:form.elements['site_code'].value, latitude:form.elements['site_latitude'].value, longitude:form.elements['site_longitude'].value, lat_long_datum_id:form.elements['site_lat_long_datum_id'].value, elevation_m:form.elements['site_elevation_m'].value, vertical_datum_id:form.elements['site_vertical_datum_id'].value, local_x:form.elements['site_local_x'].value, local_y:form.elements['site_local_y'].value, local_projection_id:form.elements['site_local_projection_id'].value, pos_accuracy_m:form.elements['site_pos_accuracy_m'].value, state:form.elements['site_state'].value, county:form.elements['site_county'].value, comments:form.elements['site_comments'].value, description:form.elements['site_description'].value}});
-      //$.post('#{@root_url}/projects/#{@project.id}/sites/'+siteId, data);
-      //$.post('/projects/#{@project.id}/sites/'+siteId+'.json', data);
-      $.ajax({
-      type: 'PUT',
-      url: '/projects/#{@project.id}/sites/'+siteId,
-      data: data,
-      success: '',
-      dataType: 'json'
-      });
-      data['site']['vertical_datum'] = vertical_datum_dd.text;
-      data['site']['local_projection'] = local_projection_dd.text;
-      pane.siteSave(data['site']);
-      //dojo.publish('voeis/project/siteTables/refresh');
-      dojo.publish('voeis/project/map/clear',[siteId]);
-      };
-      return false;
-      };
-      };
       
       function cancel_site_form(siteId) {
       if(parseInt(siteId)) {
@@ -475,16 +383,7 @@
       //test//$('#site'+siteId+'_'+fn).val('10');
       };
       
-      function valid_site_change(siteId,btn) {
-      var form = dijit.byId('site'+siteId+'-edit-form');
-      // set initial state
-      btn.attr("disabled", !form.isValid());
-      btn.connect(form, "onValidStateChange", function(state){
-      btn.attr("disabled", !state);
-      });
-      };
-      
-      function init_site_form(siteId) { setTimeout(function() {
+      function xxxinit_site_form(siteId) { setTimeout(function() {
       var SRfrom = '';
       var siteTag = 'site'+siteId;
       var form0 = siteTag+'-edit-form';
@@ -506,7 +405,7 @@
       if(!pane.newSite) submit_button.attr("disabled", !form.validate());
       //submit_button.attr("disabled", !this.isValid());
       form0.elements['site_name'].focus();
-
+      
       //IS FORM VALID?
       console.log('FORM-CONNECT:',siteId,form);
       form.connect(form, "onValidStateChange", function(state){
@@ -577,7 +476,7 @@
               -#= f.text_field("latitude", :value=>"$$$latitude$$$")
               -#%input(name="site_latitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$latitude$$$" required="true")
               -#%input(name="site_latitude" id="site00_latitude" type="text" value="$$$latitude$$$")
-              %input(name="site_latitude" dojoType="dijit.form.NumberTextBox" id="site00_latitude" type="text" value="$$$latitude$$$" required="true")
+              %input(name="site_latitude" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'######.######'}" id="site00_latitude" type="text" value="$$$latitude$$$" required="true")
           %td
             .from-element
               %span{:class=>'label'}
@@ -585,7 +484,7 @@
               -#= f.text_field("longitude", :value=>"$$$longitude$$$")
               -#%input(name="site_longitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$longitude$$$" required="true")
               -#%input(name="site_longitude" id="site00_longitude" type="text" value="$$$longitude$$$")
-              %input(name="site_longitude" dojoType="dijit.form.NumberTextBox" id="site00_longidude" type="text" value="$$$longitude$$$" required="true")
+              %input(name="site_longitude" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'######.######'}" id="site00_longidude" type="text" value="$$$longitude$$$" required="true")
 
         %tr
           %td{:colspan=>"2"}
@@ -606,7 +505,7 @@
                 %label{:for=>"site_elevation_m"} Elevation
               -#= f.text_field("elevation_m", :value=>"$$$elevation_m$$$")
               -#%input(name="site_elevation_m" type="text" value="$$$elevation_m$$$")
-              %input(name="site_elevation_m" dojoType="dijit.form.NumberTextBox" type="text" value="$$$elevation_m$$$")
+              %input(name="site_elevation_m" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'######.######'}" type="text" value="$$$elevation_m$$$")
         %tr
           %td 
             .from-element
@@ -614,14 +513,14 @@
                 %label{:for=>"site_local_x"} Local X
               -#= f.text_field("local_x", :value=>"$$$local_x$$$")
               -#%input(name="site_local_x"  type="text" value="$$$local_x$$$")
-              %input(name="site_local_x" dojoType="dijit.form.NumberTextBox" type="text" value="$$$local_x$$$")
+              %input(name="site_local_x" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'######.######'}" type="text" value="$$$local_x$$$")
           %td 
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_local_y"} Local Y
               -#= f.text_field("local_y", :value=>"$$$local_y$$$")
               -#%input(name="site_local_y"  type="text" value="$$$local_y$$$")
-              %input(name="site_local_y" dojoType="dijit.form.NumberTextBox" type="text" value="$$$local_y$$$")
+              %input(name="site_local_y" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'######.######'}" type="text" value="$$$local_y$$$")
 
         %tr
           %td{:colspan=>"2"}
@@ -665,7 +564,7 @@
                 %label{:for=>"site_pos_accuracy_m"} Position Accuracy
             -#= f.text_field("pos_accuracy_m", :value=>"$$$pos_accuracy_m$$$")
             -#%input(name="site_pos_accuracy_m" type="text" value="$$$pos_accuracy_m$$$")
-            %input(name="site_pos_accuracy_m" dojoType="dijit.form.NumberTextBox" type="text" value="$$$pos_accuracy_m$$$")
+            %input(name="site_pos_accuracy_m" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'######.######'}" type="text" value="$$$pos_accuracy_m$$$")
         %tr
           %td 
             .from-element
@@ -709,9 +608,103 @@
             -#%button(id="site00_voeis_site_submit" name="commit" dojoType="dijit.form.Button" onclick="if(formValid()){$('#loader').toggle();formSend();};")
             -#%button(id="site00_voeis_site_submit" name="commit" dojoType="dijit.form.Button" onclick="console.log('CLICK!');")
             -#%button(id="site00_voeis_site_submit" jsId="site00_voeis_site_submit" name="commit" dojoType="dijit.form.Button") Save Site
-            %button(dojoType="dijit.form.Button" id="site00_voeis_site_submit" name="commit" value="Save Site" onClick="submit_site_form($$$id$$$);return false;" disabled="true") 
+            -#%button(dojoType="dijit.form.Button" id="site00_voeis_site_submit" name="commit" value="Save Site" onClick="submit_site_form($$$id$$$);return false;" disabled="true") 
+            %button(dojoType="dijit.form.Button" id="site00_voeis_site_submit" name="commit" value="Save Site" disabled="true") 
               Save Site
-              -#%script{:type=>"dojo/method", :event=>"startup"}
+              %script{:type=>"dojo/method", :event=>"startup"}
+                //var form = dijit.byId("site00_vertical_datum_form");
+                if('site00'.slice(-2)=='00') return;
+                var SRfrom = '';
+                var form0 = 'site00-edit-form';
+                var form = dijit.byId(form0);
+                console.log('INIT-FORM:',form0,form);
+                form0 = form.domNode;
+                //var pane = dijit.byNode(dojo.byId('site00'));
+                eval('var pane = site00ref');
+                var site = pane.site;
+                console.log('INIT:',form0);
+                //INITIALIZE: drop-downs
+                var lat_long_datum_dd = drop_down(form0,'site_lat_long_datum',site.lat_long_datum_id).element;
+                var local_projection_dd = drop_down(form0,'site_local_projection',site.local_projection_id).element;
+                var vertical_datum_dd = drop_down(form0,'site_vertical_datum',site.vertical_datum_id).element;
+                console.log('VerticalDatum ID:',site.vertical_datum_id);
+                console.log('LocalProjection ID:',site.local_projection_id);
+                //INITIALIZE: submit button
+                if(!pane.newSite) this.attr("disabled", !form.validate());
+                //this.attr("disabled", !this.isValid());
+                //form0.elements['site_name'].focus();
+                dijit.byId('site00_name').focus();
+                //IS FORM VALID?
+                console.log('FORM-CONNECT: '+site.id);
+                //###ON-STATE-CHANGE
+                this.connect(form, "onValidStateChange", function(state){
+                //console.log('formStateChange:',state);
+                this.attr("disabled", !state);
+                });
+                //###ON-SUBMIT
+                this.connect(this, "onClick", function(){
+                console.log('CREATE SITE: '+site.id);
+                //var lat_long_datum_dd = drop_down(form,'site_lat_long_datum');
+                //var vertical_datum_dd = drop_down(form,'site_vertical_datum');
+                //var local_projection_dd = drop_down(form,'site_local_projection');
+                //console.log(vertical_datum_dd, local_projection_dd);
+                //vertical_datum_id:form.elements['site_vertical_datum'].options[form.elements['site_vertical_datum'].selectedIndex], 
+                //local_projection_id:form.elements['site_local_projection'].value
+                var data = {site:{
+                name:form0.elements['site_name'].value, 
+                code:form0.elements['site_code'].value, 
+                latitude:form0.elements['site_latitude'].value, 
+                longitude:form0.elements['site_longitude'].value, 
+                elevation_m:form0.elements['site_elevation_m'].value, 
+                local_x:form0.elements['site_local_x'].value, 
+                local_y:form0.elements['site_local_y'].value, 
+                pos_accuracy_m:form0.elements['site_pos_accuracy_m'].value, 
+                state:form0.elements['site_state'].value, 
+                county:form0.elements['site_county'].value, 
+                comments:form0.elements['site_comments'].value, 
+                description:form0.elements['site_description'].value,
+                lat_long_datum_id:lat_long_datum_dd.value, 
+                vertical_datum_id:vertical_datum_dd.value,
+                local_projection_id:local_projection_dd.value
+                }};
+                if(pane.newSite) {
+                //###NEW SITE
+                $.post('/projects/#{@project.id}/sites.json', data, function(newValue) {
+                var newId = parseInt(newValue.id);
+                console.log('NEW ID: '+newId, newValue);
+                data['site']['id'] = newId;
+                data['site']['lat_long_datum'] = lat_long_datum_dd.text;
+                data['site']['vertical_datum'] = vertical_datum_dd.text;
+                data['site']['local_projection'] = local_projection_dd.text;
+                pane.siteSave(data['site']);
+                //dojo.publish('voeis/project/siteTables/refresh');
+                dojo.publish('voeis/project/site/close',[0]);
+                dojo.publish('voeis/project/site/select',[newId]);
+                });
+                } else {
+                //###UPDATE SITE
+                //data['site']['id'] = siteId;
+                data['site']['id'] = site.id.toString();
+                //save//$.post('#{@root_url}/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/sites/'+siteId,{site:{id:''+siteId, name:form.elements['site_name'].value, code:form.elements['site_code'].value, latitude:form.elements['site_latitude'].value, longitude:form.elements['site_longitude'].value, lat_long_datum_id:form.elements['site_lat_long_datum_id'].value, elevation_m:form.elements['site_elevation_m'].value, vertical_datum_id:form.elements['site_vertical_datum_id'].value, local_x:form.elements['site_local_x'].value, local_y:form.elements['site_local_y'].value, local_projection_id:form.elements['site_local_projection_id'].value, pos_accuracy_m:form.elements['site_pos_accuracy_m'].value, state:form.elements['site_state'].value, county:form.elements['site_county'].value, comments:form.elements['site_comments'].value, description:form.elements['site_description'].value}});
+                //$.post('#{@root_url}/projects/#{@project.id}/sites/'+siteId, data);
+                //$.post('/projects/#{@project.id}/sites/'+siteId+'.json', data);
+                $.ajax({
+                type: 'PUT',
+                url: '/projects/#{@project.id}/sites/'+site.id,
+                data: data,
+                success: '',
+                dataType: 'json'
+                });
+                data['site']['lat_long_datum'] = lat_long_datum_dd.text;
+                data['site']['vertical_datum'] = vertical_datum_dd.text;
+                data['site']['local_projection'] = local_projection_dd.text;
+                pane.siteSave(data['site']);
+                //dojo.publish('voeis/project/siteTables/refresh');
+                dojo.publish('voeis/project/map/clear',[site.id]);
+                };
+                return false;
+                });
+                
               -#  var form = dijit.byNode(dojo.byId('site00-edit-form'));
               -#  // set initial state
               -#  this.attr("disabled", !form.isValid());

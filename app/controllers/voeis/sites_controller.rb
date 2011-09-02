@@ -9,7 +9,9 @@ class Voeis::SitesController < Voeis::BaseController
             :collection_name => 'sites',
             :instance_name => 'site',
             :resource_class => Voeis::Site
-   
+  
+  respond_to :html, :json
+  
   has_widgets do |root|
     root << widget(:vertical_datum)
   end
@@ -134,6 +136,7 @@ class Voeis::SitesController < Voeis::BaseController
           site[key] = params[:site][key].empty? ? nil : params[:site][key]
         end
       end
+      site.lat_long_datum_id = params[:site][:lat_long_datum] == "NaN" ? nil : params[:site][:lat_long_datum].to_i
       site.vertical_datum_id = params[:site][:vertical_datum] == "NaN" ? nil : params[:site][:vertical_datum].to_i
       site.local_projection_id = params[:site][:local_projection] == "NaN" ? nil : params[:site][:local_projection].to_i
       site.updated_at = Time.now
@@ -152,9 +155,14 @@ class Voeis::SitesController < Voeis::BaseController
       #                                                     :term=>@local_proj_global.term,
       #                                                     :definition=>@local_proj_global.definition)
       # end
-      if site.save
-         flash[:notice] = "New Site was saved successfully."
-         redirect_to project_url(parent)
+      respond_to do |format|
+        if site.save
+          flash[:notice] = "New Site was saved successfully."
+          format.html{redirect_to project_url(parent)}
+          format.json do
+             render :json => site.as_json, :callback => params[:jsoncallback]
+          end
+        end
       end
     }
     #create! do |success, failure|

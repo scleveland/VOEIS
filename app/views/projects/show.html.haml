@@ -37,6 +37,9 @@
     //});
     
     var pane_proto00;
+    var pnow = '#{@today}';
+    var puser = '#{@current_user.nil? ? "" : @current_user.name}';
+    
     var pmap;
     var pmarkers = [];
     var icon_red = 'http://www.google.com/intl/en_us/mapfiles/ms/icons/red-dot.png';
@@ -116,7 +119,7 @@
       //CLEAR A MAP BALLOON
       //OR ALL IF NO SITEID
       for(var i=0;i<pmarkers.length;i++) {
-        if(pmarkers[i].window.close && (!siteId || pmarkers[i].id==parseInt(siteId))) {
+        if(pmarkers[i].window.close && (!siteId || pmarkers[i].id!=parseInt(siteId))) {
           pmarkers[i].window.close();
           pmarkers[i].setIcon(icon_default);
         }
@@ -144,6 +147,7 @@
       //##var edlink = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/edit\', ['+item.id+']);"><strong>EDIT SITE HERE</strong></a>';
       //var link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+item.id+']);">';
       marker.idx = item.idx;
+      //marker.idx = markers.length;
       marker.id = parseInt(item.id);
       marker.getSite = function(id) {
         //GET SITE FROM STORE
