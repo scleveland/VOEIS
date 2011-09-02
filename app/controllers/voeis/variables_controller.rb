@@ -81,6 +81,8 @@ class Voeis::VariablesController < Voeis::BaseController
     if params[:variable][:spatial_offset_type].empty?
       @variable.spatial_offset_type = nil
     end
+    @variable.valid?
+    puts @variable.errors.inspect()
     if @variable.save  
       respond_to do |format|
         flash[:notice] = 'Variable was successfully created.'

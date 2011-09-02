@@ -82,10 +82,11 @@ class Voeis::SamplesController < Voeis::BaseController
       @variable_hash = Hash.new
       i = 1
       @variable_hash['variables'] = Array.new
-      (site.samples.variables + site.data_values.variables).each do |var|
+      site.variables.each do |var|
+        data_catalog = Voeis::SiteDataCatalog.first(:site_id => site.id, :variable_id => var.id)
         @var_hash = Hash.new
         @var_hash['id'] = var.id
-        @var_hash['name'] = var.variable_name+":"+var.data_type
+        @var_hash['name'] = var.variable_name+":"+var.data_type #+ "(" + data_catalog.starting_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + " - " + data_catalog.ending_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + ')'
         @variable_hash['variables'] << @var_hash
       end
     end
@@ -99,33 +100,22 @@ class Voeis::SamplesController < Voeis::BaseController
   
   def query
     parent.managed_repository do
-      @start_year = Voeis::DataValue.first(:order => [:local_date_time.asc])
-      @end_year = Voeis::DataValue.last(:order => [:local_date_time.asc])
+      # @start_year = Voeis::DataValue.first(:order => [:local_date_time.asc])
+      # @end_year = Voeis::DataValue.last(:order => [:local_date_time.asc])
       
-      sensor_start_year = Voeis::SensorValue.first(:order => [:timestamp.asc])
-      sensor_end_year = Voeis::SensorValue.last(:order => [:timestamp.asc])
+      @start_year = Voeis::SiteDataCatalog.first(:starting_timestamp.not => nil, :order => [:starting_timestamp.asc])
+      @end_year = Voeis::SiteDataCatalog.last(:ending_timestamp.not => nil, :order => [:ending_timestamp.asc])
+      
+      #sensor_start_year = Voeis::SensorValue.first(:order => [:timestamp.asc])
+      #sensor_end_year = Voeis::SensorValue.last(:order => [:timestamp.asc])
       if @start_year.nil? || @end_year.nil?
         @start_year = Time.now.year
         @end_year = Time.now.year
       else
-        @start_year = @start_year.local_date_time.to_time.year
-        @end_year = @end_year.local_date_time.to_time.year
+        @start_year = @start_year.starting_timestamp.to_time.year
+        @end_year = @end_year.ending_timestamp.to_time.year
       end
-      
-      if sensor_start_year.nil? || sensor_end_year.nil?
-        sensor_start_year = Time.now.year
-        sensor_end_year = Time.now.year
-      else
-        sensor_start_year = sensor_start_year.timestamp.to_time.year
-        sensor_end_year = sensor_end_year.timestamp.to_time.year
-      end
-      
-      if @start_year > sensor_start_year
-        @start_year = sensor_start_year
-      end
-      if @end_year < sensor_end_year
-        @end_year = sensor_end_year
-      end
+
       @sites = Voeis::Site.all
         variable_opt_array = Array.new
         if !@sites.empty?
@@ -216,7 +206,8 @@ class Voeis::SamplesController < Voeis::BaseController
           @column_array << ["Timestamp", 'datetime']
           @column_array << ["Vertical Offset", 'number']
           @column_array << [variable.variable_name, 'number']
-          @data_vals = (variable.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & site.data_values)
+          #@data_vals = (variable.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & site.data_values)
+          @data_vals =parent.managed_repository{Voeis::DataValue.all(:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date)}
           @data_vals.all(:order=>[:local_date_time.asc]).each do |data_val|
             temp_array = Array.new
             row_hash = Hash.new
