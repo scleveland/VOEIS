@@ -222,6 +222,11 @@ class Voeis::DataValue
               sql = "INSERT INTO \"voeis_sample_sites\" (\"sample_id\",\"site_id\") VALUES "
               sql << "(#{newsample_id.insert_id},#{site_id})"
               repository.adapter.execute(sql)
+              sql = "INSERT INTO \"voeis_sample_variables\" (\"sample_id\",\"variable_id\") VALUES "
+              sql << (0..result_ids.length-1).collect{|i|
+                "(#{newsample_id.insert_id},#{data_col_array[variable_cols[i]][variable].id})"
+              }.join(',')
+              repository.adapter.execute(sql)
             else
                sql = "INSERT INTO \"voeis_data_value_sensor_types\" (\"data_value_id\",\"sensor_type_id\") VALUES "
                sql << (0..result_ids.length-1).collect{|i|
