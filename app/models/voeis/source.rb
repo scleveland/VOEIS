@@ -15,7 +15,7 @@ class Voeis::Source
   property :city,               String,  :required => true, :default => "Unknown", :format => /[^\t|\n|\r]/
   property :state,              String,  :required => true, :default => "Unknown", :format => /[^\t|\n|\r]/
   property :zip_code,           String,  :required => true, :default => "Unknown", :format => /[^\t|\n|\r]/
-  property :citation,           String,  :required => true, :default => "Unknown", :length => 512
+  property :citation,           String, :default => "Unknown", :length => 512
   property :metadata_id,        Integer, :required => true, :default => 0
 
   #timestamps :at
