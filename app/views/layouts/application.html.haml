@@ -126,7 +126,7 @@
             = link_to("Help", page_url(:help), :dojoType => "yogo.ui.MenuLink")  
             = link_to("Development Activity", page_url(:activity), :dojoType => "yogo.ui.MenuLink")
             = link_to("Development Roadmap", page_url(:roadmap), :dojoType => "yogo.ui.MenuLink")
-            = link_to("Developers", "/doc/yard/", :dojoType => "yogo.ui.MenuLink") 
+            = link_to("Developers", "/doc/yard/", :dojoType => "yogo.ui.MenuLink", :target=>"_blank") 
             
         #projectsButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
           %span{:style => "font-weight:bold"}
@@ -231,7 +231,7 @@
                 
               
       
-      #main_container{:dojoType => "dijit.layout.ContentPane", :region => "center", :gutters => "false", :style => "padding:0; background-color:light-grey"}
+      #main_container{:dojoType=>"dijit.layout.ContentPane", :region=>"center", :gutters=>"false", :style=>"padding:0; background-color:light-grey"}
         = content_for?(:content) ? yield(:content) : yield
 
       #bottom.claro{:dojoType => "dijit.layout.ContentPane", :region => "bottom", :gutters => "false", :style => "padding:0"}

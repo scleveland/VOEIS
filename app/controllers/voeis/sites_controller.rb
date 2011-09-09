@@ -74,12 +74,13 @@ class Voeis::SitesController < Voeis::BaseController
   end
   
   def update
+    # This should be handled by the framework, but isn't when using jruby.
     params[:site][:latitude] = params[:site][:latitude].strip
     params[:site][:longitude] = params[:site][:longitude].strip
     #@vert_datum_global = Voeis::VerticalDatumCV.get(params[:site][:vertical_datum_id].to_i)
     #@local_proj_global = Voeis::LocalProjectionCV.get(params[:site][:local_projection_id].to_i)
     
-    parent.managed_repository do 
+    parent.managed_repository{
       site = Voeis::Site.get(params[:site][:id])
       
       params[:site].each do |key, value|
@@ -108,43 +109,49 @@ class Voeis::SitesController < Voeis::BaseController
       #                                                           :definition=>@local_proj_global.definition)
       # end
       #site.local_projection = local_proj
-      if site.save
-         flash[:notice] = "Site was Updated successfully."
-         redirect_to project_url(parent)
+      respond_to do |format|
+        if site.save
+          format.html{
+            flash[:notice] = "Site was Updated successfully."
+            redirect_to project_url(parent)
+          }
+          format.json{
+            render :json => site.as_json, :callback => params[:jsoncallback]
+          }
+        end
       end
-    end
-    
+    }
     ### update! do |success, failure|
     #       success.html { redirect_to project_url(parent) }
     #     end
-    
   end
 
   def create
     @project = parent
-    
     # This should be handled by the framework, but isn't when using jruby.
     params[:site][:latitude] = params[:site][:latitude].strip
     params[:site][:longitude] = params[:site][:longitude].strip
-  
     #@vert_datum_global = Voeis::VerticalDatumCV.get(params[:site][:vertical_datum_id].to_i)
     #@local_proj_global = Voeis::LocalProjectionCV.get(params[:site][:local_projection_id].to_i)
     
     @project.managed_repository{ 
       site = Voeis::Site.new
 
-      #params[:site].each_key do |key|
       logger.debug('PARAMS:')
       params[:site].each do |key, value|
         logger.debug('KEY: '+key+' / VALUE: '+value)
-        if key!='vertical_datum' && key!='local_projection'
-          site[key] = params[:site][key].empty? ? nil : params[:site][key]
-        end
+        site[key] = value.empty? ? nil : value
       end
-      site.lat_long_datum_id = params[:site][:lat_long_datum] == "NaN" ? nil : params[:site][:lat_long_datum].to_i
-      site.vertical_datum_id = params[:site][:vertical_datum] == "NaN" ? nil : params[:site][:vertical_datum].to_i
-      site.local_projection_id = params[:site][:local_projection] == "NaN" ? nil : params[:site][:local_projection].to_i
+      #if key!='vertical_datum' && key!='local_projection'
+      #  site[key] = params[:site][key].empty? ? nil : params[:site][key]
+      #end
+      #site.lat_long_datum_id = params[:site][:lat_long_datum] == "NaN" ? nil : params[:site][:lat_long_datum].to_i
+      #site.vertical_datum_id = params[:site][:vertical_datum] == "NaN" ? nil : params[:site][:vertical_datum].to_i
+      #site.local_projection_id = params[:site][:local_projection] == "NaN" ? nil : params[:site][:local_projection].to_i
       site.updated_at = Time.now
+      site.lat_long_datum_id = params[:site][:lat_long_datum_id] == "NaN" ? nil : params[:site][:lat_long_datum_id].to_i
+      site.vertical_datum_id = params[:site][:vertical_datum_id] == "NaN" ? nil : params[:site][:vertical_datum_id].to_i
+      site.local_projection_id = params[:site][:local_projection_id] == "NaN" ? nil : params[:site][:local_projection_id].to_i
       #### CV update -- global -> local
       # if @vert_datum_global.nil?
       #   site.vertical_datum = nil
@@ -162,11 +169,13 @@ class Voeis::SitesController < Voeis::BaseController
       # end
       respond_to do |format|
         if site.save
-          flash[:notice] = "New Site was saved successfully."
-          format.html{redirect_to project_url(parent)}
-          format.json do
-             render :json => site.as_json, :callback => params[:jsoncallback]
-          end
+          format.html{
+            flash[:notice] = "New Site was saved successfully."
+            redirect_to project_url(parent)
+          }
+          format.json{
+            render :json => site.as_json, :callback => params[:jsoncallback]
+          }
         end
       end
     }

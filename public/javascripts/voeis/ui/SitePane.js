@@ -16,7 +16,6 @@ dojo.declare("voeis.ui.SitePane", dijit.layout.ContentPane, {
     constructor: function() {
         this.server = this.server || voeis.Server.DEFAULT;
         this.watch("siteId", dojo.hitch(this, "_siteUpdated"));
-
         //if(arguments.length>0) this.projectId = arguments[0];
         //if(arguments.length>1) this.siteId = arguments[1];
     },
@@ -26,9 +25,19 @@ dojo.declare("voeis.ui.SitePane", dijit.layout.ContentPane, {
         this.set("title", "Loading...");
         this.set("href", this.server.projectSitePath(this.projectId, this.siteId));
         dojo.when(this.site(), dojo.hitch(this, function(site) {
-						var sitename = site.name.slice(0,12);
-						if(site.name.length>12) sitename+='...';
-						if(site.name.length>20) sitename+=site.name.slice(-8);
+						//var sitename = site.name.slice(0,12);
+						//if(site.name.length>12) sitename+='...';
+						//if(site.name.length>20) sitename+=site.name.slice(-8);
+						var sitename = site.name.toString();
+						var sitename0 = sitename.slice(0,12);
+						if(sitename.length>12) {
+							sitename0+='...';
+							if(sitename.length>20) sitename0+=sitename.slice(-8);
+							else {
+								sitename0 = sitename.slice(0,8)+'...';
+								sitename0 += sitename.slice(-6);
+							};
+						};
 						this.set("title", sitename);
 						//this.set("title", site.name);
         }));

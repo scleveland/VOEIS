@@ -23,10 +23,41 @@ class Voeis::VariablesController < Voeis::BaseController
         @site_variable_stats = Voeis::SiteDataCatalog.all(:variable_id=>params[:id].to_i, :site_id=>params[:site_id].to_i)
         @graph_data = @variable.last_ten_values_graph(@site)
         @data = @variable.last_ten_values(@site)
-        
-        @TEST = 'TESTING controller'
       end
     }
+    @variable_properties = [
+      {:label=>"Variable ID", :name=>"id"},
+      {:label=>"Name", :name=>"variable_name"},
+      {:label=>"Code", :name=>"variable_code"},
+      {:label=>"Speciation", :name=>"speciation"},
+      {:label=>"Units", :name=>"variable_units_id"},
+      {:label=>"Medium", :name=>"sample_medium"},
+      {:label=>"Value Type", :name=>"value_type"},
+      {:label=>"Quality Control", :name=>"quality_control"},
+      {:label=>"Regular?", :name=>"is_regular"},
+      {:label=>"Time Support", :name=>"time_support"},
+      {:label=>"Time Units", :name=>"time_units_id"},
+      {:label=>"Data Type", :name=>"data_type"},
+      {:label=>"General Category", :name=>"general_category"},
+      {:label=>"Null Value", :name=>"no_data_value"},
+      {:label=>"Detection Limit", :name=>"detection_limit"},
+      {:label=>"Lab Method", :name=>"lab_method_id"},
+      {:label=>"Lab", :name=>"lab_id"},
+      {:label=>"Field Method", :name=>"field_method_id"},
+      {:label=>"Spatial Units", :name=>"spatial_units_id"},
+      {:label=>"Spatial Offset Type", :name=>"spatial_offset_type"},
+      {:label=>"Spatial Offset Value", :name=>"spatial_offset_value"},
+      {:label=>"Logger Type", :name=>"logger_type"},
+      {:label=>"Logger ID", :name=>"logger_id"},
+      {:label=>"Sensor Type", :name=>"sensor_type"},
+      {:label=>"Sensor ID", :name=>"sensor_id"},
+      {:label=>"HIS ID", :name=>"his_id"},
+      {:label=>"Updated", :name=>"updated_at"},
+      {:label=>"Updated By", :name=>"updated_by"},
+      {:label=>"Update Comment", :name=>"updated_comment"},
+      {:label=>"Created", :name=>"created_at"}
+      ]
+    
     @units = Voeis::Unit.get(@variable.variable_units_id)
     logger.debug('>>>> graph_data = '+@graph_data.to_s)
     logger.debug('>>>> data = '+@data.to_s)
