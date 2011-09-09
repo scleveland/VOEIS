@@ -64,6 +64,11 @@ class Voeis::SitesController < Voeis::BaseController
     show!
   end
   
+  def versions
+    @site =  parent.managed_repository{Voeis::Site.get(params[:id])}
+    @versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
+  end
+  
   def edit
     @site =  parent.managed_repository{Voeis::Site.get(params[:id])}
   end
