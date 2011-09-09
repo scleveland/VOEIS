@@ -26,6 +26,7 @@ Yogo::Application.routes.draw do
       resources :sites do
         collection do
           post :save_site
+          get :versions
           get :site_samples
         end
       end

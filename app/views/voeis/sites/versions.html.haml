@@ -1,0 +1,24 @@
+:javascript
+  dojo.require("dojox.grid.EnhancedGrid");
+  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+  dojo.require("dojox.grid.enhanced.plugins.Filter");
+  dojo.require("dojo.data.ItemFileReadStore");
+  dojo.require("dijit.layout.TabContainer");
+  dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+  var version_data = [
+     #{@versions.map{|version| "        "+version.to_json}.join(",\n")}
+   ];
+   var pversions_json = {
+         identifier: 'updated_at',
+       label: 'name',
+       items: version_data };
+
+%h3
+  #{@site.name} - History
+
+#version_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pversions", :data=>"pversions_json"}
+%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{filter:true}",  :store=>"pversions", :clientSort=>"true", :style=>"width: 900px; height: 500px;", :rowSelector=>"20px", :jsId=>"VersionDisplayGrid", :id=>"VersionDisplayGrid", :title=>"Versions"}
+  %thead
+    %tr
+      - @versions.properties.each do |prop|
+        %th{:field=>"#{prop.name.to_s}", :filterable=>true, :width=>"150px"} #{prop.name.to_s.capitalize}
