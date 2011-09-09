@@ -154,25 +154,27 @@ class Voeis::Variable
   end
   
   def last_ten_values_graph(site)
-    #(self.data_values & site.data_values).all(:order=>[:local_date_time], :limit=>10).map{|dv| [dv.local_date_time.to_datetime.to_i, dv.data_value] }
-    sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{self.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{site.id}"
-    results = repository.adapter.select(sql)
-    if results.length != 0
-      sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time DESC LIMIT 10"
-      dresults = repository.adapter.select(sql)
+    # #(self.data_values & site.data_values).all(:order=>[:local_date_time], :limit=>10).map{|dv| [dv.local_date_time.to_datetime.to_i, dv.data_value] }
+    # sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{self.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{site.id}"
+    # results = repository.adapter.select(sql)
+    # if results.length != 0
+    #   sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time DESC LIMIT 10"
+      dresults = Voeis::DataValue.all(:site_id => site.id, :variable_id => self.id, :order => [:local_date_time.desc], :limit => 10)
+      #dresults = repository.adapter.select(sql)
       dresults.map{|dv| [dv[:local_date_time].to_datetime.to_i*1000, dv[:data_value]]}
-    end
+    #end
   end  
   
   
   def last_ten_values(site)
-    sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{self.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{site.id}"
-    results = repository.adapter.select(sql)
-    if results.length != 0
-      sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time DESC LIMIT 10"
-      dresults = repository.adapter.select(sql)
+    # sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{self.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{site.id}"
+    # results = repository.adapter.select(sql)
+    # if results.length != 0
+    #   sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time DESC LIMIT 10"
+    #   dresults = repository.adapter.select(sql)
+    dresults = Voeis::DataValue.all(:site_id => site.id, :variable_id => self.id, :order => [:local_date_time.desc], :limit => 10)
       dresults.map{|dv| [dv[:local_date_time].to_datetime, dv[:data_value]]}
       #(self.data_values & site.data_values).all(:order=>[:local_date_time], :limit=>10).map{|dv| [dv.local_date_time.to_datetime, dv.data_value] }
-    end
+    #end
   end
 end
