@@ -122,6 +122,7 @@ class Voeis::SamplesController < Voeis::BaseController
           if !@sites.all(:order => [:name.asc]).first.variables.empty?
             #variable_opt_array << ["All", "All"]
             @sites.all(:order => [:name.asc]).first.variables.each do |var|
+              data_catalog = Voeis::SiteDataCatalog.first(:site_id => @sites.all(:order => [:name.asc]).first.id, :variable_id => var.id)
               variable_opt_array << [var.variable_name+":"+var.data_type + "(" + data_catalog.starting_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + " - " + data_catalog.ending_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + ')', var.id.to_s]
             end
           else
