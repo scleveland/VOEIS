@@ -1,3 +1,10 @@
+:css
+  .row-lt1 { background-color:#ddd; }
+  .row-gr { background-color: #97D8AB }
+  
+  .smfont, .smfont * { font-size:10px }
+
+
 = javascript_include_tag("jquery.flot.js")
 - content_for(:javascripts) do
   :javascript
@@ -42,7 +49,7 @@
 #var-container{:style=>"width:900px;"}
   %h2{:style=>"margin-top:0;"}
     -if !@site.nil? 
-      #{@site.name}:#{@variable.variable_name}
+      #{@site.name}: #{@variable.variable_name}
     -else
       #{@variable.variable_name}
   -#EDIT VARIABLE BUTTON
@@ -53,7 +60,16 @@
   %br
   -#placeholder{:style=>"width:300px;height:150px;"}
 
-  %table{:id => "property-table", :style=>'float:left;'}
+  -#%strong
+  -#  UNITS:
+  -#- if !@units.nil?
+  -#  #{@units[:units_abbreviation]} (#{@units[:units_type]})
+  -#- else
+  -#  UNKNOWN
+  -#%br
+  -#%br
+  
+  %table{:id => "property-table", :style=>'float:left;margin-right:15px;'}
 
     - Voeis::Variable.properties.each do |prop|
       %tr{:class=>"row#{cycle('1','0')}"}
@@ -75,44 +91,45 @@
     - var_stats = @site_variable_stats.first(:variable_id=>@variable.id)
     %table{:id => "var-stats-table", :style=>'float:left;margin-left:5px;width:45%'}
       %tr{:class=>"row#{cycle('0','1')}"}
-        %td{:colspan=>2}
-          %b
+        %td{:colspan=>"2"}
+          %h4{:style=>"margin:0 0 5px 0;"}
             Collected Data
-      %tr{:class=>"row#{cycle('1','0')}"}
+      %tr{:class=>"row-gr"}
         %td
           %b
             &nbsp;&nbsp; Count
         %td
           = var_stats.record_number
-      %tr{:class=>"row#{cycle('0','1')}"}
+      %tr{:class=>""}
         %td
           %b
             &nbsp;&nbsp; Starting
         %td
           = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
-      %tr{:class=>"row#{cycle('1','0')}"}
+      %tr{:class=>"row-gr"}
         %td
           %b
             &nbsp;&nbsp; Ending
         %td
           = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
       %tr
-        %td{:colspan=>2}
-          %b
-            %br
+        %td{:colspan=>"2"}
+          %h4{:style=>"margin:20px 0 5px 0;"}
             Recent Data Values
-      %tr
+      %tr{:class=>"row-gr"}
         %th
           Timestamp
         %th
           Value   
       -if !@data.nil?
         -@data.each do |dv|
-          %tr
+          %tr{:class=>"row-lt#{cycle('0','1')} smfont",:style=>""}
             %td
-              = dv[0]
+              = dv[0].strftime('%Y-%m-%d %H:%M:%S')
             %td
-              = dv[1]
+              %strong
+                = dv[1].to_s+' '
+              &nbsp;#{@units[:units_abbreviation]} (#{@units[:units_type]})
   
 
     :javascript

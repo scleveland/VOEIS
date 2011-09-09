@@ -46,8 +46,8 @@ voeis.ui.ProjectSitesGrid = function(projectId, store, server) {
 				//{field: 'latitude', name: "Lat", datatype:"number", width: "auto"},
 				//{field: 'longitude', name: "Lng", datatype:"number", width: "auto"}
 			]
-    });
-    dojo.connect(grid, "onRowDblClick", this, function(evt) {
+		});
+		dojo.connect(grid, "onRowDblClick", this, function(evt) {
 			//NOT USING DBL-CLICK
 			//var item = grid.getItem(evt.rowIndex);
 			//if(item && item.id) {
@@ -58,19 +58,19 @@ voeis.ui.ProjectSitesGrid = function(projectId, store, server) {
 			var item = grid.getItem(idx);
 			if(item && item.id) {
 				//dojo.publish("voeis/project/site/selected", [projectId, item.id]);
-        var projId = item.projectId();
-        var siteId = item.id;
-        dojo.publish("voeis/project/site/popped", [projId, siteId]);
+				var projId = item.projectId();
+				var siteId = item.id;
+				dojo.publish("voeis/project/site/popped", [projId, siteId]);
 				
-        var tab_browser = dijit.byId('right_tabs');
-        var sitePane = dojo.byId(projId+'--'+siteId);
-        if(sitePane) {
-            sitePane = dijit.byNode(sitePane);
-            tab_browser.selectChild(sitePane);
-        };
-	      
-      };
-    });
+				var tab_browser = dijit.byId('right_tabs');
+				var sitePane = dojo.byId(projId+'--'+siteId);
+				if(sitePane) {
+					sitePane = dijit.byNode(sitePane);
+					tab_browser.selectChild(sitePane);
+				};
+	
+			};
+		});
 		dojo.when(project, function(project) {
 			grid.set("title", project.name);
 		});

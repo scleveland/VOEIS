@@ -180,7 +180,8 @@ class ProjectsController < InheritedResources::Base
     @sites.each{ |site| 
       @temp_array = []
       site.samples.all(:order => [:lab_sample_code.asc]).each { |samp|
-        @temp_array << Array[samp.sample_type, samp.lab_sample_code, samp.material, samp.local_date_time.to_s]
+        #@temp_array << Array[samp.id, samp.lab_sample_code, samp.sample_type, samp.material, samp.local_date_time.to_s]
+        @temp_array << Array[samp.id, samp.lab_sample_code, samp.sample_type, samp.material, samp.local_date_time.strftime('%Y-%m-%d %H:%M:%S')]
       }
       @site_samps << @temp_array
     }

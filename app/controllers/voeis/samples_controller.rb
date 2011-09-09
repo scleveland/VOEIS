@@ -11,6 +11,47 @@ class Voeis::SamplesController < Voeis::BaseController
     root << widget(:flot_graph)
   end
 
+  def index
+    @samples =  parent.managed_repository{Voeis::Sample.all}
+    @project = parent
+  end
+
+  def show
+    @project = parent
+    #@samples =  parent.managed_repository{Voeis::Sample.all}
+    #@sample =  parent.managed_repository{Voeis::Sample.get(params[:id].to_i)}
+    parent.managed_repository{
+      @samples = Voeis::Sample.all
+      @sample = Voeis::Sample.get(params[:id].to_i)
+    }
+    if !@sample.nil? 
+      @site = @sample.sites[0]
+    end
+    @sample_properties = [
+      {:label=>"Sample ID", :name=>"id"},
+      {:label=>"Lab Code", :name=>"lab_sample_code"},
+      {:label=>"Sample Type", :name=>"sample_type"},
+      {:label=>"Sample Medium", :name=>"material"},
+      {:label=>"Updated", :name=>"updated_at"},
+      {:label=>"Updated By", :name=>"updated_by"},
+      {:label=>"Update Comment", :name=>"updated_comment"},
+      {:label=>"Created", :name=>"created_at"}
+      ]
+    
+    #@project.managed_repository{
+    #  @sample = Voeis::Sample.get(params[:id].to_i)
+    #  @sites = Voeis::Site.all
+    #  if !params[:site_id].nil?
+    #    @site =  Voeis::Site.get(params[:site_id].to_i)
+    #    @site_variable_stats = Voeis::SiteDataCatalog.all(:variable_id=>params[:id].to_i, :site_id=>params[:site_id].to_i)
+    #    @graph_data = @variable.last_ten_values_graph(@site)
+    #    @data = @variable.last_ten_values(@site)
+    #    
+    #    @TEST = 'TESTING controller'
+    #  end
+    #}
+  end
+
   def new
     @project = parent
     @sample = @project.managed_repository{Voeis::Sample.new}
@@ -31,7 +72,7 @@ class Voeis::SamplesController < Voeis::BaseController
   end
 
   def edit
-    @sample =  parent.managed_repository{Voeis::Sample.get(:params[:id])}
+    @sample =  parent.managed_repository{Voeis::Sample.get(params[:id])}
     @project = parent
   end
 

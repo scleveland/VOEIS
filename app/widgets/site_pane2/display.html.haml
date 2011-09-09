@@ -8,6 +8,16 @@
   #wrapper img { margin-right:12px }
   #wrapper p { margin:0 20px }
 
+  #site00-sample-table td { text-align:center; }
+  #site00-sample-table td.time0 { text-align:left; }
+
+  .row-lt1 { background-color:#ddd; }
+  .row-gr { background-color: #6AA128; }
+  .row-gr { background-color: #97C253; }
+  .row-gr { background-color: #97D8AB; }
+  .row-gr th { background-color: #97D8AB!important; }
+  .row-gr td { background-color: #97D8AB!important; }
+
   #form-table { width:600px; }
   #form-table td { width:50%; }
   .form_element { width:20em; }
@@ -71,7 +81,6 @@
           -#&nbsp;&nbsp;&nbsp;
           -#= link_to('TEST', 'javascript:', :class=>'icon icon-edit', :onclick=>"alert('EDIT>>> '+site_pane2.editMode);") 
   %br
-  %br
 
   %table{:id=>"site00-property-table", :style=>"width:46%;margin-right:20px;margin-bottom:30px;float:left;"}
     - @site_properties.each do |prop|
@@ -85,9 +94,11 @@
   -#%br{:style=>'float:none; clear:both;'}
   -#%br
 
+  %h4{:style=>"margin-top:0;"}
+    Variable Data
   %table{:id=>"site00-variable-table", :style=>"width:48%;foat:left;"}
-    %tr
-      %th{:width=>"40%"} Variable Data
+    %tr{:class=>"row-gr"}
+      %th{:width=>"40%"} Variable
       %th{:width=>"20%", :align=>"left"} Count
       %th{:width=>"15%", :align=>"left"} Start
       %th{:width=>"15%", :align=>"left"} Stop
@@ -97,7 +108,7 @@
 
   -#%br{:style=>'float:none; clear:both;'}
   %div
-    %h3{:style=>"margin-top:0;"}
+    %h4{:style=>"margin-top:0;"}
       Existing Samples
     #all_variables-site00{:style=>"$$$export-style$$$"}
       = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
@@ -109,18 +120,22 @@
         %br
         %br    
     %table{:id=>"site00-sample-table", :style=>"width:45%;"} 
-      %tr
-        - @sample_labels.each do |label|
-          %th{:style=>"width:23%;align:center;"}
+      %tr{:class=>"row-gr"}
+        - @sample_properties.each do |prop|
+          %th{:style=>"width:20%;align:center;"}
             %b
-              = label
+              = prop[:label]
       %tr
-        %td{:colspan=>"4"}
-          %div{:class=>"sample-list"}  
-            %table
-              %tr
-                %td{:style=>"width:23%;align:center;"}
-                  $$$site-sample-data$$$
+        %td{:style=>"width:23%;align:center;"}
+          $$$site-sample-data$$$
+      
+      
+      -#  %td{:colspan=>"4"}
+      -#    %div{:class=>"sample-list"}  
+      -#      %table
+      -#        %tr
+      -#          %td{:style=>"width:23%;align:center;"}
+      -#            $$$site-sample-data$$$
 
   -##testing-site00{:dojoType=>"dijit.form.Button"}
   -#  TESTING
@@ -348,19 +363,45 @@
       fld.options[i].selected=true;
       if(fld.selectedIndex==-1 || fld.options.length==0) 
       return {value:null, text:'-none-', element:fld};
-      opt = fld.options[fld.selectedIndex];
-      return {value:parseInt(opt.value), text:opt.text, element:fld};
+      var opt = fld.options[fld.selectedIndex];
+      var ddez = {
+      element:fld,
+      value:fld.value,
+      ivalue:parseInt(fld.value),
+      xvalue:function(){return parseInt(fld.options[fld.selectedIndex].value)},
+      text:function(){return fld.options[fld.selectedIndex].text}
       }
-      function validate_site_form() {
-      return true;
+      return {value:parseInt(opt.value), text:opt.text, element:fld, dd:ddez};
+      }
+      
+      function pane_update(pane) {
+      var site = pane.site;
+      var form0 = pane.id+'-edit-form';
+      var form = dijit.byId(form0);
+      form0 = form.domNode;
+      console.log('UPDATE PANE:',form0);
+      //INITIALIZE: drop-downs
+      pane.local.lat_long_datum_dd = drop_down(form0,'site_lat_long_datum',site.lat_long_datum_id).dd;
+      pane.local.local_projection_dd = drop_down(form0,'site_local_projection',site.local_projection_id).dd;
+      pane.local.vertical_datum_dd = drop_down(form0,'site_vertical_datum',site.vertical_datum_id).dd;
+      console.log('LatLongDatum ID:',site.lat_long_datum_id);
+      console.log('VerticalDatum ID:',site.vertical_datum_id);
+      console.log('LocalProjection ID:',site.local_projection_id);
       }
       
       function cancel_site_form(siteId) {
+      //###SCROLL TO TOP
+      //window.scrollTo(0,0);
+      $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
+      $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
+      $('html #edit-site'+siteId).animate({scrollTop:0}, 'slow');//IE, FF
+      $('body #edit-site'+siteId).animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
       if(parseInt(siteId)) {
       $('#edit-site'+siteId).hide();
       $('#show-site'+siteId).show();
       return
-      }
+      };
+      //NEW SITE
       dojo.publish('voeis/project/site/close',[0]);
       };
 
@@ -621,13 +662,8 @@
                 //var pane = dijit.byNode(dojo.byId('site00'));
                 eval('var pane = site00ref');
                 var site = pane.site;
-                console.log('INIT:',form0);
-                //INITIALIZE: drop-downs
-                var lat_long_datum_dd = drop_down(form0,'site_lat_long_datum',site.lat_long_datum_id).element;
-                var local_projection_dd = drop_down(form0,'site_local_projection',site.local_projection_id).element;
-                var vertical_datum_dd = drop_down(form0,'site_vertical_datum',site.vertical_datum_id).element;
-                console.log('VerticalDatum ID:',site.vertical_datum_id);
-                console.log('LocalProjection ID:',site.local_projection_id);
+                //INITIALIZE PANE: drop-downs, etc...
+                pane_update(pane);
                 //INITIALIZE: submit button
                 if(!pane.newSite) this.attr("disabled", !form.validate());
                 //this.attr("disabled", !this.isValid());
@@ -643,6 +679,10 @@
                 //###ON-SUBMIT
                 this.connect(this, "onClick", function(){
                 console.log('CREATE SITE: '+site.id);
+                //###SCROLL TO TOP
+                //window.scrollTo(0,0);
+                $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
+                $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
                 //var lat_long_datum_dd = drop_down(form,'site_lat_long_datum');
                 //var vertical_datum_dd = drop_down(form,'site_vertical_datum');
                 //var local_projection_dd = drop_down(form,'site_local_projection');
@@ -662,19 +702,26 @@
                 county:form0.elements['site_county'].value, 
                 comments:form0.elements['site_comments'].value, 
                 description:form0.elements['site_description'].value,
-                lat_long_datum_id:lat_long_datum_dd.value, 
-                vertical_datum_id:vertical_datum_dd.value,
-                local_projection_id:local_projection_dd.value
+                lat_long_datum_id:pane.local.lat_long_datum_dd.value,
+                vertical_datum_id:pane.local.vertical_datum_dd.value,
+                local_projection_id:pane.local.local_projection_dd.value
                 }};
+                //lat_long_datum:lat_long_datum_dd.text, 
+                //vertical_datum:vertical_datum_dd.text,
+                //local_projection:local_projection_dd.text
                 if(pane.newSite) {
                 //###NEW SITE
                 $.post('/projects/#{@project.id}/sites.json', data, function(newValue) {
                 var newId = parseInt(newValue.id);
                 console.log('NEW ID: '+newId, newValue);
                 data['site']['id'] = newId;
-                data['site']['lat_long_datum'] = lat_long_datum_dd.text;
-                data['site']['vertical_datum'] = vertical_datum_dd.text;
-                data['site']['local_projection'] = local_projection_dd.text;
+                //opt = fld.options[fld.selectedIndex];
+                data['site']['lat_long_datum'] = pane.local.lat_long_datum_dd.text();
+                data['site']['vertical_datum'] = pane.local.vertical_datum_dd.text();
+                data['site']['local_projection'] = pane.local.local_projection_dd.text();
+                console.log('LatLongDatum ID:',data.site.lat_long_datum_id,data.site.lat_long_datum);
+                console.log('VerticalDatum ID:',data.site.vertical_datum_id,data.site.vertical_datum);
+                console.log('LocalProjection ID:',data.site.local_projection_id,data.site.local_projection);
                 pane.siteSave(data['site']);
                 //dojo.publish('voeis/project/siteTables/refresh');
                 dojo.publish('voeis/project/site/close',[0]);
@@ -694,9 +741,13 @@
                 success: '',
                 dataType: 'json'
                 });
-                data['site']['lat_long_datum'] = lat_long_datum_dd.text;
-                data['site']['vertical_datum'] = vertical_datum_dd.text;
-                data['site']['local_projection'] = local_projection_dd.text;
+                data['site']['lat_long_datum'] = pane.local.lat_long_datum_dd.text();
+                data['site']['vertical_datum'] = pane.local.vertical_datum_dd.text();
+                data['site']['local_projection'] = pane.local.local_projection_dd.text();
+                console.log('UPDATE>>>',data);
+                console.log('LatLongDatum ID:',data.site.lat_long_datum_id,pane.local.lat_long_datum_dd);
+                console.log('VerticalDatum ID:',data.site.vertical_datum_id,pane.local.vertical_datum_dd);
+                console.log('LocalProjection ID:',data.site.local_projection_id,pane.local.local_projection_dd);
                 pane.siteSave(data['site']);
                 //dojo.publish('voeis/project/siteTables/refresh');
                 dojo.publish('voeis/project/map/clear',[site.id]);

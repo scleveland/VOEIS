@@ -16,6 +16,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	parseOnLoad: false,
 	cleanContent: true,
 	parsedWidgets: [],
+	local: {},
 	
 	protoDivId: 'site_pane_proto',
 	style: "margin-top:0;padding-top:0;",
@@ -58,12 +59,14 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		} else {
 			var sitename = this.site.name.toString();
 			var sitename0 = sitename.slice(0,12);
-			if(sitename.length>12) sitename0+='...';
-			if(sitename.length>20) sitename0+=sitename.slice(-8);
-			else {
-				sitename0 = sitename.slice(0,8)+'...';
-				sitename0 += sitename.slice(-6);
-			}
+			if(sitename.length>12) {
+				sitename0+='...';
+				if(sitename.length>20) sitename0+=sitename.slice(-8);
+				else {
+					sitename0 = sitename.slice(0,8)+'...';
+					sitename0 += sitename.slice(-6);
+				};
+			};
 			this.set("title", sitename0);
 		};
 		
@@ -95,7 +98,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 				data += this.site_var_stats[i].count+'</td><td>\n';
 				data += this.site_var_stats[i].first+'</td><td>\n';
 				data += this.site_var_stats[i].last+'</td></tr>\n';
-				data += '<tr><td>'
+				data += '<tr class="'+((i+1==this.site_stats.length)?'':'row-lt'+(i+1)%2)+'"><td>'
 			};
 //				for(var stat in this.site_var_stats[i])
 //					data.push(this.site_var_stats[i][stat]+'</td><td>');
@@ -111,11 +114,13 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		if(this.site_samps.length>0) {
 			sitePaneContent = sitePaneContent.replace(/\$\$\$export-style\$\$\$/, '');
 			for(var i=0;i<this.site_samps.length;i++) {
-				data += this.site_samps[i][0]+'</td><td>\n';
-				data += this.site_samps[i][1]+'</td><td>\n';
+				data += '<a href="javascript:" onclick="dojo.publish(\'voeis/project/sample\', [';
+				data += this.site_samps[i][0]+',\'Sample: '+this.site_samps[i][1]+'\']);">';
+				data += '<strong>'+this.site_samps[i][1]+'</strong></a></td><td>\n';
 				data += this.site_samps[i][2]+'</td><td>\n';
-				data += this.site_samps[i][3]+'</td></tr>\n';
-				data += '<tr class="'+((i+1==this.site_samps.length)?'':'row'+(i+1)%2)+'"><td>'
+				data += this.site_samps[i][3]+'</td><td class="time">\n';
+				data += this.site_samps[i][4]+'</td></tr>\n';
+				data += '<tr class="'+((i+1==this.site_samps.length)?'':'row-lt'+(i+1)%2)+'"><td>'
 			};
 		} else {
 			sitePaneContent = sitePaneContent.replace(/\$\$\$export-style\$\$\$/, 'display:none');
@@ -140,6 +145,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		this.purgeContent();
 		this.set('content', sitePaneContent);
 		this.parsedWidgets = dojo.parser.parse(this.domNode);
+    if(window.pane_update) pane_update(this);
 		
 		if(this.newSite) {
 			//this.set("title", 'NEW SITE');
@@ -263,15 +269,16 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		//UPDATE LOCAL SITE
 		for(prop in update_props) 
 			if(this.site.hasOwnProperty(prop)) 
-				this.site[prop] = update_props[prop];
+				this.site[prop] = update_props[prop].toString();
 		//UPDATE STORE
+		var upsite = this.site;
 		if(this.newSite) {
 			//###NEW SITE
 			this.site.idx = site_data.length;
 			this.siteIdx = this.site.idx;
-			console.log('NEW:',update_props.id,this.siteIdx);
+			console.log('NEW:',update_props.id,this.site);
 			try {
-				psites.newItem(this.site);
+				psites.newItem(upsite);
 			}
 			catch (e) { 
 				console.log('ERROR: DUPLICATE KEY');
@@ -287,16 +294,16 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		} else {
 			//###UPDATE SITE
 			//var update = this.getSite(parseInt(update_props.id));
-			console.log('UPDATE:',update_props.id);
-			psites.fetch({query: {id: update_props.id},
+			console.log('UPDATE:',update_props.id,this.site);
+			psites.fetch({query: {id: parseInt(update_props.id)},
 				onComplete: function(items,request) {
 					var onSaveError = function(error) {
 						console.log('SAVE-ERROR: '+error);
 					};
 					//### UPDATE ATTRIBUTES
 					for(prop in items[0])
-						if(update_props.hasOwnProperty(prop) && prop!='id')
-							psites.setValue(items[0], prop, update_props[prop])
+						if(upsite.hasOwnProperty(prop) && prop!='id')
+							psites.setValue(items[0], prop, upsite[prop]);
 				},
 				onError: function(error,request) {
 					console.log('ERROR: '+error);
@@ -306,7 +313,10 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			//site_data[this.siteIdx] = this.site;
 		};
 		this.siteUpdate();
-		//window.scrollTo(0,0);
+    //###SCROLL TO TOP
+    //window.scrollTo(0,0);
+    $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
+    $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
 		return this.site.id;
 	},
 

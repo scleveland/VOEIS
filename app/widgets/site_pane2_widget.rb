@@ -15,8 +15,14 @@ class SitePane2Widget < Apotomo::Widget
     @site_stats = []
     @site_samps = []
     @variable_labels = Array["Variable Data","Count","Start","End"]
-    @sample_labels = Array["Sample Type","Lab Sample Code","Sample Medium","Timestamp"]
-    @sample_fields = Array["sample_type","lab_sample_code","material","local_date_time"]
+    @sample_labels = Array["Sample ID","Lab Code","Sample Type","Sample Medium","Timestamp"]
+    @sample_fields = Array["id","lab_sample_code","sample_type","material","local_date_time"]
+    @sample_properties = [
+      {:label=>"Lab Code", :name=>"lab_sample_code"},
+      {:label=>"Type", :name=>"sample_type"},
+      {:label=>"Medium", :name=>"material"},
+      {:label=>"Timestamp", :name=>"local_date_time"}
+      ]
 
     @sites.map{ |site| 
       stats = @project.managed_repository{Voeis::SiteDataCatalog.all(:site_id=>site.id)}.aggregate(:record_number.sum, :starting_timestamp.min, :ending_timestamp.max)
@@ -37,7 +43,7 @@ class SitePane2Widget < Apotomo::Widget
     @sites.map{ |site| 
       @temp_array = []
       site.samples.all(:order => [:lab_sample_code.asc]).each { |samp|
-        @temp_array << Array[samp.sample_type, samp.lab_sample_code, samp.material, samp.local_date_time.to_s]
+        @temp_array << Array[samp.sample_type, samp.lab_sample_code, samp.material, samp.local_date_time.strftime('%Y-%m-%d %H:%M:%S')]
       }
       @site_samps << @temp_array
     }

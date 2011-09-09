@@ -231,7 +231,7 @@
                 
               
       
-      #main_container{:dojoType => "dijit.layout.ContentPane", :region => "center", :gutters => "false", :style => "padding:0; background-color:light-grey"}
+      #main_container{:dojoType=>"dijit.layout.ContentPane", :region=>"center", :gutters=>"false", :style=>"padding:0; background-color:light-grey"}
         = content_for?(:content) ? yield(:content) : yield
 
       #bottom.claro{:dojoType => "dijit.layout.ContentPane", :region => "bottom", :gutters => "false", :style => "padding:0"}
