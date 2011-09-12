@@ -119,7 +119,7 @@
       //CLEAR A MAP BALLOON
       //OR ALL IF NO SITEID
       for(var i=0;i<pmarkers.length;i++) {
-        if(pmarkers[i].window.close && (!siteId || pmarkers[i].id!=parseInt(siteId))) {
+        if(pmarkers[i].window.close && (!siteId || pmarkers[i].id==parseInt(siteId))) {
           pmarkers[i].window.close();
           pmarkers[i].setIcon(icon_default);
         }
@@ -588,62 +588,24 @@
 
     //#############
 
-    dojo.subscribe("voeis/project/siteTables/test", function() {
-      console.log('TABLES TEST');
-      var tabs = dijit.byId('tab_browser');
-      var table0 = dijit.byId('project_sites');
-      var table1 = dijit.byId('SiteDisplayGrid');
-      var lastId = 0;
-      
-      psites.fetch({query: {},
-        count: 1, sort: [{attribute: 'id', descending: true}],
-        onItem: function(item) {
-          lastId = parseInt(psites.getValue(item, 'id'));
-          //siteName += '-TESTING!!!';
-          //psites.setValue(item, 'name', siteName);
-        }
-      });
-      console.log('LAST-ID:',lastId);
-      lastId++;
-      
-      try {
-      psites.newItem({
-        id:''+lastId,
-        name:'This is a TEST--'+lastId,
-        code:'this-is-a-test-1234567-'+lastId,
-        latitude:'45.2698',
-        longitude:'-111.2788',
-        lat_long_datum_id:'',
-        elevation_m:'12',
-        vertical_datum_id:'',
-        local_x:'',
-        local_y:'',
-        local_projection_id:'',
-        pos_accuracy_m:'',
-        state:'Montana',
-        county:'Gallatin',
-        comments:'this is a test... on ID:'+lastId,
-        description:'',
-      });
-      }
-      catch (e) { 
-        console.log('ERROR: DUPLICATE KEY')
-      };
-      
-      //psites.data = psites_json;
-      //psites.close();
-      //table0.render();
-      //table1.render();
-    });
-
     dojo.subscribe("voeis/project/map/clear", function(siteId) {
       console.log('CLEAR MAP');
+      var tabs = dijit.byId('tab_browser');
+      var projPane = dijit.byId("overview");
+      var selected = tabs.selectedChildWidget;
+      tabs.selectChild(projPane);
       pmap_clear(siteId);
+      tabs.selectChild(selected);
     });
 
     dojo.subscribe("voeis/project/map/new", function(siteId) {
       console.log('NEW MAP MARKER');
+      var tabs = dijit.byId('tab_browser');
+      var projPane = dijit.byId("overview");
+      var selected = tabs.selectedChildWidget;
+      tabs.selectChild(projPane);
       pmap_new(siteId);
+      tabs.selectChild(selected);
     });
 
     dojo.subscribe("voeis/project/site/close", function(siteId) {

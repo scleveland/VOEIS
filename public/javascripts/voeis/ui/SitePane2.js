@@ -209,7 +209,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			if(site && site.id && site.code && site.idx)
 				this.site = site;
 			else
-				this.site = this.getSite(0);
+				this.site = this.getSite(1);
 		};
 		this.siteIdx = this.site.idx;
 		this.site_stats = [];
@@ -239,10 +239,11 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			if(site_data[i].id==siteId) 
 				return site_data[i];
 		*/
-		console.log('GET-SITE: '+siteId);
 		//console.log('TYPE-OF: '+(typeof siteId));
-		siteId = parseInt(siteId);
 		var site;
+		var id = siteId || this.site.id;
+		siteId = parseInt(id);
+		console.log('GET-SITE: '+siteId);
 		psites.fetch({query: {id: siteId},
 			onItem: function(item) {
 				site = $.extend({},item);
@@ -266,19 +267,22 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			console.log('ERROR: WRONG "ID"');
 			return false;
 		}
-		//UPDATE LOCAL SITE
-		for(prop in update_props) 
-			if(this.site.hasOwnProperty(prop)) 
-				this.site[prop] = update_props[prop].toString();
+
 		//UPDATE STORE
-		var upsite = this.site;
+		
 		if(this.newSite) {
 			//###NEW SITE
+			console.log('NEW:',update_props.id,this.site);
 			this.site.idx = site_data.length;
 			this.siteIdx = this.site.idx;
-			console.log('NEW:',update_props.id,this.site);
+			var newsite = {};
+			for(prop in this.site) 
+				if(update_props.hasOwnProperty(prop)) 
+					newsite[prop] = update_props[prop].toString();
+				else
+					newsite[prop] = this.site[prop].toString();
 			try {
-				psites.newItem(upsite);
+				psites.newItem(newsite);
 			}
 			catch (e) { 
 				console.log('ERROR: DUPLICATE KEY');
@@ -301,17 +305,17 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 						console.log('SAVE-ERROR: '+error);
 					};
 					//### UPDATE ATTRIBUTES
-					for(prop in items[0])
-						if(upsite.hasOwnProperty(prop) && prop!='id')
-							psites.setValue(items[0], prop, upsite[prop]);
+					for(prop in update_props)
+						if(items[0].hasOwnProperty(prop) && prop!='id')
+							psites.setValue(items[0], prop, update_props[prop].toString());
 				},
 				onError: function(error,request) {
 					console.log('ERROR: '+error);
 				}
 			});
-			//##UPDATE STORE ARRAY
-			//site_data[this.siteIdx] = this.site;
 		};
+		//UPDATE LOCAL SITE
+		this.site = this.getSite();
 		this.siteUpdate();
     //###SCROLL TO TOP
     //window.scrollTo(0,0);
