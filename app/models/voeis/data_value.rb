@@ -61,12 +61,12 @@ class Voeis::DataValue
       time_col = Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "Time").column_number
     end
     if !Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "VerticalOffset").nil?
-      vertical_offset_col = Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "Vertical-Offset").column_number
+      vertical_offset_col = Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "VerticalOffset").column_number
     else
       vertical_offset_col = ""
     end
      if !Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "EndingVerticalOffset").nil?
-        end_vertical_offset_col = Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "Vertical-Offset").column_number
+        end_vertical_offset_col = Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "EndingVerticalOffset").column_number
       else
         end_vertical_offset_col = ""
       end
@@ -87,7 +87,7 @@ class Voeis::DataValue
         sample_id = col.column_number
       end
       sensor_col_array[col.column_number] = [col.sensor_types.first, col.unit, col.name]
-      if col.name != "ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "Vertical-Offset"
+      if col.name != "ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "VerticalOffset"
         sensor_cols << col.column_number
       end
     end
