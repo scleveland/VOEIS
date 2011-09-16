@@ -24,12 +24,13 @@ class Voeis::DataValue
   
   has 1, :site,       :model => "Voeis::Site",     :through => Resource
   has 1,:source,       :model => "Voeis::Source",       :through => Resource
-
+   
   has 1, :sample,     :model => "Voeis::Sample",   :through => Resource
   has n, :meta_tags,  :model => "Voeis::MetaTag",  :through => Resource
   has 1, :variable,   :model => "Voeis::Variable", :through => Resource
   has n, :data_streams,  :model => "Voeis::DataStream", :through => Resource
   has 1, :sensor_type,  :model => "Voeis::SensorType", :through => Resource
+  has n, :data_sets,  :model =>"Voeis::DataSet", :through => Resource
   #has n, :method,     :model => "Voeis::Method", :through => Resource
   
   
@@ -60,12 +61,12 @@ class Voeis::DataValue
       time_col = Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "Time").column_number
     end
     if !Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "VerticalOffset").nil?
-      vertical_offset_col = Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "Vertical-Offset").column_number
+      vertical_offset_col = Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "VerticalOffset").column_number
     else
       vertical_offset_col = ""
     end
      if !Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "EndingVerticalOffset").nil?
-        end_vertical_offset_col = Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "Vertical-Offset").column_number
+        end_vertical_offset_col = Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "EndingVerticalOffset").column_number
       else
         end_vertical_offset_col = ""
       end
@@ -86,7 +87,7 @@ class Voeis::DataValue
         sample_id = col.column_number
       end
       sensor_col_array[col.column_number] = [col.sensor_types.first, col.unit, col.name]
-      if col.name != "ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "Vertical-Offset"
+      if col.name != "ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "VerticalOffset"
         sensor_cols << col.column_number
       end
     end
@@ -97,8 +98,19 @@ class Voeis::DataValue
       starting_id = Voeis::DataValue.last(:order =>[:id.asc]).id
     end
     rows_parsed = 0
-    header_row=""
-    CSV.foreach(csv_file) do |row|
+    header_row=""  
+    source_id = Voeis::DataStream.get(data_stream_template_id).source.id
+    dst_time = 0
+    dst = false
+    if Voeis::DataStream.get(data_stream_template_id).DST
+       dst_time = 1
+       dst = true
+    end
+    user_id = User.current.id
+    create_comment = "Created at #{created_at} by #{User.current.first_name} #{User.current.last_name} [#{User.current.login}]"
+    rows = CSV.read(csv_file)
+    #CSV.foreach(csv_file) do |row|
+    rows.each do |row|
       if rows_parsed > start_line-1
       #   (1..start_line-1).each do
       #     header_row = csv.readline
@@ -108,7 +120,7 @@ class Voeis::DataValue
         if !row.empty?        
         Rails.logger.info '#{row.join(', ')}'
         #puts row.join(', ')
-          parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols)
+          parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id, create_comment)
         else 
           #puts "EMPTY ROW"
         end
@@ -144,7 +156,7 @@ class Voeis::DataValue
   # @author Yogo Team
   #
   # @api public
-  def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array,sensor_cols)
+  def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id, create_comment)
     require 'chronic'  #for robust timestamp parsing
     name = 2
     variable = 0
@@ -155,15 +167,6 @@ class Voeis::DataValue
     vertical_offset = vertical_offset_col == "" ? 0.0 : row[vertical_offset_col.to_i].to_f
   end_vertical_offset = end_vertical_offset_col == "" ? 0.0 : row[end_vertical_offset_col.to_i].to_f
     data_stream = Voeis::DataStream.get(data_stream_id)
-    source = data_stream.source
-    dst_time = 0
-    dst = false
-    if data_stream.DST
-       dst_time = 1
-       dst = true
-    end
-    user_id = User.current.id
-    create_comment = "Created at #{created_at} by #{User.current.first_name} #{User.current.last_name} [#{User.current.login}]"
     sample_datetime = Chronic.parse(row[data_timestamp_col]).to_datetime
     timestamp = DateTime.civil(sample_datetime.year,sample_datetime.month,
                    sample_datetime.day,sample_datetime.hour,sample_datetime.min,
@@ -178,7 +181,7 @@ class Voeis::DataValue
                 cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
 
                 row_values << "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id} )"
-                puts "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id} )"
+                #puts "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id} )"
               end #end if
           end #end loop
           if !row_values.empty?
@@ -186,26 +189,50 @@ class Voeis::DataValue
             sql << row_values.join(',')
             sql << " RETURNING \"id\""
             result_ids = repository.adapter.select(sql)
+            variable_sql = Array.new
+            site_sql = Array.new
+            data_stream_sql = Array.new
+            source_sql = Array.new
+            (0..result_ids.length-1).each do |i|
+              variable_sql << "(#{result_ids[i]},#{data_col_array[variable_cols[i]][variable].id})"
+              site_sql << "(#{result_ids[i]},#{site_id})"
+              data_stream_sql <<  "(#{result_ids[i]},#{data_stream_id})"
+              source_sql << "(#{result_ids[i]},#{source_id})"
+            end
             sql = "INSERT INTO \"voeis_data_value_variables\" (\"data_value_id\",\"variable_id\") VALUES "
-            sql << (0..result_ids.length-1).collect{|i|
-              "(#{result_ids[i]},#{data_col_array[variable_cols[i]][variable].id})"
-            }.join(',')
+            sql << variable_sql.join(',')
             repository.adapter.execute(sql)
             sql = "INSERT INTO \"voeis_data_value_sites\" (\"data_value_id\",\"site_id\") VALUES "
-            sql << (0..result_ids.length-1).collect{|i|
-              "(#{result_ids[i]},#{site_id})"
-            }.join(',')
+            sql << site_sql.join(',')
             repository.adapter.execute(sql)
             sql = "INSERT INTO \"voeis_data_stream_data_values\" (\"data_value_id\",\"data_stream_id\") VALUES "
-            sql << (0..result_ids.length-1).collect{|i|
-              "(#{result_ids[i]},#{data_stream_id})"
-            }.join(',')
+            sql << data_stream_sql.join(',')
             repository.adapter.execute(sql)
             sql = "INSERT INTO \"voeis_data_value_sources\" (\"data_value_id\",\"source_id\") VALUES "
-            sql << (0..result_ids.length-1).collect{|i|
-              "(#{result_ids[i]},#{source.id})"
-            }.join(',')
+            sql << source_sql.join(',')
             repository.adapter.execute(sql)
+            
+            
+            # sql = "INSERT INTO \"voeis_data_value_variables\" (\"data_value_id\",\"variable_id\") VALUES "
+            # sql << (0..result_ids.length-1).collect{|i|
+            #   "(#{result_ids[i]},#{data_col_array[variable_cols[i]][variable].id})"
+            # }.join(',')
+            # repository.adapter.execute(sql)
+            # sql = "INSERT INTO \"voeis_data_value_sites\" (\"data_value_id\",\"site_id\") VALUES "
+            # sql << (0..result_ids.length-1).collect{|i|
+            #   "(#{result_ids[i]},#{site_id})"
+            # }.join(',')
+            # repository.adapter.execute(sql)
+            # sql = "INSERT INTO \"voeis_data_stream_data_values\" (\"data_value_id\",\"data_stream_id\") VALUES "
+            # sql << (0..result_ids.length-1).collect{|i|
+            #   "(#{result_ids[i]},#{data_stream_id})"
+            # }.join(',')
+            # repository.adapter.execute(sql)
+            # sql = "INSERT INTO \"voeis_data_value_sources\" (\"data_value_id\",\"source_id\") VALUES "
+            # sql << (0..result_ids.length-1).collect{|i|
+            #   "(#{result_ids[i]},#{source_id})"
+            # }.join(',')
+            # repository.adapter.execute(sql)
             
             if sample_id != -1
               sample_value=[]

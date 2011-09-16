@@ -47,6 +47,7 @@ Yogo::Application.routes.draw do
 
       resources :variables
       resources :meta_tags
+      resources :data_sets
       resources :spatial_offsets
       resources :labs
       resources :units
