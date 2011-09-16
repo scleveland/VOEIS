@@ -39,7 +39,7 @@
   -#    -if !current_user.nil? && current_user.projects.include?(@project)
   -#      = link_to("Edit Site", edit_project_site_path(@project,resource.id), :dojoType => "yogo.ui.MenuLink")
     
-%h2
+%h3
   #{@site.name}
 
 -#-if !current_user.nil? && current_user.projects.include?(@project)
@@ -57,12 +57,13 @@
   %br
   %table{:id => "property-table", :style=>'width:80%;float:left;'}
     - @site_properties.each do |prop|
-      %tr{:class=>"row#{cycle('1','0')}"}
+      %tr{:class=>"row#{cycle('1','0')}", :style=>"width:40%"}
+        %td{:style=>"text-align:right;"}
+          %strong
+            #{prop[:label]}
+            &nbsp;&nbsp;&nbsp;
         %td
-          %b
-            #{prop.capitalize}
-        %td
-          #{@site[prop]}
+          #{@site_ref[prop[:name].to_sym]}
 
   %br{:style=>'float:none; clear:both;'}
   %br
@@ -89,9 +90,9 @@
     - else
       - @site.variables.each do |var|
         - var_stats = @site_variable_stats.first(:variable_id=>var.id)
-        %tr
+        %tr{:class=>"row-lt#{cycle('1','0')}"}
           %td
-            %b
+            %strong
               -#= link_to(var.variable_name, project_variable_path(@project,var.id)) 
               = link_to(var.variable_name, "javascript:", :onclick=>"dojo.publish('voeis/project/variable/tab', ['#{@project.id}',#{var.id},'#{var.variable_name}',#{@site.id}]);")
           - if !var_stats.nil?
@@ -127,10 +128,10 @@
           %tr
             - @label_array.each do |label|
               %th
-                %b
+                %strong
                   = label
           - @site.samples.each do |samp|
-            %tr{:class=>"row#{cycle('1','0')}"}
+            %tr{:class=>"row-#{cycle('gr','')}"}
               - @field_array.each do |field|
                 %td
                   = samp[field].to_s

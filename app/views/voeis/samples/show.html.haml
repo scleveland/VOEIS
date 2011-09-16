@@ -1,9 +1,3 @@
-:css
-  .row-lt1 { background-color:#ddd; }
-  .row-gr { background-color: #97D8AB }
-  
-  .smfont, .smfont * { font-size:10px }
-
 = javascript_include_tag("jquery.flot.js")
 - content_for(:javascripts) do
   :javascript
@@ -53,47 +47,44 @@
 -#%br
 
 #samp-container
-  %h2{:style=>"margin-top:0;"}
+  %h3{:style=>"margin-top:0;"}
     -if !@sample.nil?
       -if !@site.nil? 
-        #{@site.name}
-        %br
-        &nbsp;&nbsp;&nbsp;
-        Sample: #{@sample.lab_sample_code}
+        #{@site.name}: 
+        [Sample: #{@sample.lab_sample_code}]
       -else
         #{@sample.lab_sample_code}
     -else
       UNKNOWN
 
-  -#EDIT VARIABLE BUTTON
-  -#= link_to('Edit', edit_project_variable_path(@project,@variable.id), :class=>'icon icon-edit')
-  -#&nbsp;&nbsp;&nbsp;
-  -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
-  -#= link_to('Cancel', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
+  %strong
+    SHOW SAMPLE DETAILS
+  %br
+  %br
 
-  -#placeholder{:style=>"width:300px;height:150px;"}
-  -#%br
-  
   #samp_properties
 
     %table{:id => "property-table", :style=>'width:400px;float:left;margin:0 25px 25px 0;'}
+      -#%tr{:class=>"row#{cycle('1','0')}"}
+      -#  %td{:style=>"text-align:right;"}
+      -#    %strong
+      -#      Project
+      -#      &nbsp;&nbsp;&nbsp;
+      -#  %td
+      -#    #{@project.name}
       %tr{:class=>"row#{cycle('1','0')}"}
-        %td
-          %strong
-            Project
-        %td
-          #{@project.name}
-      %tr{:class=>"row#{cycle('1','0')}"}
-        %td
+        %td{:style=>"text-align:right;"}
           %strong
             Site
+            &nbsp;&nbsp;&nbsp;
         %td
-          #{'['+@site.id.to_s+'] '+@site.site_name}
+          #{'%s [Id:%s]'%[@site.site_name,@site.id]}
       - @sample_properties.each do |prop|
         %tr{:class=>"row#{cycle('1','0')}"}
-          %td
+          %td{:style=>"text-align:right;"}
             %strong
-              #{prop[:label].to_s.capitalize}
+              #{prop[:label]}
+              &nbsp;&nbsp;&nbsp;
           %td
             #{@sample.nil? ? '-NONE-' : @sample[prop[:name]]}
 

@@ -38,16 +38,46 @@ class Voeis::SitesController < Voeis::BaseController
     @site_variable_stats = parent.managed_repository{Voeis::SiteDataCatalog.all(:site_id=>@site.id)}
     # debugger
     @versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
+    @site_ref = {}
+    Voeis::Site.properties.each{|prop| @site_ref[prop.name] = @site[prop.name]}
+    @site_ref[:lat_long_datum] = @site.lat_long_datum.nil? ? '-' : @site.lat_long_datum.srs_name
+    @site_ref[:vertical_datum] = @site.vertical_datum.nil? ? '-' : @site.vertical_datum.term
+    @site_ref[:local_projection] = @site.local_projection.nil? ? '-' : @site.local_projection.srs_name
 
-    @site_properties = @site.properties.map{ |prop| 
-      prop = prop.name.to_s
-      #if prop.name.to_s[-3..-1]=='_id'
-      #  prop.name.to_s[0..-4]
-      #  #@site_ref_props << prop
-      #else
-      #  prop.name.to_s
-      #end
-    }
+    #@site_properties = @site.properties.map{ |prop| 
+    #  prop = prop.name.to_s
+    #  #if prop.name.to_s[-3..-1]=='_id'
+    #  #  prop.name.to_s[0..-4]
+    #  #  #@site_ref_props << prop
+    #  #else
+    #  #  prop.name.to_s
+    #  #end
+    #}
+    @site_properties = [
+      {:label=>"Site ID", :name=>"id"},
+      {:label=>"Name", :name=>"name"},
+      {:label=>"Code", :name=>"code"},
+      {:label=>"Latitude", :name=>"latitude"},
+      {:label=>"Longitude", :name=>"longitude"},
+      {:label=>"Lat/Long Datum", :name=>"lat_long_datum"},
+      {:label=>"Elevation", :name=>"elevation_m"},
+      {:label=>"Local X", :name=>"local_x"},
+      {:label=>"Local Y", :name=>"local_y"},
+      {:label=>"Local Projection", :name=>"local_projection"},
+      {:label=>"Vertical Datum", :name=>"vertical_datum"},
+      {:label=>"Position Accuracy", :name=>"pos_accuracy_m"},
+      {:label=>"State", :name=>"state"},
+      {:label=>"County", :name=>"county"},
+      {:label=>"Description", :name=>"description"},
+      {:label=>"Comments", :name=>"comments"},
+      {:label=>"HIS ID", :name=>"his_id"},
+      {:label=>"Time Zone Offset", :name=>"time_zone_offset"},
+      {:label=>"Updated", :name=>"updated_at"},
+      {:label=>"Updated By", :name=>"updated_by"},
+      {:label=>"Update Comment", :name=>"updated_comment"},
+      {:label=>"Provenance Comment", :name=>"provenance_comment"},
+      {:label=>"Created", :name=>"created_at"}
+      ]
     #@site_properties << 'vertical_datum'
     #@site_properties << 'local_projection'
 
@@ -65,8 +95,56 @@ class Voeis::SitesController < Voeis::BaseController
   end
   
   def versions
+    @project = parent
     @site =  parent.managed_repository{Voeis::Site.get(params[:id])}
     @versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
+    @versions_ref = []
+    version_number = @versions.count
+    @versions.each{|ver|
+      temp = {}
+      @versions.properties.each{|prop| temp[prop.name] = ver[prop.name]}
+      temp[:lat_long_datum] = '-'
+      temp[:vertical_datum] = '-'
+      temp[:local_projection] = '-'
+      if !Voeis::SpatialReference.get(ver.lat_long_datum_id).nil?
+        temp[:lat_long_datum] = Voeis::SpatialReference.get(ver.lat_long_datum_id).srs_name
+      end
+      if !Voeis::VerticalDatumCV.get(ver.vertical_datum_id).nil?
+        temp[:vertical_datum] = Voeis::VerticalDatumCV.get(ver.vertical_datum_id).term
+      end
+      if !Voeis::SpatialReference.get(ver.local_projection_id).nil?
+        temp[:local_projection] = Voeis::SpatialReference.get(ver.local_projection_id).srs_name
+      end
+      temp[:version] = version_number
+      temp[:version_id] = '%s-site%s-ver%03d'%[@project.id,@site.id,version_number]
+      temp[:version_ts] = ver.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+      version_number-=1
+      @versions_ref << temp
+    }
+    @ver_properties = [
+#      {:label=>"Version", :name=>"version"},
+#      {:label=>"Site ID", :name=>"id"},
+      {:label=>"Name", :name=>"name"},
+      {:label=>"Code", :name=>"code"},
+      {:label=>"Latitude", :name=>"latitude"},
+      {:label=>"Longitude", :name=>"longitude"},
+      {:label=>"Lat/Long Datum", :name=>"lat_long_datum"},
+      {:label=>"Elevation", :name=>"elevation_m"},
+      {:label=>"Local X", :name=>"local_x"},
+      {:label=>"Local Y", :name=>"local_y"},
+      {:label=>"Local Projection", :name=>"local_projection"},
+      {:label=>"Vertical Datum", :name=>"vertical_datum"},
+      {:label=>"Position Accuracy", :name=>"pos_accuracy_m"},
+      {:label=>"State", :name=>"state"},
+      {:label=>"County", :name=>"county"},
+      {:label=>"Description", :name=>"description"},
+      {:label=>"Comments", :name=>"comments"},
+      {:label=>"HIS ID", :name=>"his_id"},
+      {:label=>"Update Comment", :name=>"updated_comment"},
+      {:label=>"Provenance Comment", :name=>"provenance_comment"}
+      ]
+    ###
+    
   end
   
   def edit

@@ -25,26 +25,38 @@ class Voeis::VariablesController < Voeis::BaseController
         @data = @variable.last_ten_values(@site)
       end
     }
+    @variable_ref = {}
+    Voeis::Variable.properties.each{|prop| @variable_ref[prop.name] = @variable[prop.name]}
+    #@units = Voeis::Unit.get(@variable.variable_units_id)
+    #@tunits = Voeis::Unit.get(@variable.time_units_id)
+    @units = @variable.variable_units
+    sunits = @variable.spatial_units
+    @variable_ref[:variable_units] = '%s (%s)'%[@units[:units_abbreviation],@units[:units_type]]
+    @variable_ref[:time_units] = @variable.time_units[:units_name]
+    @variable_ref[:lab_method] = @variable.lab_method.nil? ? 'NA' : @variable.lab_method.lab_method_name
+    @variable_ref[:lab] = @variable.lab.nil? ? 'NA' : '%s (%s)'%[@variable.lab.lab_name,@variable.lab.lab_organization]
+    @variable_ref[:field_method] = @variable.field_method.nil? ? 'NA' : @variable.field_method.method_name
+    @variable_ref[:spatial_units] = sunits.nil? ? 'NA' : '%s (%s)'%[sunits[:units_abbreviation],sunits[:units_type]]
     @variable_properties = [
       {:label=>"Variable ID", :name=>"id"},
       {:label=>"Name", :name=>"variable_name"},
       {:label=>"Code", :name=>"variable_code"},
       {:label=>"Speciation", :name=>"speciation"},
-      {:label=>"Units", :name=>"variable_units_id"},
+      {:label=>"Units", :name=>"variable_units"},
       {:label=>"Medium", :name=>"sample_medium"},
       {:label=>"Value Type", :name=>"value_type"},
       {:label=>"Quality Control", :name=>"quality_control"},
       {:label=>"Regular?", :name=>"is_regular"},
       {:label=>"Time Support", :name=>"time_support"},
-      {:label=>"Time Units", :name=>"time_units_id"},
+      {:label=>"Time Units", :name=>"time_units"},
       {:label=>"Data Type", :name=>"data_type"},
       {:label=>"General Category", :name=>"general_category"},
       {:label=>"Null Value", :name=>"no_data_value"},
       {:label=>"Detection Limit", :name=>"detection_limit"},
-      {:label=>"Lab Method", :name=>"lab_method_id"},
-      {:label=>"Lab", :name=>"lab_id"},
-      {:label=>"Field Method", :name=>"field_method_id"},
-      {:label=>"Spatial Units", :name=>"spatial_units_id"},
+      {:label=>"Lab Method", :name=>"lab_method"},
+      {:label=>"Lab", :name=>"lab"},
+      {:label=>"Field Method", :name=>"field_method"},
+      {:label=>"Spatial Units", :name=>"spatial_units"},
       {:label=>"Spatial Offset Type", :name=>"spatial_offset_type"},
       {:label=>"Spatial Offset Value", :name=>"spatial_offset_value"},
       {:label=>"Logger Type", :name=>"logger_type"},
@@ -58,7 +70,6 @@ class Voeis::VariablesController < Voeis::BaseController
       {:label=>"Created", :name=>"created_at"}
       ]
     
-    @units = Voeis::Unit.get(@variable.variable_units_id)
     logger.debug('>>>> graph_data = '+@graph_data.to_s)
     logger.debug('>>>> data = '+@data.to_s)
     #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
