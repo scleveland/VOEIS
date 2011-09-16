@@ -108,8 +108,9 @@ class Voeis::DataValue
     end
     user_id = User.current.id
     create_comment = "Created at #{created_at} by #{User.current.first_name} #{User.current.last_name} [#{User.current.login}]"
-    
-    CSV.foreach(csv_file) do |row|
+    rows = CSV.read(csv_file)
+    #CSV.foreach(csv_file) do |row|
+    rows.each do |row|
       if rows_parsed > start_line-1
       #   (1..start_line-1).each do
       #     header_row = csv.readline
