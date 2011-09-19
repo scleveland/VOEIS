@@ -515,12 +515,16 @@
 
     var openVarTab = function(tabs, projectId, varId, varName, siteId) {
       //var varPane = new voeis.ui.VariablePane();
-      var projVarId = '#{@project.id}-var'+varId;
+      var projVarId = '#{@project.id}-site'+siteId+'-var'+varId;
       var projVarHref = "/projects/#{@project.id}/variables/"+varId+".html?&site_id="+siteId;
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
+      var saveStrip = tabs.tabStrip;
+      console.log('TABSTRIP:',tabs.tabStrip);
+      tabs.tabStrip = false;
       var projVarLoad = function(varId,varName) {
         graphInit(varId,varName);
+        
       };
       openProjTab(tabs, projVarHref, projVarId, varName, projVarLoad);
       //##
@@ -538,6 +542,19 @@
       //##
     };
 
+    var openHistoryTab = function(tabs, projectId, siteId) {
+      //var varPane = new voeis.ui.VariablePane();
+      var projHistHref = "/projects/#{@project.id}/sites/versions?id="+siteId;
+      var projHistId = '#{@project.id}-site'+siteId+'-history';
+      var projHistName = 'History: Site-'+siteId;
+      //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
+      //projectSitePath(this.projectId, this.siteId)
+      var projHistLoad = function(siteId,varName) {
+      };
+      openProjTab(tabs, projHistHref, projHistId, projHistName, projHistLoad);
+      //##
+    };
+
     var openProjTab = function(tabs, tabHref, tabId, tabTitle, tabLoad) {
       //###SCROLL TO TOP
       //window.scrollTo(0,0);
@@ -551,6 +568,7 @@
         tabPane = new dojox.layout.ContentPane({
           id: tabId,
           title: tabTitle,
+          style: "margine-top:0;padding-top:0;",
           closable: true,
         	executeScripts: true,
       	  ioArgs: { headers: {"Accept": "text/html"} },
@@ -621,6 +639,7 @@
       };
     });
 
+  /* ***
     dojo.subscribe("voeis/project/siteTables/refresh", function() {
       console.log('REFRESH TABLES');
       var tabs = dijit.byId('tab_browser');
@@ -651,6 +670,7 @@
       var table1 = dijit.byId('SiteDisplayGrid');
       
     });
+  *** */
 
     dojo.subscribe("voeis/project/site/new", function() {
       console.log('NEW SITE');
@@ -692,6 +712,13 @@
       var projectId = "#{@project.id}";
       var tabs = dijit.byId('tab_browser');
       openVarTab(tabs, projectId, varId, varName, siteId);
+    });
+
+    dojo.subscribe("voeis/project/site/history", function(siteId) {
+      console.log('SITE HISTORY',arguments);
+      var projectId = "#{@project.id}";
+      var tabs = dijit.byId('tab_browser');
+      openHistoryTab(tabs, projectId, siteId);
     });
 
     dojo.subscribe("voeis/project/browse", function(projectId) {

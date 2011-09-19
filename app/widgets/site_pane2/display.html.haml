@@ -11,13 +11,6 @@
   #site00-sample-table td { text-align:center; }
   #site00-sample-table td.time0 { text-align:left; }
 
-  .row-lt1 { background-color:#ddd; }
-  .row-gr { background-color: #6AA128; }
-  .row-gr { background-color: #97C253; }
-  .row-gr { background-color: #97D8AB; }
-  .row-gr th { background-color: #97D8AB!important; }
-  .row-gr td { background-color: #97D8AB!important; }
-
   #form-table { width:600px; }
   #form-table td { width:50%; }
   .form_element { width:20em; }
@@ -28,6 +21,15 @@
   .new_voeis_site input { width:18em; }
   .new_voeis_site textarea { width:45em; }
   .new_voeis_site select { width:21em; }
+
+-#
+  .row-lt1 { background-color:#ddd; }
+  .row-gr { background-color: #6AA128; }
+  .row-gr { background-color: #97C253; }
+  .row-gr { background-color: #97D8AB; }
+  .row-gr th { background-color: #97D8AB!important; }
+  .row-gr td { background-color: #97D8AB!important; }
+  .smfont, .smfont * { font-size:10px }
 
 
 - content_for(:javascripts) do
@@ -54,7 +56,7 @@
 -#= render(:partial => "../views/voeis/sites/new_local_projection")
 
 
-%h2{:id=>"site00-name-head", :style=>"margin-top:0;"}
+%h3{:id=>"site00-name-head", :style=>"margin:0 0 16px 0;padding:0;"}
   $$$site-name$$$
 
 -#-if !current_user.nil? && current_user.projects.include?(@project)
@@ -62,32 +64,44 @@
 -#  &nbsp;&nbsp;&nbsp;
 -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
 -#%br
--#%br
 
 #show-site00{:style=>"margin-top:0;padding-top:0;"}
-  %table
-    %tr
-      %td{:style=>"width:200px;"}
-        %b SHOW DETAILS
-      %td
-        -#= link_to('CANCEL', project_path(@project), :class => 'icon icon-cancel') 
-        -#= link_to('CANCEL', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
-        -#-if !@current_user.nil? && @current_user.projects.include?(@project)
-        -if @auth
-          &nbsp;&nbsp;&nbsp;
-          -#= link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"init_site_form($$$id$$$);$('#show-site00').hide();$('#edit-site00').show();")
-          = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show-site00').hide();$('#edit-site00').show();")
-          -#%br
-          -#&nbsp;&nbsp;&nbsp;
-          -#= link_to('TEST', 'javascript:', :class=>'icon icon-edit', :onclick=>"alert('EDIT>>> '+site_pane2.editMode);") 
+  %strong SHOW SITE DETAILS
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -if @auth
+    = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show-site00').hide();$('#edit-site00').show();")
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+  %br
+  
+  -#%table{:style=>"width:90%;"}
+  -#  %tr
+  -#    %td{:style=>"width:160px!important;"}
+  -#      %strong SHOW SITE DETAILS
+  -#    -if @auth
+  -#      %td{:style=>"width:100px!important;"}
+  -#        -#= link_to('CANCEL', project_path(@project), :class => 'icon icon-cancel') 
+  -#        -#= link_to('CANCEL', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
+  -#        -#-if !@current_user.nil? && @current_user.projects.include?(@project)
+  -#        &nbsp;&nbsp;&nbsp;
+  -#        -#= link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"init_site_form($$$id$$$);$('#show-site00').hide();$('#edit-site00').show();")
+  -#        = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show-site00').hide();$('#edit-site00').show();")
+  -#        -#%br
+  -#        -#&nbsp;&nbsp;&nbsp;
+  -#        -#= link_to('TEST', 'javascript:', :class=>'icon icon-edit', :onclick=>"alert('EDIT>>> '+site_pane2.editMode);") 
+  -#      %td{:style=>"width:100px!important;"}
+  -#        = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+  
   %br
 
   %table{:id=>"site00-property-table", :style=>"width:46%;margin-right:20px;margin-bottom:30px;float:left;"}
     - @site_properties.each do |prop|
       %tr{:class=>"row#{cycle('1','0')}"}
-        %td
-          %b
+        %td{:style=>"text-align:right;width:45%"}
+          %strong
             #{prop[:label]}
+            &nbsp;&nbsp;&nbsp;
         %td{:class=>"show_#{prop[:name]}"}
           $$$#{prop[:name]}$$$
 
@@ -123,7 +137,7 @@
       %tr{:class=>"row-gr"}
         - @sample_properties.each do |prop|
           %th{:style=>"width:20%;align:center;"}
-            %b
+            %strong
               = prop[:label]
       %tr
         %td{:style=>"width:23%;align:center;"}
@@ -341,12 +355,19 @@
     -#    -#%button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"dijit.byNode(dojo.byId('site00')).dialog.hide();"} Cancel
     -#    %button{:onClick=>"site00ref.dialog.hide();return false;", :value=>"Cancel"} Cancel
 
-    %table{:id=>"site00-edit-control"}
-      %tr
-        %td{:style=>"width:200px;"}
-          %b EDITING
-        %td
-          = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit-site00').hide();$('#show-site00').show();") 
+    -#%table{:id=>"site00-edit-control"}
+    -#  %tr
+    -#    %td{:style=>"width:200px;"}
+    -#      %strong EDIT SITE
+    -#    %td
+    -#      = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit-site00').hide();$('#show-site00').show();") 
+    -#%br
+
+    %strong EDIT SITE
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit-site00').hide();$('#show-site00').show();") 
     %br
 
 
@@ -366,8 +387,8 @@
       var opt = fld.options[fld.selectedIndex];
       var ddez = {
       element:fld,
-      value:fld.value,
-      ivalue:parseInt(fld.value),
+      value:function(){ return fld.value },
+      ivalue:function(){ return parseInt(fld.value) },
       xvalue:function(){return parseInt(fld.options[fld.selectedIndex].value)},
       text:function(){return fld.options[fld.selectedIndex].text}
       }
@@ -384,9 +405,10 @@
       pane.local.lat_long_datum_dd = drop_down(form0,'site_lat_long_datum',site.lat_long_datum_id).dd;
       pane.local.local_projection_dd = drop_down(form0,'site_local_projection',site.local_projection_id).dd;
       pane.local.vertical_datum_dd = drop_down(form0,'site_vertical_datum',site.vertical_datum_id).dd;
-      console.log('LatLongDatum ID:',site.lat_long_datum_id);
-      console.log('VerticalDatum ID:',site.vertical_datum_id);
-      console.log('LocalProjection ID:',site.local_projection_id);
+      console.log('>>>PANE_UPDATE: SITE:',site);
+      console.log('LatLongDatum ID:',pane.local.lat_long_datum_dd.value,pane.local.lat_long_datum_dd.text());
+      console.log('VerticalDatum ID:',pane.local.vertical_datum_dd.value,pane.local.vertical_datum_dd.text());
+      console.log('LocalProjection ID:',pane.local.local_projection_dd.value,pane.local.local_projection_dd.text());
       }
       
       function cancel_site_form(siteId) {
@@ -404,55 +426,6 @@
       //NEW SITE
       dojo.publish('voeis/project/site/close',[0]);
       };
-
-      function submit_site_dialog(siteId,fn) {
-      var siteTag = 'site'+siteId
-      var pane = dijit.byNode(dojo.byId(siteTag));
-      var form0 = siteTag+'-edit-form';
-      var form = dojo.byId(form0);
-      console.log('create = ',fn);
-      data = {};
-      data[fn+'_c_v'] = {term: $("#site"+siteId+"_"+fn+"_term").val(), definition: $("#site"+siteId+"_"+fn+"_definition").val()};
-      $.post("/"+fn+"_c_vs.json", data, function(dat) {
-      //$.post("#{@root_url}/"+fn+"_c_vs.json", data, function(dat) {
-      //save//$('#site00_vertical_datum').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val() + ':' + $("#site00_vertical_datum_definition").val()));
-      $('#site'+siteId+'_'+fn).append($("<option></option>").attr("value",dat['id']).text($('#site'+siteId+'_'+fn+'_term').val()));
-      $('#site'+siteId+'_'+fn).val(dat['id']);
-      });
-      //test//$('#site'+siteId+'_'+fn).append($("<option></option>").attr("value",'10').text($('#site'+siteId+'_'+fn+'_term').val()));
-      //test//$('#site'+siteId+'_'+fn).val('10');
-      };
-      
-      function xxxinit_site_form(siteId) { setTimeout(function() {
-      var SRfrom = '';
-      var siteTag = 'site'+siteId;
-      var form0 = siteTag+'-edit-form';
-      var form = dijit.byId(form0);
-      console.log('INIT-FORM:',form0,form);
-      form0 = form.domNode;
-      var pane = dijit.byNode(dojo.byId(siteTag));
-      var site = pane.site;
-      //console.log('INIT:',form0);
-      var lat_long_datum_dd = drop_down(form0,'site_lat_long_datum',site.lat_long_datum_id).element;
-      var local_projection_dd = drop_down(form0,'site_local_projection',site.local_projection_id).element;
-      var vertical_datum_dd = drop_down(form0,'site_vertical_datum',site.vertical_datum_id).element;
-      console.log('VerticalDatum ID:',site.vertical_datum_id);
-      console.log('LocalProjection ID:',site.local_projection_id);
-      //var submit_button = dijit.byId('site00_voeis_site_submit');
-      //var submit_button = dijit.byNode(form0.elements['commit']);
-      var submit_button = dijit.byId('site'+siteId+'_voeis_site_submit');
-      // set initial state: submit button
-      if(!pane.newSite) submit_button.attr("disabled", !form.validate());
-      //submit_button.attr("disabled", !this.isValid());
-      form0.elements['site_name'].focus();
-      
-      //IS FORM VALID?
-      console.log('FORM-CONNECT:',siteId,form);
-      form.connect(form, "onValidStateChange", function(state){
-      console.log('formStateChange:',state);
-      submit_button.attr("disabled", !state);
-      });
-      }, 200)};
       
       
 
@@ -466,11 +439,6 @@
     
     -#%form(accept-charset="UTF-8" action="/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/sites/$$$id$$$" class="new_voeis_site" data-remote="true" id="site00-edit-form" method="put")
     %form(accept-charset="UTF-8" class="new_voeis_site" data-remote="true" id="site00-edit-form" jsId="site00_edit_form" dojoType="dijit.form.Form")
-      %script{:type=>"dojo/method", :event=>"onKeyPress", :args=>"key"}
-        console.log('KEYPRESS:',key);
-        //var submit_button = dijit.byId('site00_voeis_site_submit');
-        // set changed state
-        //submit_button.attr("disabled", !state);
       -#--%script{:type=>"dojo/method", :event=>"onValidStateChange", :args=>"state"}
       -#--var submit_button = dijit.byId('site00_voeis_site_submit');
       -#--// set changed state
@@ -640,7 +608,14 @@
             -#site00-comments(name="site_comments" dojoType="dijit.form.Textarea")
             %textarea( name="site_comments" id="site00_comments" rows="5")
               $$$comments$$$
-
+        %tr
+          %td{:colspan=>"2"}
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"site_provenance_comment"} Provenance Comment
+            %textarea( name="site_provenance_comment" id="site00_provenance_comment" rows="2")
+               
+        
         %tr
           %td{:colspan=>"2"}
             %br
@@ -662,6 +637,7 @@
                 //var pane = dijit.byNode(dojo.byId('site00'));
                 eval('var pane = site00ref');
                 var site = pane.site;
+                console.log('GO PANE_UPDATE:',pane);
                 //INITIALIZE PANE: drop-downs, etc...
                 pane_update(pane);
                 //INITIALIZE: submit button
@@ -702,10 +678,14 @@
                 county:form0.elements['site_county'].value, 
                 comments:form0.elements['site_comments'].value, 
                 description:form0.elements['site_description'].value,
-                lat_long_datum_id:pane.local.lat_long_datum_dd.value,
-                vertical_datum_id:pane.local.vertical_datum_dd.value,
-                local_projection_id:pane.local.local_projection_dd.value
+                provenance_comment:form0.elements['site_provenance_comment'].value, 
+                lat_long_datum_id:pane.local.lat_long_datum_dd.element.value,
+                vertical_datum_id:pane.local.vertical_datum_dd.element.value,
+                local_projection_id:pane.local.local_projection_dd.element.value
                 }};
+                console.log('LatLongDatum ID:',pane.local.lat_long_datum_dd.value,pane.local.lat_long_datum_dd.text());
+                console.log('VerticalDatum ID:',pane.local.vertical_datum_dd.value,pane.local.vertical_datum_dd.text());
+                console.log('LocalProjection ID:',pane.local.local_projection_dd.value,pane.local.local_projection_dd.text());
                 //lat_long_datum:lat_long_datum_dd.text, 
                 //vertical_datum:vertical_datum_dd.text,
                 //local_projection:local_projection_dd.text

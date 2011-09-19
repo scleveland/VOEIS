@@ -124,6 +124,7 @@ class ProjectsController < InheritedResources::Base
       {:label=>"Updated", :name=>"updated_at"},
       {:label=>"Updated By", :name=>"updated_by"},
       {:label=>"Update Comment", :name=>"updated_comment"},
+      {:label=>"Provenance Comment", :name=>"provenance_comment"},
       {:label=>"Created", :name=>"created_at"}
       ]
     
