@@ -1,9 +1,9 @@
 dojo.provide("acme.voeislayer");
 
-
+dojo.require("dojo.parser");
+dojo.require("dijit.dijit");
 dojo.require("dijit.Declaration");
 dojo.require("dijit.Dialog");
-dojo.require("dijit.dijit");
 dojo.require("dijit.Editor");
 dojo.require("dijit.form.Button");
 dojo.require("dijit.form.CheckBox");
@@ -33,7 +33,6 @@ dojo.require("dijit.TooltipDialog");
 dojo.require("dijit.Tree");
 dojo.require("dojo.data.ItemFileReadStore");
 dojo.require("dojo.data.ItemFileWriteStore");
-dojo.require("dojo.parser");
 dojo.require("dojo.store.Memory");
 dojo.require("dojox.form.CheckedMultiSelect");
 dojo.require("dojox.form.PasswordValidator");
