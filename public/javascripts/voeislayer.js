@@ -1,8 +1,8 @@
 dojo.provide("acme.voeislayer");
 
 
-dojo.require('dijit.Dialog');
 dojo.require("dijit.Declaration");
+dojo.require("dijit.Dialog");
 dojo.require("dijit.dijit");
 dojo.require("dijit.Editor");
 dojo.require("dijit.form.Button");
