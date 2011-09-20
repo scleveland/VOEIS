@@ -164,7 +164,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	},
 
 	setSite: function(site) {
-		if(parseInt(site)===site) {
+		if(parseInt(site)==site) {	//integer?
 			if(parseInt(site)!=0) {
 				var siteId = parseInt(site);
 				this.site = this.getSite(siteId);
@@ -242,7 +242,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		//console.log('TYPE-OF: '+(typeof siteId));
 		var site;
 		var id = siteId || this.site.id;
-		siteId = parseInt(id);
+		//siteId = parseInt(id);
+		siteId = ''+id;
 		console.log('GET-SITE: '+siteId);
 		psites.fetch({query: {id: siteId},
 			onItem: function(item) {
@@ -280,8 +281,10 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 				if(update_props.hasOwnProperty(prop)) 
 					newsite[prop] = update_props[prop].toString();
 				else
-					newsite[prop] = this.site[prop].toString();
+					if(this.site[prop]==null) newsite[prop] = null;
+					else newsite[prop] = this.site[prop].toString();
 			try {
+				console.log('>>>CREATE NEW:',newsite);
 				psites.newItem(newsite);
 			}
 			catch (e) { 
@@ -315,7 +318,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			});
 		};
 		//UPDATE LOCAL SITE
-		this.site = this.getSite();
+		this.site = this.getSite(update_props.id);
 		this.siteUpdate();
     //###SCROLL TO TOP
     //window.scrollTo(0,0);

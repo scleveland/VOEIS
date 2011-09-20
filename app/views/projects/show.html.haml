@@ -98,14 +98,18 @@
       //for(var i=0;i<site_data.length;i++) 
       //  if(site_data[i].id==siteId) 
       //    return site_data[i];
+      siteId = ''+siteId;
       console.log('GET-SITE-ID: '+siteId);
       var site = {};
       psites.fetch({query: {id: siteId},
         onItem: function(item) {
           //site = $.extend({},item);
           //site = item;
-          for(prop in item) 
-            site[prop] = item[prop].toString();
+          console.log('FETCH ITEM:',item);
+          for(prop in item) {
+            if(item[prop]==null) site[prop] = null;
+            else site[prop] = item[prop].toString();
+          };
         },
         onError: function(error,request) {
           console.log('ERROR: '+error);
@@ -131,6 +135,7 @@
     function pmap_new(siteId) {
       //ADD NEW MAP MARKER
       var item = get_site(siteId);
+      console.log('>>>NEW MARKER:',item);
       pmap_add_item(item);
     }
     
