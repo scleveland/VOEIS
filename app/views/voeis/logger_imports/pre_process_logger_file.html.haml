@@ -71,6 +71,11 @@ Form Progress:
           dijit.byId("next0").set("disabled", false);
           updateProgressBar();
           });
+        -if !@data_template.source.nil?
+          :javascript
+            $(document).ready(function() {
+              updateSource();
+            });
       -#selectedSite
       -#  Currenlty Selected Site:  
       -#  %span{:id => "selected_site", :class=>"var_spans"}None
