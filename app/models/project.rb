@@ -74,6 +74,7 @@ class Project
                           "voeis/lab_method$retrieve",
                           "voeis/sample$retrieve",
                           "voeis/sample_material$retrieve",
+                          "voeis/data_set$retrieve",
                           "voeis/site_data_catalog$retrieve",
                           #"voeis/site_data_catalog$update",
                           "voeis/apiv$retrieve",
@@ -178,7 +179,7 @@ class Project
   manage Voeis::SampleMaterial
   manage Voeis::DataValue
   manage Voeis::Apiv
-
+  manage Voeis::DataSet
   def sites
     managed_repository{ Voeis::Site.all }
   end
