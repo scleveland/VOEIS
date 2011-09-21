@@ -265,7 +265,7 @@ class Voeis::SamplesController < Voeis::BaseController
           row_hash[:value] = data_val.data_value
           @row_array << temp_array
           @grid_array << @row_hash.as_json
-          @graph_data << Array[d.local_date_time.to_datetime.to_i*1000, d.data_value]
+          @graph_data << Array[data_val.local_date_time.to_datetime.to_i*1000, data_value.data_value]
         end
       end #end if "ALL"
       if params[:export] == 1
