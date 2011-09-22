@@ -19,8 +19,7 @@ For: Variable(
 
 
 -if row_array.empty?
-  Sorry - there were no results for this search.
--else
+
   -form_tag("export") do 
     =hidden_field_tag('column_array', column_array.to_json)
     =hidden_field_tag('row_array', row_array.to_json)
@@ -41,15 +40,83 @@ For: Variable(
     dojo.require("dojo.data.ItemFileReadStore");
     dojo.require("dijit.layout.TabContainer");
     dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
-    var value_data = [
-    #{data_vals.map{|c| "        "+c.to_json}.join(",\n")}
-     ];
-    var data = #{graph_data.as_json};
-    var values_json = {
-    identifier: 'id',
-    label: 'name',
-    items: value_data };
+    dojo.require("dojox.grid.enhanced.plugins.Pagination");
+    dojo.require("dojox.charting.Chart2D");
+    dojo.require("dojox.charting.DataChart");
+    dojo.require("dojo.data.ItemFileWriteStore");
+    dojo.require("dojox.charting.StoreSeries");
+    dojo.require("dojox.charting.DataSeries");
+    dojo.require("dojo.store.Observable");
+    dojo.require("dojo.store.Memory");
+    dojo.require("dojox.charting.themes.Claro");
+
+    var value_data = #{data_vals.to_json};
+    //var data = #{graph_data.as_json};
+    var data = [#{data_vals.map{|c| Array[c.local_date_time.to_datetime.to_i*1000, c.data_value].to_json    }.join(",")}];
+    var values_json = {identifier: 'id', label: 'name', items: value_data };
     var value_store = new dojo.data.ItemFileReadStore({data: values_json});
+    
+    var val_store = new dojo.data.ItemFileReadStore({data: values_json});
+    var dvalue_store = dojo.store.Observable(new dojo.store.Memory({
+        data: {
+            identifier: "id",
+            label: "data values",
+            items: value_data
+        }
+    }));
+    //var chart1 = new dojox.charting.Chart2D("simplechart");
+    function trans1(store, item){
+      // let's create our object
+      var o = {
+        x: store.getValue(item, "local_date_time"),
+        y: store.getValue(item, "data_value")
+      };
+      return o;
+    }
+    //chart1.addPlot("default", {type: "Lines"});
+    //chart1.addAxis("x");
+    //chart1.addAxis("y", {vertical: true});
+    //var series = new dojox.charting.DataSeries(value_store, { query: {id:"*"}}, trans1);
+    //chart1.addSeries(value_data, {query: {id: "*"}}, trans1(value_data, ));
+    //chart1.addSeries("DataValues", new dojox.charting.StoreSeries(dvalue_store, { query: { id: "*" } }, "local_date_time", "data_value"));
+    //chart1.addSeries("Series 1", series);
+    //chart1.render();
+
+    //chart = new dojox.charting.DataChart("chartDiv" ,{type:dojox.charting.plot2d.Scatter,xaxis:{labelFunc:"seriesLabels"}});
+    //chart.setStore(value_store, {symbol:"*"}, "data_value");  //  <-- single value property
+    // set the layout structure:
+    var val_layout = [{
+       field: 'local_date_time',
+       name: 'Timestamp',
+       width: 'auto'
+    },
+    {
+       field: 'vertical_offset',
+       name: 'Vertical Offset',
+       width: 'auto'
+    },
+    {
+       field: 'data_value',
+       name: 'Value',
+       width: 'auto'
+    }];
+
+    // create a new grid:
+    var val_grid = new dojox.grid.EnhancedGrid({
+       store: val_store,
+       clientSort: true,
+       rowSelector: '20px',
+       structure: val_layout,
+       plugins: {filter:true, pagination:true
+       }
+    },
+    document.createElement('div'));
+
+    // append the new grid to the div "gridContainer":
+    dojo.byId("gridContainer").appendChild(val_grid.domNode);
+
+    // Call startup, in order to render the grid:
+    val_grid.startup();
     var plot =$.plot($("#placeholder"), [data],{
            series: {
                color : "blue",
@@ -63,6 +130,7 @@ For: Variable(
            pan:   { interactive: true },
            zoom:  { interactive: true }
     });
+    
 
     //Function ShowToolTip and previousPoint allow the hover function to display
      //a message for each data point on the graph when the cursor hoversover
@@ -85,6 +153,7 @@ For: Variable(
      //Most of this should remain the same
      //NOTE-- the time string for #x is in UTC format and currently is in GMT time
      var previousPoint = null;
+     
      $("#placeholder").bind("plothover", function (event, pos, item) {
          var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
          dDate = new Date();
@@ -111,6 +180,8 @@ For: Variable(
              previousPoint = null;            
          }
      });
+  -#simplechart{:style=>"width: 250px; height: 150px;"}
+  -#chartDiv{:style=>"width: 250px; height: 150px;"}
   #placeholder{:style=>"width:600px;height:300px;"}
   -#=render_widget :flot_graph, :display, :variable=>variable, :data => graph_data
   -##value_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pvalues", :data=>"values_json"}
@@ -120,17 +191,21 @@ For: Variable(
   -#%th{:field=>"local_date_time", :width=>"190px", :filterable=>true} Timestamp
   -#%th{:field=>"vertical_offset", :width=>"130px", :filterable=>true} Vertical Offset
   -#%th{:field=>"data_value", :width=>"100px", :filterable=>true} Value
-          
-  -i=0
-  %table
-    %tr
-      -column_array.each do |col|
-        %th
-          =col[0]
-    -row_array.each do |row|
-      -i=1-i
-      %tr{:class=>"row#{i}"}
-        -row.each do |col|
-          %td{:class =>"search-results"}
-            =col
-  
+  #gridContainer{:style=>"width:900px;height:300px;"}
+
+  -# -i=0
+  -# %table
+  -#   %tr
+  -#     -column_array.each do |col|
+  -#       %th
+  -#         =col[0]
+  -#   -row_array.each do |row|
+  -#     -i=1-i
+  -#     %tr{:class=>"row#{i}"}
+  -#       -row.each do |col|
+  -#         %td{:class =>"search-results"}
+  -#           =col
+:javascript
+  dojo.addOnLoad(function() {
+    
+  });

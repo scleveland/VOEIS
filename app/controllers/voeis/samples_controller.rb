@@ -245,7 +245,7 @@ class Voeis::SamplesController < Voeis::BaseController
         variable = parent.managed_repository{Voeis::Variable.get(params[:variable])}
         @var_name = variable.variable_name
         @units = Voeis::Unit.get(variable.variable_units_id).units_name
-        
+        @row_array = Array.new
         @grid_array = Array.new
         @column_array << ["Timestamp", 'datetime']
         @column_array << ["Vertical Offset", 'number']
@@ -253,20 +253,20 @@ class Voeis::SamplesController < Voeis::BaseController
         @graph_data = Array.new
         #@data_vals = (variable.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & site.data_values)
         @data_vals =parent.managed_repository{Voeis::DataValue.all(:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date, :order=>[:local_date_time.asc])}
-        @data_vals.each do |data_val|
-          temp_array = Array.new
-          row_hash = Hash.new
-          temp_array << data_val.local_date_time.to_datetime
-          row_hash[:datetime] = data_val.local_date_time.to_datetime
-          row_hash[:unixtime] = data_val.local_date_time.to_datetime.to_i
-          temp_array << data_val.vertical_offset
-          row_hash[:vertical_offset] = data_val.vertical_offset
-          temp_array << data_val.data_value
-          row_hash[:value] = data_val.data_value
-          @row_array << temp_array
-          @grid_array << @row_hash.as_json
-          @graph_data << Array[data_val.local_date_time.to_datetime.to_i*1000, data_val.data_value]
-        end
+        # @data_vals.each do |data_val|
+        #   temp_array = Array.new
+        #   row_hash = Hash.new
+        #   temp_array << data_val.local_date_time.to_datetime
+        #   row_hash[:datetime] = data_val.local_date_time.to_datetime
+        #   row_hash[:unixtime] = data_val.local_date_time.to_datetime.to_i
+        #   temp_array << data_val.vertical_offset
+        #   row_hash[:vertical_offset] = data_val.vertical_offset
+        #   temp_array << data_val.data_value
+        #   row_hash[:value] = data_val.data_value
+        #   @row_array << temp_array
+        #   @grid_array << @row_hash.as_json
+        #   @graph_data << Array[data_val.local_date_time.to_datetime.to_i*1000, data_val.data_value]
+        # end
       end #end if "ALL"
       if params[:export] == 1
          column_names = Array.new
