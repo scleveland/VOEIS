@@ -22,7 +22,6 @@
   .new_voeis_site textarea { width:45em; }
   .new_voeis_site select { width:21em; }
 
--#
   .row-lt1 { background-color:#ddd; }
   .row-gr { background-color: #6AA128; }
   .row-gr { background-color: #97C253; }
@@ -30,6 +29,32 @@
   .row-gr th { background-color: #97D8AB!important; }
   .row-gr td { background-color: #97D8AB!important; }
   .smfont, .smfont * { font-size:10px }
+
+  #site00_lat_long_picker {
+    width: 600px;
+    height: 350px;
+    padding: 0!important;
+  }
+  #site00_lat_long_mapdiv {
+    width: 585px;
+    height: 305px;
+    margin: 0!important;
+    xposition: absolute;
+    xborder: red solid 3px;
+  }
+  #site00_lat_long_map_control {
+    width: 84px;
+    height: 24px;
+    margin-right: 5px;
+    background: url('/images/select-button-gold.gif') transparent center no-repeat;
+    cursor: pointer;
+    
+    xposition: relative;
+    xposition: absolute;
+    xbottom: 50px;
+    xright: 50px;
+    xz-index: 1;
+  }
 
 
 - content_for(:javascripts) do
@@ -115,8 +140,8 @@
       %th{:width=>"30%"} Variable
       %th{:width=>"30%", :align=>"left"} Units / Type
       %th{:width=>"10%", :align=>"left"} Count
-      %th{:width=>"14%", :align=>"left"} Start
-      %th{:width=>"14%", :align=>"left"} Stop
+      %th{:width=>"14%"} Start
+      %th{:width=>"14%"} Stop
     %tr
       %td
         $$$site-variable-data$$$
@@ -164,6 +189,85 @@
   -##edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>'EDIT', :style=>"margin-top:0;padding-top:0;display:none;"}
   #edit-site00{:style=>"margin-top:0;padding-top:0;display:none;"}
 
+    #site00_lat_long_picker{:dojoType=>"dijit.Dialog", :jsId=>"site00_lat_long_picker", :title=>"Select location for Latitude/Longitude (click/shift-click to zoom in/out)", 
+      :style=>"padding:0;"}
+      %script{:type=>"dojo/method", :event=>"onShow"}
+        //var form = dijit.byId("site00_vertical_datum_form");
+        var form = site00_edit_form;
+        site00_lat_long = {};
+        //var mapdiv = dojo.byId("site00_loat_long_mapdiv");
+        var mapdiv = document.getElementById('site00_lat_long_mapdiv');
+        var innerdiv = document.getElementById('site00_lat_long_innerdiv');
+        var button = document.getElementById('site00_lat_long_map_control')
+        var domclick;
+        var crosshairShape = {coords:[0,0,0,0],type:'rect'};
+        var crosshairImg = '/images/cross-hairs.gif';
+        
+        site00_lat_long.map_opts = {
+        //center: new google.maps.LatLng(46.739861,-110.786133), 
+        center: new google.maps.LatLng(39.707187,-96.152344),
+        zoom: 3,
+        //mapTypeId: google.maps.MapTypeId.SATELLITE,
+        mapTypeId: google.maps.MapTypeId.TERRAIN,
+        draggableCursor: 'crosshair',
+        scaleControl: true, 
+        zoomControl: true, 
+        mapTypeControl: true,
+        scrollwheel: true
+        };
+        var myOptions = {
+        zoom:12,
+        center:new google.maps.LatLng(39.707187,-96.152344),
+        mapTypeId:google.maps.MapTypeId.SATELLITE,
+        draggableCursor:'crosshair',
+        mapTypeControlOptions:{style:google.maps.MapTypeControlStyle.DROPDOWN_MENU}
+        };
+        
+        site00_lat_long.map = new google.maps.Map(mapdiv, site00_lat_long.map_opts);
+        site00_lat_long.crosshair = new google.maps.Marker({
+        map: site00_lat_long.map,
+        icon: crosshairImg,
+        shape: crosshairShape
+        });
+        site00_lat_long.crosshair.bindTo('position',site00_lat_long.map,'center');
+        site00_lat_long.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(button);
+        //###CLICK-MAP
+        $('body').click( function(e){
+        console.log('DOMCLICK:',e);
+        var clickat = mapclick.latLng;
+        var mapzoom = site00_lat_long.map.getZoom();
+        if(e.shiftKey) mapzoom -= 1;
+        else mapzoom += 1;
+        site00_lat_long.map.setCenter(clickat);
+        site00_lat_long.map.setZoom(mapzoom);
+        });
+        //google.maps.event.addDomListener(mapdiv, 'click', function(ev){ domclick = ev; });
+        google.maps.event.addListener(site00_lat_long.map, 'click', function(mapev){ 
+        mapclick = mapev;
+        var clickat = mapev.latLng;
+        console.log('CLICKAT:',clickat.toString());
+        });
+        //###SELECT FUNCTION
+        site00_lat_long.map_select = function(){
+        var form = site00_edit_form.domNode;
+        var formlat = dijit.byId('site00_latitude');
+        var formlong = dijit.byId('site00_longitude');
+        var mapCenter = site00_lat_long.map.getCenter();
+        formlat.set('value',mapCenter.lat());
+        formlong.set('value',mapCenter.lng());
+        site00_lat_long_picker.hide();
+        };
+        //###ON-HIDE
+        this.connect(this, "onHide", function(){
+        //var form = site00_edit_form.domNode;
+        //form.elements['site_lat_long_datum'].focus();
+        var formlat = dijit.byId('site00_latitude');
+        formlat.focus();
+        });
+      #site00_lat_long_mapdiv{:style=>"margin:0!important;"}
+        #site00_lat_long_map_control{:onclick=>"site00_lat_long.map_select();"}
+          %a{:href=>"javascript:", :onclick=>"alert('TESTING!!!');this.hide();return false;"}
+    
     -#site00_xnew_local_projection{:dojoType=>"dijit.Dialog", :title=>"NEW Local Projection"}
     -##site00_new_local_projection{:dojoType=>"dijit.Dialog", :jsId=>"site00_new_local_projection", :title=>"NEW Local Projection"}
     -#  TESTING Local Projection
@@ -478,6 +582,11 @@
               -#%input(name="site_code"  type="text" value="$$$code$$$")
               %input(name="site_code" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$code$$$" required="true")
         %tr
+          %td{:colspan=>"2"}
+            .from-element{:style=>"cursor:pointer;margin-top:10px;"}
+            %a{:style=>"cursor:pointer;", :class=>"icon icon-notice", :href=>"javascript:", :onclick=>"site00_lat_long_picker.show();return false;"}
+              Select MAP location to populate Latitude & Longitude
+        %tr
           %td
             .from-element
               %span{:class=>'label'}
@@ -493,12 +602,12 @@
               -#= f.text_field("longitude", :value=>"$$$longitude$$$")
               -#%input(name="site_longitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$longitude$$$" required="true")
               -#%input(name="site_longitude" id="site00_longitude" type="text" value="$$$longitude$$$")
-              %input(name="site_longitude" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'######.######'}" id="site00_longidude" type="text" value="$$$longitude$$$" required="true")
+              %input(name="site_longitude" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'######.######'}" id="site00_longitude" type="text" value="$$$longitude$$$" required="true")
 
         %tr
           %td{:colspan=>"2"}
-            .from-element
-              %span{:class=>'label'}
+            .from-element{:style=>"cursor:pointer;"}
+              %span{:class=>'label', :style=>"cursor:pointer;"}
                 %label{:for=>"site_lat_long_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"SRfrom='LLD';site00_new_spatial_reference.show();"}
                   Latitude Longitude Datum
             -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
@@ -533,8 +642,8 @@
 
         %tr
           %td{:colspan=>"2"}
-            .from-element
-              %span{:class=>'label'}
+            .from-element{:style=>"cursor:pointer;"}
+              %span{:class=>'label', :style=>"cursor:pointer;"}
                 %label{:for=>"site_local_projection", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"SRfrom='LP';site00_new_spatial_reference.show();"}
                   Local Projection
             -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
@@ -550,8 +659,8 @@
 
         %tr
           %td{:colspan=>"2"}
-            .from-element
-              %span{:class=>'label'}
+            .from-element{:style=>"cursor:pointer;"}
+              %span{:class=>'label', :style=>"cursor:pointer;"}
                 -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
                 %label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
                   Vertical Datum
