@@ -123,12 +123,18 @@ class Voeis::SamplesController < Voeis::BaseController
       @variable_hash = Hash.new
       i = 1
       @variable_hash['variables'] = Array.new
-      site.variables.each do |var|
-        data_catalog = Voeis::SiteDataCatalog.first(:site_id => site.id, :variable_id => var.id)
-        @var_hash = Hash.new
-        @var_hash['id'] = var.id
-        @var_hash['name'] = var.variable_name+":"+var.data_type + "(" + data_catalog.starting_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + " - " + data_catalog.ending_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + ')'
-        @variable_hash['variables'] << @var_hash
+      @variable_hash['variables'] = site.variables.map do |var|
+        if data_catalog = Voeis::SiteDataCatalog.first(:site_id => site.id, :variable_id => var.id)
+          var_hash = Hash.new
+          var_hash['id'] = var.id
+          if !data_catalog.starting_timestamp.nil?
+            var_hash['name'] = var.variable_name+":"+var.data_type + "(" + data_catalog.starting_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + " - " + data_catalog.ending_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + ')'
+          else
+            var_hash['name'] = var.variable_name+":"+var.data_type
+          end
+          var_hash
+        end
+        #@variable_hash['variables'] << @var_hash
       end
     end
     respond_to do |format|
@@ -164,7 +170,11 @@ class Voeis::SamplesController < Voeis::BaseController
             #variable_opt_array << ["All", "All"]
             @sites.all(:order => [:name.asc]).first.variables.each do |var|
               data_catalog = Voeis::SiteDataCatalog.first(:site_id => @sites.all(:order => [:name.asc]).first.id, :variable_id => var.id)
-              variable_opt_array << [var.variable_name+":"+var.data_type + "(" + data_catalog.starting_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + " - " + data_catalog.ending_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + ')', var.id.to_s]
+              if !data_catalog.starting_timestamp.nil?
+                variable_opt_array << [var.variable_name+":"+var.data_type + "(" + data_catalog.starting_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + " - " + data_catalog.ending_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + ')', var.id.to_s]
+              else
+                variable_opt_array << [var.variable_name+":"+var.data_type, var.id.to_s]
+              end
             end
           else
             variable_opt_array << ["None", "None"]
@@ -230,42 +240,33 @@ class Voeis::SamplesController < Voeis::BaseController
           end #end var
           @row_array << temp_array
         end #end stamp
-        puts "COLUMNARRAY: #{@column_array}"
-        puts "ROWARRAY: #{@row_arrray}" 
+
       else #we want only one variable
         variable = parent.managed_repository{Voeis::Variable.get(params[:variable])}
         @var_name = variable.variable_name
         @units = Voeis::Unit.get(variable.variable_units_id).units_name
-        # my_sample = nil
-        # variable.samples.each do |sample|
-        #   if sample.sites.first.id == site.id
-        #     my_sample = sample
-        #   end
-        # end
         
         @grid_array = Array.new
-        #if !my_sample.nil?
-          @column_array << ["Timestamp", 'datetime']
-          @column_array << ["Vertical Offset", 'number']
-          @column_array << [variable.variable_name, 'number']
-          #@data_vals = (variable.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & site.data_values)
-          @data_vals =parent.managed_repository{Voeis::DataValue.all(:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date)}
-          @data_vals.all(:order=>[:local_date_time.asc]).each do |data_val|
-            temp_array = Array.new
-            row_hash = Hash.new
-            temp_array << data_val.local_date_time.to_datetime
-            row_hash[:datetime] = data_val.local_date_time.to_datetime
-            row_hash[:unixtime] = data_val.local_date_time.to_datetime.to_i
-            temp_array << data_val.vertical_offset
-            row_hash[:vertical_offset] = data_val.vertical_offset
-            temp_array << data_val.data_value
-            row_hash[:value] = data_val.data_value
-            @row_array << temp_array
-            @grid_array << @row_hash.as_json
-          end
-        #end
+        @column_array << ["Timestamp", 'datetime']
+        @column_array << ["Vertical Offset", 'number']
+        @column_array << [variable.variable_name, 'number']
         @graph_data = Array.new
-        @data_vals.map{|d| @graph_data << Array[d.local_date_time.to_datetime.to_i*1000, d.data_value]}
+        #@data_vals = (variable.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & site.data_values)
+        @data_vals =parent.managed_repository{Voeis::DataValue.all(:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date, :order=>[:local_date_time.asc])}
+        @data_vals.each do |data_val|
+          temp_array = Array.new
+          row_hash = Hash.new
+          temp_array << data_val.local_date_time.to_datetime
+          row_hash[:datetime] = data_val.local_date_time.to_datetime
+          row_hash[:unixtime] = data_val.local_date_time.to_datetime.to_i
+          temp_array << data_val.vertical_offset
+          row_hash[:vertical_offset] = data_val.vertical_offset
+          temp_array << data_val.data_value
+          row_hash[:value] = data_val.data_value
+          @row_array << temp_array
+          @grid_array << @row_hash.as_json
+          @graph_data << Array[data_val.local_date_time.to_datetime.to_i*1000, data_val.data_value]
+        end
       end #end if "ALL"
       if params[:export] == 1
          column_names = Array.new

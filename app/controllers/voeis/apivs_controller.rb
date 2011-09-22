@@ -173,7 +173,8 @@ class Voeis::ApivsController < Voeis::BaseController
    #   
    # end
   #
-  #curl -F datafile=@NFork_tail.csv	 -F data_template_id=12 http://localhost:3000/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_logger_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
+  #curl -F datafile=@highland-test.csv	 -F data_template_id=10 https://voeis.msu.montana.edu/projects/e2f8e892-1f57-11e0-bbd7-6e9ffb75bc80/apivs/upload_logger_data.json?api_key=e6af8ec25873c1092596e235082e7758ae4cfe6e11e689c5150aa995a4fc89e9
+  #curl -F datafile=@CR1000_BigSky_SFork.dat	 -F data_template_id=9 https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_logger_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
    
   #curl -F datafile=@CR1000_2_BigSky_NFork.csv	 -F data_template_id=2 http://localhost:3000/projects/cfee5aec-c520-11e0-a45c-c82a14fffebf/apivs/upload_logger_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
   # curl -F datafile=@matt1item.csv -F data_template_id=19 -F start_line=1 -F  api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_logger_data.json?
@@ -721,7 +722,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # update_project_site
   # API for updating a site within in a project
   # 
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/update_project_site.json?name=example&code=example&latitude=45.232&longitude=-111.234&state=MT 
+  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/update_project_site.json?id=1&name=example&code=example&latitude=45.232&longitude=-111.234&state=MT 
   #
   # @param [Integer] id the id of the site
   # @param [String] name the name of the site - <optional>
@@ -741,7 +742,7 @@ class Voeis::ApivsController < Voeis::BaseController
           @site = Voeis::Site.get(params['id'].to_i)
           Voeis::Site.properties.each do |prop|
             if prop.name.to_s != "id"
-              if !params[prop.name].nil?
+              if !params[prop.name].nil? || !params[prop.name].empty?
                 @site[prop.name.to_s] = params[prop.name.to_s]
               end #endif
             end#endif
@@ -841,7 +842,7 @@ class Voeis::ApivsController < Voeis::BaseController
         @var_hash = Hash.new
         @var_hash = @var.as_json
         @var_hash = @var_hash.merge({'time_series_data'=>  Voeis::DataValue.all(:datatype=>"Sensor", :variable_id=> @var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
-        @var_hash = @var_hash.merge({'sample_data' => Voeis::DataValues.all(:datatype=>"Sample", :variable_id=> @var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+        @var_hash = @var_hash.merge({'sample_data' => Voeis::DataValue.all(:datatype=>"Sample", :variable_id=> @var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
         @values << @var_hash
         @data_values[:variable] = @values
         @data_values[:project] = parent.as_json

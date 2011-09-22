@@ -72,6 +72,11 @@ Form Progress:
           dijit.registry.byClass("dijit.form.Button").forEach(function(btn){if(btn.attr("title") == "Next"){btn.set("disabled", false);}});
           updateProgressBar();
           });
+        -if !@data_template.source.nil?
+          :javascript
+            $(document).ready(function() {
+              updateSource();
+            });
       -#selectedSite
       -#  Currenlty Selected Site:  
       -#  %span{:id => "selected_site", :class=>"var_spans"}None
@@ -429,11 +434,12 @@ Form Progress:
           %td
             = @csv_array[@start_line-1][col-1]
       -@var_properties.each do |prop|
-        %tr
-          %th #{prop.to_s.capitalize!.gsub("_", " ")}
-          - @columns.each do |col|
-            %td
-              %span{:id => "var_td_"+prop.to_s+"_"+col.to_s, :onClick=>"editColumn(#{col})", :class=>"column_td"}None
+        -if prop.to_s == "speciation" || prop.to_s == "variable_units_id" || prop.to_s == "sample_medium" || prop.to_s == "quality_control" || prop.to_s == "value_type" || prop.to_s == "data_type" || prop.to_s == "general_category" || prop.to_s == "no_data_value" || prop.to_s == "detection_limit" || prop.to_s == "variable_name" || prop.to_s =="varaible_units_id"
+          %tr
+            %th #{prop.to_s.capitalize!.gsub("_", " ")}
+            - @columns.each do |col|
+              %td
+                %span{:id => "var_td_"+prop.to_s+"_"+col.to_s, :onClick=>"editColumn(#{col})", :class=>"column_td"}None
   =clear_break
   %button{:dojoType=>"dijit.form.Button", :title=>"Save", :type=>"submit",:id=>"save_samples_button", :disabled=>true}
     Save Samples

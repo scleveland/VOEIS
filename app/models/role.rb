@@ -57,6 +57,7 @@ class Role
       Voeis::ValueTypeCV,
       Voeis::VariableNameCV,
       Voeis::Equipment,
+      Voeis::DataSet,
       Voeis::Visit,
       Voeis::Campaign]
   end
