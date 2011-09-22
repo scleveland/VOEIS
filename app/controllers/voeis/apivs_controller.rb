@@ -487,6 +487,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # @param [DateTime] :start_datetime pull data after this datetime
   # @param [DateTime] :end_datetime pull date before this datetime
   #
+  # @return [JSON] a JSON object with variable, site, time_series_data, time_series_count,time_series_ max, time_series_min, time_series_avg, sample_data, sample_count, sample_max, sample_min and sample_avg fields
   #
   # @author Sean Cleveland
   #
@@ -503,8 +504,18 @@ class Voeis::ApivsController < Voeis::BaseController
        @site.variables. each do |var|
          @var_hash = Hash.new
          @var_hash = var.as_json
-         @var_hash = @var_hash.merge({'time_series_data' => Voeis::DataValue.all(:datatype=>"Sensor",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => var.id)}) 
-         @var_hash = @var_hash.merge({'sample_data' => Voeis::DataValue.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => var.id)})
+         tseries = Voeis::DataValue.all(:datatype=>"Sensor",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => var.id) 
+         @var_hash = @var_hash.merge({"time_series_data" => tseries}) 
+         @var_hash = @var_hash.merge({"time_series_count"=>tseries.count})
+         @var_hash = @var_hash.merge({:time_series_max=>tseries.max(:data_value)})
+         @var_hash = @var_hash.merge({:time_series_min=>tseries.min(:data_value)})
+         @var_hash = @var_hash.merge({:time_series_avg=>tseries.avg(:data_value)}) 
+         sdata = Voeis::DataValue.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => var.id)
+         @var_hash = @var_hash.merge({"sample_data" => sdata})
+         @var_hash = @var_hash.merge({"sample_count"=>sdata.count})
+         @var_hash = @var_hash.merge({"sample_max"=>sdata.max(:data_value)})
+         @var_hash = @var_hash.merge({"sample_min"=>sdata.min(:data_value)})
+         @var_hash = @var_hash.merge({"sample_avg"=>sdata.avg(:data_value) })
          @values << @var_hash
        end
        @data_values[:variables] = @values
@@ -524,7 +535,7 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   # @param [Integer] :site_id the id of the site to pull data for
   # 
-  #
+  #@return [JSON] a JSON object with variable, site, data fields
   #
   # @author Sean Cleveland
   #
@@ -562,7 +573,7 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   # @param [Integer] :site_id the id of the site to pull data for
   # 
-  #
+  # @return [JSON] a JSON object with variables, site, data fields
   #
   # @author Sean Cleveland
   #
@@ -595,7 +606,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # pulls data from a within a project's site
   #
   # @example URL
-  # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -603,6 +614,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # @param [DateTime] :start_datetime pull data after this datetime
   # @param [DateTime] :end_datetime pull date before this datetime
   #
+  # @return [JSON] a JSON object with variable, site, data, count, max, min and avg fields
   #
   # @author Sean Cleveland
   #
@@ -628,7 +640,12 @@ class Voeis::ApivsController < Voeis::BaseController
       #  @data_values[:error] = "There are no Sensor Value for this site and variable combination"
       # else
          @data_values[:variable] = @variable.as_json
-         @data_values[:data] = Voeis::DataValue.all(:datatype=>"Sensor", :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => @variable.id,:order => [:local_date_time.asc]).as_json 
+         tseries=Voeis::DataValue.all(:datatype=>"Sensor", :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => @variable.id,:order => [:local_date_time.asc]) 
+         @data_values[:data] = tseries.as_json
+         @data_values[:count] = tseries.count
+         @data_values[:max] = tseries.max(:data_value)
+         @data_values[:min] =tseries.min(:data_value)
+         @data_values[:avg]=tseries.avg(:data_value)
        #end
      end
      respond_to do |format|
@@ -640,7 +657,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # pulls data from a within a project's site for samples only
   #
   # @example URL
-  # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=7&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -648,7 +665,8 @@ class Voeis::ApivsController < Voeis::BaseController
   # @param [DateTime] :start_datetime pull data after this datetime
   # @param [DateTime] :end_datetime pull date before this datetime
   #
-  #
+  # @return [JSON] a JSON object with variable, site, data, count, max, min and avg fields
+  # 
   # @author Sean Cleveland
   #
   # @api public
@@ -673,7 +691,12 @@ class Voeis::ApivsController < Voeis::BaseController
       #  @data_values[:error] = "There are no Sensor Value for this site and variable combination"
       # else
          @data_values[:variable] = @variable.as_json
-         @data_values[:data] = Voeis::DataValue.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id=>@site.id, :variable_id => @variable.id, :order => [:local_date_time.asc]).as_json 
+         tseries = Voeis::DataValue.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id=>@site.id, :variable_id => @variable.id, :order => [:local_date_time.asc]) 
+         @data_values[:data] = tseries.as_json
+         @data_values[:count] = tseries.count
+         @data_values[:max] = tseries.max(:data_value)
+         @data_values[:min] =tseries.min(:data_value)
+         @data_values[:avg]=tseries.avg(:data_value)
        #end
      end
      respond_to do |format|
