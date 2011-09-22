@@ -283,9 +283,9 @@ class Voeis::SamplesController < Voeis::BaseController
            :type => 'text/csv; charset=utf-8; header=present',
            :filename => filename)
       else
-        respond_to do |format|
-          format.js 
-        end#end format
+        # respond_to do |format|
+        #   format.js 
+        # end#end format
       end#end if export
     else
       @var_name = "None"

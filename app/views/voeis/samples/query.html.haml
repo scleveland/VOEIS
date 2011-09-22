@@ -12,15 +12,24 @@
   = date_select('range', 'end_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
   = clear_break
 
-  = f.submit('Search', :onclick => "dijit.byId('loading_dialog').show();")
+  -#= f.submit('Search', :onclick => "dijit.byId('loading_dialog').show();")
+  %button{:id=> 'new_search_button',:dojoType=>"dijit.form.Button", :title=>'Search', :onClick=>"newSearch();"}
+    Search
   = link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
 = clear_break
+%div{:style=>"width:800px;height:400px"}
+  #search_container{:dojoType=>"dijit.layout.TabContainer", :style=>"width:100%;height:100%"}
 
 %div{:dojoType=>"dijit.Dialog", :disableCloseButton => true, :id=>"loading_dialog", :title=>"Loading..."}
   #search-div-loader
 #search_results
   :javascript  
     dojo.require('dijit.Dialog');
+    dojo.require("dijit.layout.TabContainer");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dijit.form.Button");
+    var search_number = 0;
+
     $(function() { 
     $("#site").change(function() { 
 
@@ -44,3 +53,15 @@
     return false;
     });
     });
+    function newSearch() {
+    //dijit.byId('loading_dialog').show();  
+    search_number = search_number + 1;
+    var pane = new dijit.layout.ContentPane({ title:"Search"+search_number, href:"search?site=" + $("#site").val()+"&variable=" + $("#variable").val()+"&range[start_date(2i)]=" + $("#range_start_date_2i").val()+"&range[start_date(3i)]=" + $("#range_start_date_3i").val()+"&range[start_date(1i)]=" + $("#range_start_date_1i").val()+"&range[end_date(2i)]=" + $("#range_end_date_2i").val()+"&range[end_date(3i)]=" + $("#range_end_date_3i").val()+"&range[end_date(1i)]=" + $("#range_end_date_1i").val() });
+    dijit.byId("search_container").addChild(pane);
+    
+    //$.post("search?site=" + $("#site").val()+"&variable=" + $("#variable").val()+"&range[start_date(2i)]=" + $("#range_start_date_2i").val()+"&range[start_date(3i)]=" + $("#range_start_date_3i").val()+"&range[start_date(1i)]=" + $("#range_start_date_1i").val()+"&range[end_date(2i)]=" + $("#range_end_date_2i").val()+"&range[end_date(3i)]=" + $("#range_end_date_3i").val()+"&range[end_date(1i)]=" + $("#range_end_date_1i").val(),
+    //function(data) {
+    //}
+    //);
+    }
+  

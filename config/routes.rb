@@ -38,7 +38,7 @@ Yogo::Application.routes.draw do
           get  :site_data_streams
           post :pre_upload
           post :create_stream
-          post :search
+          get :search
           post :upload
           post :export
           post :data
