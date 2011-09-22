@@ -173,7 +173,7 @@ class ProjectsController < InheritedResources::Base
         else
           var_stats = ['NA', 'NA', 'NA']
         end
-        @temp_array << {:varname=>var.variable_name, :varid=>var.id, :count=>var_stats[0], :first=>var_stats[1], :last=>var_stats[2]}
+        @temp_array << {:varname=>var.variable_name, :varid=>var.id, :varunits=>'%s (%s)'%[var.variable_units[:units_abbreviation],var.data_type], :count=>var_stats[0], :first=>var_stats[1], :last=>var_stats[2]}
       }
       @site_var_stats << @temp_array
     }

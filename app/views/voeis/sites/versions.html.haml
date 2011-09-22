@@ -54,9 +54,10 @@
           %th{:field=>"version_ts", :filterable=>true, :width=>"130px"} Updated
           %th{:field=>"updated_comment", :filterable=>true, :width=>"45%"} Update Comment
           %th{:field=>"provenance_comment", :filterable=>true, :width=>"30%"} Provenance Comment
+  -### VERSION TABS
   - @versions_ref.each do |version|
     %div{:id=>"#{version[:version_id]}", :dojoType=>"dijit.layout.ContentPane", 
-      :title=>"Version #{version[:version].to_s}", :style=>"margin:0;padding:0;", :selected=>"true"}
+      :title=>"#{version[:version_ttl]}", :style=>"margin:0;padding:0;", :selected=>"true"}
       %table{:id=>"property-table-site#{@site.id}", :style=>'margin:20px 50px;width:80%;float:left;'}
         %tr
           %td{:style=>"text-align:right;"}
@@ -64,7 +65,7 @@
               Version
               &nbsp;&nbsp;&nbsp;
           %td
-            #{version[:version]}
+            #{version[:version] ? version[:version] : 'Current'}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             %a{:href=>"javascript:", :onclick=>"versionsTab();return false;"}
               [RETRUN TO VERSIONS TAB]
