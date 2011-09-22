@@ -99,7 +99,10 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>
+the string used in the permissions array to id the model.
+</p>
+</div></span>
   
 </li>
 
@@ -120,7 +123,10 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>
+all the possible permissions.
+</p>
+</div></span>
   
 </li>
 
@@ -172,18 +178,29 @@
   
 
   
-</p><table class="source_code">
+</p><div class="docstring">
+  <div class="discussion">
+    <p>
+the string used in the permissions array to id the model
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-248
-249
-250</pre>
+253
+254
+255</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/facet.rb', line 248</span>
+      <pre class="code"><span class="info file"># File 'lib/facet.rb', line 253</span>
 
 <span class='kw'>def</span> <span class='id permission_base_name'>permission_base_name</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id name'>name</span><span class='period'>.</span><span class='id underscore'>underscore</span>
@@ -200,26 +217,37 @@
   
 
   
-</p><table class="source_code">
+</p><div class="docstring">
+  <div class="discussion">
+    <p>
+all the possible permissions
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-236
-237
-238
-239
 240
 241
 242
 243
 244
 245
-246</pre>
+246
+247
+248
+249
+250</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/facet.rb', line 236</span>
+      <pre class="code"><span class="info file"># File 'lib/facet.rb', line 240</span>
 
 <span class='kw'>def</span> <span class='id permissions'>permissions</span>
   <span class='lbrace'>{</span>
@@ -250,13 +278,13 @@
       <pre class="lines">
 
 
-252
-253
-254
-255</pre>
+257
+258
+259
+260</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/facet.rb', line 252</span>
+      <pre class="code"><span class="info file"># File 'lib/facet.rb', line 257</span>
 
 <span class='kw'>def</span> <span class='id permissions_for'>permissions_for</span><span class='lparen'>(</span><span class='id target'>target</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span> <span class='kw'>if</span> <span class='id target'>target</span><span class='period'>.</span><span class='id nil?'>nil?</span>
@@ -272,7 +300,7 @@
 </div>
     
     <div id="footer">
-  Generated on Tue Aug 16 11:28:19 2011 by 
+  Generated on Thu Sep 22 17:18:10 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

@@ -225,12 +225,12 @@
       <pre class="lines">
 
 
-20
-21
-22</pre>
+23
+24
+25</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/system_role.rb', line 20</span>
+      <pre class="code"><span class="info file"># File 'app/models/system_role.rb', line 23</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id available_permissions'>available_permissions</span>
   <span class='ivar'>@_availaible_permissions</span> <span class='op'>||=</span> <span class='id permission_sources'>permission_sources</span><span class='period'>.</span><span class='id map'>map</span> <span class='lbrace'>{</span><span class='op'>|</span><span class='id ps'>ps</span><span class='op'>|</span> <span class='id ps'>ps</span><span class='period'>.</span><span class='id to_permissions'>to_permissions</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id flatten'>flatten</span>
@@ -253,14 +253,14 @@
       <pre class="lines">
 
 
-24
-25
-26
 27
-28</pre>
+28
+29
+30
+31</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/system_role.rb', line 24</span>
+      <pre class="code"><span class="info file"># File 'app/models/system_role.rb', line 27</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id available_permissions_by_source'>available_permissions_by_source</span>
   <span class='id source_hash'>source_hash</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id new'>new</span>
@@ -285,12 +285,12 @@
       <pre class="lines">
 
 
-16
-17
-18</pre>
+19
+20
+21</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/system_role.rb', line 16</span>
+      <pre class="code"><span class="info file"># File 'app/models/system_role.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id permission_sources'>permission_sources</span>
   <span class='lbracket'>[</span><span class='const'>Project</span><span class='comma'>,</span> <span class='const'>Role</span><span class='comma'>,</span> <span class='const'>User</span><span class='comma'>,</span> <span class='const'>SystemRole</span><span class='rbracket'>]</span>
@@ -340,12 +340,12 @@
       <pre class="lines">
 
 
-30
-31
-32</pre>
+33
+34
+35</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/system_role.rb', line 30</span>
+      <pre class="code"><span class="info file"># File 'app/models/system_role.rb', line 33</span>
 
 <span class='kw'>def</span> <span class='id has_permission?'>has_permission?</span><span class='lparen'>(</span><span class='id permission'>permission</span><span class='rparen'>)</span>
   <span class='id actions'>actions</span><span class='period'>.</span><span class='id include?'>include?</span><span class='lparen'>(</span><span class='id permission'>permission</span><span class='rparen'>)</span>
@@ -360,7 +360,7 @@
 </div>
     
     <div id="footer">
-  Generated on Tue Aug 16 11:28:20 2011 by 
+  Generated on Thu Sep 22 17:18:11 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

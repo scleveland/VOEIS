@@ -228,7 +228,9 @@ POST /variables
 52
 53
 54
-55</pre>
+55
+56
+57</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/variables_controller.rb', line 23</span>
@@ -253,7 +255,9 @@ POST /variables
    <span class='kw'>if</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:spatial_offset_type</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
      <span class='ivar'>@variable</span><span class='period'>.</span><span class='id spatial_offset_type'>spatial_offset_type</span> <span class='op'>=</span> <span class='kw'>nil</span>
    <span class='kw'>end</span>
-
+   <span class='ivar'>@variable</span><span class='period'>.</span><span class='id valid?'>valid?</span>
+   <span class='id puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>**************************************************************************************</span><span class='tstring_end'>&quot;</span></span>
+   <span class='id puts'>puts</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id errors'>errors</span><span class='period'>.</span><span class='id inspect'>inspect</span><span class='lparen'>(</span><span class='rparen'>)</span>
   <span class='id respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id format'>format</span><span class='op'>|</span>
     <span class='kw'>if</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id save'>save</span>
       <span class='id flash'>flash</span><span class='lbracket'>[</span><span class='symbol'>:notice</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Variables was successfully created.</span><span class='tstring_end'>'</span></span>
@@ -284,12 +288,12 @@ POST /variables
       <pre class="lines">
 
 
-67
-68
-69</pre>
+69
+70
+71</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/variables_controller.rb', line 67</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/variables_controller.rb', line 69</span>
 
 <span class='kw'>def</span> <span class='id invalid_page'>invalid_page</span>
   <span class='id redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='symbol'>:back</span><span class='rparen'>)</span>
@@ -349,7 +353,7 @@ GET /variables/new
 </div>
     
     <div id="footer">
-  Generated on Tue Aug 16 11:28:22 2011 by 
+  Generated on Thu Sep 22 17:18:13 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

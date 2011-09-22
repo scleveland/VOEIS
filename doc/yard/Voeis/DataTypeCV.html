@@ -71,7 +71,7 @@
   
     
       <dt class="r2">Includes:</dt>
-      <dd class="r2">DataMapper::Resource, <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html" title="Yogo::Versioned::DataMapper::Resource (module)">Yogo::Versioned::DataMapper::Resource</a></span></dd>
+      <dd class="r2">DataMapper::Resource, <span class='object_link'><a href="../Facet/DataMapper/Resource.html" title="Facet::DataMapper::Resource (module)">Facet::DataMapper::Resource</a></span>, <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html" title="Yogo::Versioned::DataMapper::Resource (module)">Yogo::Versioned::DataMapper::Resource</a></span></dd>
       
     
   
@@ -100,6 +100,10 @@ field in the Variable model
   
 </div>
 
+  
+  
+  
+  
   
   
   
@@ -180,6 +184,16 @@ field in the Variable model
   <p class="inherited"><span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#included-class_method" title="Yogo::Versioned::DataMapper::Resource.included (method)">included</a></span></p>
 
   
+  
+  
+  
+  
+  
+  
+  <h3 class="inherited">Methods included from <span class='object_link'><a href="../Facet/DataMapper/Resource.html" title="Facet::DataMapper::Resource (module)">Facet::DataMapper::Resource</a></span></h3>
+  <p class="inherited"><span class='object_link'><a href="../Facet/DataMapper/Resource.html#included-class_method" title="Facet::DataMapper::Resource.included (method)">included</a></span></p>
+
+  
 
   <div id="class_method_details" class="method_details_list">
     <h2>Class Method Details</h2>
@@ -198,7 +212,6 @@ field in the Variable model
       <pre class="lines">
 
 
-18
 19
 20
 21
@@ -207,10 +220,11 @@ field in the Variable model
 24
 25
 26
-27</pre>
+27
+28</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/data_type_cv.rb', line 18</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/data_type_cv.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id load_from_his'>load_from_his</span>
   <span class='id his_data_types'>his_data_types</span> <span class='op'>=</span> <span class='const'>His</span><span class='op'>::</span><span class='const'>DataTypeCV</span><span class='period'>.</span><span class='id all'>all</span>
@@ -246,7 +260,6 @@ field in the Variable model
       <pre class="lines">
 
 
-29
 30
 31
 32
@@ -260,10 +273,11 @@ field in the Variable model
 40
 41
 42
-43</pre>
+43
+44</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/data_type_cv.rb', line 29</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/data_type_cv.rb', line 30</span>
 
 <span class='kw'>def</span> <span class='id store_to_his'>store_to_his</span><span class='lparen'>(</span><span class='id u_id'>u_id</span><span class='rparen'>)</span>
   <span class='id data_type_to_store'>data_type_to_store</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='id u_id'>u_id</span><span class='rparen'>)</span>
@@ -290,7 +304,7 @@ field in the Variable model
 </div>
     
     <div id="footer">
-  Generated on Tue Aug 16 11:28:21 2011 by 
+  Generated on Thu Sep 22 17:18:12 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>
