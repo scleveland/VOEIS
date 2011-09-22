@@ -94,9 +94,11 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			for(var i=0;i<this.site_var_stats.length;i++) {
 				data += '<a href="javascript:" onclick="dojo.publish(\'voeis/project/variable\', [';
 				data += this.site_var_stats[i].varid+',\''+this.site_var_stats[i].varname+'\','+this.site.id+']);">';
-				data += '<strong>'+this.site_var_stats[i].varname+'</strong></a></td><td>\n';
-				data += this.site_var_stats[i].count+'</td><td>\n';
-				data += this.site_var_stats[i].first+'</td><td>\n';
+				data += '<strong>'+this.site_var_stats[i].varname+'</strong></a></td><td class="smfont">\n';
+				data += this.site_var_stats[i].varunits+'</td><td class="smfont">\n';
+				data += this.site_var_stats[i].vartype+'</td><td class="smfont">\n';
+				data += this.site_var_stats[i].count+'</td><td class="smfont">\n';
+				data += this.site_var_stats[i].first+'</td><td class="smfont">\n';
 				data += this.site_var_stats[i].last+'</td></tr>\n';
 				data += '<tr class="'+((i+1==this.site_stats.length)?'':'row-lt'+(i+1)%2)+'"><td>'
 			};
