@@ -115,8 +115,7 @@ class Voeis::ApivsController < Voeis::BaseController
 
   # pulls data from a data stream
   #
-  # @example URL
-  # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_data_stream_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_stream_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_data_stream_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_stream_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :data_stream_id
@@ -192,8 +191,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # this requires that a datastream has already been created
   # to parse this file.  Can return json or xml as specified
   #
-  # @example curl
-  # curl -F datafile=@CR1000_2_BigSky_NFork_small.dat -F data_template_id=1 http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_logger_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
+  # @example curl -F datafile=@CR1000_2_BigSky_NFork_small.dat -F data_template_id=1 http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_logger_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
   #
   #
   # @param [File] :datafile csv file to store
@@ -479,8 +477,7 @@ class Voeis::ApivsController < Voeis::BaseController
   
   # pulls data from a within a project's site
   #
-  # @example URL
-  # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -529,8 +526,7 @@ class Voeis::ApivsController < Voeis::BaseController
   
   # pulls data from a within a project's site
   #
-  # @example URL
-  # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -567,8 +563,7 @@ class Voeis::ApivsController < Voeis::BaseController
   
   # pulls data from a within a project's site for samples only
   #
-  # @example URL
-  # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -605,8 +600,7 @@ class Voeis::ApivsController < Voeis::BaseController
   
   # pulls data from a within a project's site
   #
-  # @example URL
-  # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -656,8 +650,7 @@ class Voeis::ApivsController < Voeis::BaseController
   
   # pulls data from a within a project's site for samples only
   #
-  # @example URL
-  # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=7&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=7&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -841,8 +834,7 @@ class Voeis::ApivsController < Voeis::BaseController
    
    # pulls data from a within a project's by the variable
    #
-   # @example URL
-   # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+   # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
    #
    #
    # @param [Integer] :variable_id the id of the variable to pull data for
@@ -880,8 +872,7 @@ class Voeis::ApivsController < Voeis::BaseController
    
    # pulls data from a within a project's by site and the variable
    #
-   # @example URL
-   # http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+   # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
    #
    #
    # @param [Integer] :site_id the id for site to pull data for
