@@ -96,7 +96,6 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 				data += this.site_var_stats[i].varid+',\''+this.site_var_stats[i].varname+'\','+this.site.id+']);">';
 				data += '<strong>'+this.site_var_stats[i].varname+'</strong></a></td><td class="smfont">\n';
 				data += this.site_var_stats[i].varunits+'</td><td class="smfont">\n';
-				data += this.site_var_stats[i].vartype+'</td><td class="smfont">\n';
 				data += this.site_var_stats[i].count+'</td><td class="smfont">\n';
 				data += this.site_var_stats[i].first+'</td><td class="smfont">\n';
 				data += this.site_var_stats[i].last+'</td></tr>\n';
