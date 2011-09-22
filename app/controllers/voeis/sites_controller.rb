@@ -100,12 +100,31 @@ class Voeis::SitesController < Voeis::BaseController
     @versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
     @versions_ref = []
     version_number = @versions.count
+    temp = {}
+    @versions.properties.each{|prop| temp[prop.name] = @site[prop.name]}
+    temp[:lat_long_datum] = '-none-'
+    temp[:vertical_datum] = '-none-'
+    temp[:local_projection] = '-none-'
+    if !Voeis::SpatialReference.get(@site.lat_long_datum_id).nil?
+      temp[:lat_long_datum] = Voeis::SpatialReference.get(@site.lat_long_datum_id).srs_name
+    end
+    if !Voeis::VerticalDatumCV.get(@site.vertical_datum_id).nil?
+      temp[:vertical_datum] = Voeis::VerticalDatumCV.get(@site.vertical_datum_id).term
+    end
+    if !Voeis::SpatialReference.get(@site.local_projection_id).nil?
+      temp[:local_projection] = Voeis::SpatialReference.get(@site.local_projection_id).srs_name
+    end
+    temp[:version] = 0
+    temp[:version_ttl] = 'Current'
+    temp[:version_id] = '%s-site%s-ver000'%[@project.id,@site.id]
+    temp[:version_ts] = @site.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+    @versions_ref << temp
     @versions.each{|ver|
       temp = {}
       @versions.properties.each{|prop| temp[prop.name] = ver[prop.name]}
-      temp[:lat_long_datum] = '-'
-      temp[:vertical_datum] = '-'
-      temp[:local_projection] = '-'
+      temp[:lat_long_datum] = '-none-'
+      temp[:vertical_datum] = '-none-'
+      temp[:local_projection] = '-none-'
       if !Voeis::SpatialReference.get(ver.lat_long_datum_id).nil?
         temp[:lat_long_datum] = Voeis::SpatialReference.get(ver.lat_long_datum_id).srs_name
       end
@@ -116,6 +135,7 @@ class Voeis::SitesController < Voeis::BaseController
         temp[:local_projection] = Voeis::SpatialReference.get(ver.local_projection_id).srs_name
       end
       temp[:version] = version_number
+      temp[:version_ttl] = 'Version %s'%version_number
       temp[:version_id] = '%s-site%s-ver%03d'%[@project.id,@site.id,version_number]
       temp[:version_ts] = ver.updated_at.strftime('%Y-%m-%d %H:%M:%S')
       version_number-=1
