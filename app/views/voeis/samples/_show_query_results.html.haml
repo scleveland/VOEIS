@@ -49,9 +49,10 @@ For: Variable(
     dojo.require("dojo.store.Observable");
     dojo.require("dojo.store.Memory");
     dojo.require("dojox.charting.themes.Claro");
-    var value_data = [#{data_vals.map{|c| "        "+c.to_json}.join(",\n")}];
-    //var data = #{graph_data.as_json};
-    var data = [#{data_vals.map{|c| Array[c.local_date_time.to_datetime.to_i*1000, c.data_value].to_json    }.join(",")}];
+
+    var value_data = #{data_vals.to_json};
+    var data = #{graph_data.as_json};
+
     var values_json = {identifier: 'id', label: 'name', items: value_data };
     var value_store = new dojo.data.ItemFileReadStore({data: values_json});
     
