@@ -10,7 +10,8 @@
      #{@versions_ref.map{|version| "        "+version.to_json}.join(",\n")}
   ];
   var pversions_json_site#{@site.id} = {
-      identifier: 'updated_at',
+      //identifier: 'updated_at',
+      identifier: 'version',
       label: 'name',
       items: version_data_site#{@site.id} };
   
@@ -50,9 +51,9 @@
           tabs.selectChild(pane);
       %thead
         %tr
-          %th{:field=>"version", :filterable=>false, :width=>"40px", :style=>"text-align:right;"} V #
+          %th{:field=>"version_ttl", :filterable=>false, :width=>"70px", :style=>"text-align:right;"} Version
           %th{:field=>"version_ts", :filterable=>true, :width=>"130px"} Updated
-          %th{:field=>"updated_comment", :filterable=>true, :width=>"45%"} Update Comment
+          %th{:field=>"updated_comment", :filterable=>true, :width=>"40%"} Update Comment
           %th{:field=>"provenance_comment", :filterable=>true, :width=>"30%"} Provenance Comment
   -### VERSION TABS
   - @versions_ref.each do |version|
@@ -65,7 +66,7 @@
               Version
               &nbsp;&nbsp;&nbsp;
           %td
-            #{version[:version] ? version[:version] : 'Current'}
+            #{version[:version]==0 ? 'Current' : version[:version]}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             %a{:href=>"javascript:", :onclick=>"versionsTab();return false;"}
               [RETRUN TO VERSIONS TAB]
