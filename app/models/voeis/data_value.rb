@@ -117,7 +117,7 @@ class Voeis::DataValue
     rows.each do |row|
       if !row.nil?
         results = Array.new
-        if rows_parsed > start_line-1
+        if rows_parsed >= start_line-1 || start_line == 1
         #   (1..start_line-1).each do
         #     header_row = csv.readline
         #   end
