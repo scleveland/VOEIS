@@ -6,6 +6,7 @@
     function(data) {
       $('#source').append($("<option></option>").attr("value",data['id']).text($("#source_organization").val() + ':' + $("#source_contact_name").val())); 
       $('#source').val(data['id']);
+      updateSource();
       dijit.byId("new_source").hide();
     }
     );
