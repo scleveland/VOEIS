@@ -31,6 +31,11 @@ class SourcesController < InheritedResources::Base
         end
         format.html { (redirect_to(source_path( @source.id))) }
       else
+        format.json do
+          msg = Hash.new
+          msg[:errors] = @source.errors.inspect()
+          render :json => msg.to_json, :callback => params[:jsoncallback]
+        end
         format.html { render :action => "new" }
       end
     end

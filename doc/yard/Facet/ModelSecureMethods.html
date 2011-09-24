@@ -103,7 +103,10 @@
   
 
   
-    <span class="summary_desc"><div class='inline'></div></span>
+    <span class="summary_desc"><div class='inline'><p>
+Why is this not just in ResourceSecureMethods? -Sean.
+</p>
+</div></span>
   
 </li>
 
@@ -186,18 +189,29 @@
   
 
   
-</p><table class="source_code">
+</p><div class="docstring">
+  <div class="discussion">
+    <p>
+Why is this not just in ResourceSecureMethods? -Sean
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
   <tr>
     <td>
       <pre class="lines">
 
 
-173
 174
-175</pre>
+175
+176</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/facet.rb', line 173</span>
+      <pre class="code"><span class="info file"># File 'lib/facet.rb', line 174</span>
 
 <span class='kw'>def</span> <span class='id secured_instance_methods'>secured_instance_methods</span>
   <span class='lbracket'>[</span><span class='symbol'>:attributes</span><span class='comma'>,</span> <span class='symbol'>:attributes=</span><span class='comma'>,</span> <span class='symbol'>:save</span><span class='comma'>,</span> <span class='symbol'>:destroy</span><span class='rbracket'>]</span>
@@ -248,15 +262,15 @@
       <pre class="lines">
 
 
-177
 178
 179
 180
 181
-182</pre>
+182
+183</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/facet.rb', line 177</span>
+      <pre class="code"><span class="info file"># File 'lib/facet.rb', line 178</span>
 
 <span class='kw'>def</span> <span class='id unsecured_instance_methods'>unsecured_instance_methods</span>
   <span class='comment'># TODO: Evaluate what instance methods should be unsecured
@@ -274,7 +288,7 @@
 </div>
     
     <div id="footer">
-  Generated on Tue Aug 16 11:28:19 2011 by 
+  Generated on Thu Sep 22 17:26:27 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

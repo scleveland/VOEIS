@@ -504,7 +504,7 @@ get_project_site API for getting a site within a Project.
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#get_project_site_data-instance_method" title="#get_project_site_data (instance method)">- (Object) <strong>get_project_site_data</strong> </a>
+      <a href="#get_project_site_data-instance_method" title="#get_project_site_data (instance method)">- (JSON) <strong>get_project_site_data</strong> </a>
     
 
     
@@ -528,7 +528,7 @@ pulls data from a within a project&#8217;s site.
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#get_project_site_sample_data_last_update-instance_method" title="#get_project_site_sample_data_last_update (instance method)">- (Object) <strong>get_project_site_sample_data_last_update</strong> </a>
+      <a href="#get_project_site_sample_data_last_update-instance_method" title="#get_project_site_sample_data_last_update (instance method)">- (JSON) <strong>get_project_site_sample_data_last_update</strong> </a>
     
 
     
@@ -552,7 +552,7 @@ pulls data from a within a project&#8217;s site for samples only.
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#get_project_site_sample_values_by_variable-instance_method" title="#get_project_site_sample_values_by_variable (instance method)">- (Object) <strong>get_project_site_sample_values_by_variable</strong> </a>
+      <a href="#get_project_site_sample_values_by_variable-instance_method" title="#get_project_site_sample_values_by_variable (instance method)">- (JSON) <strong>get_project_site_sample_values_by_variable</strong> </a>
     
 
     
@@ -576,7 +576,7 @@ pulls data from a within a project&#8217;s site for samples only.
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#get_project_site_sensor_data_last_update-instance_method" title="#get_project_site_sensor_data_last_update (instance method)">- (Object) <strong>get_project_site_sensor_data_last_update</strong> </a>
+      <a href="#get_project_site_sensor_data_last_update-instance_method" title="#get_project_site_sensor_data_last_update (instance method)">- (JSON) <strong>get_project_site_sensor_data_last_update</strong> </a>
     
 
     
@@ -600,7 +600,7 @@ pulls data from a within a project&#8217;s site.
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#get_project_site_sensor_values_by_variable-instance_method" title="#get_project_site_sensor_values_by_variable (instance method)">- (Object) <strong>get_project_site_sensor_values_by_variable</strong> </a>
+      <a href="#get_project_site_sensor_values_by_variable-instance_method" title="#get_project_site_sensor_values_by_variable (instance method)">- (JSON) <strong>get_project_site_sensor_values_by_variable</strong> </a>
     
 
     
@@ -1050,23 +1050,23 @@ Sean Cleveland
       <pre class="lines">
 
 
-314
-315
-316
-317
-318
-319
-320
-321
-322
-323
-324
-325
-326
-327</pre>
+329
+330
+331
+332
+333
+334
+335
+336
+337
+338
+339
+340
+341
+342</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 314</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 329</span>
 
 <span class='kw'>def</span> <span class='id create_project_data_stream'>create_project_data_stream</span>
   <span class='ivar'>@stream</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -1272,26 +1272,26 @@ Sean Cleveland
       <pre class="lines">
 
 
-352
-353
-354
-355
-356
-357
-358
-359
-360
-361
-362
-363
-364
-365
-366
 367
-368</pre>
+368
+369
+370
+371
+372
+373
+374
+375
+376
+377
+378
+379
+380
+381
+382
+383</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 352</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 367</span>
 
 <span class='kw'>def</span> <span class='id create_project_data_stream_column'>create_project_data_stream_column</span>
    <span class='ivar'>@data_column</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -1500,33 +1500,33 @@ Sean Cleveland
       <pre class="lines">
 
 
-1165
-1166
-1167
-1168
-1169
-1170
-1171
-1172
-1173
-1174
-1175
-1176
-1177
-1178
-1179
-1180
-1181
-1182
-1183
-1184
-1185
-1186
-1187
-1188</pre>
+1198
+1199
+1200
+1201
+1202
+1203
+1204
+1205
+1206
+1207
+1208
+1209
+1210
+1211
+1212
+1213
+1214
+1215
+1216
+1217
+1218
+1219
+1220
+1221</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1165</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1198</span>
 
 <span class='kw'>def</span> <span class='id create_project_sample'>create_project_sample</span>
  <span class='ivar'>@sample</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -1692,39 +1692,6 @@ Sean Cleveland
       <pre class="lines">
 
 
-1228
-1229
-1230
-1231
-1232
-1233
-1234
-1235
-1236
-1237
-1238
-1239
-1240
-1241
-1242
-1243
-1244
-1245
-1246
-1247
-1248
-1249
-1250
-1251
-1252
-1253
-1254
-1255
-1256
-1257
-1258
-1259
-1260
 1261
 1262
 1263
@@ -1732,10 +1699,43 @@ Sean Cleveland
 1265
 1266
 1267
-1268</pre>
+1268
+1269
+1270
+1271
+1272
+1273
+1274
+1275
+1276
+1277
+1278
+1279
+1280
+1281
+1282
+1283
+1284
+1285
+1286
+1287
+1288
+1289
+1290
+1291
+1292
+1293
+1294
+1295
+1296
+1297
+1298
+1299
+1300
+1301</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1228</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1261</span>
 
 <span class='kw'>def</span> <span class='id create_project_sample_measurement'>create_project_sample_measurement</span>
   <span class='ivar'>@measurement</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -1962,21 +1962,6 @@ Sean Cleveland
       <pre class="lines">
 
 
-392
-393
-394
-395
-396
-397
-398
-399
-400
-401
-402
-403
-404
-405
-406
 407
 408
 409
@@ -1984,10 +1969,25 @@ Sean Cleveland
 411
 412
 413
-414</pre>
+414
+415
+416
+417
+418
+419
+420
+421
+422
+423
+424
+425
+426
+427
+428
+429</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 392</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 407</span>
 
 <span class='kw'>def</span> <span class='id create_project_sensor_type'>create_project_sensor_type</span>
   <span class='ivar'>@sensor_type</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -2203,30 +2203,30 @@ Sean Cleveland
       <pre class="lines">
 
 
-438
-439
-440
-441
-442
-443
-444
-445
-446
-447
-448
-449
-450
-451
-452
 453
 454
 455
 456
 457
-458</pre>
+458
+459
+460
+461
+462
+463
+464
+465
+466
+467
+468
+469
+470
+471
+472
+473</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 438</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 453</span>
 
 <span class='kw'>def</span> <span class='id create_project_sensor_value'>create_project_sensor_value</span>
   <span class='ivar'>@sensor_type</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -2396,38 +2396,42 @@ Sean Cleveland
       <pre class="lines">
 
 
-682
-683
-684
-685
-686
-687
-688
-689
-690
-691
-692
-693
-694
-695
-696
-697
-698
-699
-700</pre>
+715
+716
+717
+718
+719
+720
+721
+722
+723
+724
+725
+726
+727
+728
+729
+730
+731
+732
+733
+734
+735</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 682</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 715</span>
 
 <span class='kw'>def</span> <span class='id create_project_site'>create_project_site</span>
   <span class='ivar'>@site</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
   <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span> <span class='kw'>do</span>
-    <span class='ivar'>@site</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='symbol'>:name</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:name</span><span class='rbracket'>]</span><span class='comma'>,</span> 
-                                   <span class='symbol'>:code</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:code</span><span class='rbracket'>]</span><span class='comma'>,</span>
-                                   <span class='symbol'>:latitude</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:latitude</span><span class='rbracket'>]</span><span class='comma'>,</span>
-                                   <span class='symbol'>:longitude</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:longitude</span><span class='rbracket'>]</span><span class='comma'>,</span>
-                                   <span class='symbol'>:state</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:state</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='comment'>#,
-</span>                                   <span class='comment'>#:country =&gt; params[:country])
+    <span class='ivar'>@site</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id new'>new</span>
+    <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id properties'>properties</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id prop'>prop</span><span class='op'>|</span>
+      <span class='kw'>if</span> <span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='period'>.</span><span class='id to_s'>to_s</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span>
+        <span class='kw'>if</span> <span class='op'>!</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id nil?'>nil?</span>
+          <span class='ivar'>@site</span><span class='lbracket'>[</span><span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbracket'>]</span>
+        <span class='kw'>end</span> <span class='comment'>#endif
+</span>      <span class='kw'>end</span><span class='comment'>#endif
+</span>    <span class='kw'>end</span><span class='comment'>#end loop
 </span>    <span class='kw'>begin</span>
      <span class='ivar'>@site</span><span class='period'>.</span><span class='id save'>save</span>
     <span class='kw'>rescue</span>
@@ -2552,28 +2556,28 @@ Sean Cleveland
       <pre class="lines">
 
 
-898
-899
-900
-901
-902
-903
-904
-905
-906
-907
-908
-909
-910
-911
-912
-913
-914
-915
-916</pre>
+931
+932
+933
+934
+935
+936
+937
+938
+939
+940
+941
+942
+943
+944
+945
+946
+947
+948
+949</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 898</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 931</span>
 
 <span class='kw'>def</span> <span class='id create_project_variable'>create_project_variable</span>
   <span class='ivar'>@variable</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -2612,31 +2616,31 @@ Sean Cleveland
       <pre class="lines">
 
 
-1080
-1081
-1082
-1083
-1084
-1085
-1086
-1087
-1088
-1089
-1090
-1091
-1092
-1093
-1094
-1095
-1096
-1097
-1098
-1099
-1100
-1101</pre>
+1113
+1114
+1115
+1116
+1117
+1118
+1119
+1120
+1121
+1122
+1123
+1124
+1125
+1126
+1127
+1128
+1129
+1130
+1131
+1132
+1133
+1134</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1080</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1113</span>
 
 <span class='kw'>def</span> <span class='id dojo_variables_for_tree'>dojo_variables_for_tree</span>
   <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id new'>new</span>
@@ -2721,11 +2725,6 @@ Sean Cleveland
     <p>
 pulls data from a data stream
 </p>
-<p>
-<a
-href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_data_stream_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_stream_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_data_stream_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_stream_id=1&start_datetime=12/1/2010</a>
-12:23&amp;end_datetime=12/1/2010 24:00:00
-</p>
 
 
   </div>
@@ -2736,7 +2735,9 @@ href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0
     <h3>Examples:</h3>
     
       <h4><div class='inline'><p>
-URL
+<a
+href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_data_stream_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_stream_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_data_stream_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_stream_id=1&start_datetime=12/1/2010</a>
+12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 </div></h4>
       <pre class="example code"></pre>
@@ -2815,6 +2816,7 @@ Sean Cleveland
       <pre class="lines">
 
 
+129
 130
 131
 132
@@ -2838,11 +2840,10 @@ Sean Cleveland
 150
 151
 152
-153
-154</pre>
+153</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 130</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 129</span>
 
 <span class='kw'>def</span> <span class='id get_data_stream_data'>get_data_stream_data</span>    
  <span class='ivar'>@dts</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -2887,16 +2888,16 @@ Sean Cleveland
       <pre class="lines">
 
 
-1031
-1032
-1033
-1034
-1035
-1036
-1037</pre>
+1064
+1065
+1066
+1067
+1068
+1069
+1070</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1031</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1064</span>
 
 <span class='kw'>def</span> <span class='id get_dojo_voeis_variables'>get_dojo_voeis_variables</span>
   <span class='ivar'>@variables</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id new'>new</span>
@@ -3005,18 +3006,18 @@ Sean Cleveland
       <pre class="lines">
 
 
-284
-285
-286
-287
-288
-289
-290
-291
-292</pre>
+299
+300
+301
+302
+303
+304
+305
+306
+307</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 284</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 299</span>
 
 <span class='kw'>def</span> <span class='id get_project_data_templates'>get_project_data_templates</span>
  <span class='ivar'>@dts</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -3113,19 +3114,19 @@ Sean Cleveland
       <pre class="lines">
 
 
-1136
-1137
-1138
-1139
-1140
-1141
-1142
-1143
-1144
-1145</pre>
+1169
+1170
+1171
+1172
+1173
+1174
+1175
+1176
+1177
+1178</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1136</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1169</span>
 
 <span class='kw'>def</span> <span class='id get_project_sample'>get_project_sample</span>
  <span class='ivar'>@sample</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -3224,18 +3225,18 @@ Sean Cleveland
       <pre class="lines">
 
 
-1202
-1203
-1204
-1205
-1206
-1207
-1208
-1209
-1210</pre>
+1235
+1236
+1237
+1238
+1239
+1240
+1241
+1242
+1243</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1202</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1235</span>
 
 <span class='kw'>def</span> <span class='id get_project_sample_measurements'>get_project_sample_measurements</span>
  <span class='ivar'>@measurements</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -3312,18 +3313,18 @@ Sean Cleveland
       <pre class="lines">
 
 
-1114
-1115
-1116
-1117
-1118
-1119
-1120
-1121
-1122</pre>
+1147
+1148
+1149
+1150
+1151
+1152
+1153
+1154
+1155</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1114</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1147</span>
 
 <span class='kw'>def</span> <span class='id get_project_samples'>get_project_samples</span>
  <span class='ivar'>@samples</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -3413,18 +3414,18 @@ Sean Cleveland
       <pre class="lines">
 
 
-753
-754
-755
-756
-757
-758
-759
-760
-761</pre>
+788
+789
+790
+791
+792
+793
+794
+795
+796</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 753</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 788</span>
 
 <span class='kw'>def</span> <span class='id get_project_site'>get_project_site</span>
   <span class='ivar'>@site</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -3443,7 +3444,7 @@ Sean Cleveland
       <div class="method_details ">
   <p class="signature " id="get_project_site_data-instance_method">
   
-    - (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>get_project_site_data</strong> 
+    - (<tt>JSON</tt>) <strong>get_project_site_data</strong> 
   
 
   
@@ -3451,11 +3452,6 @@ Sean Cleveland
   <div class="discussion">
     <p>
 pulls data from a within a project&#8217;s site
-</p>
-<p>
-<a
-href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010</a>
-12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 
 
@@ -3467,7 +3463,9 @@ href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0
     <h3>Examples:</h3>
     
       <h4><div class='inline'><p>
-URL
+<a
+href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010</a>
+12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 </div></h4>
       <pre class="example code"></pre>
@@ -3528,6 +3526,27 @@ pull date before this datetime
     </li>
   
 </ul>
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+        <span class='type'>(<tt>JSON</tt>)</span>
+      
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>
+a JSON object with variable, site, time_series_data,
+time_series_count,time_series_ max, time_series_min, time_series_avg,
+sample_data, sample_count, sample_max, sample_min and sample_avg fields
+</p>
+</div>
+      
+    </li>
+  
+</ul>
 <h3>Author:</h3>
 <ul class="author">
   
@@ -3552,21 +3571,6 @@ Sean Cleveland
       <pre class="lines">
 
 
-477
-478
-479
-480
-481
-482
-483
-484
-485
-486
-487
-488
-489
-490
-491
 492
 493
 494
@@ -3575,10 +3579,35 @@ Sean Cleveland
 497
 498
 499
-500</pre>
+500
+501
+502
+503
+504
+505
+506
+507
+508
+509
+510
+511
+512
+513
+514
+515
+516
+517
+518
+519
+520
+521
+522
+523
+524
+525</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 477</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 492</span>
 
 <span class='kw'>def</span> <span class='id get_project_site_data'>get_project_site_data</span>    
  <span class='ivar'>@site</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -3592,8 +3621,18 @@ Sean Cleveland
      <span class='ivar'>@site</span><span class='period'>.</span><span class='id variables'>variables</span><span class='period'>.</span> <span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id var'>var</span><span class='op'>|</span>
        <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id new'>new</span>
        <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='id var'>var</span><span class='period'>.</span><span class='id as_json'>as_json</span>
-       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>time_series_data</span><span class='tstring_end'>'</span></span> <span class='op'>=&gt;</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id data_values'>data_values</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sensor</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span> 
-       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>sample_data</span><span class='tstring_end'>'</span></span> <span class='op'>=&gt;</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id data_values'>data_values</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sample</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+       <span class='id tseries'>tseries</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sensor</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:site_id</span> <span class='op'>=&gt;</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:variable_id</span> <span class='op'>=&gt;</span> <span class='id var'>var</span><span class='period'>.</span><span class='id id'>id</span><span class='rparen'>)</span> 
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>time_series_data</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id tseries'>tseries</span><span class='rbrace'>}</span><span class='rparen'>)</span> 
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>time_series_count</span><span class='tstring_end'>&quot;</span></span><span class='op'>=&gt;</span><span class='id tseries'>tseries</span><span class='period'>.</span><span class='id count'>count</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='symbol'>:time_series_max</span><span class='op'>=&gt;</span><span class='id tseries'>tseries</span><span class='period'>.</span><span class='id max'>max</span><span class='lparen'>(</span><span class='symbol'>:data_value</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='symbol'>:time_series_min</span><span class='op'>=&gt;</span><span class='id tseries'>tseries</span><span class='period'>.</span><span class='id min'>min</span><span class='lparen'>(</span><span class='symbol'>:data_value</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='symbol'>:time_series_avg</span><span class='op'>=&gt;</span><span class='id tseries'>tseries</span><span class='period'>.</span><span class='id avg'>avg</span><span class='lparen'>(</span><span class='symbol'>:data_value</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span> 
+       <span class='id sdata'>sdata</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sample</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:site_id</span> <span class='op'>=&gt;</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:variable_id</span> <span class='op'>=&gt;</span> <span class='id var'>var</span><span class='period'>.</span><span class='id id'>id</span><span class='rparen'>)</span>
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>sample_data</span><span class='tstring_end'>&quot;</span></span> <span class='op'>=&gt;</span> <span class='id sdata'>sdata</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>sample_count</span><span class='tstring_end'>&quot;</span></span><span class='op'>=&gt;</span><span class='id sdata'>sdata</span><span class='period'>.</span><span class='id count'>count</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>sample_max</span><span class='tstring_end'>&quot;</span></span><span class='op'>=&gt;</span><span class='id sdata'>sdata</span><span class='period'>.</span><span class='id max'>max</span><span class='lparen'>(</span><span class='symbol'>:data_value</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>sample_min</span><span class='tstring_end'>&quot;</span></span><span class='op'>=&gt;</span><span class='id sdata'>sdata</span><span class='period'>.</span><span class='id min'>min</span><span class='lparen'>(</span><span class='symbol'>:data_value</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>sample_avg</span><span class='tstring_end'>&quot;</span></span><span class='op'>=&gt;</span><span class='id sdata'>sdata</span><span class='period'>.</span><span class='id avg'>avg</span><span class='lparen'>(</span><span class='symbol'>:data_value</span><span class='rparen'>)</span> <span class='rbrace'>}</span><span class='rparen'>)</span>
        <span class='ivar'>@values</span> <span class='op'>&lt;&lt;</span> <span class='ivar'>@var_hash</span>
      <span class='kw'>end</span>
      <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:variables</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@values</span>
@@ -3612,7 +3651,7 @@ Sean Cleveland
       <div class="method_details ">
   <p class="signature " id="get_project_site_sample_data_last_update-instance_method">
   
-    - (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>get_project_site_sample_data_last_update</strong> 
+    - (<tt>JSON</tt>) <strong>get_project_site_sample_data_last_update</strong> 
   
 
   
@@ -3620,11 +3659,6 @@ Sean Cleveland
   <div class="discussion">
     <p>
 pulls data from a within a project&#8217;s site for samples only
-</p>
-<p>
-<a
-href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010</a>
-12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 
 
@@ -3636,7 +3670,9 @@ href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0
     <h3>Examples:</h3>
     
       <h4><div class='inline'><p>
-URL
+<a
+href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010</a>
+12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 </div></h4>
       <pre class="example code"></pre>
@@ -3663,6 +3699,25 @@ the id of the site to pull data for
     </li>
   
 </ul>
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+        <span class='type'>(<tt>JSON</tt>)</span>
+      
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>
+a JSON object with variables, site, data fields
+</p>
+</div>
+      
+    </li>
+  
+</ul>
 <h3>Author:</h3>
 <ul class="author">
   
@@ -3687,33 +3742,33 @@ Sean Cleveland
       <pre class="lines">
 
 
-553
-554
-555
-556
-557
-558
-559
-560
-561
-562
-563
-564
-565
-566
-567
-568
-569
-570
-571
-572
-573
-574
-575
-576</pre>
+576
+577
+578
+579
+580
+581
+582
+583
+584
+585
+586
+587
+588
+589
+590
+591
+592
+593
+594
+595
+596
+597
+598
+599</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 553</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 576</span>
 
 <span class='kw'>def</span> <span class='id get_project_site_sample_data_last_update'>get_project_site_sample_data_last_update</span>    
  <span class='ivar'>@site</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -3728,7 +3783,7 @@ Sean Cleveland
        <span class='comment'>#var = sensor.variables.first
 </span>       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id new'>new</span>
        <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='id var'>var</span><span class='period'>.</span><span class='id as_json'>as_json</span>
-       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>data</span><span class='tstring_end'>'</span></span> <span class='op'>=&gt;</span> <span class='lparen'>(</span><span class='id var'>var</span><span class='period'>.</span><span class='id data_values'>data_values</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sample</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:order</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id asc'>asc</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>&amp;</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id data_values'>data_values</span><span class='rparen'>)</span><span class='period'>.</span><span class='id last'>last</span><span class='period'>.</span><span class='id as_json'>as_json</span><span class='rbrace'>}</span><span class='rparen'>)</span> 
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>data</span><span class='tstring_end'>'</span></span> <span class='op'>=&gt;</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sample</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:order</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id asc'>asc</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:site_id</span> <span class='op'>=&gt;</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:variable_id</span> <span class='op'>=&gt;</span> <span class='id var'>var</span><span class='period'>.</span><span class='id id'>id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id last'>last</span><span class='period'>.</span><span class='id as_json'>as_json</span><span class='rbrace'>}</span><span class='rparen'>)</span> 
        <span class='ivar'>@values</span> <span class='op'>&lt;&lt;</span> <span class='ivar'>@var_hash</span>
      <span class='kw'>end</span>
      <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:variables</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@values</span>
@@ -3747,7 +3802,7 @@ Sean Cleveland
       <div class="method_details ">
   <p class="signature " id="get_project_site_sample_values_by_variable-instance_method">
   
-    - (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>get_project_site_sample_values_by_variable</strong> 
+    - (<tt>JSON</tt>) <strong>get_project_site_sample_values_by_variable</strong> 
   
 
   
@@ -3755,11 +3810,6 @@ Sean Cleveland
   <div class="discussion">
     <p>
 pulls data from a within a project&#8217;s site for samples only
-</p>
-<p>
-<a
-href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010</a>
-12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 
 
@@ -3771,7 +3821,9 @@ href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0
     <h3>Examples:</h3>
     
       <h4><div class='inline'><p>
-URL
+<a
+href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=7&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=7&start_datetime=12/1/2010</a>
+12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 </div></h4>
       <pre class="example code"></pre>
@@ -3849,6 +3901,25 @@ pull date before this datetime
     </li>
   
 </ul>
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+        <span class='type'>(<tt>JSON</tt>)</span>
+      
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>
+a JSON object with variable, site, data, count, max, min and avg fields
+</p>
+</div>
+      
+    </li>
+  
+</ul>
 <h3>Author:</h3>
 <ul class="author">
   
@@ -3873,38 +3944,43 @@ Sean Cleveland
       <pre class="lines">
 
 
-638
-639
-640
-641
-642
-643
-644
-645
-646
-647
-648
-649
-650
-651
-652
-653
-654
-655
-656
-657
-658
-659
-660
-661
-662
-663
-664
-665
-666</pre>
+666
+667
+668
+669
+670
+671
+672
+673
+674
+675
+676
+677
+678
+679
+680
+681
+682
+683
+684
+685
+686
+687
+688
+689
+690
+691
+692
+693
+694
+695
+696
+697
+698
+699</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 638</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 666</span>
 
 <span class='kw'>def</span> <span class='id get_project_site_sample_values_by_variable'>get_project_site_sample_values_by_variable</span>    
  <span class='ivar'>@site</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -3927,7 +4003,12 @@ Sean Cleveland
 </span>    <span class='comment'>#  @data_values[:error] = &quot;There are no Sensor Value for this site and variable combination&quot;
 </span>    <span class='comment'># else
 </span>       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id as_json'>as_json</span>
-       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:data</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='ivar'>@site</span><span class='period'>.</span><span class='id data_values'>data_values</span> <span class='op'>&amp;</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id data_values'>data_values</span><span class='rparen'>)</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sample</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:order</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id asc'>asc</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id as_json'>as_json</span> 
+       <span class='id tseries'>tseries</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sample</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:site_id</span><span class='op'>=&gt;</span><span class='ivar'>@site</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:variable_id</span> <span class='op'>=&gt;</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:order</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id asc'>asc</span><span class='rbracket'>]</span><span class='rparen'>)</span> 
+       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:data</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id tseries'>tseries</span><span class='period'>.</span><span class='id as_json'>as_json</span>
+       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:count</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id tseries'>tseries</span><span class='period'>.</span><span class='id count'>count</span>
+       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id tseries'>tseries</span><span class='period'>.</span><span class='id max'>max</span><span class='lparen'>(</span><span class='symbol'>:data_value</span><span class='rparen'>)</span>
+       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:min</span><span class='rbracket'>]</span> <span class='op'>=</span><span class='id tseries'>tseries</span><span class='period'>.</span><span class='id min'>min</span><span class='lparen'>(</span><span class='symbol'>:data_value</span><span class='rparen'>)</span>
+       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:avg</span><span class='rbracket'>]</span><span class='op'>=</span><span class='id tseries'>tseries</span><span class='period'>.</span><span class='id avg'>avg</span><span class='lparen'>(</span><span class='symbol'>:data_value</span><span class='rparen'>)</span>
      <span class='comment'>#end
 </span>   <span class='kw'>end</span>
    <span class='id respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id format'>format</span><span class='op'>|</span>
@@ -3943,7 +4024,7 @@ Sean Cleveland
       <div class="method_details ">
   <p class="signature " id="get_project_site_sensor_data_last_update-instance_method">
   
-    - (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>get_project_site_sensor_data_last_update</strong> 
+    - (<tt>JSON</tt>) <strong>get_project_site_sensor_data_last_update</strong> 
   
 
   
@@ -3951,11 +4032,6 @@ Sean Cleveland
   <div class="discussion">
     <p>
 pulls data from a within a project&#8217;s site
-</p>
-<p>
-<a
-href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010</a>
-12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 
 
@@ -3967,7 +4043,9 @@ href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0
     <h3>Examples:</h3>
     
       <h4><div class='inline'><p>
-URL
+<a
+href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010</a>
+12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 </div></h4>
       <pre class="example code"></pre>
@@ -3988,6 +4066,25 @@ URL
         &mdash;
         <div class='inline'><p>
 the id of the site to pull data for
+</p>
+</div>
+      
+    </li>
+  
+</ul>
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+        <span class='type'>(<tt>JSON</tt>)</span>
+      
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>
+a JSON object with variable, site, data fields
 </p>
 </div>
       
@@ -4018,33 +4115,33 @@ Sean Cleveland
       <pre class="lines">
 
 
-515
-516
-517
-518
-519
-520
-521
-522
-523
-524
-525
-526
-527
-528
-529
-530
-531
-532
-533
-534
-535
-536
-537
-538</pre>
+539
+540
+541
+542
+543
+544
+545
+546
+547
+548
+549
+550
+551
+552
+553
+554
+555
+556
+557
+558
+559
+560
+561
+562</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 515</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 539</span>
 
 <span class='kw'>def</span> <span class='id get_project_site_sensor_data_last_update'>get_project_site_sensor_data_last_update</span>    
  <span class='ivar'>@site</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -4059,7 +4156,7 @@ Sean Cleveland
        <span class='comment'>#var = sensor.variables.first
 </span>       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id new'>new</span>
        <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='id var'>var</span><span class='period'>.</span><span class='id as_json'>as_json</span>
-       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>data</span><span class='tstring_end'>'</span></span> <span class='op'>=&gt;</span> <span class='lparen'>(</span><span class='id var'>var</span><span class='period'>.</span><span class='id data_values'>data_values</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sensor</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:order</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id asc'>asc</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>&amp;</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id data_values'>data_values</span><span class='rparen'>)</span><span class='period'>.</span><span class='id last'>last</span><span class='period'>.</span><span class='id as_json'>as_json</span><span class='rbrace'>}</span><span class='rparen'>)</span> 
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>data</span><span class='tstring_end'>'</span></span> <span class='op'>=&gt;</span>  <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id last'>last</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sensor</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:order</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id asc'>asc</span><span class='rbracket'>]</span><span class='comma'>,</span> <span class='symbol'>:site_id</span> <span class='op'>=&gt;</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:variable_id</span> <span class='op'>=&gt;</span> <span class='id var'>var</span><span class='period'>.</span><span class='id id'>id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id as_json'>as_json</span><span class='rbrace'>}</span><span class='rparen'>)</span> 
        <span class='ivar'>@values</span> <span class='op'>&lt;&lt;</span> <span class='ivar'>@var_hash</span>
      <span class='kw'>end</span>
      <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:variables</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@values</span>
@@ -4078,7 +4175,7 @@ Sean Cleveland
       <div class="method_details ">
   <p class="signature " id="get_project_site_sensor_values_by_variable-instance_method">
   
-    - (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>get_project_site_sensor_values_by_variable</strong> 
+    - (<tt>JSON</tt>) <strong>get_project_site_sensor_values_by_variable</strong> 
   
 
   
@@ -4086,11 +4183,6 @@ Sean Cleveland
   <div class="discussion">
     <p>
 pulls data from a within a project&#8217;s site
-</p>
-<p>
-<a
-href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010</a>
-12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 
 
@@ -4102,7 +4194,9 @@ href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0
     <h3>Examples:</h3>
     
       <h4><div class='inline'><p>
-URL
+<a
+href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010</a>
+12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 </div></h4>
       <pre class="example code"></pre>
@@ -4180,6 +4274,25 @@ pull date before this datetime
     </li>
   
 </ul>
+<h3>Returns:</h3>
+<ul class="return">
+  
+    <li>
+      
+        <span class='type'>(<tt>JSON</tt>)</span>
+      
+      
+      
+      
+        &mdash;
+        <div class='inline'><p>
+a JSON object with variable, site, data, count, max, min and avg fields
+</p>
+</div>
+      
+    </li>
+  
+</ul>
 <h3>Author:</h3>
 <ul class="author">
   
@@ -4204,38 +4317,43 @@ Sean Cleveland
       <pre class="lines">
 
 
-593
-594
-595
-596
-597
-598
-599
-600
-601
-602
-603
-604
-605
-606
-607
-608
-609
-610
-611
-612
-613
-614
-615
 616
 617
 618
 619
 620
-621</pre>
+621
+622
+623
+624
+625
+626
+627
+628
+629
+630
+631
+632
+633
+634
+635
+636
+637
+638
+639
+640
+641
+642
+643
+644
+645
+646
+647
+648
+649</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 593</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 616</span>
 
 <span class='kw'>def</span> <span class='id get_project_site_sensor_values_by_variable'>get_project_site_sensor_values_by_variable</span>    
  <span class='ivar'>@site</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -4258,7 +4376,12 @@ Sean Cleveland
 </span>    <span class='comment'>#  @data_values[:error] = &quot;There are no Sensor Value for this site and variable combination&quot;
 </span>    <span class='comment'># else
 </span>       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id as_json'>as_json</span>
-       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:data</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='ivar'>@site</span><span class='period'>.</span><span class='id data_values'>data_values</span> <span class='op'>&amp;</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id data_values'>data_values</span><span class='rparen'>)</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sensor</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:order</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id asc'>asc</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id as_json'>as_json</span> 
+       <span class='id tseries'>tseries</span><span class='op'>=</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sensor</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:site_id</span> <span class='op'>=&gt;</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:variable_id</span> <span class='op'>=&gt;</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span><span class='symbol'>:order</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id asc'>asc</span><span class='rbracket'>]</span><span class='rparen'>)</span> 
+       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:data</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id tseries'>tseries</span><span class='period'>.</span><span class='id as_json'>as_json</span>
+       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:count</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id tseries'>tseries</span><span class='period'>.</span><span class='id count'>count</span>
+       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:max</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id tseries'>tseries</span><span class='period'>.</span><span class='id max'>max</span><span class='lparen'>(</span><span class='symbol'>:data_value</span><span class='rparen'>)</span>
+       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:min</span><span class='rbracket'>]</span> <span class='op'>=</span><span class='id tseries'>tseries</span><span class='period'>.</span><span class='id min'>min</span><span class='lparen'>(</span><span class='symbol'>:data_value</span><span class='rparen'>)</span>
+       <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:avg</span><span class='rbracket'>]</span><span class='op'>=</span><span class='id tseries'>tseries</span><span class='period'>.</span><span class='id avg'>avg</span><span class='lparen'>(</span><span class='symbol'>:data_value</span><span class='rparen'>)</span>
      <span class='comment'>#end
 </span>   <span class='kw'>end</span>
    <span class='id respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id format'>format</span><span class='op'>|</span>
@@ -4283,11 +4406,6 @@ Sean Cleveland
     <p>
 pulls data from a within a project&#8217;s by site and the variable
 </p>
-<p>
-<a
-href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010</a>
-12:23&amp;end_datetime=12/1/2010 24:00:00
-</p>
 
 
   </div>
@@ -4298,7 +4416,9 @@ href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0
     <h3>Examples:</h3>
     
       <h4><div class='inline'><p>
-URL
+<a
+href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010</a>
+12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 </div></h4>
       <pre class="example code"></pre>
@@ -4400,39 +4520,39 @@ Sean Cleveland
       <pre class="lines">
 
 
-854
-855
-856
-857
-858
-859
-860
-861
-862
-863
-864
-865
-866
-867
-868
-869
-870
-871
-872
-873
-874
-875
-876
-877
-878
-879
-880
-881
-882
-883</pre>
+887
+888
+889
+890
+891
+892
+893
+894
+895
+896
+897
+898
+899
+900
+901
+902
+903
+904
+905
+906
+907
+908
+909
+910
+911
+912
+913
+914
+915
+916</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 854</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 887</span>
 
 <span class='kw'>def</span> <span class='id get_project_site_variable_data'>get_project_site_variable_data</span>    
  <span class='ivar'>@var</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -4450,8 +4570,8 @@ Sean Cleveland
        <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id new'>new</span>
        <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var</span><span class='period'>.</span><span class='id as_json'>as_json</span>
        <span class='comment'>#if !@var.sensor_types.first.nil?
-</span>       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>time_series_data</span><span class='tstring_end'>'</span></span><span class='op'>=&gt;</span>  <span class='lparen'>(</span><span class='ivar'>@var</span><span class='period'>.</span><span class='id data_values'>data_values</span> <span class='op'>+</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id data_values'>data_values</span><span class='rparen'>)</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sensor</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
-       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>sample_data</span><span class='tstring_end'>'</span></span> <span class='op'>=&gt;</span> <span class='lparen'>(</span><span class='ivar'>@var</span><span class='period'>.</span><span class='id data_values'>data_values</span> <span class='op'>+</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id data_values'>data_values</span><span class='rparen'>)</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sample</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+</span>       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>time_series_data</span><span class='tstring_end'>'</span></span><span class='op'>=&gt;</span>  <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sensor</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:site_id</span><span class='op'>=&gt;</span><span class='ivar'>@site</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:variable_id</span><span class='op'>=&gt;</span><span class='ivar'>@var</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+       <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>sample_data</span><span class='tstring_end'>'</span></span> <span class='op'>=&gt;</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:site_id</span><span class='op'>=&gt;</span><span class='ivar'>@site</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:variable_id</span><span class='op'>=&gt;</span><span class='ivar'>@var</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sample</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
          <span class='comment'>#@var_hash = @var_hash.merge({'data' =&gt; @var.data_values.all(:local_date_time.gte =&gt; params[:start_datetime].to_time, :local_date_time.lte =&gt; params[:end_datetime].to_time) &amp; @site.data_values.all(:local_date_time.gte =&gt; params[:start_datetime].to_time, :local_date_time.lte =&gt; params[:end_datetime].to_time)})  
 </span>     <span class='kw'>end</span>
        <span class='ivar'>@values</span> <span class='op'>&lt;&lt;</span> <span class='ivar'>@var_hash</span>
@@ -4522,18 +4642,18 @@ Sean Cleveland
       <pre class="lines">
 
 
-772
-773
-774
-775
-776
-777
-778
-779
-780</pre>
+807
+808
+809
+810
+811
+812
+813
+814
+815</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 772</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 807</span>
 
 <span class='kw'>def</span> <span class='id get_project_sites'>get_project_sites</span>
   <span class='ivar'>@site</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -4623,18 +4743,18 @@ Sean Cleveland
       <pre class="lines">
 
 
-928
-929
-930
-931
-932
-933
-934
-935
-936</pre>
+961
+962
+963
+964
+965
+966
+967
+968
+969</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 928</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 961</span>
 
 <span class='kw'>def</span> <span class='id get_project_variable'>get_project_variable</span>
   <span class='ivar'>@variable</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -4662,11 +4782,6 @@ Sean Cleveland
     <p>
 pulls data from a within a project&#8217;s by the variable
 </p>
-<p>
-<a
-href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&variable_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&variable_id=1&start_datetime=12/1/2010</a>
-12:23&amp;end_datetime=12/1/2010 24:00:00
-</p>
 
 
   </div>
@@ -4677,7 +4792,9 @@ href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0
     <h3>Examples:</h3>
     
       <h4><div class='inline'><p>
-URL
+<a
+href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&variable_id=1&start_datetime=12/1/2010">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&variable_id=1&start_datetime=12/1/2010</a>
+12:23&amp;end_datetime=12/1/2010 24:00:00
 </p>
 </div></h4>
       <pre class="example code"></pre>
@@ -4762,31 +4879,31 @@ Sean Cleveland
       <pre class="lines">
 
 
-814
-815
-816
-817
-818
-819
-820
-821
-822
-823
-824
-825
-826
-827
-828
-829
-830
-831
-832
-833
-834
-835</pre>
+848
+849
+850
+851
+852
+853
+854
+855
+856
+857
+858
+859
+860
+861
+862
+863
+864
+865
+866
+867
+868
+869</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 814</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 848</span>
 
 <span class='kw'>def</span> <span class='id get_project_variable_data'>get_project_variable_data</span>    
  <span class='ivar'>@var</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -4799,8 +4916,8 @@ Sean Cleveland
    <span class='kw'>else</span>
      <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id new'>new</span>
      <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var</span><span class='period'>.</span><span class='id as_json'>as_json</span>
-     <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>time_series_data</span><span class='tstring_end'>'</span></span><span class='op'>=&gt;</span>  <span class='ivar'>@var</span><span class='period'>.</span><span class='id data_values'>data_values</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sensor</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
-     <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>sample_data</span><span class='tstring_end'>'</span></span> <span class='op'>=&gt;</span> <span class='ivar'>@var</span><span class='period'>.</span><span class='id data_values'>data_values</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sample</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+     <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>time_series_data</span><span class='tstring_end'>'</span></span><span class='op'>=&gt;</span>  <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sensor</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:variable_id</span><span class='op'>=&gt;</span> <span class='ivar'>@var</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
+     <span class='ivar'>@var_hash</span> <span class='op'>=</span> <span class='ivar'>@var_hash</span><span class='period'>.</span><span class='id merge'>merge</span><span class='lparen'>(</span><span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>sample_data</span><span class='tstring_end'>'</span></span> <span class='op'>=&gt;</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id all'>all</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Sample</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:variable_id</span><span class='op'>=&gt;</span> <span class='ivar'>@var</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id gte'>gte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='period'>.</span><span class='id lte'>lte</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:end_datetime</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_time'>to_time</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='rparen'>)</span>
      <span class='ivar'>@values</span> <span class='op'>&lt;&lt;</span> <span class='ivar'>@var_hash</span>
      <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@values</span>
      <span class='ivar'>@data_values</span><span class='lbracket'>[</span><span class='symbol'>:project</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id parent'>parent</span><span class='period'>.</span><span class='id as_json'>as_json</span>
@@ -4868,18 +4985,18 @@ Sean Cleveland
       <pre class="lines">
 
 
-946
-947
-948
-949
-950
-951
-952
-953
-954</pre>
+979
+980
+981
+982
+983
+984
+985
+986
+987</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 946</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 979</span>
 
 <span class='kw'>def</span> <span class='id get_project_variables'>get_project_variables</span>
   <span class='ivar'>@variable</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -4949,16 +5066,16 @@ Sean Cleveland
       <pre class="lines">
 
 
-791
-792
-793
-794
-795
-796
-797</pre>
+826
+827
+828
+829
+830
+831
+832</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 791</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 826</span>
 
 <span class='kw'>def</span> <span class='id get_voeis_sites'>get_voeis_sites</span>
   <span class='ivar'>@site</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -5033,16 +5150,16 @@ Sean Cleveland
       <pre class="lines">
 
 
-965
-966
-967
-968
-969
-970
-971</pre>
+998
+999
+1000
+1001
+1002
+1003
+1004</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 965</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 998</span>
 
 <span class='kw'>def</span> <span class='id get_voeis_variables'>get_voeis_variables</span>
   <span class='ivar'>@variables</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -5138,35 +5255,35 @@ Sean Cleveland
       <pre class="lines">
 
 
-1051
-1052
-1053
-1054
-1055
-1056
-1057
-1058
-1059
-1060
-1061
-1062
-1063
-1064
-1065
-1066
-1067
-1068
-1069
-1070
-1071
-1072
-1073
-1074
-1075
-1076</pre>
+1084
+1085
+1086
+1087
+1088
+1089
+1090
+1091
+1092
+1093
+1094
+1095
+1096
+1097
+1098
+1099
+1100
+1101
+1102
+1103
+1104
+1105
+1106
+1107
+1108
+1109</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1051</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1084</span>
 
 <span class='kw'>def</span> <span class='id import_voeis_variable_to_project'>import_voeis_variable_to_project</span>    
   <span class='ivar'>@var</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Variable</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:voeis_variable_id</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_i'>to_i</span><span class='rparen'>)</span>
@@ -5222,7 +5339,7 @@ update_project_site API for updating a site within in a project
     
       <h4><div class='inline'><p>
 <a
-href="http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/update_project_site.json?name=example&code=example&latitude=45.232&longitude=-111.234&state=MT">voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/update_project_site.json?name=example&code=example&latitude=45.232&longitude=-111.234&state=MT</a>
+href="http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/update_project_site.json?id=1&name=example&code=example&latitude=45.232&longitude=-111.234&state=MT">voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/update_project_site.json?id=1&name=example&code=example&latitude=45.232&longitude=-111.234&state=MT</a>
 </p>
 </div></h4>
       <pre class="example code"></pre>
@@ -5358,33 +5475,33 @@ Sean Cleveland
       <pre class="lines">
 
 
-718
-719
-720
-721
-722
-723
-724
-725
-726
-727
-728
-729
-730
-731
-732
-733
-734
-735
-736
-737
-738
-739
-740
-741</pre>
+753
+754
+755
+756
+757
+758
+759
+760
+761
+762
+763
+764
+765
+766
+767
+768
+769
+770
+771
+772
+773
+774
+775
+776</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 718</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 753</span>
 
 <span class='kw'>def</span> <span class='id update_project_site'>update_project_site</span>
   <span class='ivar'>@site</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -5394,7 +5511,7 @@ Sean Cleveland
         <span class='ivar'>@site</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>id</span><span class='tstring_end'>'</span></span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_i'>to_i</span><span class='rparen'>)</span>
         <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id properties'>properties</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id prop'>prop</span><span class='op'>|</span>
           <span class='kw'>if</span> <span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='period'>.</span><span class='id to_s'>to_s</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span>
-            <span class='kw'>if</span> <span class='op'>!</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id nil?'>nil?</span>
+            <span class='kw'>if</span> <span class='op'>!</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id nil?'>nil?</span> <span class='op'>||</span> <span class='op'>!</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>
               <span class='ivar'>@site</span><span class='lbracket'>[</span><span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbracket'>]</span>
             <span class='kw'>end</span> <span class='comment'>#endif
 </span>          <span class='kw'>end</span><span class='comment'>#endif
@@ -5541,33 +5658,33 @@ Sean Cleveland
       <pre class="lines">
 
 
-987
-988
-989
-990
-991
-992
-993
-994
-995
-996
-997
-998
-999
-1000
-1001
-1002
-1003
-1004
-1005
-1006
-1007
-1008
-1009
-1010</pre>
+1020
+1021
+1022
+1023
+1024
+1025
+1026
+1027
+1028
+1029
+1030
+1031
+1032
+1033
+1034
+1035
+1036
+1037
+1038
+1039
+1040
+1041
+1042
+1043</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 987</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1020</span>
 
 <span class='kw'>def</span> <span class='id update_project_variable'>update_project_variable</span>
   <span class='ivar'>@variable</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -5611,26 +5728,26 @@ Sean Cleveland
       <pre class="lines">
 
 
-1012
-1013
-1014
-1015
-1016
-1017
-1018
-1019
-1020
-1021
-1022
-1023
-1024
-1025
-1026
-1027
-1028</pre>
+1045
+1046
+1047
+1048
+1049
+1050
+1051
+1052
+1053
+1054
+1055
+1056
+1057
+1058
+1059
+1060
+1061</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1012</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 1045</span>
 
 <span class='kw'>def</span> <span class='id update_voeis_variable'>update_voeis_variable</span>
   <span class='ivar'>@variable</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span>
@@ -5668,10 +5785,6 @@ alows user to upload csv file to be processed into data this requires that
 a datastream has already been created to parse this file.  Can return json
 or xml as specified
 </p>
-<p>
-curl -F datafile=@CR1000_2_BigSky_NFork_small.dat -F data_template_id=1 <a
-href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_logger_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_logger_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7</a>
-</p>
 
 
   </div>
@@ -5682,7 +5795,8 @@ href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0
     <h3>Examples:</h3>
     
       <h4><div class='inline'><p>
-curl
+curl -F datafile=@CR1000_2_BigSky_NFork_small.dat -F data_template_id=1 <a
+href="http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_logger_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7">voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_logger_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7</a>
 </p>
 </div></h4>
       <pre class="example code"></pre>
@@ -5832,7 +5946,6 @@ Sean Cleveland
       <pre class="lines">
 
 
-208
 209
 210
 211
@@ -5895,10 +6008,25 @@ Sean Cleveland
 268
 269
 270
-271</pre>
+271
+272
+273
+274
+275
+276
+277
+278
+279
+280
+281
+282
+283
+284
+285
+286</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 208</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/apivs_controller.rb', line 209</span>
 
 <span class='kw'>def</span> <span class='id upload_logger_data'>upload_logger_data</span> 
   <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span> <span class='kw'>do</span>
@@ -5915,6 +6043,18 @@ Sean Cleveland
             <span class='id start_line'>start_line</span> <span class='op'>=</span> <span class='id data_stream_template'>data_stream_template</span><span class='period'>.</span><span class='id start_line'>start_line</span>
           <span class='kw'>else</span>
             <span class='id start_line'>start_line</span> <span class='op'>=</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:start_line</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_i'>to_i</span>
+          <span class='kw'>end</span>
+          <span class='kw'>if</span> <span class='id data_stream_template'>data_stream_template</span><span class='period'>.</span><span class='id utc_offset'>utc_offset</span><span class='period'>.</span><span class='id nil?'>nil?</span>
+            <span class='id site'>site</span> <span class='op'>=</span> <span class='id data_stream_template'>data_stream_template</span><span class='period'>.</span><span class='id sites'>sites</span><span class='period'>.</span><span class='id first'>first</span>
+            <span class='kw'>if</span> <span class='id site'>site</span><span class='period'>.</span><span class='id time_zone_offset'>time_zone_offset</span><span class='period'>.</span><span class='id nil?'>nil?</span> <span class='op'>||</span> <span class='id site'>site</span><span class='period'>.</span><span class='id time_zone_offset'>time_zone_offset</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>unknown</span><span class='tstring_end'>&quot;</span></span>
+              <span class='kw'>begin</span>
+                <span class='id site'>site</span><span class='period'>.</span><span class='id fetch_time_zone_offset'>fetch_time_zone_offset</span>
+              <span class='kw'>rescue</span>
+                <span class='comment'>#do nothing
+</span>              <span class='kw'>end</span>
+            <span class='kw'>end</span>
+            <span class='id data_stream_template'>data_stream_template</span><span class='period'>.</span><span class='id utc_offset'>utc_offset</span> <span class='op'>=</span> <span class='id site'>site</span><span class='period'>.</span><span class='id time_zone_offset'>time_zone_offset</span>
+            <span class='id data_stream_template'>data_stream_template</span><span class='period'>.</span><span class='id save!'>save!</span>
           <span class='kw'>end</span>
           <span class='id lines'>lines</span> <span class='op'>=</span><span class='int'>0</span>
           <span class='const'>CSV</span><span class='period'>.</span><span class='id foreach'>foreach</span><span class='lparen'>(</span><span class='ivar'>@new_file</span><span class='rparen'>)</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id row'>row</span><span class='op'>|</span> <span class='id lines'>lines</span> <span class='op'>+=</span><span class='int'>1</span><span class='rbrace'>}</span>
@@ -5940,6 +6080,7 @@ Sean Cleveland
           <span class='id logger'>logger</span><span class='period'>.</span><span class='id info'>info</span> <span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File does not match the data_templates number of columns.</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
         <span class='kw'>end</span>
       <span class='kw'>rescue</span>   <span class='const'>Exception</span> <span class='op'>=&gt;</span> <span class='id e'>e</span>
+          <span class='id email_exception'>email_exception</span><span class='lparen'>(</span><span class='id e'>e</span><span class='comma'>,</span><span class='id request'>request</span><span class='period'>.</span><span class='id env'>env</span><span class='rparen'>)</span>
           <span class='id logger'>logger</span><span class='period'>.</span><span class='id info'>info</span> <span class='lbrace'>{</span><span class='id e'>e</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbrace'>}</span>
           <span class='id logger'>logger</span><span class='period'>.</span><span class='id info'>info</span> <span class='lbrace'>{</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>YEAH</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
         <span class='comment'>#problem parsing file
@@ -5953,6 +6094,7 @@ Sean Cleveland
       <span class='kw'>end</span>
       <span class='kw'>if</span> <span class='id flash_error'>flash_error</span><span class='lbracket'>[</span><span class='symbol'>:error</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id nil?'>nil?</span>
         <span class='id flash_error'>flash_error</span><span class='lbracket'>[</span><span class='symbol'>:success</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>File was parsed succesfully.</span><span class='tstring_end'>&quot;</span></span>
+        <span class='id data_stream_template'>data_stream_template</span><span class='period'>.</span><span class='id sites'>sites</span><span class='period'>.</span><span class='id first'>first</span><span class='period'>.</span><span class='id update_site_data_catalog'>update_site_data_catalog</span>
         <span class='comment'>#flash_error = flash_error.merge({:last_record =&gt; data_stream_template.data_stream_columns.sensor_types.sensor_values.last(:order =&gt;[:id.asc]).as_json}) 
 </span>      <span class='kw'>end</span>
       <span class='id format'>format</span><span class='period'>.</span><span class='id json'>json</span> <span class='kw'>do</span>
@@ -5974,7 +6116,7 @@ Sean Cleveland
 </div>
     
     <div id="footer">
-  Generated on Tue Aug 16 11:28:23 2011 by 
+  Generated on Thu Sep 22 17:26:32 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

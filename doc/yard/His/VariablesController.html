@@ -282,14 +282,16 @@ POST /variables
 43
 44
 45
-46</pre>
+46
+47</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/his/variables_controller.rb', line 35</span>
 
 <span class='kw'>def</span> <span class='id create'>create</span>
   <span class='ivar'>@variable</span> <span class='op'>=</span> <span class='const'>His</span><span class='op'>::</span><span class='const'>Variable</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-
+  <span class='ivar'>@variable</span><span class='period'>.</span><span class='id valid?'>valid?</span>
+  <span class='id puts'>puts</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id errors'>errors</span><span class='period'>.</span><span class='id inspect'>inspect</span><span class='lparen'>(</span><span class='rparen'>)</span>
   <span class='id respond_to'>respond_to</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id format'>format</span><span class='op'>|</span>
     <span class='kw'>if</span> <span class='ivar'>@variable</span><span class='period'>.</span><span class='id save'>save</span>
       <span class='id flash'>flash</span><span class='lbracket'>[</span><span class='symbol'>:notice</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>His::Variable was successfully created.</span><span class='tstring_end'>'</span></span>
@@ -508,7 +510,6 @@ PUT /variables/1
       <pre class="lines">
 
 
-49
 50
 51
 52
@@ -519,10 +520,11 @@ PUT /variables/1
 57
 58
 59
-60</pre>
+60
+61</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/his/variables_controller.rb', line 49</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/his/variables_controller.rb', line 50</span>
 
 <span class='kw'>def</span> <span class='id update'>update</span>
   <span class='ivar'>@variable</span> <span class='op'>=</span> <span class='const'>His</span><span class='op'>::</span><span class='const'>Variable</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:variable</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -546,7 +548,7 @@ PUT /variables/1
 </div>
     
     <div id="footer">
-  Generated on Tue Aug 16 11:28:23 2011 by 
+  Generated on Thu Sep 22 17:26:32 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>
