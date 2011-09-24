@@ -160,27 +160,36 @@
             %span 
               = @project.name
             %div{:dojoType => "dijit.Menu"}
-              - if @project.id.to_s == request.fullpath[-(@project.id.to_s.length)..-1]
+              - if @project.id.to_s == request.fullpath.gsub(/(\?.*$)/,'')[-(@project.id.to_s.length)..-1]
+                - atroot = true
                 = link_to("Overview", "javascript:", :dojoType => "yogo.ui.MenuLink", :onclick=>"dijit.byId('overview_dialog').show();")
               - else
+                - atroot = false
                 = link_to("Project Home", project_path(@project), :dojoType => "yogo.ui.MenuLink")
-              -if !current_user.nil? && current_user.projects.include?(@project)
-                -#= link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
-                = link_to("Add Site", "javascript:", :dojoType => "yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/site/new');")
                 
-                - if !@sites.nil? && @sites.count > 0
-                  -#= link_to("Add Variable", new_project_variable_path(@project), :dojoType => "yogo.ui.MenuLink")
-                  -#= link_to("Add Unit", new_project_unit_path(@project), :dojoType => "yogo.ui.MenuLink")
-                  -#= link_to("Add Sample", new_project_sample_path(@project), :dojoType => "yogo.ui.MenuLink")
-                  -#= link_to("Upload Sample Data", @project.id.to_s+"/data_values/pre_process_sample_file_upload", :dojoType => "yogo.ui.MenuLink")
-                  -#= link_to("Add Data Stream", new_project_data_stream_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
-                  = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType => "yogo.ui.MenuLink")
-                  = link_to("Add Logger Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType => "yogo.ui.MenuLink")
-                - if @project.managed_repository { Voeis::Sample.all.count } > 0
-                  -#= link_to("Add Field Data", new_field_measurement_project_sensor_values_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
-                - if @project.managed_repository { Voeis::DataStream.all.count } > 0
-                  -#= link_to("Add Data", add_project_data_streams_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
+              -if !current_user.nil? && current_user.projects.include?(@project)
+                - if atroot
+                  -#= link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
+                  = link_to("Add Site", "javascript:", :dojoType => "yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/site/new');")
+                - else
+                  = link_to("Add Site", project_path(@project)+'?tab=newsite', :dojoType => "yogo.ui.MenuLink")
+                
+                = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_sample_menu")
+                = link_to("Add Logger Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")
                 = link_to("Settings...", edit_project_path(@project), :dojoType => "yogo.ui.MenuLink")
+
+                -#- if !@sites.nil? && @sites.count > 0
+                -#  -#= link_to("Add Variable", new_project_variable_path(@project), :dojoType => "yogo.ui.MenuLink")
+                -#  -#= link_to("Add Unit", new_project_unit_path(@project), :dojoType => "yogo.ui.MenuLink")
+                -#  -#= link_to("Add Sample", new_project_sample_path(@project), :dojoType => "yogo.ui.MenuLink")
+                -#  -#= link_to("Upload Sample Data", @project.id.to_s+"/data_values/pre_process_sample_file_upload", :dojoType => "yogo.ui.MenuLink")
+                -#  -#= link_to("Add Data Stream", new_project_data_stream_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
+                -#  = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_sample_menu")
+                -#  = link_to("Add Logger Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")
+                -#- if @project.managed_repository { Voeis::Sample.all.count } > 0
+                -#  -#= link_to("Add Field Data", new_field_measurement_project_sensor_values_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
+                -#- if @project.managed_repository { Voeis::DataStream.all.count } > 0
+                -#  -#= link_to("Add Data", add_project_data_streams_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
 
           - if !@sites.nil? && @sites.count > 0
             #dataButton{:dojoType => "dijit.form.DropDownButton"}

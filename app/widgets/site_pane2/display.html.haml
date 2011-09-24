@@ -39,13 +39,14 @@
     width: 585px;
     height: 305px;
     margin: 0!important;
+    padding: 0!important;
     xposition: absolute;
     xborder: red solid 3px;
   }
   #site00_lat_long_map_control {
     width: 84px;
     height: 24px;
-    margin-right: 5px;
+    margin: 10px 5px;
     background: url('/images/select-button-gold.gif') transparent center no-repeat;
     cursor: pointer;
     
@@ -199,7 +200,7 @@
         var mapdiv = document.getElementById('site00_lat_long_mapdiv');
         var innerdiv = document.getElementById('site00_lat_long_innerdiv');
         var button = document.getElementById('site00_lat_long_map_control')
-        var domclick;
+        var mapclick = false;
         var crosshairShape = {coords:[0,0,0,0],type:'rect'};
         var crosshairImg = '/images/cross-hairs.gif';
         
@@ -234,16 +235,21 @@
         //###CLICK-MAP
         $('body').click( function(e){
         console.log('DOMCLICK:',e);
+        //setTimeout(function(){
+        if(!mapclick) return;
         var clickat = mapclick.latLng;
         var mapzoom = site00_lat_long.map.getZoom();
         if(e.shiftKey) mapzoom -= 1;
         else mapzoom += 1;
         site00_lat_long.map.setCenter(clickat);
         site00_lat_long.map.setZoom(mapzoom);
+        mapclick = false;
+        //},50);
         });
         //google.maps.event.addDomListener(mapdiv, 'click', function(ev){ domclick = ev; });
         google.maps.event.addListener(site00_lat_long.map, 'click', function(mapev){ 
         mapclick = mapev;
+        //mapclick['mapCenter'] = site00_lat_long.map.getCenter();
         var clickat = mapev.latLng;
         console.log('CLICKAT:',clickat.toString());
         });
@@ -472,7 +478,8 @@
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit-site00').hide();$('#show-site00').show();") 
+    -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
+    = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"cancel_site_form($$$id$$$);") 
     %br
 
 
@@ -816,6 +823,10 @@
                 //dojo.publish('voeis/project/siteTables/refresh');
                 dojo.publish('voeis/project/site/close',[0]);
                 dojo.publish('voeis/project/site/select',[newId]);
+                //if(add_sample_menu.disabled) add_sample_menu.set('disabled',false);
+                //if(add_logger_menu.disabled) add_logger_menu.set('disabled',false);
+                add_sample_menu.set('disabled',false);
+                add_logger_menu.set('disabled',false);
                 });
                 } else {
                 //###UPDATE SITE
@@ -872,7 +883,7 @@
             &nbsp;&nbsp;
             -#%button(dojoType="dijit.form.Button" onclick="console.log('CANCEL!');$('#edit-site00').hide();$('#show-site00').show();") 
             -#%button(id="site00_voeis_cancel" dojoType="dijit.form.Button") Cancel
-            %button(dojoType="dijit.form.Button" id="site00_voeis_cancel" value="Cancel" onclick="cancel_site_form($$$id$$$)") Cancel
+            %button(dojoType="dijit.form.Button" id="site00_voeis_cancel" value="Cancel" onclick="cancel_site_form($$$id$$$);") Cancel
             -#&nbsp;&nbsp;
             -#= link_to('Cancel', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit-site00').hide();$('#show-site00').show();") 
             -#= link_to('TEST', 'javascript:', :class=>'icon icon-cancel', :onclick=>"dijit.byNode(dojo.byId('site00')).siteFormSave(this);") 
