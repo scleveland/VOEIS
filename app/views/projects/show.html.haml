@@ -246,6 +246,10 @@
         center: new google.maps.LatLng(46.739861,-110.786133), 
         zoom: 4};
       pmap = new google.maps.Map(document.getElementById("#{@project.id}"), map_opts);
+      google.maps.event.addListenerOnce(pmap, 'bounds_changed', function(){
+        console.log('MAP LOADED')
+        if(window.on_map_load) on_map_load();
+      });
       var bounds = new google.maps.LatLngBounds();
       for(var i=0;i<site_data.length;i++) {
         var item = site_data[i];
@@ -254,6 +258,12 @@
         bounds.extend(point);
       };
       pmap.fitBounds(bounds);
+    };
+
+    //OPEN TABS?
+    function on_map_load() {
+      if('#{@tab}'=='newsite')
+        dojo.publish('voeis/project/site/new');
     };
 
     dojo.addOnLoad(function(){
@@ -289,6 +299,13 @@
     $(window).ready(function(){ 
       console.log('DONE LOADING!!');
       pmap_init();
+      //HAVE SITES?
+      if(site_data.length==0) {
+        add_sample_menu.set('disabled',true);
+        add_logger_menu.set('disabled',true);
+      };
+      //if('#{@tab}'=='newsite')
+      //  dojo.publish('voeis/project/site/new');
 
       //dojo.parser.parse();
       //dijit.byId('SiteDisplayGrid').canSort = function(col,field){ return (col>1 && field=='name'); };

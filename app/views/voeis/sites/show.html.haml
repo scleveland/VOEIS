@@ -68,20 +68,31 @@
   %br{:style=>'float:none; clear:both;'}
   %br
   %br
-  %table{:id=>'stats', :class=>'', :style=>'width:500px; padding:0; float:left; margin-left:10px;'}
+  
+  %h4{:style=>"margin-top:0;"}
+    Variable Data
+  %table{:id=>'stats', :class=>'', :style=>'width:600px; padding:0; float:left; margin-left:10px;'}
     %tr
-      %td
-        %h4{:style=>'margin-top:0;'}
-          Variable Data
-      %td
-        %h4{:style=>'margin-top:0;'}
-          Count
-      %td
-        %h4{:style=>'margin-top:0;'}
-          Start
-      %td
-        %h4{:style=>'margin-top:0;'}
-          End
+      %th{:width=>"30%"} Variable
+      %th{:width=>"30%", :align=>"left"} Units / Type
+      %th{:width=>"10%", :align=>"left"} Count
+      %th{:width=>"14%"} Start
+      %th{:width=>"14%"} Stop
+      -#%td
+      -#  %h4{:style=>'margin-top:0;'}
+      -#    Variable
+      -#%td
+      -#  %h4{:style=>'margin-top:0;'}
+      -#    Count
+      -#%td
+      -#  %h4{:style=>'margin-top:0;'}
+      -#    Count
+      -#%td
+      -#  %h4{:style=>'margin-top:0;'}
+      -#    Start
+      -#%td
+      -#  %h4{:style=>'margin-top:0;'}
+      -#    End
   
     - if @site_variable_stats.empty?
       %tr
@@ -97,6 +108,8 @@
               = link_to(var.variable_name, "javascript:", :onclick=>"dojo.publish('voeis/project/variable/tab', ['#{@project.id}',#{var.id},'#{var.variable_name}',#{@site.id}]);")
           - if !var_stats.nil?
             %td
+              = "%s (%s)"%[var.variable_units.units_abbreviation,var.data_type]
+            %td
               -#= 'ID = %s'%var.id
               = var_stats.record_number
             %td
@@ -104,6 +117,8 @@
             %td
               = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
           - else
+            %td
+              NA
             %td
               NA
             %td

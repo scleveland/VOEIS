@@ -191,6 +191,10 @@ class ProjectsController < InheritedResources::Base
     @vartical_datum_items = Voeis::VerticalDatumCV.all(:order => [:term.asc])
     @local_projection_items = Voeis::SpatialReference.all(:order => [:srs_name.asc])
     
+    if !params[:tab].nil?
+      @tab = params[:tab]
+    end
+    
     # @current_data = Array.new
     #     @items = Array.new
     #     @start_time = nil

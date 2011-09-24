@@ -35,14 +35,14 @@ class Voeis::SitesController < Voeis::BaseController
   
   def show
     @site =  parent.managed_repository{Voeis::Site.get(params[:id])}
-    @site_variable_stats = parent.managed_repository{Voeis::SiteDataCatalog.all(:site_id=>@site.id)}
+    @site_variable_stats = parent.managed_repository{Voeis::SiteDataCatalog.all(:site_id=>params[:id])}
     # debugger
     @versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
     @site_ref = {}
     Voeis::Site.properties.each{|prop| @site_ref[prop.name] = @site[prop.name]}
-    @site_ref[:lat_long_datum] = @site.lat_long_datum.nil? ? '-' : @site.lat_long_datum.srs_name
-    @site_ref[:vertical_datum] = @site.vertical_datum.nil? ? '-' : @site.vertical_datum.term
-    @site_ref[:local_projection] = @site.local_projection.nil? ? '-' : @site.local_projection.srs_name
+    @site_ref[:lat_long_datum] = @site.lat_long_datum.nil? ? '-none-' : @site.lat_long_datum.srs_name
+    @site_ref[:vertical_datum] = @site.vertical_datum.nil? ? '-none-' : @site.vertical_datum.term
+    @site_ref[:local_projection] = @site.local_projection.nil? ? '-none-' : @site.local_projection.srs_name
 
     #@site_properties = @site.properties.map{ |prop| 
     #  prop = prop.name.to_s
