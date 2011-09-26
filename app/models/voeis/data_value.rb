@@ -127,13 +127,17 @@ class Voeis::DataValue
           Rails.logger.info '#{row.join(', ')}'
           #puts row.join(', ')
             results = parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id, create_comment)
+            if results.empty?
+              skipped_rows += 1
+            else
+              total_records = total_records + results.length
+              total_results << results
+            end
           else 
             #puts "EMPTY ROW"
             skipped_rows +=1 
           end
         end
-        total_records = total_records + results.length
-        total_results << results
         rows_parsed += 1 
       end
     end
@@ -149,7 +153,7 @@ class Voeis::DataValue
     # elsif !Voeis::DataValue.last(:order =>[:id.asc]).nil? 
     #   total_records = data_value.id - starting_id
     # end
-    return_hash = {:total_records_saved => total_records, :total_rows_parsed => rows_parsed, :last_record => data_value.as_json}
+    return_hash = {:total_records_saved => total_records, :rows_skipped => skipped_rows, :total_rows_parsed => rows_parsed, :last_record => data_value.as_json}
   end
   
   
