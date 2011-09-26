@@ -130,6 +130,7 @@
       };
       var grid = dijit.byId('project_sites');
       grid.selection.clear();
+      pmap_refresh();
     }
     
     function pmap_new(siteId) {
@@ -137,6 +138,7 @@
       var item = get_site(siteId);
       console.log('>>>NEW MARKER:',item);
       pmap_add_item(item);
+      pmap_refresh();
     }
     
     function pmap_add_item(item) {
@@ -236,6 +238,19 @@
       pmarkers.push(marker);
     };
 
+    function pmap_refresh(update) {
+      var bounds = new google.maps.LatLngBounds();
+      for(var i=0;i<site_data.length;i++) {
+        var item = site_data[i];
+        //var point = new google.maps.LatLng(item.latitude, item.longitude);
+        var point = new google.maps.LatLng(item.latitude.toString(), item.longitude.toString());
+        if(update) pmap_add_item(item);
+        bounds.extend(point);
+      };
+      pmap.fitBounds(bounds);
+      
+    }
+    
     function pmap_init() {
       var map_opts = {
         scaleControl: true, 
@@ -250,14 +265,7 @@
         console.log('MAP LOADED')
         if(window.on_map_load) on_map_load();
       });
-      var bounds = new google.maps.LatLngBounds();
-      for(var i=0;i<site_data.length;i++) {
-        var item = site_data[i];
-        var point = new google.maps.LatLng(item.latitude, item.longitude);
-        pmap_add_item(item);
-        bounds.extend(point);
-      };
-      pmap.fitBounds(bounds);
+      pmap_refresh(true);
     };
 
     //OPEN TABS?
@@ -423,7 +431,11 @@
     -#= render(:partial => 'overview_map', :locals => { :project => @project,
     -#                                                  :sites => @sites,
     -#                                                  :class_name => 'show-map' } )
-    %table{:id=>'project_sites', :dojoType=>"dojox.grid.EnhancedGrid", :store=>"psites", :autoWidth=>"false",
+    %table{:id=>'project_sites', :dojoType=>"dojox.grid.EnhancedGrid", 
+            :store=>"psites", 
+            :clientSort=>"true", 
+            :sortInfo=>"1",
+            :autoWidth=>"false",
             :style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
       -#:style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
       %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
