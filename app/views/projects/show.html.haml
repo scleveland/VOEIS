@@ -248,7 +248,7 @@
         bounds.extend(point);
       };
       pmap.fitBounds(bounds);
-      
+      //OverviewGrid.set('store', 'psites');
     }
     
     function pmap_init() {
@@ -432,9 +432,8 @@
     -#                                                  :sites => @sites,
     -#                                                  :class_name => 'show-map' } )
     %table{:id=>'project_sites', :dojoType=>"dojox.grid.EnhancedGrid", 
+            :jsId=>"OverviewGrid", 
             :store=>"psites", 
-            :clientSort=>"true", 
-            :sortInfo=>"1",
             :autoWidth=>"false",
             :style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
       -#:style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
