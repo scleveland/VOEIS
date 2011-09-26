@@ -23,13 +23,22 @@
         items: project_data };
     
     var pcount = '#{@projects.length}';
+    
+    var goto_project = false;
 
-    function project_formatter(id) {
+    function project_formatter(item) {
+      //var table = dijit.byId('projects_table');
+      var id = item.id;
       var href = '/projects/'+id;
       var img = '<img src="/images/view.gif" alt="SHOW project" title="Project Details" />';
+      //var idx = table.getItemIndex(item);
+      //console.log('FORMATTER item:',item);
+      //console.log('FORMATTER ID:',id);
+      //console.log('FORMATTER Proj:',item.name);
       //var onclick = 'window.defaultStatus="LOADING...";return true;';
       //var link = '<a href="'+href+'" onclick="'+onclick+'">'+img+'</a>';
-      var link = '<a href="'+href+'">'+img+'</a>';
+      //var link = '<a href="'+href+'" onclick="table.selection.addToSelection(idx);return false;">'+img+'</a>';
+      var link = '<a href="'+href+'" onclick="goto_project=true;console.log(\'>>>DETAILS>>>\');">'+img+'</a>';
       //var link = '<a href="javascript:" onclick="alert(\'SiteID; \'+id);"><img src="/images/view.gif" alt="VIEW site" title="VIEW" /></a>';
       return '&nbsp;&nbsp;'+link;
     };
@@ -51,12 +60,12 @@
 #tab_browser{:dojoType=>"dijit.layout.TabContainer"}
   %table{:id=>'projects_table', :title=>"Projects", :dojoType=>"dojox.grid.EnhancedGrid", 
           :store=>"projectsDataStore", 
-          :clientSort=>true,
-          :sortInfo=>"-2",
           :plugins=>"{indirectSelection: true}"}
+    -#    :clientSort=>true,
+    -#    :sortInfo=>"-2",
     %thead
       %tr
-        %th{:field=>"id", :width=>"45px", :filterable=>false, :formatter=>'project_formatter'} Show
+        %th{:field=>"_item", :width=>"45px", :filterable=>false, :formatter=>'project_formatter'} Show
         -#%th{:field => "id", :width => "auto"} Proj.ID 
         %th{:field => "name", :width => "auto"} Project 
     %script{:type => "dojo/method", :event => "onRowDblClick", :args => "evt"}
@@ -67,8 +76,9 @@
         //dojo.publish("voeis/project/browse", [id]);
     %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
       :plain
-        //console.log("selected:");
+        console.log("SELECTED:");
         console.log(arguments);
+        if(goto_project) return;
         //console.log('URL: '+window.location);
         //console.log('STAT: '+window.deafultStatus);
         //if(window.defaultStatus=='LOADING...') return;
@@ -77,7 +87,7 @@
         dojo.publish("voeis/project/browse", [item]);
     %script{:type => "dojo/method", :event => "onDeselected", :args => "idx"}
       :plain
-        console.log("deselected:");
+        console.log("DE-SELECTED:");
         console.log(arguments);
         //dijit.byId('loading_dialog').show();
         var map = dijit.byId('split_map');

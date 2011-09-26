@@ -38,7 +38,7 @@ dojo.declare("voeis.ui.SitePane", dijit.layout.ContentPane, {
 								sitename0 += sitename.slice(-6);
 							};
 						};
-						this.set("title", sitename);
+						this.set("title", sitename0);
 						//this.set("title", site.name);
         }));
     },

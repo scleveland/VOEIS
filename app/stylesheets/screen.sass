@@ -4,6 +4,8 @@
 // This import applies a global reset to any page that imports this stylesheet.
 //@import "blueprint/reset"
 
+// SET BASE COLORS: partials/_base.sass
+
 // To configure blueprint, edit the partials/base.sass file.
 @import "partials/base.sass"
 
@@ -26,6 +28,11 @@
 // Light Blue:      #8fdaf2
 // Dark Highlight:  #784a1c
 // Light Highlight: #bd8e5e
+
+// VOEIS NEW colors
+// Voeis Blue:  #6699CC
+// Light Green: #70A600
+// Dark Green:  #416700
 
 // Border Mixins
 =borders
@@ -561,13 +568,15 @@ body
 .icon-expanded
   background-image: image-url('minus.jpg')
 .icon-add
-  background-image: image-url('add.png')
+  background-image: image-url('icons/add.png')
 .icon-edit 
-  background-image: image-url('edit.png')
+  background-image: image-url('icons/edit.png')
 .icon-hist 
   background-image: image-url('icons/hist-icon16t.png')
+.icon-notice
+  background-image: image-url('icons/notice.png')
 .icon-copy
-  background-image: image-url('copy.png')
+  background-image: image-url('icons/copy.png')
 .icon-delete
   background-image: image-url('delete.png')
 .icon-move
