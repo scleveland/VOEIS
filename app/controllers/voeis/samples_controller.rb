@@ -202,6 +202,7 @@ class Voeis::SamplesController < Voeis::BaseController
     @row_array = Array.new
     site = parent.managed_repository{Voeis::Site.get(params[:site])}
     @site_name =site.name
+    @site = site
     if params[:variable] != "None"
       
       if params[:variable] == "All"
@@ -244,6 +245,7 @@ class Voeis::SamplesController < Voeis::BaseController
       else #we want only one variable
         variable = parent.managed_repository{Voeis::Variable.get(params[:variable])}
         @var_name = variable.variable_name
+        @variable = variable
         @units = Voeis::Unit.get(variable.variable_units_id).units_name
         @row_array = Array.new
         @grid_array = Array.new
@@ -308,16 +310,27 @@ class Voeis::SamplesController < Voeis::BaseController
   
   #export the results of search/browse to a csv file
   def export
+    debugger
     headers = JSON[params[:column_array]]
-    rows = JSON[params[:row_array]]
+    site = JSON[params[:site]]
+    variable = JSON[params[:variable]]
+    rows = JSON[params[:data_vals]]
     column_names = Array.new
     headers.each do |col|
       column_names << col[0]
     end
     csv_string = CSV.generate do |csv|
-      csv << column_names
+      #csv << column_names
+      csv<< ["Site Information"]
+      csv<< site.keys
+      csv<< site.values
+      csv<< ["Variable Information"]
+      csv<< variable.keys
+      csv<< variable.values
+      csv<< ["Data"]
+      csv << rows.first.keys
       rows.each do |row|
-        csv << row
+        csv << row.values
       end
     end
     #csv_string =JSON[params[:data_vals]].to_csv

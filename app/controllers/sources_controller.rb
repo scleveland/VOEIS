@@ -25,7 +25,7 @@ class SourcesController < InheritedResources::Base
     @source = Voeis::Source.new(params[:source])
     respond_to do |format|
       if @source.save
-        flash[:notice] = 'Sources was successfully created.'
+        flash[:notice] = 'Source was successfully created.'
         format.json do
           render :json => @source.as_json, :callback => params[:jsoncallback]
         end
