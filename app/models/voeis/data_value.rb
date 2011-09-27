@@ -34,6 +34,20 @@ class Voeis::DataValue
   #has n, :method,     :model => "Voeis::Method", :through => Resource
   
   
+  def local_date_time
+    d = [:year, :mon, :day, :hour, :min, :sec].map{|q| @local_date_time.send(q)}
+    d << (utc_offset/24).to_f
+    #puts d
+    DateTime.new(*d) 
+  end
+  
+  def date_time_utc
+    d = [:year, :mon, :day, :hour, :min, :sec].map{|q| @date_time_utc.send(q)}
+    d << (0.0/24).to_f
+    #puts d
+    DateTime.new(*d) 
+  end
+  
   # Parses a csv file using an existing data_column template
   # column values are stored in data_values
   #
