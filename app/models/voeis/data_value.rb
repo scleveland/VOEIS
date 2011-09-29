@@ -101,7 +101,7 @@ class Voeis::DataValue
         sample_id = col.column_number
       end
       sensor_col_array[col.column_number] = [col.sensor_types.first, col.unit, col.name]
-      if col.name != "ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "VerticalOffset"
+      if col.name != "ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "VerticalOffset" && col.name != "Ignore"
         sensor_cols << col.column_number
       end
     end
@@ -131,7 +131,7 @@ class Voeis::DataValue
     rows.each do |row|
       if !row.nil?
         results = Array.new
-        if rows_parsed >= start_line-1 || start_line == 1
+        if rows_parsed >= start_line-1# || start_line == 1
         #   (1..start_line-1).each do
         #     header_row = csv.readline
         #   end
@@ -156,7 +156,6 @@ class Voeis::DataValue
       end
     end
     #end
-    debugger
     if total_records != 0
       data_value = Voeis::DataValue.get(total_results.last)#:order =>[:id.asc]) 
     else
@@ -200,6 +199,7 @@ class Voeis::DataValue
     vertical_offset = vertical_offset_col == "" ? 0.0 : row[vertical_offset_col.to_i].to_f
     end_vertical_offset = end_vertical_offset_col == "" ? 0.0 : row[end_vertical_offset_col.to_i].to_f
     data_stream = Voeis::DataStream.get(data_stream_id)
+    debugger
     sample_datetime = Chronic.parse(row[data_timestamp_col]).to_datetime
     timestamp = DateTime.civil(sample_datetime.year,sample_datetime.month,
                    sample_datetime.day,sample_datetime.hour,sample_datetime.min,
@@ -210,7 +210,7 @@ class Voeis::DataValue
           created_at = updated_at = Time.now.strftime("%Y-%m-%dT%H:%M:%S%z")
           row_values = []
           (0..row.size-1).each do |i|
-            if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore" 
+            if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore"
                 cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
                 row_values << "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id} )"
               end #end if
