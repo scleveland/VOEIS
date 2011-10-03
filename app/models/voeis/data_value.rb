@@ -95,7 +95,7 @@ class Voeis::DataValue
     sample_id = -1
     Voeis::DataStream.get(data_stream_template_id).data_stream_columns.each do |col|
       data_col_array[col.column_number] = [col.variables.first, col.unit, col.name]
-      if col.name != "Ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "VerticalOffset" && col.name !=  "EndingVerticalOffset" && col.name !=  "SampleID"
+      if col.name != "Ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "VerticalOffset" && col.name !=  "EndingVerticalOffset" && col.name !=  "SampleID" && col.name != "ignore"
         variable_cols << col.column_number
       elsif col.name ==  "SampleID"
         sample_id = col.column_number
@@ -140,7 +140,7 @@ class Voeis::DataValue
           if !row[data_timestamp_col].nil? && !row[data_timestamp_col].empty?        
           Rails.logger.info '#{row.join(', ')}'
           #puts row.join(', ')
-            results = parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id, create_comment)
+            results = parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id)
             if results.empty?
               skipped_rows += 1
             else
@@ -159,14 +159,9 @@ class Voeis::DataValue
     if total_records != 0
       data_value = Voeis::DataValue.get(total_results.last)#:order =>[:id.asc]) 
     else
-      data_value = {:message => "No new Records were saved - it appears this file has already been parsed and stored."}
+       data_value = {:message => "No new Records were saved - it appears this file has already been parsed and stored."}
     end
-    # if starting_id == -9999  && !Voeis::DataValue.first(:order => [:id.asc]).nil?
-    #   total_records = data_value.id - Voeis::DataValue.first(:order => [:id.asc]).id
-    # elsif !Voeis::DataValue.last(:order =>[:id.asc]).nil? 
-    #   total_records = data_value.id - starting_id
-    # end
-    return_hash = {:total_records_saved => total_records, :rows_skipped => skipped_rows, :total_rows_parsed => rows_parsed, :last_record => data_value.as_json}
+    return_hash = {:total_records_saved => total_records, :rows_skipped => skipped_rows, :total_rows_parsed => rows_parsed, :last_record => Voeis::DataValue.last(:site_id=> site_id, :variable_id => data_col_array[variable_cols.last][0].id, :order => [:created_at]).as_json, :last_record_for_this_file => data_value.as_json}
   end
   
   
@@ -187,19 +182,19 @@ class Voeis::DataValue
   # @author Yogo Team
   #
   # @api public
-  def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id, create_comment)
+  def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id)
     require 'chronic'  #for robust timestamp parsing
     name = 2
     variable = 0
     sensor = 0
     unit = 1
     result_ids = Array.new
+    
     #Voeis::SensorValue.transaction do
     #timestamp = (data_timestamp_col == "") ? Time.parse(row[date_col].to_s + ' ' + row[time_col].to_s).strftime("%Y-%m-%dT%H:%M:%S%z") : row[data_timestamp_col.to_i]
     vertical_offset = vertical_offset_col == "" ? 0.0 : row[vertical_offset_col.to_i].to_f
     end_vertical_offset = end_vertical_offset_col == "" ? 0.0 : row[end_vertical_offset_col.to_i].to_f
     data_stream = Voeis::DataStream.get(data_stream_id)
-    debugger
     sample_datetime = Chronic.parse(row[data_timestamp_col]).to_datetime
     timestamp = DateTime.civil(sample_datetime.year,sample_datetime.month,
                    sample_datetime.day,sample_datetime.hour,sample_datetime.min,
@@ -208,6 +203,7 @@ class Voeis::DataValue
     #if (Voeis::DataValue.first(:local_date_time => timestamp) & 
     if Voeis::DataValue.first(:datatype=>data_stream.type, :local_date_time=>timestamp, :site_id=> site_id, :variable_id => data_col_array[variable_cols[0]][variable].id).nil?
           created_at = updated_at = Time.now.strftime("%Y-%m-%dT%H:%M:%S%z")
+          create_comment = "Created at #{created_at} by #{User.current.first_name} #{User.current.last_name} [#{User.current.login}]"
           row_values = []
           (0..row.size-1).each do |i|
             if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore"

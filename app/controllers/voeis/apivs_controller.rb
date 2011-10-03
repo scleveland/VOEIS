@@ -201,7 +201,8 @@ class Voeis::ApivsController < Voeis::BaseController
   # @return [String] :success or :error message
   # @return [Integer] :total_records_saved - the total number of records saved to Voeis
   # @return [Integer] :total_rows_parsed - the total number of rows successfully parsed
-  # @return [String] :last_record  - the last record saved
+  # @return [String] :last_record  - the last record saved for the last variable in the row defined by the data-template - this will return the most recently created record
+  # @return[String]:last_record_for_this_field - this is the last record stored for this file- if the file has already been stored this field will have a message indicating that has occurred.
   #
   # @author Sean Cleveland
   #
@@ -879,6 +880,7 @@ class Voeis::ApivsController < Voeis::BaseController
    # @param [Integer] :variable_id the id of the variable to pull data for
    # @param [DateTime] :start_datetime pull data after this datetime
    # @param [DateTime] :end_datetime pull date before this datetime
+   # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
    #
    #
    # @author Sean Cleveland
@@ -898,16 +900,24 @@ class Voeis::ApivsController < Voeis::BaseController
           @data_values[:error] = "There is no variable with the ID:" + params[:variable_id]
         else
           @var_hash = Hash.new
-          @var_hash = @var.as_json
-          #if !@var.sensor_types.first.nil?
-          @var_hash = @var_hash.merge({'time_series_data'=>  Voeis::DataValue.all(:datatype=>"Sensor", :site_id=>@site.id, :variable_id=>@var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
-          @var_hash = @var_hash.merge({'sample_data' => Voeis::DataValue.all(:site_id=>@site.id, :variable_id=>@var.id,:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
-            #@var_hash = @var_hash.merge({'data' => @var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time) & @site.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})  
+          if params[:small_data]
+            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            @var_hash = @var_hash.merge({'time_series' => repository.adapter.select(sql)})
+            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            @var_hash = @var_hash.merge({'sample_data' => repository.adapter.select(sql)})
+            @values << @var_hash
+            @data_values[:data_values] = @values
+          else
+            #if !@var.sensor_types.first.nil?
+            @var_hash = @var_hash.merge({'time_series_data'=>  Voeis::DataValue.all(:datatype=>"Sensor", :site_id=>@site.id, :variable_id=>@var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+            @var_hash = @var_hash.merge({'sample_data' => Voeis::DataValue.all(:site_id=>@site.id, :variable_id=>@var.id,:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})
+              #@var_hash = @var_hash.merge({'data' => @var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time) & @site.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})  
+            @values << @var_hash
+            @data_values[:variable] = @values
+            @data_values[:site] = @site
+            @data_values[:project] = parent.as_json
+           end
         end
-          @values << @var_hash
-          @data_values[:variable] = @values
-          @data_values[:site] = @site
-          @data_values[:project] = parent.as_json
       end
     end
     respond_to do |format|
