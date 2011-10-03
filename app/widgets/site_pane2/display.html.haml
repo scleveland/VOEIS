@@ -480,6 +480,8 @@
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
     = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"cancel_site_form($$$id$$$);") 
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    (* Required)
     %br
 
 
@@ -575,7 +577,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_name"} Name
+                %label{:for=>"site_name"} Name *
               -#= f.text_field("name", :value=>"$$$name$$$")
               -#%input(name="site_name" dojoType="dijit.form.ValidationTextBox" size="50" type="text" value="$$$name$$$" required="true")
               -#%input(name="site_name" id="site00_name" type="text" value="$$$name$$$")
@@ -583,7 +585,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_code"} Code
+                %label{:for=>"site_code"} Code *
               -#= f.text_field("code", :value=>"$$$code$$$")
               -#%input(name="site_code"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$code$$$" required="true")
               -#%input(name="site_code"  type="text" value="$$$code$$$")
@@ -597,7 +599,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_latitude"} Latitude
+                %label{:for=>"site_latitude"} Latitude *
               -#= f.text_field("latitude", :value=>"$$$latitude$$$")
               -#%input(name="site_latitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$latitude$$$" required="true")
               -#%input(name="site_latitude" id="site00_latitude" type="text" value="$$$latitude$$$")
@@ -605,7 +607,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_longitude"} Longitude
+                %label{:for=>"site_longitude"} Longitude *
               -#= f.text_field("longitude", :value=>"$$$longitude$$$")
               -#%input(name="site_longitude"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$longitude$$$" required="true")
               -#%input(name="site_longitude" id="site00_longitude" type="text" value="$$$longitude$$$")
@@ -694,7 +696,7 @@
           %td 
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_state"} State
+                %label{:for=>"site_state"} State *
             -#= f.text_field("state", :value=>"$$$state$$$")
             -#%input(name="site_state" type="text" value="$$$state$$$")
             %input(name="site_state" dojoType="dijit.form.ValidationTextBox" type="text" value="$$$state$$$" required="true")
@@ -725,13 +727,12 @@
             -#site00-comments(name="site_comments" dojoType="dijit.form.Textarea")
             %textarea( name="site_comments" id="site00_comments" rows="5")
               $$$comments$$$
-        %tr
+        %tr{:id=>"site00-provenance-row"}
           %td{:colspan=>"2"}
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_provenance_comment"} Provenance Comment
             %textarea( name="site_provenance_comment" id="site00_provenance_comment" rows="2")
-               
         
         %tr
           %td{:colspan=>"2"}
