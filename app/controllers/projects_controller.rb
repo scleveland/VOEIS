@@ -26,10 +26,13 @@ class ProjectsController < InheritedResources::Base
     respond_to do |format|
       if @project.save
         flash[:notice] = 'Project was successfully updated.'
-        format.json do
+        format.json {
           render :json => @project.as_json, :callback => params[:jsoncallback]
-        end
-        format.html {render :action => "edit"}
+        }
+        format.html {
+          #render :action => "edit"
+          redirect_to(project_path(@project))
+        }
       else
         flash[:error] = 'Project was NOT updated.'
         format.html { render :action => "edit" }
