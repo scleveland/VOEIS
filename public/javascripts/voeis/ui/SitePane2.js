@@ -154,6 +154,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			$(this.domNode).find('#edit-'+siteTag).show();
 			//$(this.domNode).find('#'+siteTag+'-name-head').text('NEW SITE');
 			$(this.domNode).find('#'+siteTag+'-edit-control').hide();
+			$(this.domNode).find('#'+siteTag+'-provenance-row').hide();
 			console.log('NewSite:',siteTag);
 			console.log('domNode.id:',this.domNode.id);
 			
@@ -286,6 +287,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 					else newsite[prop] = this.site[prop].toString();
 			try {
 				console.log('>>>CREATE NEW:',newsite);
+				newsite['id'] = parseInt(newsite.id);
 				psites.newItem(newsite);
 			}
 			catch (e) { 
@@ -362,7 +364,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		//REMOVE dijit widgets
 		if(this.parsedWidgets) 
 			for(var i=0;i<this.parsedWidgets.length;i++) {
-				console.log('Wid ID: '+this.parsedWidgets[i].id);
+				//console.log('Wid ID: '+this.parsedWidgets[i].id);
 				this.parsedWidgets[i].destroyRecursive(false);
 			};
 		//REMOVE any dom nodes left
@@ -370,7 +372,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		var toDel = this.containerNode.childNodes;
 		if(toDel) 
 			for(var i=0;i<toDel.length;i++) {
-				console.log('Node: '+toDel[i].nodeName+' ('+toDel[i].id+')');
+				//console.log('Node: '+toDel[i].nodeName+' ('+toDel[i].id+')');
 				this.containerNode.removeChild(toDel[i]);
 			};
 	},
