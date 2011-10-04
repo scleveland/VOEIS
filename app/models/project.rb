@@ -22,6 +22,7 @@ class Project
 
   property :is_private,       Boolean,    :required => true, :default => false
   property :publish_to_his,   Boolean,    :required => false, :default => false
+  property :deleted_at,       ParanoidDateTime
 
   has n, :memberships, :parent_key => [:id], :child_key => [:project_id], :model => 'Membership'
   has n, :users, :through => :memberships
