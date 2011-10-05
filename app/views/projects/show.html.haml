@@ -141,6 +141,15 @@
       pmap_refresh();
     }
     
+    function pmap_update(siteId) {
+      //UPDATE MAP MARKER
+      var item = get_site(siteId);
+      console.log('>>>UPD MARKER:',item);
+      var point = new google.maps.LatLng(item.latitude, item.longitude);
+      pmarkers[item.idx].setPosition(point);
+      pmap_refresh();
+    }
+    
     function pmap_add_item(item) {
       //ADD ITEM MARKER TO MAP
       var site_name = item.name.toString();
@@ -401,8 +410,8 @@
                                           :root_url=>root_url
 
 -#site_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"psites", :data=>"psites_json"}
+-#site_store{:dojoType=>"dojo.data.ItemFileWriteStore", :jsId=>"psites", :data=>"psites_json"}
 
-            
 #content-title{:style=>"margin:0;margin-bottom:0;padding:0;"} 
   %a{:href=>"javascript:", :onclick=>"dijit.byId('overview_dialog').show();return false;", 
       :title=>"click for overview",
@@ -418,7 +427,6 @@
   -#&nbsp;&nbsp;&nbsp;&nbsp;
   -#&nbsp;&nbsp;&nbsp;&nbsp;
   -#%strong
-  -#  = link_to("TEST-STORE", "javascript:", :onclick=>"dojo.publish('voeis/project/siteTables/test');")
 
 
 = clear_break
@@ -431,23 +439,24 @@
     -#= render(:partial => 'overview_map', :locals => { :project => @project,
     -#                                                  :sites => @sites,
     -#                                                  :class_name => 'show-map' } )
-    %table{:id=>'project_sites', :dojoType=>"dojox.grid.EnhancedGrid", 
-            :jsId=>"OverviewGrid", 
-            :store=>"psites", 
-            :autoWidth=>"false",
-            :style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
-      -#:style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
-      %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
-        :plain
-          //var map = dijit.byId(@project);
-          //var map = getElementById('#{@project.id}');
-          var item = this.getItem(idx);
-          pmarkers[item.idx].pop();
-          //pmarkers[item.idx].seltable();
-      %thead
-        %tr
-          %th{:field => "name", :width => "auto"} Site
-    = clear_break
+    #map-grid{:style=>"margin:0;padding:0;"}
+      %table{:id=>'project_sites', :dojoType=>"dojox.grid.EnhancedGrid", 
+              :jsId=>"OverviewGrid", 
+              :store=>"psites", 
+              :autoWidth=>"false",
+              :style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
+        -#:style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
+        %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
+          :plain
+            //var map = dijit.byId(@project);
+            //var map = getElementById('#{@project.id}');
+            var item = this.getItem(idx);
+            pmarkers[item.idx].pop();
+            //pmarkers[item.idx].seltable();
+        %thead
+          %tr
+            %th{:field => "name", :width => "auto"} Site
+      = clear_break
 
   %table{:dojoType=>"dojox.grid.EnhancedGrid", :title=>"Data Summary", 
           :plugins=> "{nestedSorting:false, filter:true, indirectSelection:false}",  
@@ -492,6 +501,30 @@
         %th{:field=>"data_end", :width=>"75px", :filterable=>true} Ending
         -#%th{:field=>"latitude", :width=>"100px", :filterable=>true} Lat
         -#%th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
+  
+  %table{:id=>'project_sites_test', :dojoType=>"dojox.grid.EnhancedGrid", 
+          :jsId=>"OverviewGrid_test", 
+          :title=>"TestTab", 
+          :store=>"psites", 
+          :autoWidth=>"false",
+          :style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
+    -#:style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
+    %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
+      :plain
+        //var map = dijit.byId(@project);
+        //var map = getElementById('#{@project.id}');
+        var tabs = dijit.byId('tab_browser');
+        var projPane = dijit.byId("overview");
+        var item = this.getItem(idx);
+        tabs.selectChild(projPane);
+        pmarkers[item.idx].pop();
+        //pmarkers[item.idx].seltable();
+    %thead
+      %tr
+        %th{:field => "name", :width => "auto"} Site
+  = clear_break
+
+  
   = clear_break
   -#%p{:style=>'font-size:10px;margin-top:5px;'}
   -#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -554,7 +587,7 @@
       //projectSitePath(this.projectId, this.siteId)
       var saveStrip = tabs.tabStrip;
       console.log('TABSTRIP:',tabs.tabStrip);
-      tabs.tabStrip = false;
+      //tabs.tabStrip = false;
       var projVarLoad = function(varId,varName) {
         graphInit(varId,varName);
         
@@ -656,6 +689,17 @@
       var selected = tabs.selectedChildWidget;
       tabs.selectChild(projPane);
       pmap_new(siteId);
+      tabs.selectChild(selected);
+    });
+
+    dojo.subscribe("voeis/project/map/update", function(siteId) {
+      console.log('UPD MAP MARKER');
+      var tabs = dijit.byId('tab_browser');
+      var projPane = dijit.byId("overview");
+      var selected = tabs.selectedChildWidget;
+      tabs.selectChild(projPane);
+      pmap_clear(siteId);
+      pmap_update(siteId);
       tabs.selectChild(selected);
     });
 

@@ -319,6 +319,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 					console.log('ERROR: '+error);
 				}
 			});
+			//##UPDATE PMARKERS
+			dojo.publish('voeis/project/map/update',[update_props.id]);
 		};
 		//UPDATE LOCAL SITE
 		this.site = this.getSite(update_props.id);
