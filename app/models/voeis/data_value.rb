@@ -195,7 +195,11 @@ class Voeis::DataValue
     vertical_offset = vertical_offset_col == "" ? 0.0 : row[vertical_offset_col.to_i].to_f
     end_vertical_offset = end_vertical_offset_col == "" ? 0.0 : row[end_vertical_offset_col.to_i].to_f
     data_stream = Voeis::DataStream.get(data_stream_id)
-    sample_datetime = Chronic.parse(row[data_timestamp_col]).to_datetime
+    if DateTime.parse(row[data_timestamp_col])
+      sample_datetime = DateTime.parse(row[data_timestamp_col])
+    else
+      sample_datetime = Chronic.parse(row[data_timestamp_col]).to_datetime
+    end
     timestamp = DateTime.civil(sample_datetime.year,sample_datetime.month,
                    sample_datetime.day,sample_datetime.hour,sample_datetime.min,
                    sample_datetime.sec, (data_stream.utc_offset+dst_time)/24.to_f)

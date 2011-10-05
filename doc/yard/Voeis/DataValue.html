@@ -131,7 +131,7 @@ stored in data_values.
         <li class="public ">
   <span class="summary_signature">
     
-      <a href="#parse_logger_row-class_method" title="parse_logger_row (class method)">+ (Object) <strong>parse_logger_row</strong>(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array, sensor_cols, source_id, dst_time, dst, user_id, create_comment) </a>
+      <a href="#parse_logger_row-class_method" title="parse_logger_row (class method)">+ (Object) <strong>parse_logger_row</strong>(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array, sensor_cols, source_id, dst_time, dst, user_id) </a>
     
 
     
@@ -149,6 +149,57 @@ Parses a csv row using an existing data_column template column values are
 stored in sensor_values.
 </p>
 </div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#date_time_utc-instance_method" title="#date_time_utc (instance method)">- (Object) <strong>date_time_utc</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#local_date_time-instance_method" title="#local_date_time (instance method)">- (Object) <strong>local_date_time</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
   
 </li>
 
@@ -286,20 +337,6 @@ Yogo Team
       <pre class="lines">
 
 
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
 65
 66
 67
@@ -388,10 +425,22 @@ Yogo Team
 150
 151
 152
-153</pre>
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 51</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 65</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id parse_logger_csv'>parse_logger_csv</span><span class='lparen'>(</span><span class='id csv_file'>csv_file</span><span class='comma'>,</span> <span class='id data_stream_template_id'>data_stream_template_id</span><span class='comma'>,</span> <span class='id site_id'>site_id</span><span class='comma'>,</span> <span class='id start_line'>start_line</span><span class='comma'>,</span> <span class='id sample_type'>sample_type</span><span class='comma'>,</span> <span class='id sample_medium'>sample_medium</span><span class='rparen'>)</span>
   <span class='comment'>#Determine how the time is stored
@@ -426,13 +475,13 @@ Yogo Team
   <span class='id sample_id'>sample_id</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>1</span>
   <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataStream</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id data_stream_template_id'>data_stream_template_id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id data_stream_columns'>data_stream_columns</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id col'>col</span><span class='op'>|</span>
     <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id col'>col</span><span class='period'>.</span><span class='id column_number'>column_number</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id col'>col</span><span class='period'>.</span><span class='id variables'>variables</span><span class='period'>.</span><span class='id first'>first</span><span class='comma'>,</span> <span class='id col'>col</span><span class='period'>.</span><span class='id unit'>unit</span><span class='comma'>,</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span><span class='rbracket'>]</span>
-    <span class='kw'>if</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ignore</span><span class='tstring_end'>&quot;</span></span>  <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Timestamp</span><span class='tstring_end'>&quot;</span></span>  <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Time</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Date</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>VerticalOffset</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>EndingVerticalOffset</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SampleID</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>if</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ignore</span><span class='tstring_end'>&quot;</span></span>  <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Timestamp</span><span class='tstring_end'>&quot;</span></span>  <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Time</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Date</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>VerticalOffset</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>EndingVerticalOffset</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SampleID</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ignore</span><span class='tstring_end'>&quot;</span></span>
       <span class='id variable_cols'>variable_cols</span> <span class='op'>&lt;&lt;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id column_number'>column_number</span>
     <span class='kw'>elsif</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>==</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SampleID</span><span class='tstring_end'>&quot;</span></span>
       <span class='id sample_id'>sample_id</span> <span class='op'>=</span> <span class='id col'>col</span><span class='period'>.</span><span class='id column_number'>column_number</span>
     <span class='kw'>end</span>
     <span class='id sensor_col_array'>sensor_col_array</span><span class='lbracket'>[</span><span class='id col'>col</span><span class='period'>.</span><span class='id column_number'>column_number</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='id col'>col</span><span class='period'>.</span><span class='id sensor_types'>sensor_types</span><span class='period'>.</span><span class='id first'>first</span><span class='comma'>,</span> <span class='id col'>col</span><span class='period'>.</span><span class='id unit'>unit</span><span class='comma'>,</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span><span class='rbracket'>]</span>
-    <span class='kw'>if</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ignore</span><span class='tstring_end'>&quot;</span></span>  <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Timestamp</span><span class='tstring_end'>&quot;</span></span>  <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Time</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Date</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>VerticalOffset</span><span class='tstring_end'>&quot;</span></span>
+    <span class='kw'>if</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ignore</span><span class='tstring_end'>&quot;</span></span>  <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Timestamp</span><span class='tstring_end'>&quot;</span></span>  <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Time</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Date</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span>  <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>VerticalOffset</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id name'>name</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ignore</span><span class='tstring_end'>&quot;</span></span>
       <span class='id sensor_cols'>sensor_cols</span> <span class='op'>&lt;&lt;</span> <span class='id col'>col</span><span class='period'>.</span><span class='id column_number'>column_number</span>
     <span class='kw'>end</span>
   <span class='kw'>end</span>
@@ -462,8 +511,8 @@ Yogo Team
 </span>  <span class='id rows'>rows</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id row'>row</span><span class='op'>|</span>
     <span class='kw'>if</span> <span class='op'>!</span><span class='id row'>row</span><span class='period'>.</span><span class='id nil?'>nil?</span>
       <span class='id results'>results</span> <span class='op'>=</span> <span class='const'>Array</span><span class='period'>.</span><span class='id new'>new</span>
-      <span class='kw'>if</span> <span class='id rows_parsed'>rows_parsed</span> <span class='op'>&gt;</span> <span class='id start_line'>start_line</span><span class='op'>-</span><span class='int'>1</span>
-      <span class='comment'>#   (1..start_line-1).each do
+      <span class='kw'>if</span> <span class='id rows_parsed'>rows_parsed</span> <span class='op'>&gt;=</span> <span class='id start_line'>start_line</span><span class='op'>-</span><span class='int'>1</span><span class='comment'># || start_line == 1
+</span>      <span class='comment'>#   (1..start_line-1).each do
 </span>      <span class='comment'>#     header_row = csv.readline
 </span>      <span class='comment'>#   end
 </span>      <span class='comment'># end
@@ -471,30 +520,28 @@ Yogo Team
 </span>        <span class='kw'>if</span> <span class='op'>!</span><span class='id row'>row</span><span class='lbracket'>[</span><span class='id data_timestamp_col'>data_timestamp_col</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id nil?'>nil?</span> <span class='op'>&amp;&amp;</span> <span class='op'>!</span><span class='id row'>row</span><span class='lbracket'>[</span><span class='id data_timestamp_col'>data_timestamp_col</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id empty?'>empty?</span>        
         <span class='const'>Rails</span><span class='period'>.</span><span class='id logger'>logger</span><span class='period'>.</span><span class='id info'>info</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>#{row.join(</span><span class='tstring_end'>'</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>)}</span><span class='tstring_end'>'</span></span>
         <span class='comment'>#puts row.join(', ')
-</span>          <span class='id results'>results</span> <span class='op'>=</span> <span class='id parse_logger_row'>parse_logger_row</span><span class='lparen'>(</span><span class='id data_timestamp_col'>data_timestamp_col</span><span class='comma'>,</span> <span class='id data_stream_template_id'>data_stream_template_id</span><span class='comma'>,</span> <span class='id vertical_offset_col'>vertical_offset_col</span><span class='comma'>,</span> <span class='id date_col'>date_col</span><span class='comma'>,</span> <span class='id time_col'>time_col</span><span class='comma'>,</span>  <span class='id row'>row</span><span class='comma'>,</span> <span class='id site_id'>site_id</span><span class='comma'>,</span> <span class='id data_col_array'>data_col_array</span><span class='comma'>,</span> <span class='id variable_cols'>variable_cols</span><span class='comma'>,</span> <span class='id sample_id'>sample_id</span><span class='comma'>,</span> <span class='id sample_type'>sample_type</span><span class='comma'>,</span> <span class='id sample_medium'>sample_medium</span><span class='comma'>,</span> <span class='id end_vertical_offset_col'>end_vertical_offset_col</span><span class='comma'>,</span><span class='id sensor_col_array'>sensor_col_array</span><span class='comma'>,</span><span class='id sensor_cols'>sensor_cols</span><span class='comma'>,</span> <span class='id source_id'>source_id</span><span class='comma'>,</span> <span class='id dst_time'>dst_time</span><span class='comma'>,</span> <span class='id dst'>dst</span><span class='comma'>,</span> <span class='id user_id'>user_id</span><span class='comma'>,</span> <span class='id create_comment'>create_comment</span><span class='rparen'>)</span>
+</span>          <span class='id results'>results</span> <span class='op'>=</span> <span class='id parse_logger_row'>parse_logger_row</span><span class='lparen'>(</span><span class='id data_timestamp_col'>data_timestamp_col</span><span class='comma'>,</span> <span class='id data_stream_template_id'>data_stream_template_id</span><span class='comma'>,</span> <span class='id vertical_offset_col'>vertical_offset_col</span><span class='comma'>,</span> <span class='id date_col'>date_col</span><span class='comma'>,</span> <span class='id time_col'>time_col</span><span class='comma'>,</span>  <span class='id row'>row</span><span class='comma'>,</span> <span class='id site_id'>site_id</span><span class='comma'>,</span> <span class='id data_col_array'>data_col_array</span><span class='comma'>,</span> <span class='id variable_cols'>variable_cols</span><span class='comma'>,</span> <span class='id sample_id'>sample_id</span><span class='comma'>,</span> <span class='id sample_type'>sample_type</span><span class='comma'>,</span> <span class='id sample_medium'>sample_medium</span><span class='comma'>,</span> <span class='id end_vertical_offset_col'>end_vertical_offset_col</span><span class='comma'>,</span><span class='id sensor_col_array'>sensor_col_array</span><span class='comma'>,</span><span class='id sensor_cols'>sensor_cols</span><span class='comma'>,</span> <span class='id source_id'>source_id</span><span class='comma'>,</span> <span class='id dst_time'>dst_time</span><span class='comma'>,</span> <span class='id dst'>dst</span><span class='comma'>,</span> <span class='id user_id'>user_id</span><span class='rparen'>)</span>
+          <span class='kw'>if</span> <span class='id results'>results</span><span class='period'>.</span><span class='id empty?'>empty?</span>
+            <span class='id skipped_rows'>skipped_rows</span> <span class='op'>+=</span> <span class='int'>1</span>
+          <span class='kw'>else</span>
+            <span class='id total_records'>total_records</span> <span class='op'>=</span> <span class='id total_records'>total_records</span> <span class='op'>+</span> <span class='id results'>results</span><span class='period'>.</span><span class='id length'>length</span>
+            <span class='id total_results'>total_results</span> <span class='op'>&lt;&lt;</span> <span class='id results'>results</span>
+          <span class='kw'>end</span>
         <span class='kw'>else</span> 
           <span class='comment'>#puts &quot;EMPTY ROW&quot;
 </span>          <span class='id skipped_rows'>skipped_rows</span> <span class='op'>+=</span><span class='int'>1</span> 
         <span class='kw'>end</span>
       <span class='kw'>end</span>
-      <span class='id total_records'>total_records</span> <span class='op'>=</span> <span class='id total_records'>total_records</span> <span class='op'>+</span> <span class='id results'>results</span><span class='period'>.</span><span class='id length'>length</span>
-      <span class='id total_results'>total_results</span> <span class='op'>&lt;&lt;</span> <span class='id results'>results</span>
       <span class='id rows_parsed'>rows_parsed</span> <span class='op'>+=</span> <span class='int'>1</span> 
     <span class='kw'>end</span>
   <span class='kw'>end</span>
   <span class='comment'>#end
-</span>  <span class='id debugger'>debugger</span>
-  <span class='kw'>if</span> <span class='id total_records'>total_records</span> <span class='op'>!=</span> <span class='int'>0</span>
+</span>  <span class='kw'>if</span> <span class='id total_records'>total_records</span> <span class='op'>!=</span> <span class='int'>0</span>
     <span class='id data_value'>data_value</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id total_results'>total_results</span><span class='period'>.</span><span class='id last'>last</span><span class='rparen'>)</span><span class='comment'>#:order =&gt;[:id.asc]) 
 </span>  <span class='kw'>else</span>
-    <span class='id data_value'>data_value</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No new Records were saved - it appears this file has already been parsed and stored.</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
+     <span class='id data_value'>data_value</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='symbol'>:message</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No new Records were saved - it appears this file has already been parsed and stored.</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
   <span class='kw'>end</span>
-  <span class='comment'># if starting_id == -9999  &amp;&amp; !Voeis::DataValue.first(:order =&gt; [:id.asc]).nil?
-</span>  <span class='comment'>#   total_records = data_value.id - Voeis::DataValue.first(:order =&gt; [:id.asc]).id
-</span>  <span class='comment'># elsif !Voeis::DataValue.last(:order =&gt;[:id.asc]).nil? 
-</span>  <span class='comment'>#   total_records = data_value.id - starting_id
-</span>  <span class='comment'># end
-</span>  <span class='id return_hash'>return_hash</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='symbol'>:total_records_saved</span> <span class='op'>=&gt;</span> <span class='id total_records'>total_records</span><span class='comma'>,</span> <span class='symbol'>:total_rows_parsed</span> <span class='op'>=&gt;</span> <span class='id rows_parsed'>rows_parsed</span><span class='comma'>,</span> <span class='symbol'>:last_record</span> <span class='op'>=&gt;</span> <span class='id data_value'>data_value</span><span class='period'>.</span><span class='id as_json'>as_json</span><span class='rbrace'>}</span>
+  <span class='id return_hash'>return_hash</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='symbol'>:total_records_saved</span> <span class='op'>=&gt;</span> <span class='id total_records'>total_records</span><span class='comma'>,</span> <span class='symbol'>:rows_skipped</span> <span class='op'>=&gt;</span> <span class='id skipped_rows'>skipped_rows</span><span class='comma'>,</span> <span class='symbol'>:total_rows_parsed</span> <span class='op'>=&gt;</span> <span class='id rows_parsed'>rows_parsed</span><span class='comma'>,</span> <span class='symbol'>:last_record</span> <span class='op'>=&gt;</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id last'>last</span><span class='lparen'>(</span><span class='symbol'>:site_id</span><span class='op'>=&gt;</span> <span class='id site_id'>site_id</span><span class='comma'>,</span> <span class='symbol'>:variable_id</span> <span class='op'>=&gt;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id variable_cols'>variable_cols</span><span class='period'>.</span><span class='id last'>last</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span> <span class='symbol'>:order</span> <span class='op'>=&gt;</span> <span class='lbracket'>[</span><span class='symbol'>:created_at</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id as_json'>as_json</span><span class='comma'>,</span> <span class='symbol'>:last_record_for_this_file</span> <span class='op'>=&gt;</span> <span class='id data_value'>data_value</span><span class='period'>.</span><span class='id as_json'>as_json</span><span class='rbrace'>}</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -504,7 +551,7 @@ Yogo Team
       <div class="method_details ">
   <p class="signature " id="parse_logger_row-class_method">
   
-    + (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>parse_logger_row</strong>(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array, sensor_cols, source_id, dst_time, dst, user_id, create_comment) 
+    + (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>parse_logger_row</strong>(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array, sensor_cols, source_id, dst_time, dst, user_id) 
   
 
   
@@ -607,18 +654,6 @@ Yogo Team
       <pre class="lines">
 
 
-173
-174
-175
-176
-177
-178
-179
-180
-181
-182
-183
-184
 185
 186
 187
@@ -693,18 +728,33 @@ Yogo Team
 256
 257
 258
-259</pre>
+259
+260
+261
+262
+263
+264
+265
+266
+267
+268
+269
+270
+271
+272
+273</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 173</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 185</span>
 
-<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id parse_logger_row'>parse_logger_row</span><span class='lparen'>(</span><span class='id data_timestamp_col'>data_timestamp_col</span><span class='comma'>,</span> <span class='id data_stream_id'>data_stream_id</span><span class='comma'>,</span> <span class='id vertical_offset_col'>vertical_offset_col</span><span class='comma'>,</span> <span class='id date_col'>date_col</span><span class='comma'>,</span> <span class='id time_col'>time_col</span><span class='comma'>,</span> <span class='id row'>row</span><span class='comma'>,</span> <span class='id site_id'>site_id</span><span class='comma'>,</span> <span class='id data_col_array'>data_col_array</span><span class='comma'>,</span> <span class='id variable_cols'>variable_cols</span><span class='comma'>,</span> <span class='id sample_id'>sample_id</span><span class='comma'>,</span> <span class='id sample_type'>sample_type</span><span class='comma'>,</span> <span class='id sample_medium'>sample_medium</span><span class='comma'>,</span> <span class='id end_vertical_offset_col'>end_vertical_offset_col</span><span class='comma'>,</span> <span class='id sensor_col_array'>sensor_col_array</span><span class='comma'>,</span><span class='id sensor_cols'>sensor_cols</span><span class='comma'>,</span> <span class='id source_id'>source_id</span><span class='comma'>,</span> <span class='id dst_time'>dst_time</span><span class='comma'>,</span> <span class='id dst'>dst</span><span class='comma'>,</span> <span class='id user_id'>user_id</span><span class='comma'>,</span> <span class='id create_comment'>create_comment</span><span class='rparen'>)</span>
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id parse_logger_row'>parse_logger_row</span><span class='lparen'>(</span><span class='id data_timestamp_col'>data_timestamp_col</span><span class='comma'>,</span> <span class='id data_stream_id'>data_stream_id</span><span class='comma'>,</span> <span class='id vertical_offset_col'>vertical_offset_col</span><span class='comma'>,</span> <span class='id date_col'>date_col</span><span class='comma'>,</span> <span class='id time_col'>time_col</span><span class='comma'>,</span> <span class='id row'>row</span><span class='comma'>,</span> <span class='id site_id'>site_id</span><span class='comma'>,</span> <span class='id data_col_array'>data_col_array</span><span class='comma'>,</span> <span class='id variable_cols'>variable_cols</span><span class='comma'>,</span> <span class='id sample_id'>sample_id</span><span class='comma'>,</span> <span class='id sample_type'>sample_type</span><span class='comma'>,</span> <span class='id sample_medium'>sample_medium</span><span class='comma'>,</span> <span class='id end_vertical_offset_col'>end_vertical_offset_col</span><span class='comma'>,</span> <span class='id sensor_col_array'>sensor_col_array</span><span class='comma'>,</span><span class='id sensor_cols'>sensor_cols</span><span class='comma'>,</span> <span class='id source_id'>source_id</span><span class='comma'>,</span> <span class='id dst_time'>dst_time</span><span class='comma'>,</span> <span class='id dst'>dst</span><span class='comma'>,</span> <span class='id user_id'>user_id</span><span class='rparen'>)</span>
   <span class='id require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>chronic</span><span class='tstring_end'>'</span></span>  <span class='comment'>#for robust timestamp parsing
 </span>  <span class='id name'>name</span> <span class='op'>=</span> <span class='int'>2</span>
   <span class='id variable'>variable</span> <span class='op'>=</span> <span class='int'>0</span>
   <span class='id sensor'>sensor</span> <span class='op'>=</span> <span class='int'>0</span>
   <span class='id unit'>unit</span> <span class='op'>=</span> <span class='int'>1</span>
   <span class='id result_ids'>result_ids</span> <span class='op'>=</span> <span class='const'>Array</span><span class='period'>.</span><span class='id new'>new</span>
+  
   <span class='comment'>#Voeis::SensorValue.transaction do
 </span>  <span class='comment'>#timestamp = (data_timestamp_col == &quot;&quot;) ? Time.parse(row[date_col].to_s + ' ' + row[time_col].to_s).strftime(&quot;%Y-%m-%dT%H:%M:%S%z&quot;) : row[data_timestamp_col.to_i]
 </span>  <span class='id vertical_offset'>vertical_offset</span> <span class='op'>=</span> <span class='id vertical_offset_col'>vertical_offset_col</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='op'>?</span> <span class='float'>0.0</span> <span class='op'>:</span> <span class='id row'>row</span><span class='lbracket'>[</span><span class='id vertical_offset_col'>vertical_offset_col</span><span class='period'>.</span><span class='id to_i'>to_i</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_f'>to_f</span>
@@ -718,9 +768,10 @@ Yogo Team
 </span>  <span class='comment'>#if (Voeis::DataValue.first(:local_date_time =&gt; timestamp) &amp; 
 </span>  <span class='kw'>if</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='id data_stream'>data_stream</span><span class='period'>.</span><span class='id type'>type</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='op'>=&gt;</span><span class='id timestamp'>timestamp</span><span class='comma'>,</span> <span class='symbol'>:site_id</span><span class='op'>=&gt;</span> <span class='id site_id'>site_id</span><span class='comma'>,</span> <span class='symbol'>:variable_id</span> <span class='op'>=&gt;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id variable_cols'>variable_cols</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id variable'>variable</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id id'>id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id nil?'>nil?</span>
         <span class='id created_at'>created_at</span> <span class='op'>=</span> <span class='id updated_at'>updated_at</span> <span class='op'>=</span> <span class='const'>Time</span><span class='period'>.</span><span class='id now'>now</span><span class='period'>.</span><span class='id strftime'>strftime</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>%Y-%m-%dT%H:%M:%S%z</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+        <span class='id create_comment'>create_comment</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Created at </span><span class='embexpr_beg'>#{</span><span class='id created_at'>created_at</span><span class='rbrace'>}</span><span class='tstring_content'> by </span><span class='embexpr_beg'>#{</span><span class='const'>User</span><span class='period'>.</span><span class='id current'>current</span><span class='period'>.</span><span class='id first_name'>first_name</span><span class='rbrace'>}</span><span class='tstring_content'> </span><span class='embexpr_beg'>#{</span><span class='const'>User</span><span class='period'>.</span><span class='id current'>current</span><span class='period'>.</span><span class='id last_name'>last_name</span><span class='rbrace'>}</span><span class='tstring_content'> [</span><span class='embexpr_beg'>#{</span><span class='const'>User</span><span class='period'>.</span><span class='id current'>current</span><span class='period'>.</span><span class='id login'>login</span><span class='rbrace'>}</span><span class='tstring_content'>]</span><span class='tstring_end'>&quot;</span></span>
         <span class='id row_values'>row_values</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
         <span class='lparen'>(</span><span class='int'>0</span><span class='op'>..</span><span class='id row'>row</span><span class='period'>.</span><span class='id size'>size</span><span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id i'>i</span><span class='op'>|</span>
-          <span class='kw'>if</span> <span class='id i'>i</span> <span class='op'>!=</span> <span class='id data_timestamp_col'>data_timestamp_col</span> <span class='op'>&amp;&amp;</span> <span class='id i'>i</span> <span class='op'>!=</span> <span class='id date_col'>date_col</span> <span class='op'>&amp;&amp;</span> <span class='id i'>i</span> <span class='op'>!=</span> <span class='id time_col'>time_col</span> <span class='op'>&amp;&amp;</span> <span class='id i'>i</span> <span class='op'>!=</span> <span class='id vertical_offset_col'>vertical_offset_col</span> <span class='op'>&amp;&amp;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ignore</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>EndingVerticalOffset</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SampleID</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ignore</span><span class='tstring_end'>&quot;</span></span> 
+          <span class='kw'>if</span> <span class='id i'>i</span> <span class='op'>!=</span> <span class='id data_timestamp_col'>data_timestamp_col</span> <span class='op'>&amp;&amp;</span> <span class='id i'>i</span> <span class='op'>!=</span> <span class='id date_col'>date_col</span> <span class='op'>&amp;&amp;</span> <span class='id i'>i</span> <span class='op'>!=</span> <span class='id time_col'>time_col</span> <span class='op'>&amp;&amp;</span> <span class='id i'>i</span> <span class='op'>!=</span> <span class='id vertical_offset_col'>vertical_offset_col</span> <span class='op'>&amp;&amp;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ignore</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>EndingVerticalOffset</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SampleID</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ignore</span><span class='tstring_end'>&quot;</span></span>
               <span class='id cv'>cv</span> <span class='op'>=</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$</span><span class='regexp_end'>/</span></span><span class='period'>.</span><span class='id match'>match</span><span class='lparen'>(</span><span class='id row'>row</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id row'>row</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_f'>to_f</span> <span class='op'>:</span> <span class='op'>-</span><span class='float'>9999.0</span>
               <span class='id row_values'>row_values</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(</span><span class='embexpr_beg'>#{</span><span class='id cv'>cv</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbrace'>}</span><span class='tstring_content'>, '</span><span class='embexpr_beg'>#{</span><span class='id timestamp'>timestamp</span><span class='rbrace'>}</span><span class='tstring_content'>', </span><span class='embexpr_beg'>#{</span><span class='id vertical_offset'>vertical_offset</span><span class='rbrace'>}</span><span class='tstring_content'>,FALSE, '</span><span class='embexpr_beg'>#{</span><span class='id row'>row</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbrace'>}</span><span class='tstring_content'>', '</span><span class='embexpr_beg'>#{</span><span class='id created_at'>created_at</span><span class='rbrace'>}</span><span class='tstring_content'>', '</span><span class='embexpr_beg'>#{</span><span class='id updated_at'>updated_at</span><span class='rbrace'>}</span><span class='tstring_content'>', </span><span class='embexpr_beg'>#{</span><span class='id user_id'>user_id</span><span class='rbrace'>}</span><span class='tstring_content'>,'</span><span class='embexpr_beg'>#{</span><span class='id create_comment'>create_comment</span><span class='rbrace'>}</span><span class='tstring_content'>', </span><span class='embexpr_beg'>#{</span><span class='id data_stream'>data_stream</span><span class='period'>.</span><span class='id utc_offset'>utc_offset</span><span class='op'>+</span><span class='id dst_time'>dst_time</span><span class='rbrace'>}</span><span class='tstring_content'>,'</span><span class='embexpr_beg'>#{</span><span class='id timestamp'>timestamp</span><span class='period'>.</span><span class='id utc'>utc</span><span class='rbrace'>}</span><span class='tstring_content'>','</span><span class='embexpr_beg'>#{</span><span class='id dst'>dst</span><span class='rbrace'>}</span><span class='tstring_content'>',</span><span class='embexpr_beg'>#{</span><span class='id end_vertical_offset'>end_vertical_offset</span><span class='rbrace'>}</span><span class='tstring_content'>,</span><span class='embexpr_beg'>#{</span><span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id variable'>variable</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id quality_control'>quality_control</span><span class='period'>.</span><span class='id to_f'>to_f</span><span class='rbrace'>}</span><span class='tstring_content'>,'</span><span class='embexpr_beg'>#{</span><span class='id data_stream'>data_stream</span><span class='period'>.</span><span class='id type'>type</span><span class='rbrace'>}</span><span class='tstring_content'>', </span><span class='embexpr_beg'>#{</span><span class='id site_id'>site_id</span><span class='rbrace'>}</span><span class='tstring_content'>,  </span><span class='embexpr_beg'>#{</span><span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id variable'>variable</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id id'>id</span><span class='rbrace'>}</span><span class='tstring_content'> )</span><span class='tstring_end'>&quot;</span></span>
             <span class='kw'>end</span> <span class='comment'>#end if
@@ -792,10 +843,84 @@ Yogo Team
     
   </div>
 
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="date_time_utc-instance_method">
+  
+    - (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>date_time_utc</strong> 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+44
+45
+46
+47
+48
+49</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 44</span>
+
+<span class='kw'>def</span> <span class='id date_time_utc'>date_time_utc</span>
+  <span class='id d'>d</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='symbol'>:year</span><span class='comma'>,</span> <span class='symbol'>:mon</span><span class='comma'>,</span> <span class='symbol'>:day</span><span class='comma'>,</span> <span class='symbol'>:hour</span><span class='comma'>,</span> <span class='symbol'>:min</span><span class='comma'>,</span> <span class='symbol'>:sec</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id map'>map</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id q'>q</span><span class='op'>|</span> <span class='ivar'>@date_time_utc</span><span class='period'>.</span><span class='id send'>send</span><span class='lparen'>(</span><span class='id q'>q</span><span class='rparen'>)</span><span class='rbrace'>}</span>
+  <span class='id d'>d</span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='float'>0.0</span><span class='op'>/</span><span class='int'>24</span><span class='rparen'>)</span><span class='period'>.</span><span class='id to_f'>to_f</span>
+  <span class='comment'>#puts d
+</span>  <span class='const'>DateTime</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='op'>*</span><span class='id d'>d</span><span class='rparen'>)</span> 
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="local_date_time-instance_method">
+  
+    - (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>local_date_time</strong> 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+37
+38
+39
+40
+41
+42</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 37</span>
+
+<span class='kw'>def</span> <span class='id local_date_time'>local_date_time</span>
+  <span class='id d'>d</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='symbol'>:year</span><span class='comma'>,</span> <span class='symbol'>:mon</span><span class='comma'>,</span> <span class='symbol'>:day</span><span class='comma'>,</span> <span class='symbol'>:hour</span><span class='comma'>,</span> <span class='symbol'>:min</span><span class='comma'>,</span> <span class='symbol'>:sec</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id map'>map</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id q'>q</span><span class='op'>|</span> <span class='ivar'>@local_date_time</span><span class='period'>.</span><span class='id send'>send</span><span class='lparen'>(</span><span class='id q'>q</span><span class='rparen'>)</span><span class='rbrace'>}</span>
+  <span class='id d'>d</span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='id utc_offset'>utc_offset</span><span class='op'>/</span><span class='int'>24</span><span class='rparen'>)</span><span class='period'>.</span><span class='id to_f'>to_f</span>
+  <span class='comment'>#puts d
+</span>  <span class='const'>DateTime</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='op'>*</span><span class='id d'>d</span><span class='rparen'>)</span> 
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
 </div>
     
     <div id="footer">
-  Generated on Thu Sep 22 17:26:30 2011 by 
+  Generated on Mon Oct  3 15:11:59 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

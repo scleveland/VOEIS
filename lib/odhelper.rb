@@ -434,6 +434,57 @@ module Odhelper
     end
   end
   
+  def set_site_and_variables(project)
+    project.managed_repository do
+      Voeis::Site.each do |site|
+        puts site.name
+        site.variables.each do |var|
+          puts site.name + ':' + var.variable_name
+          set_data_values_site_and_variable(site.id, var.id)
+        end
+      end
+    end
+  end
+  
+  def set_data_stream_utc_offsets(project)
+    project.managed_repository do
+      Voeis::DataStream.all.each do |data_stream_template|
+        if data_stream_template.utc_offset.nil?
+          site = data_stream_template.sites.first
+          if site.time_zone_offset.nil? || site.time_zone_offset == "unknown"
+            begin
+              site.fetch_time_zone_offset
+            rescue
+              #do nothing
+            end
+          end
+          data_stream_template.utc_offset = site.time_zone_offset
+          data_stream_template.save!
+        end
+      end
+    end
+  end
+  
+  def set_project_sites_time_zone_offset(project)
+    project.managed_repository do
+      Voeis::Site.all.each do |site|
+        if site.time_zone_offset == "unknown" || site.time_zone_offset == "unkown" || site.time_zone_offset.nil?
+          begin
+            site.fetch_time_zone_offset
+          rescue
+            puts "site utc offset fectch"
+          end
+        end
+      end
+    end
+  end
+  
+  def set_data_values_site_and_variable(site_id, variable_id)
+    site = Voeis::Site.get(site_id)
+    variable = Voeis::Variable.get(variable_id)
+    (site.data_values.all(:site_id => nil) & variable.data_values.all(:site_id=>nil)).all.update!(:site_id => site.id, :variable_id => variable.id)
+  end
+  
   def set_sites(project)
     project.managed_repository do
       Voeis::Site.all.each do |site|
@@ -470,6 +521,29 @@ module Odhelper
               puts e
             end
           end
+        end
+      end
+    end
+  end
+  
+  def create_data_value_site_and_variable_index(project)
+    project.managed_repository do
+      begin
+        sql = "CREATE INDEX data_value_idx ON voeis_data_values (datatype, local_date_time, site_id, variable_id)"
+        repository.adapter.execute(sql)
+      rescue
+      end
+    end
+  end
+  
+  def set_variable_quality_control(project)
+    puts project.name
+    project.managed_repository do
+      Voeis::Variable.all.each do |var|
+        if var.quality_control.nil?
+          puts var.variable_name
+          var.quality_control = 0
+          var.save!
         end
       end
     end
