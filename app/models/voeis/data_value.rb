@@ -35,17 +35,19 @@ class Voeis::DataValue
   
   
   def local_date_time
-    d = [:year, :mon, :day, :hour, :min, :sec].map{|q| @local_date_time.send(q)}
-    d << (utc_offset/24).to_f
-    #puts d
-    DateTime.new(*d) 
+    # d = [:year, :mon, :day, :hour, :min, :sec].map{|q| @local_date_time.send(q)}
+    # d << (utc_offset/24).to_f
+    # #puts d
+    # DateTime.new(*d) 
+    @local_date_time.to_datetime.change(:offset => "#{utc_offset}:00")
   end
   
   def date_time_utc
-    d = [:year, :mon, :day, :hour, :min, :sec].map{|q| @date_time_utc.send(q)}
-    d << (0.0/24).to_f
-    #puts d
-    DateTime.new(*d) 
+    # d = [:year, :mon, :day, :hour, :min, :sec].map{|q| @date_time_utc.send(q)}
+    # d << (0.0/24).to_f
+    # #puts d
+    # DateTime.new(*d) 
+    @date_time_utc.to_datetime.change(:offset => "+00:00")
   end
   
   # Parses a csv file using an existing data_column template
@@ -195,14 +197,16 @@ class Voeis::DataValue
     vertical_offset = vertical_offset_col == "" ? 0.0 : row[vertical_offset_col.to_i].to_f
     end_vertical_offset = end_vertical_offset_col == "" ? 0.0 : row[end_vertical_offset_col.to_i].to_f
     data_stream = Voeis::DataStream.get(data_stream_id)
-    if DateTime.parse(row[data_timestamp_col])
-      sample_datetime = DateTime.parse(row[data_timestamp_col])
-    else
+    # if DateTime.parse(row[data_timestamp_col])
+    #       sample_datetime = DateTime.parse(row[data_timestamp_col])
+    #     else
       sample_datetime = Chronic.parse(row[data_timestamp_col]).to_datetime
-    end
-    timestamp = DateTime.civil(sample_datetime.year,sample_datetime.month,
-                   sample_datetime.day,sample_datetime.hour,sample_datetime.min,
-                   sample_datetime.sec, (data_stream.utc_offset+dst_time)/24.to_f)
+    # end
+    # timestamp = DateTime.civil(sample_datetime.year,sample_datetime.month,
+    #                sample_datetime.day,sample_datetime.hour,sample_datetime.min,
+    #                sample_datetime.sec, (data_stream.utc_offset+dst_time)/24.to_r)
+    timestamp = sample_datetime.change(:offset => "#{(data_stream.utc_offset+dst_time)}:00")
+    debugger
     #if t = Date.parse(timestamp) rescue nil?
     #if (Voeis::DataValue.first(:local_date_time => timestamp) & 
     if Voeis::DataValue.first(:datatype=>data_stream.type, :local_date_time=>timestamp, :site_id=> site_id, :variable_id => data_col_array[variable_cols[0]][variable].id).nil?
@@ -212,7 +216,7 @@ class Voeis::DataValue
           (0..row.size-1).each do |i|
             if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore"
                 cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
-                row_values << "(#{cv.to_s}, '#{timestamp}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id} )"
+                row_values << "(#{cv.to_s}, '#{timestamp.to_s}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc.to_s}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id} )"
               end #end if
           end #end loop
           if !row_values.empty?
