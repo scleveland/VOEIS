@@ -30,6 +30,7 @@ class Project
 
   after :create, :give_current_user_membership
   after :create,  :upgrade_global_models
+  after :create, :create_data_value_indexes
   before :destroy, :destroy_cleanup
   after :save, :publish_his
 
@@ -200,6 +201,28 @@ class Project
   def give_current_user_membership
     unless User.current.nil?
       Membership.create(:user => User.current, :project => self, :role => Role.first(:position => 1))
+    end
+  end
+  
+  def create_data_value_indexes
+    self.managed_repository do
+      begin
+        sql = "CREATE INDEX data_value_idx ON voeis_data_values (datatype, local_date_time, site_id, variable_id)"
+        repository.adapter.execute(sql)
+        sql = "CREATE INDEX data_value_idx_var ON voeis_data_values (variable_id)"
+        repository.adapter.execute(sql)
+        sql = "CREATE INDEX data_value_idx_site ON voeis_data_values (site_id)"
+        repository.adapter.execute(sql)
+        sql = "CREATE INDEX data_value_idx_site_var ON voeis_data_values (site_id, variable_id)"
+        repository.adapter.execute(sql)
+        sql = "CREATE INDEX data_value_idx_time ON voeis_data_values (local_date_time)"
+        repository.adapter.execute(sql)
+        sql = "CREATE INDEX data_value_idx_site_var_time ON voeis_data_values (local_date_time, site_id, variable_id)"
+        repository.adapter.execute(sql)
+        sql = "CREATE INDEX data_value_idx_type ON voeis_data_values (datatype)"
+        repository.adapter.execute(sql)
+      rescue
+      end
     end
   end
 end # Project
