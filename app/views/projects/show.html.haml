@@ -502,27 +502,27 @@
         -#%th{:field=>"latitude", :width=>"100px", :filterable=>true} Lat
         -#%th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
   
-  %table{:id=>'project_sites_test', :dojoType=>"dojox.grid.EnhancedGrid", 
-          :jsId=>"OverviewGrid_test", 
-          :title=>"TestTab", 
-          :store=>"psites", 
-          :autoWidth=>"false",
-          :style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
-    -#:style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
-    %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
-      :plain
-        //var map = dijit.byId(@project);
-        //var map = getElementById('#{@project.id}');
-        var tabs = dijit.byId('tab_browser');
-        var projPane = dijit.byId("overview");
-        var item = this.getItem(idx);
-        tabs.selectChild(projPane);
-        pmarkers[item.idx].pop();
-        //pmarkers[item.idx].seltable();
-    %thead
-      %tr
-        %th{:field => "name", :width => "auto"} Site
-  = clear_break
+  -#%table{:id=>'project_sites_test', :dojoType=>"dojox.grid.EnhancedGrid", 
+  -#        :jsId=>"OverviewGrid_test", 
+  -#        :title=>"TestTab", 
+  -#        :store=>"psites", 
+  -#        :autoWidth=>"false",
+  -#        :style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
+  -#  -#:style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
+  -#  %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
+  -#    :plain
+  -#      //var map = dijit.byId(@project);
+  -#      //var map = getElementById('#{@project.id}');
+  -#      var tabs = dijit.byId('tab_browser');
+  -#      var projPane = dijit.byId("overview");
+  -#      var item = this.getItem(idx);
+  -#      tabs.selectChild(projPane);
+  -#      pmarkers[item.idx].pop();
+  -#      //pmarkers[item.idx].seltable();
+  -#  %thead
+  -#    %tr
+  -#      %th{:field => "name", :width => "auto"} Site
+  -#= clear_break
 
   
   = clear_break
@@ -796,6 +796,16 @@
       var projectId = "#{@project.id}";
       var tabs = dijit.byId('tab_browser');
       openHistoryTab(tabs, projectId, siteId);
+    });
+
+    dojo.subscribe("voeis/project/site/history/update", function(siteId) {
+      console.log('SITE HISTORY UPDATE:',arguments);
+      var projHistId = '#{@project.id}-site'+siteId+'-history';
+      var histPane = dojo.byId(projHistId);
+      if(histPane) {
+        histPane = dijit.byNode(histPane);
+        histPane.refresh();
+      };
     });
 
     dojo.subscribe("voeis/project/browse", function(projectId) {

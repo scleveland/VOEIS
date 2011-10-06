@@ -27,6 +27,9 @@
 
 %strong
   SHOW SITE VERSIONS
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+= link_to('UPDATE', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history/update', [#{@site.id}]);")
 %br
 
 %div{:id=>"version_store_site#{@site.id}", :dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pversions_site#{@site.id}", :data=>"pversions_json_site#{@site.id}", :style=>"height:0;margin:0;padding:0;"}
