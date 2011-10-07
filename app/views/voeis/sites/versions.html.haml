@@ -59,12 +59,12 @@
           %th{:field=>"updated_comment", :filterable=>true, :width=>"40%"} Update Comment
           %th{:field=>"provenance_comment", :filterable=>true, :width=>"30%"} Provenance Comment
   -### VERSION TABS
-  - @versions_ref.each do |version|
+  - @versions_sites.each do |version|
     %div{:id=>"#{version[:version_id]}", :dojoType=>"dijit.layout.ContentPane", 
       :title=>"#{version[:version_ttl]}", :style=>"margin:0;padding:0;", :selected=>"true"}
       %table{:id=>"property-table-site#{@site.id}", :style=>'margin:20px 50px;width:80%;float:left;'}
         %tr
-          %td{:style=>"text-align:right;"}
+          %td{:style=>"text-align:right;width:25%;"}
             %strong
               Version
               &nbsp;&nbsp;&nbsp;
@@ -75,8 +75,8 @@
               [RETRUN TO VERSIONS TAB]
         - @ver_properties.each do |prop|
           %tr{:class=>"row#{cycle('1','0')}"}
-            %td{:style=>"text-align:right;"}
-              %strong
+            %td{:style=>"text-align:right;width:25%;"}
+              %strong{:style=>"#{version[:dirty].include?(prop[:name])?'color:#B22800':''}"}
                 #{prop[:label]}
                 &nbsp;&nbsp;&nbsp;
             %td

@@ -99,8 +99,17 @@ class Voeis::SitesController < Voeis::BaseController
     @site =  parent.managed_repository{Voeis::Site.get(params[:id])}
     @versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
     @versions_ref = []
+    @versions_sites = []
     version_number = @versions.count
     temp = {}
+    temp[:version] = 0
+    temp[:version_ttl] = 'Current'
+    temp[:version_id] = '%s-site%s-ver000'%[@project.id,@site.id]
+    temp[:version_ts] = @site.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+    temp[:updated_comment] = @site.updated_comment
+    temp[:provenance_comment] = @site.provenance_comment
+    @versions_ref << temp
+    temp[:dirty] = @site.get_dirty
     @versions.properties.each{|prop| temp[prop.name] = @site[prop.name]}
     temp[:lat_long_datum] = '-none-'
     temp[:vertical_datum] = '-none-'
@@ -114,13 +123,17 @@ class Voeis::SitesController < Voeis::BaseController
     if !Voeis::SpatialReference.get(@site.local_projection_id).nil?
       temp[:local_projection] = Voeis::SpatialReference.get(@site.local_projection_id).srs_name
     end
-    temp[:version] = 0
-    temp[:version_ttl] = 'Current'
-    temp[:version_id] = '%s-site%s-ver000'%[@project.id,@site.id]
-    temp[:version_ts] = @site.updated_at.strftime('%Y-%m-%d %H:%M:%S')
-    @versions_ref << temp
+    @versions_sites << temp
     @versions.each{|ver|
       temp = {}
+      temp[:version] = version_number
+      temp[:version_ttl] = 'Version %s'%version_number
+      temp[:version_id] = '%s-site%s-ver%03d'%[@project.id,@site.id,version_number]
+      temp[:version_ts] = ver.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+      temp[:updated_comment] = ver.updated_comment
+      temp[:provenance_comment] = ver.provenance_comment
+      @versions_ref << temp
+      temp[:dirty] = @site.get_dirty(ver.updated_comment)
       @versions.properties.each{|prop| temp[prop.name] = ver[prop.name]}
       temp[:lat_long_datum] = '-none-'
       temp[:vertical_datum] = '-none-'
@@ -134,12 +147,8 @@ class Voeis::SitesController < Voeis::BaseController
       if !Voeis::SpatialReference.get(ver.local_projection_id).nil?
         temp[:local_projection] = Voeis::SpatialReference.get(ver.local_projection_id).srs_name
       end
-      temp[:version] = version_number
-      temp[:version_ttl] = 'Version %s'%version_number
-      temp[:version_id] = '%s-site%s-ver%03d'%[@project.id,@site.id,version_number]
-      temp[:version_ts] = ver.updated_at.strftime('%Y-%m-%d %H:%M:%S')
       version_number-=1
-      @versions_ref << temp
+      @versions_sites << temp
     }
     @ver_properties = [
 #      {:label=>"Version", :name=>"version"},
@@ -164,7 +173,6 @@ class Voeis::SitesController < Voeis::BaseController
       {:label=>"Provenance Comment", :name=>"provenance_comment"}
       ]
     ###
-    
   end
   
   def edit
@@ -173,8 +181,8 @@ class Voeis::SitesController < Voeis::BaseController
   
   def update
     # This should be handled by the framework, but isn't when using jruby.
-    params[:site][:latitude] = params[:site][:latitude].strip
-    params[:site][:longitude] = params[:site][:longitude].strip
+    params[:site][:latitude] = params[:site][:latitude].strip.to_f
+    params[:site][:longitude] = params[:site][:longitude].strip.to_f
     #@vert_datum_global = Voeis::VerticalDatumCV.get(params[:site][:vertical_datum_id].to_i)
     #@local_proj_global = Voeis::LocalProjectionCV.get(params[:site][:local_projection_id].to_i)
     
@@ -182,7 +190,7 @@ class Voeis::SitesController < Voeis::BaseController
       site = Voeis::Site.get(params[:site][:id])
       
       params[:site].each do |key, value|
-        site[key] = value.empty? ? nil : value
+        site[key] = value.blank? ? nil : value
       end
       site.updated_at = Time.now
       site.lat_long_datum_id = params[:site][:lat_long_datum_id] == "NaN" ? nil : params[:site][:lat_long_datum_id].to_i
