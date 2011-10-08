@@ -136,7 +136,8 @@ class ProjectsController < InheritedResources::Base
       lat_long_datum = site.lat_long_datum.nil? ? '' : site.lat_long_datum.srs_name.to_s
       local_proj = site.local_projection.nil? ? '' : site.local_projection.srs_name.to_s
       vert_datum = site.vertical_datum.nil? ? '' : site.vertical_datum.term.to_s
-      @site_ref << {:lat_long_datum=>lat_long_datum, :local_projection=>local_proj, :vertical_datum=>vert_datum}
+      upd_user = User.get(site.updated_by)
+      @site_ref << {:lat_long_datum=>lat_long_datum, :local_projection=>local_proj, :vertical_datum=>vert_datum, :updated_by=>'%s (%s)'%[upd_user.name,upd_user.login]}
     }
     
     @sites.each{ |site| 

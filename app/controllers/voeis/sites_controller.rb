@@ -123,6 +123,8 @@ class Voeis::SitesController < Voeis::BaseController
     if !Voeis::SpatialReference.get(@site.local_projection_id).nil?
       temp[:local_projection] = Voeis::SpatialReference.get(@site.local_projection_id).srs_name
     end
+    upd_user = User.get(@site.updated_by)
+    temp[:updated_by_name] = '%s (%s)'%[upd_user.name,upd_user.login]
     @versions_sites << temp
     @versions.each{|ver|
       temp = {}
@@ -147,6 +149,8 @@ class Voeis::SitesController < Voeis::BaseController
       if !Voeis::SpatialReference.get(ver.local_projection_id).nil?
         temp[:local_projection] = Voeis::SpatialReference.get(ver.local_projection_id).srs_name
       end
+      upd_user = User.get(ver.updated_by)
+      temp[:updated_by_name] = '%s (%s)'%[upd_user.name,upd_user.login]
       version_number-=1
       @versions_sites << temp
     }
@@ -169,6 +173,7 @@ class Voeis::SitesController < Voeis::BaseController
       {:label=>"Description", :name=>"description"},
       {:label=>"Comments", :name=>"comments"},
       {:label=>"HIS ID", :name=>"his_id"},
+      {:label=>"Updated By", :name=>"updated_by_name"},
       {:label=>"Update Comment", :name=>"updated_comment"},
       {:label=>"Provenance Comment", :name=>"provenance_comment"}
       ]

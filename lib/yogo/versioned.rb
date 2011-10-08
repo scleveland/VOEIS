@@ -22,7 +22,6 @@ module Yogo
       
       # Register before save hooks
       before(:save) do
-        #dirty_fields = self.dirty_attributes.keys.map{|k| k.name.to_s }.delete_if{|x| ['id','updated_at','provenance_comment'].include?(x) }.join(', ')
         dirty_props = self.dirty_attributes.keys.map{|k| k.name.to_s }.delete_if{|x| ['id','updated_at','provenance_comment'].include?(x) }
         dirty_props = dirty_props.map{|p| 
           p = (p[-3..-1]=='_id' && !::ID_EXCEPTIONS.include?(p)) ? p[0..-4] : p 

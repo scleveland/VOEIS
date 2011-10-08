@@ -203,13 +203,20 @@
         var mapclick = false;
         var crosshairShape = {coords:[0,0,0,0],type:'rect'};
         var crosshairImg = '/images/cross-hairs.gif';
-        
+        var map_center = new google.maps.LatLng(39.707187,-96.152344);
+        var map_zoom = 3;
+        if(!site00ref.newSite) {
+        map_center = new google.maps.LatLng(parseFloat(site00ref.site.latitude),parseFloat(site00ref.site.longitude));
+        map_zoom = 15;
+        console.log('EDIT SITE MAP:',map_center);
+        }
         site00_lat_long.map_opts = {
         //center: new google.maps.LatLng(46.739861,-110.786133), 
-        center: new google.maps.LatLng(39.707187,-96.152344),
-        zoom: 3,
+        center: map_center,
+        zoom: map_zoom,
+        mapTypeId: google.maps.MapTypeId.HYBRID,
         //mapTypeId: google.maps.MapTypeId.SATELLITE,
-        mapTypeId: google.maps.MapTypeId.TERRAIN,
+        //mapTypeId: google.maps.MapTypeId.TERRAIN,
         draggableCursor: 'crosshair',
         scaleControl: true, 
         zoomControl: true, 
