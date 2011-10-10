@@ -3,6 +3,64 @@ module Odhelper
     :his
   end
   
+  def upgrade_sites_CVzero
+    # REPLACE ALL CV REFERENCES: null -> 0
+    # Fields ending _id that are NOT references
+    #ID_EXCEPTIONS = ['his_id']
+    User.current = User.first
+    Project.all.each do |project|
+      print '>>>PROJECT: '+project.name
+      project.managed_repository do
+        Voeis::Site.all.each do |site|
+          if !site.nil?
+            site.lat_long_datum_id = 0 if site.lat_long_datum_id.nil?
+            site.vertical_datum_id = 0 if site.vertical_datum_id.nil?
+            site.local_projection_id = 0 if site.local_projection_id.nil?
+            if site.attribute_dirty?(:lat_long_datum_id) or
+              site.attribute_dirty?(:vertical_datum_id) or
+              site.attribute_dirty?(:local_projection_id)
+              siteId = [project.id,site.id,site.name]
+              if site.save
+                puts 'SITE UPDATED: ProjID: %s -- SiteID: %s (%s)'%siteId
+              else
+                puts '!!!SAVE FAILED: ProjID: %s -- Site ID: %s (%s)'%siteId
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  
+  def upgrade_sites_CVnull
+    # REPLACE ALL CV REFERENCES: null -> 0
+    # Fields ending _id that are NOT references
+    #ID_EXCEPTIONS = ['his_id']
+    User.current = User.first
+    Project.all.each do |project|
+      print '>>>PROJECT: '+project.name
+      project.managed_repository do
+        Voeis::Site.all.each do |site|
+          if !site.nil?
+            site.lat_long_datum_id = nil if site.lat_long_datum_id==0
+            site.vertical_datum_id = nil if site.vertical_datum_id==0
+            site.local_projection_id = nil if site.local_projection_id==0
+            if site.attribute_dirty?(:lat_long_datum_id) or
+              site.attribute_dirty?(:vertical_datum_id) or
+              site.attribute_dirty?(:local_projection_id)
+              siteId = [project.id,site.id,site.name]
+              if site.save
+                puts 'SITE UPDATED: ProjID: %s -- SiteID: %s (%s)'%siteId
+              else
+                puts '!!!SAVE FAILED: ProjID: %s -- Site ID: %s (%s)'%siteId
+              end
+            end
+          end
+        end
+      end
+    end
+  end
+  
   def upgrade_projects
     User.current = User.first
     DataMapper::Model.descendants.each do |model|

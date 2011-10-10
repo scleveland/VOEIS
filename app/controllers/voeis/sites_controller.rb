@@ -202,7 +202,8 @@ class Voeis::SitesController < Voeis::BaseController
       site.vertical_datum_id = params[:site][:vertical_datum_id] == "NaN" ? nil : params[:site][:vertical_datum_id].to_i
       site.local_projection_id = params[:site][:local_projection_id] == "NaN" ? nil : params[:site][:local_projection_id].to_i
       puts site.valid?
-      puts site.errors.inspect()
+      puts site.errors.inspect
+      
       #### CV update -- global -> local
       # if @vert_datum_global.nil?
       #         site.vertical_datum = nil
