@@ -417,7 +417,7 @@
       :title=>"click for overview",
       :style=>"margin:0;padding:0;"}
     - if @project.is_private == true
-      %span.icon.icon-private{:style=>"padding:0;"}
+      %span.icon.icon-private-title{:style=>"padding-top:0;"}
         = @project.name
     - else
       %span.icon{:style=>"padding:0;"}
