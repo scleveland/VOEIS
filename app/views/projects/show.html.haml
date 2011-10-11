@@ -412,17 +412,17 @@
 -#site_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"psites", :data=>"psites_json"}
 -#site_store{:dojoType=>"dojo.data.ItemFileWriteStore", :jsId=>"psites", :data=>"psites_json"}
 
-#content-title{:style=>"margin:0;margin-bottom:0;padding:0;"} 
+#content-title{:style=>"margin:0;padding:0;"} 
   %a{:href=>"javascript:", :onclick=>"dijit.byId('overview_dialog').show();return false;", 
       :title=>"click for overview",
       :style=>"margin:0;padding:0;"}
     - if @project.is_private == true
-      %span.icon.icon-private-title{:style=>"padding-top:0;"}
+      %span.icon-title.icon-private-title
         = @project.name
     - else
-      %span.icon{:style=>"padding:0;"}
+      %span.icon-title
         = @project.name
-    %span{:style=>"font-size:10px;"}
+    %span.icon-title{:style=>"font-size:10px;"}
       &nbsp;&nbsp; (click for Project Overview)
   -#&nbsp;&nbsp;&nbsp;&nbsp;
   -#&nbsp;&nbsp;&nbsp;&nbsp;
