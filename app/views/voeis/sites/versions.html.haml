@@ -73,8 +73,9 @@
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             %a{:href=>"javascript:", :onclick=>"versionsTab();return false;"}
               [RETRUN TO VERSIONS TAB]
+        - reset_cycle
         - @ver_properties.each do |prop|
-          %tr{:class=>"row#{cycle('1','0')}"}
+          %tr{:class=>cycle('row1','row0')}
             %td{:style=>"text-align:right;width:25%;"}
               %strong{:style=>"#{version[:dirty].include?(prop[:name])?'color:#B22800':''}"}
                 #{prop[:label]}

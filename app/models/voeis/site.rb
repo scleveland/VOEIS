@@ -34,7 +34,7 @@ class Voeis::Site
   property :name,                String,  :required => true, :length => 512
   property :latitude,            Float,   :required => true
   property :longitude,           Float,   :required => true
-  property :lat_long_datum_id,   Integer, :required => false, :default => 0
+  property :lat_long_datum_id,   Integer, :required => false
   property :elevation_m,         Float,   :required => false
   #property :vertical_datum,      String,  :required => false
   property :vertical_datum_id,   Integer, :required => false
@@ -89,7 +89,7 @@ class Voeis::Site
     
     puts "HHEYE"
     puts self.code
-    puts self.vertical_datum
+    puts self.vertical_datum_id
     if !self.local_projection_id.nil? && self.local_projection_id !=0
       puts "HECKYA"
       @spat_ref_global = DataMapper.repository(:default){Voeis::SpatialReference.get(self.local_projection_id)}
@@ -108,6 +108,7 @@ class Voeis::Site
                                           :is_geographic =>@spat_ref_global.is_geographic,
                                           :notes=>@spat_ref_global.notes)
     end
+    puts self.vertical_datum_id
   end
   
   def fetch_time_zone_offset
@@ -198,5 +199,6 @@ class Voeis::Site
       end
     end #end each
   end
+  
 end
 
