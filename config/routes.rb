@@ -44,7 +44,8 @@ Yogo::Application.routes.draw do
           post :data
         end
       end
-
+      resources :vertical_datum_c_vs
+      resources :spatial_references
       resources :variables
       resources :meta_tags
       resources :data_sets
