@@ -41,7 +41,7 @@ class Role
       Voeis::LabMethod,
       Voeis::MetaTag,
       Voeis::VerticalDatumCV,
-      Voeis::LocalProjectionCV,
+      Voeis::SpatialReference,
       Voeis::FieldMethod,
       Voeis::GeneralCategoryCV,
       Voeis::Lab,
