@@ -155,13 +155,13 @@ class User
   #   current_user.has_role?(:role_name)
   #
   # @param [Symbol or String] role
-  # @param [optional, Project] optional project for context
+  # @param [Object] project 
   #
   # @return [Boolean]
   #   True if the user belongs to the role or False if the user doesn't belong to the role
   #
   # @api public
-  def has_role?(role_name, project = nil)
+  def has_role?(role_name, project)
     #@_user_role_names ||= self.roles(:project => project).collect(&:name)
     @_user_role_names ||= self.memberships(:project_id => project.id).roles.collect(&:name)
     @_user_role_names.include?(role_name.to_s)
