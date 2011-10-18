@@ -162,7 +162,8 @@ class User
   #
   # @api public
   def has_role?(role_name, project = nil)
-    @_user_role_names ||= self.roles(:project => project).collect(&:name)
+    #@_user_role_names ||= self.roles(:project => project).collect(&:name)
+    @_user_role_names ||= self.memberships(:project_id => project.id).roles.collect(&:name)
     @_user_role_names.include?(role_name.to_s)
   end
 
