@@ -339,7 +339,7 @@ accepts an array of varialbes that should be associated with the site.
   
   
   <h3 class="inherited">Methods included from <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html" title="Yogo::Versioned::DataMapper::Resource (module)">Yogo::Versioned::DataMapper::Resource</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#included-class_method" title="Yogo::Versioned::DataMapper::Resource.included (method)">included</a></span></p>
+  <p class="inherited"><span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#get_dirty-instance_method" title="Yogo::Versioned::DataMapper::Resource#get_dirty (method)">#get_dirty</a></span>, <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#included-class_method" title="Yogo::Versioned::DataMapper::Resource.included (method)">included</a></span>, <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#to_hash-instance_method" title="Yogo::Versioned::DataMapper::Resource#to_hash (method)">#to_hash</a></span></p>
 
   
   
@@ -370,7 +370,6 @@ accepts an array of varialbes that should be associated with the site.
       <pre class="lines">
 
 
-129
 130
 131
 132
@@ -388,10 +387,11 @@ accepts an array of varialbes that should be associated with the site.
 144
 145
 146
-147</pre>
+147
+148</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 129</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 130</span>
 
 <span class='kw'>def</span> <span class='id create_from_his'>create_from_his</span><span class='lparen'>(</span><span class='id id'>id</span><span class='rparen'>)</span>
   <span class='id his_s'>his_s</span> <span class='op'>=</span> <span class='id repository'>repository</span><span class='lparen'>(</span><span class='symbol'>:his</span><span class='rparen'>)</span><span class='lbrace'>{</span> <span class='const'>His</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id id'>id</span><span class='rparen'>)</span> <span class='rbrace'>}</span>
@@ -430,15 +430,15 @@ accepts an array of varialbes that should be associated with the site.
       <pre class="lines">
 
 
-113
 114
 115
 116
 117
-118</pre>
+118
+119</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 113</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 114</span>
 
 <span class='kw'>def</span> <span class='id fetch_time_zone_offset'>fetch_time_zone_offset</span>
   <span class='id require'>require</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>geonames</span><span class='tstring_end'>&quot;</span></span>
@@ -464,17 +464,17 @@ accepts an array of varialbes that should be associated with the site.
       <pre class="lines">
 
 
-120
 121
 122
 123
 124
 125
 126
-127</pre>
+127
+128</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 120</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 121</span>
 
 <span class='kw'>def</span> <span class='id load_from_his'>load_from_his</span>
   <span class='id his_sites'>his_sites</span> <span class='op'>=</span> <span class='id repository'>repository</span><span class='lparen'>(</span><span class='symbol'>:his</span><span class='rparen'>)</span><span class='lbrace'>{</span> <span class='const'>His</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id all'>all</span> <span class='rbrace'>}</span>
@@ -502,7 +502,6 @@ accepts an array of varialbes that should be associated with the site.
       <pre class="lines">
 
 
-149
 150
 151
 152
@@ -516,10 +515,11 @@ accepts an array of varialbes that should be associated with the site.
 160
 161
 162
-163</pre>
+163
+164</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 149</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 150</span>
 
 <span class='kw'>def</span> <span class='id store_to_his'>store_to_his</span>
   <span class='id new_his_site'>new_his_site</span> <span class='op'>=</span> <span class='const'>His</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id first_or_create'>first_or_create</span><span class='lparen'>(</span><span class='symbol'>:site_code</span> <span class='op'>=&gt;</span> <span class='id site_code'>site_code</span><span class='comma'>,</span> <span class='symbol'>:site_name</span>  <span class='op'>=&gt;</span> <span class='id site_name'>site_name</span><span class='comma'>,</span>
@@ -585,7 +585,8 @@ accepts an array of varialbes that should be associated with the site.
 108
 109
 110
-111</pre>
+111
+112</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 80</span>
@@ -602,7 +603,7 @@ accepts an array of varialbes that should be associated with the site.
   
   <span class='id puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HHEYE</span><span class='tstring_end'>&quot;</span></span>
   <span class='id puts'>puts</span> <span class='kw'>self</span><span class='period'>.</span><span class='id code'>code</span>
-  <span class='id puts'>puts</span> <span class='kw'>self</span><span class='period'>.</span><span class='id vertical_datum'>vertical_datum</span>
+  <span class='id puts'>puts</span> <span class='kw'>self</span><span class='period'>.</span><span class='id vertical_datum_id'>vertical_datum_id</span>
   <span class='kw'>if</span> <span class='op'>!</span><span class='kw'>self</span><span class='period'>.</span><span class='id local_projection_id'>local_projection_id</span><span class='period'>.</span><span class='id nil?'>nil?</span> <span class='op'>&amp;&amp;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id local_projection_id'>local_projection_id</span> <span class='op'>!=</span><span class='int'>0</span>
     <span class='id puts'>puts</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HECKYA</span><span class='tstring_end'>&quot;</span></span>
     <span class='ivar'>@spat_ref_global</span> <span class='op'>=</span> <span class='const'>DataMapper</span><span class='period'>.</span><span class='id repository'>repository</span><span class='lparen'>(</span><span class='symbol'>:default</span><span class='rparen'>)</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id local_projection_id'>local_projection_id</span><span class='rparen'>)</span><span class='rbrace'>}</span>
@@ -621,6 +622,7 @@ accepts an array of varialbes that should be associated with the site.
                                         <span class='symbol'>:is_geographic</span> <span class='op'>=&gt;</span><span class='ivar'>@spat_ref_global</span><span class='period'>.</span><span class='id is_geographic'>is_geographic</span><span class='comma'>,</span>
                                         <span class='symbol'>:notes</span><span class='op'>=&gt;</span><span class='ivar'>@spat_ref_global</span><span class='period'>.</span><span class='id notes'>notes</span><span class='rparen'>)</span>
   <span class='kw'>end</span>
+  <span class='id puts'>puts</span> <span class='kw'>self</span><span class='period'>.</span><span class='id vertical_datum_id'>vertical_datum_id</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -640,7 +642,6 @@ accepts an array of varialbes that should be associated with the site.
       <pre class="lines">
 
 
-165
 166
 167
 168
@@ -656,10 +657,11 @@ accepts an array of varialbes that should be associated with the site.
 178
 179
 180
-181</pre>
+181
+182</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 165</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 166</span>
 
 <span class='kw'>def</span> <span class='id update_site_data_catalog'>update_site_data_catalog</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id variables'>variables</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id var'>var</span><span class='op'>|</span>
@@ -707,7 +709,6 @@ accepts an array of varialbes that should be associated with the site.
       <pre class="lines">
 
 
-184
 185
 186
 187
@@ -723,10 +724,11 @@ accepts an array of varialbes that should be associated with the site.
 197
 198
 199
-200</pre>
+200
+201</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 184</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/site.rb', line 185</span>
 
 <span class='kw'>def</span> <span class='id update_site_data_catalog_variables'>update_site_data_catalog_variables</span><span class='lparen'>(</span><span class='id variables'>variables</span><span class='rparen'>)</span>
   <span class='id variables'>variables</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id var'>var</span><span class='op'>|</span>
@@ -755,7 +757,7 @@ accepts an array of varialbes that should be associated with the site.
 </div>
     
     <div id="footer">
-  Generated on Mon Oct  3 15:11:58 2011 by 
+  Generated on Fri Oct 21 14:32:00 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

@@ -216,7 +216,7 @@ stored in sensor_values.
   
   
   <h3 class="inherited">Methods included from <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html" title="Yogo::Versioned::DataMapper::Resource (module)">Yogo::Versioned::DataMapper::Resource</a></span></h3>
-  <p class="inherited"><span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#included-class_method" title="Yogo::Versioned::DataMapper::Resource.included (method)">included</a></span></p>
+  <p class="inherited"><span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#get_dirty-instance_method" title="Yogo::Versioned::DataMapper::Resource#get_dirty (method)">#get_dirty</a></span>, <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#included-class_method" title="Yogo::Versioned::DataMapper::Resource.included (method)">included</a></span>, <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#to_hash-instance_method" title="Yogo::Versioned::DataMapper::Resource#to_hash (method)">#to_hash</a></span></p>
 
   
   
@@ -337,8 +337,6 @@ Yogo Team
       <pre class="lines">
 
 
-65
-66
 67
 68
 69
@@ -437,10 +435,12 @@ Yogo Team
 162
 163
 164
-165</pre>
+165
+166
+167</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 65</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 67</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id parse_logger_csv'>parse_logger_csv</span><span class='lparen'>(</span><span class='id csv_file'>csv_file</span><span class='comma'>,</span> <span class='id data_stream_template_id'>data_stream_template_id</span><span class='comma'>,</span> <span class='id site_id'>site_id</span><span class='comma'>,</span> <span class='id start_line'>start_line</span><span class='comma'>,</span> <span class='id sample_type'>sample_type</span><span class='comma'>,</span> <span class='id sample_medium'>sample_medium</span><span class='rparen'>)</span>
   <span class='comment'>#Determine how the time is stored
@@ -654,8 +654,6 @@ Yogo Team
       <pre class="lines">
 
 
-185
-186
 187
 188
 189
@@ -742,10 +740,18 @@ Yogo Team
 270
 271
 272
-273</pre>
+273
+274
+275
+276
+277
+278
+279
+280
+281</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 185</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 187</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id parse_logger_row'>parse_logger_row</span><span class='lparen'>(</span><span class='id data_timestamp_col'>data_timestamp_col</span><span class='comma'>,</span> <span class='id data_stream_id'>data_stream_id</span><span class='comma'>,</span> <span class='id vertical_offset_col'>vertical_offset_col</span><span class='comma'>,</span> <span class='id date_col'>date_col</span><span class='comma'>,</span> <span class='id time_col'>time_col</span><span class='comma'>,</span> <span class='id row'>row</span><span class='comma'>,</span> <span class='id site_id'>site_id</span><span class='comma'>,</span> <span class='id data_col_array'>data_col_array</span><span class='comma'>,</span> <span class='id variable_cols'>variable_cols</span><span class='comma'>,</span> <span class='id sample_id'>sample_id</span><span class='comma'>,</span> <span class='id sample_type'>sample_type</span><span class='comma'>,</span> <span class='id sample_medium'>sample_medium</span><span class='comma'>,</span> <span class='id end_vertical_offset_col'>end_vertical_offset_col</span><span class='comma'>,</span> <span class='id sensor_col_array'>sensor_col_array</span><span class='comma'>,</span><span class='id sensor_cols'>sensor_cols</span><span class='comma'>,</span> <span class='id source_id'>source_id</span><span class='comma'>,</span> <span class='id dst_time'>dst_time</span><span class='comma'>,</span> <span class='id dst'>dst</span><span class='comma'>,</span> <span class='id user_id'>user_id</span><span class='rparen'>)</span>
   <span class='id require'>require</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>chronic</span><span class='tstring_end'>'</span></span>  <span class='comment'>#for robust timestamp parsing
@@ -760,10 +766,16 @@ Yogo Team
 </span>  <span class='id vertical_offset'>vertical_offset</span> <span class='op'>=</span> <span class='id vertical_offset_col'>vertical_offset_col</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='op'>?</span> <span class='float'>0.0</span> <span class='op'>:</span> <span class='id row'>row</span><span class='lbracket'>[</span><span class='id vertical_offset_col'>vertical_offset_col</span><span class='period'>.</span><span class='id to_i'>to_i</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_f'>to_f</span>
   <span class='id end_vertical_offset'>end_vertical_offset</span> <span class='op'>=</span> <span class='id end_vertical_offset_col'>end_vertical_offset_col</span> <span class='op'>==</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span> <span class='op'>?</span> <span class='float'>0.0</span> <span class='op'>:</span> <span class='id row'>row</span><span class='lbracket'>[</span><span class='id end_vertical_offset_col'>end_vertical_offset_col</span><span class='period'>.</span><span class='id to_i'>to_i</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_f'>to_f</span>
   <span class='id data_stream'>data_stream</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataStream</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id data_stream_id'>data_stream_id</span><span class='rparen'>)</span>
-  <span class='id sample_datetime'>sample_datetime</span> <span class='op'>=</span> <span class='const'>Chronic</span><span class='period'>.</span><span class='id parse'>parse</span><span class='lparen'>(</span><span class='id row'>row</span><span class='lbracket'>[</span><span class='id data_timestamp_col'>data_timestamp_col</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id to_datetime'>to_datetime</span>
-  <span class='id timestamp'>timestamp</span> <span class='op'>=</span> <span class='const'>DateTime</span><span class='period'>.</span><span class='id civil'>civil</span><span class='lparen'>(</span><span class='id sample_datetime'>sample_datetime</span><span class='period'>.</span><span class='id year'>year</span><span class='comma'>,</span><span class='id sample_datetime'>sample_datetime</span><span class='period'>.</span><span class='id month'>month</span><span class='comma'>,</span>
-                 <span class='id sample_datetime'>sample_datetime</span><span class='period'>.</span><span class='id day'>day</span><span class='comma'>,</span><span class='id sample_datetime'>sample_datetime</span><span class='period'>.</span><span class='id hour'>hour</span><span class='comma'>,</span><span class='id sample_datetime'>sample_datetime</span><span class='period'>.</span><span class='id min'>min</span><span class='comma'>,</span>
-                 <span class='id sample_datetime'>sample_datetime</span><span class='period'>.</span><span class='id sec'>sec</span><span class='comma'>,</span> <span class='lparen'>(</span><span class='id data_stream'>data_stream</span><span class='period'>.</span><span class='id utc_offset'>utc_offset</span><span class='op'>+</span><span class='id dst_time'>dst_time</span><span class='rparen'>)</span><span class='op'>/</span><span class='int'>24</span><span class='period'>.</span><span class='id to_f'>to_f</span><span class='rparen'>)</span>
+  <span class='comment'># if DateTime.parse(row[data_timestamp_col])
+</span>  <span class='comment'>#       sample_datetime = DateTime.parse(row[data_timestamp_col])
+</span>  <span class='comment'>#     else
+</span>    <span class='id sample_datetime'>sample_datetime</span> <span class='op'>=</span> <span class='const'>Chronic</span><span class='period'>.</span><span class='id parse'>parse</span><span class='lparen'>(</span><span class='id row'>row</span><span class='lbracket'>[</span><span class='id data_timestamp_col'>data_timestamp_col</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id to_datetime'>to_datetime</span>
+  <span class='comment'># end
+</span>  <span class='comment'># timestamp = DateTime.civil(sample_datetime.year,sample_datetime.month,
+</span>  <span class='comment'>#                sample_datetime.day,sample_datetime.hour,sample_datetime.min,
+</span>  <span class='comment'>#                sample_datetime.sec, (data_stream.utc_offset+dst_time)/24.to_r)
+</span>  <span class='id timestamp'>timestamp</span> <span class='op'>=</span> <span class='id sample_datetime'>sample_datetime</span><span class='period'>.</span><span class='id change'>change</span><span class='lparen'>(</span><span class='symbol'>:offset</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='lparen'>(</span><span class='id data_stream'>data_stream</span><span class='period'>.</span><span class='id utc_offset'>utc_offset</span><span class='op'>+</span><span class='id dst_time'>dst_time</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='tstring_content'>:00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
+  <span class='id debugger'>debugger</span>
   <span class='comment'>#if t = Date.parse(timestamp) rescue nil?
 </span>  <span class='comment'>#if (Voeis::DataValue.first(:local_date_time =&gt; timestamp) &amp; 
 </span>  <span class='kw'>if</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>DataValue</span><span class='period'>.</span><span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:datatype</span><span class='op'>=&gt;</span><span class='id data_stream'>data_stream</span><span class='period'>.</span><span class='id type'>type</span><span class='comma'>,</span> <span class='symbol'>:local_date_time</span><span class='op'>=&gt;</span><span class='id timestamp'>timestamp</span><span class='comma'>,</span> <span class='symbol'>:site_id</span><span class='op'>=&gt;</span> <span class='id site_id'>site_id</span><span class='comma'>,</span> <span class='symbol'>:variable_id</span> <span class='op'>=&gt;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id variable_cols'>variable_cols</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id variable'>variable</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id id'>id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id nil?'>nil?</span>
@@ -773,7 +785,7 @@ Yogo Team
         <span class='lparen'>(</span><span class='int'>0</span><span class='op'>..</span><span class='id row'>row</span><span class='period'>.</span><span class='id size'>size</span><span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span><span class='period'>.</span><span class='id each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id i'>i</span><span class='op'>|</span>
           <span class='kw'>if</span> <span class='id i'>i</span> <span class='op'>!=</span> <span class='id data_timestamp_col'>data_timestamp_col</span> <span class='op'>&amp;&amp;</span> <span class='id i'>i</span> <span class='op'>!=</span> <span class='id date_col'>date_col</span> <span class='op'>&amp;&amp;</span> <span class='id i'>i</span> <span class='op'>!=</span> <span class='id time_col'>time_col</span> <span class='op'>&amp;&amp;</span> <span class='id i'>i</span> <span class='op'>!=</span> <span class='id vertical_offset_col'>vertical_offset_col</span> <span class='op'>&amp;&amp;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ignore</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>EndingVerticalOffset</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>SampleID</span><span class='tstring_end'>&quot;</span></span> <span class='op'>&amp;&amp;</span> <span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>!=</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Ignore</span><span class='tstring_end'>&quot;</span></span>
               <span class='id cv'>cv</span> <span class='op'>=</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$</span><span class='regexp_end'>/</span></span><span class='period'>.</span><span class='id match'>match</span><span class='lparen'>(</span><span class='id row'>row</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='rparen'>)</span> <span class='op'>?</span> <span class='id row'>row</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_f'>to_f</span> <span class='op'>:</span> <span class='op'>-</span><span class='float'>9999.0</span>
-              <span class='id row_values'>row_values</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(</span><span class='embexpr_beg'>#{</span><span class='id cv'>cv</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbrace'>}</span><span class='tstring_content'>, '</span><span class='embexpr_beg'>#{</span><span class='id timestamp'>timestamp</span><span class='rbrace'>}</span><span class='tstring_content'>', </span><span class='embexpr_beg'>#{</span><span class='id vertical_offset'>vertical_offset</span><span class='rbrace'>}</span><span class='tstring_content'>,FALSE, '</span><span class='embexpr_beg'>#{</span><span class='id row'>row</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbrace'>}</span><span class='tstring_content'>', '</span><span class='embexpr_beg'>#{</span><span class='id created_at'>created_at</span><span class='rbrace'>}</span><span class='tstring_content'>', '</span><span class='embexpr_beg'>#{</span><span class='id updated_at'>updated_at</span><span class='rbrace'>}</span><span class='tstring_content'>', </span><span class='embexpr_beg'>#{</span><span class='id user_id'>user_id</span><span class='rbrace'>}</span><span class='tstring_content'>,'</span><span class='embexpr_beg'>#{</span><span class='id create_comment'>create_comment</span><span class='rbrace'>}</span><span class='tstring_content'>', </span><span class='embexpr_beg'>#{</span><span class='id data_stream'>data_stream</span><span class='period'>.</span><span class='id utc_offset'>utc_offset</span><span class='op'>+</span><span class='id dst_time'>dst_time</span><span class='rbrace'>}</span><span class='tstring_content'>,'</span><span class='embexpr_beg'>#{</span><span class='id timestamp'>timestamp</span><span class='period'>.</span><span class='id utc'>utc</span><span class='rbrace'>}</span><span class='tstring_content'>','</span><span class='embexpr_beg'>#{</span><span class='id dst'>dst</span><span class='rbrace'>}</span><span class='tstring_content'>',</span><span class='embexpr_beg'>#{</span><span class='id end_vertical_offset'>end_vertical_offset</span><span class='rbrace'>}</span><span class='tstring_content'>,</span><span class='embexpr_beg'>#{</span><span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id variable'>variable</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id quality_control'>quality_control</span><span class='period'>.</span><span class='id to_f'>to_f</span><span class='rbrace'>}</span><span class='tstring_content'>,'</span><span class='embexpr_beg'>#{</span><span class='id data_stream'>data_stream</span><span class='period'>.</span><span class='id type'>type</span><span class='rbrace'>}</span><span class='tstring_content'>', </span><span class='embexpr_beg'>#{</span><span class='id site_id'>site_id</span><span class='rbrace'>}</span><span class='tstring_content'>,  </span><span class='embexpr_beg'>#{</span><span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id variable'>variable</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id id'>id</span><span class='rbrace'>}</span><span class='tstring_content'> )</span><span class='tstring_end'>&quot;</span></span>
+              <span class='id row_values'>row_values</span> <span class='op'>&lt;&lt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>(</span><span class='embexpr_beg'>#{</span><span class='id cv'>cv</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbrace'>}</span><span class='tstring_content'>, '</span><span class='embexpr_beg'>#{</span><span class='id timestamp'>timestamp</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbrace'>}</span><span class='tstring_content'>', </span><span class='embexpr_beg'>#{</span><span class='id vertical_offset'>vertical_offset</span><span class='rbrace'>}</span><span class='tstring_content'>,FALSE, '</span><span class='embexpr_beg'>#{</span><span class='id row'>row</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbrace'>}</span><span class='tstring_content'>', '</span><span class='embexpr_beg'>#{</span><span class='id created_at'>created_at</span><span class='rbrace'>}</span><span class='tstring_content'>', '</span><span class='embexpr_beg'>#{</span><span class='id updated_at'>updated_at</span><span class='rbrace'>}</span><span class='tstring_content'>', </span><span class='embexpr_beg'>#{</span><span class='id user_id'>user_id</span><span class='rbrace'>}</span><span class='tstring_content'>,'</span><span class='embexpr_beg'>#{</span><span class='id create_comment'>create_comment</span><span class='rbrace'>}</span><span class='tstring_content'>', </span><span class='embexpr_beg'>#{</span><span class='id data_stream'>data_stream</span><span class='period'>.</span><span class='id utc_offset'>utc_offset</span><span class='op'>+</span><span class='id dst_time'>dst_time</span><span class='rbrace'>}</span><span class='tstring_content'>,'</span><span class='embexpr_beg'>#{</span><span class='id timestamp'>timestamp</span><span class='period'>.</span><span class='id utc'>utc</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rbrace'>}</span><span class='tstring_content'>','</span><span class='embexpr_beg'>#{</span><span class='id dst'>dst</span><span class='rbrace'>}</span><span class='tstring_content'>',</span><span class='embexpr_beg'>#{</span><span class='id end_vertical_offset'>end_vertical_offset</span><span class='rbrace'>}</span><span class='tstring_content'>,</span><span class='embexpr_beg'>#{</span><span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id variable'>variable</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id quality_control'>quality_control</span><span class='period'>.</span><span class='id to_f'>to_f</span><span class='rbrace'>}</span><span class='tstring_content'>,'</span><span class='embexpr_beg'>#{</span><span class='id data_stream'>data_stream</span><span class='period'>.</span><span class='id type'>type</span><span class='rbrace'>}</span><span class='tstring_content'>', </span><span class='embexpr_beg'>#{</span><span class='id site_id'>site_id</span><span class='rbrace'>}</span><span class='tstring_content'>,  </span><span class='embexpr_beg'>#{</span><span class='id data_col_array'>data_col_array</span><span class='lbracket'>[</span><span class='id i'>i</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='id variable'>variable</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id id'>id</span><span class='rbrace'>}</span><span class='tstring_content'> )</span><span class='tstring_end'>&quot;</span></span>
             <span class='kw'>end</span> <span class='comment'>#end if
 </span>        <span class='kw'>end</span> <span class='comment'>#end loop
 </span>        <span class='kw'>if</span> <span class='op'>!</span><span class='id row_values'>row_values</span><span class='period'>.</span><span class='id empty?'>empty?</span>
@@ -860,21 +872,23 @@ Yogo Team
       <pre class="lines">
 
 
-44
 45
 46
 47
 48
-49</pre>
+49
+50
+51</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 44</span>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 45</span>
 
 <span class='kw'>def</span> <span class='id date_time_utc'>date_time_utc</span>
-  <span class='id d'>d</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='symbol'>:year</span><span class='comma'>,</span> <span class='symbol'>:mon</span><span class='comma'>,</span> <span class='symbol'>:day</span><span class='comma'>,</span> <span class='symbol'>:hour</span><span class='comma'>,</span> <span class='symbol'>:min</span><span class='comma'>,</span> <span class='symbol'>:sec</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id map'>map</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id q'>q</span><span class='op'>|</span> <span class='ivar'>@date_time_utc</span><span class='period'>.</span><span class='id send'>send</span><span class='lparen'>(</span><span class='id q'>q</span><span class='rparen'>)</span><span class='rbrace'>}</span>
-  <span class='id d'>d</span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='float'>0.0</span><span class='op'>/</span><span class='int'>24</span><span class='rparen'>)</span><span class='period'>.</span><span class='id to_f'>to_f</span>
-  <span class='comment'>#puts d
-</span>  <span class='const'>DateTime</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='op'>*</span><span class='id d'>d</span><span class='rparen'>)</span> 
+  <span class='comment'># d = [:year, :mon, :day, :hour, :min, :sec].map{|q| @date_time_utc.send(q)}
+</span>  <span class='comment'># d &lt;&lt; (0.0/24).to_f
+</span>  <span class='comment'># #puts d
+</span>  <span class='comment'># DateTime.new(*d) 
+</span>  <span class='ivar'>@date_time_utc</span><span class='period'>.</span><span class='id to_datetime'>to_datetime</span><span class='period'>.</span><span class='id change'>change</span><span class='lparen'>(</span><span class='symbol'>:offset</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>+00:00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -899,16 +913,18 @@ Yogo Team
 39
 40
 41
-42</pre>
+42
+43</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/models/voeis/data_value.rb', line 37</span>
 
 <span class='kw'>def</span> <span class='id local_date_time'>local_date_time</span>
-  <span class='id d'>d</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='symbol'>:year</span><span class='comma'>,</span> <span class='symbol'>:mon</span><span class='comma'>,</span> <span class='symbol'>:day</span><span class='comma'>,</span> <span class='symbol'>:hour</span><span class='comma'>,</span> <span class='symbol'>:min</span><span class='comma'>,</span> <span class='symbol'>:sec</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id map'>map</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id q'>q</span><span class='op'>|</span> <span class='ivar'>@local_date_time</span><span class='period'>.</span><span class='id send'>send</span><span class='lparen'>(</span><span class='id q'>q</span><span class='rparen'>)</span><span class='rbrace'>}</span>
-  <span class='id d'>d</span> <span class='op'>&lt;&lt;</span> <span class='lparen'>(</span><span class='id utc_offset'>utc_offset</span><span class='op'>/</span><span class='int'>24</span><span class='rparen'>)</span><span class='period'>.</span><span class='id to_f'>to_f</span>
-  <span class='comment'>#puts d
-</span>  <span class='const'>DateTime</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='op'>*</span><span class='id d'>d</span><span class='rparen'>)</span> 
+  <span class='comment'># d = [:year, :mon, :day, :hour, :min, :sec].map{|q| @local_date_time.send(q)}
+</span>  <span class='comment'># d &lt;&lt; (utc_offset/24).to_f
+</span>  <span class='comment'># #puts d
+</span>  <span class='comment'># DateTime.new(*d) 
+</span>  <span class='ivar'>@local_date_time</span><span class='period'>.</span><span class='id to_datetime'>to_datetime</span><span class='period'>.</span><span class='id change'>change</span><span class='lparen'>(</span><span class='symbol'>:offset</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='embexpr_beg'>#{</span><span class='id utc_offset'>utc_offset</span><span class='rbrace'>}</span><span class='tstring_content'>:00</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -920,7 +936,7 @@ Yogo Team
 </div>
     
     <div id="footer">
-  Generated on Mon Oct  3 15:11:59 2011 by 
+  Generated on Fri Oct 21 14:32:01 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>
