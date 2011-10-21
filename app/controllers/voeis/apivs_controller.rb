@@ -324,8 +324,8 @@ class Voeis::ApivsController < Voeis::BaseController
          site_start = nil
          site_end = nil
          unless Voeis::SiteDataCatalog.all(:site_id => site.id).empty?
-           site_start =  Voeis::SiteDataCatalog.first(:site_id => site.id,:order => [:starting_timestamp], :starting_timestamp.not => nil).starting_timestamp
-           site_end = Voeis::SiteDataCatalog.last(:site_id => site.id,:order => [:ending_timestamp], :ending_timestamp.not => nil).ending_timestamp
+           site_start =  Voeis::SiteDataCatalog.first(:site_id => site.id,:order => [:starting_timestamp], :starting_timestamp.not => nil).nil? ? nil : Voeis::SiteDataCatalog.first(:site_id => site.id,:order => [:starting_timestamp], :starting_timestamp.not => nil).starting_timestamp
+           site_end = Voeis::SiteDataCatalog.last(:site_id => site.id,:order => [:ending_timestamp], :ending_timestamp.not => nil).nil? ? nil : Voeis::SiteDataCatalog.last(:site_id => site.id,:order => [:ending_timestamp], :ending_timestamp.not => nil).ending_timestamp
            site_total = Voeis::SiteDataCatalog.sum(:record_number, :site_id => site.id)
          end
          site_array << {:site => site}.merge(var_hash).merge(:record_number => site_total, :starting_timestamp => site_start, :ending_timestamp => site_end)
