@@ -64,6 +64,10 @@ module Yogo
           end
         end
         
+        def to_hash
+          hash = {}; self.attributes.each { |k,v| hash[k] = v }
+              return hash
+        end
       end # Resource
     end # DataMapper
   end # Versioned
