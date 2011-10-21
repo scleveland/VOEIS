@@ -317,7 +317,7 @@ class Voeis::ApivsController < Voeis::BaseController
          site.variables.each do |var|
            sdc = Voeis::SiteDataCatalog.first(:site_id => site.id, :variable_id => var.id)
            unless sdc.nil?
-              var_hash[:variables] << {:variable=>var}.merge({:record_number => sdc.record_number, :starting_timestamp => sdc.starting_timestamp, :ending_timestamp => sdc.ending_timestamp})
+              var_hash[:variables] << var.to_hash.merge({:record_number => sdc.record_number, :starting_timestamp => sdc.starting_timestamp, :ending_timestamp => sdc.ending_timestamp})
            end
          end
          site_total = 0
@@ -328,7 +328,7 @@ class Voeis::ApivsController < Voeis::BaseController
            site_end = Voeis::SiteDataCatalog.last(:site_id => site.id,:order => [:ending_timestamp], :ending_timestamp.not => nil).nil? ? nil : Voeis::SiteDataCatalog.last(:site_id => site.id,:order => [:ending_timestamp], :ending_timestamp.not => nil).ending_timestamp
            site_total = Voeis::SiteDataCatalog.sum(:record_number, :site_id => site.id)
          end
-         site_array << {:site => site}.merge(var_hash).merge(:record_number => site_total, :starting_timestamp => site_start, :ending_timestamp => site_end)
+         site_array << site.to_hash.merge(var_hash).merge(:record_number => site_total, :starting_timestamp => site_start, :ending_timestamp => site_end)
        end
        @summary[:sites] = site_array
        @summary[:record_number] =Voeis::SiteDataCatalog.sum(:record_number)
