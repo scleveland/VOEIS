@@ -102,6 +102,60 @@
       
     </ul>
   
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_dirty-instance_method" title="#get_dirty (instance method)">- (Object) <strong>get_dirty</strong>(updated_comment = self.updated_comment) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>
+Dirty Field list.
+</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_hash-instance_method" title="#to_hash (instance method)">- (Object) <strong>to_hash</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
 
 
 
@@ -122,15 +176,15 @@
       <pre class="lines">
 
 
-31
-32
-33
-34
-35
-36</pre>
+49
+50
+51
+52
+53
+54</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'lib/yogo/versioned.rb', line 31</span>
+      <pre class="code"><span class="info file"># File 'lib/yogo/versioned.rb', line 49</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id included'>included</span><span class='lparen'>(</span><span class='id base'>base</span><span class='rparen'>)</span>
   <span class='id base'>base</span><span class='period'>.</span><span class='id class_eval'>class_eval</span> <span class='kw'>do</span>
@@ -145,10 +199,95 @@
     
   </div>
 
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="get_dirty-instance_method">
+  
+    - (<tt><span class='object_link'><a href="../../../Object.html" title="Object (class)">Object</a></span></tt>) <strong>get_dirty</strong>(updated_comment = self.updated_comment) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>
+Dirty Field list
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+57
+58
+59
+60
+61
+62
+63
+64
+65</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/yogo/versioned.rb', line 57</span>
+
+<span class='kw'>def</span> <span class='id get_dirty'>get_dirty</span><span class='lparen'>(</span><span class='id updated_comment'>updated_comment</span><span class='op'>=</span><span class='kw'>self</span><span class='period'>.</span><span class='id updated_comment'>updated_comment</span><span class='rparen'>)</span>
+  <span class='comment'>#if !(dirty_props = /#{Regexp.quote(@@updated_fields)}(.*)$/.match(updated_comment)).blank?
+</span>  <span class='comment'>#  return dirty_props[1].split(/, ?/)
+</span>  <span class='kw'>if</span> <span class='op'>!</span><span class='lparen'>(</span><span class='id dirty_props'>dirty_props</span> <span class='op'>=</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='embexpr_beg'>#{</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id quote'>quote</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>UPDATED_FIELDS</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='tstring_content'>(.*)$</span><span class='regexp_end'>/</span></span><span class='period'>.</span><span class='id match'>match</span><span class='lparen'>(</span><span class='id updated_comment'>updated_comment</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id blank?'>blank?</span>
+    <span class='kw'>return</span> <span class='id dirty_props'>dirty_props</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>, ?</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="to_hash-instance_method">
+  
+    - (<tt><span class='object_link'><a href="../../../Object.html" title="Object (class)">Object</a></span></tt>) <strong>to_hash</strong> 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+67
+68
+69</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/yogo/versioned.rb', line 67</span>
+
+<span class='kw'>def</span> <span class='id to_hash'>to_hash</span>
+    <span class='const'>Hash</span><span class='lbracket'>[</span><span class='id instance_variables'>instance_variables</span><span class='period'>.</span><span class='id map'>map</span> <span class='lbrace'>{</span> <span class='op'>|</span><span class='id var'>var</span><span class='op'>|</span> <span class='lbracket'>[</span><span class='id var'>var</span><span class='lbracket'>[</span><span class='int'>1</span><span class='op'>..</span><span class='op'>-</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id to_sym'>to_sym</span><span class='comma'>,</span> <span class='id instance_variable_get'>instance_variable_get</span><span class='lparen'>(</span><span class='id var'>var</span><span class='rparen'>)</span><span class='rbracket'>]</span> <span class='rbrace'>}</span><span class='rbracket'>]</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
 </div>
     
     <div id="footer">
-  Generated on Mon Oct  3 15:11:57 2011 by 
+  Generated on Fri Oct 21 14:31:59 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

@@ -293,6 +293,53 @@ class Voeis::ApivsController < Voeis::BaseController
       end
     end
   end
+  
+  
+  # get_project_data_summary
+  # API for getting a list of the data within a Project
+  #
+  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_data_summary.json?
+  #
+  #
+  # @author Sean Cleveland
+  #
+  # @return [JSON String] a JSON object with and array of sites and each sites variables meta-information along with the "record_number"(total number of records for the object), "starting_timestamp"(the first timestamp for a time-series related to that object) and "ending_timestamp"(the last timestamp for a time-series related to that object) for each variable, site and the project itself.
+  # 
+  # @api public
+  def get_project_data_summary
+    @summary = Hash.new
+     parent.managed_repository do
+       site_array = Array.new
+       Voeis::Site.all.each do |site|
+         #site_hash[site.id.to_s]   
+         var_hash = Hash.new
+         var_hash[:variables] = Array.new
+         site.variables.each do |var|
+           sdc = Voeis::SiteDataCatalog.first(:site_id => site.id, :variable_id => var.id)
+           unless sdc.nil?
+              var_hash[:variables] << var.to_hash.merge({:record_number => sdc.record_number, :starting_timestamp => sdc.starting_timestamp, :ending_timestamp => sdc.ending_timestamp})
+           end
+         end
+         site_total = 0
+         site_start = nil
+         site_end = nil
+         unless Voeis::SiteDataCatalog.all(:site_id => site.id).empty?
+           site_start =  Voeis::SiteDataCatalog.first(:site_id => site.id,:order => [:starting_timestamp], :starting_timestamp.not => nil).nil? ? nil : Voeis::SiteDataCatalog.first(:site_id => site.id,:order => [:starting_timestamp], :starting_timestamp.not => nil).starting_timestamp
+           site_end = Voeis::SiteDataCatalog.last(:site_id => site.id,:order => [:ending_timestamp], :ending_timestamp.not => nil).nil? ? nil : Voeis::SiteDataCatalog.last(:site_id => site.id,:order => [:ending_timestamp], :ending_timestamp.not => nil).ending_timestamp
+           site_total = Voeis::SiteDataCatalog.sum(:record_number, :site_id => site.id)
+         end
+         site_array << site.to_hash.merge(var_hash).merge(:record_number => site_total, :starting_timestamp => site_start, :ending_timestamp => site_end)
+       end
+       @summary[:sites] = site_array
+       @summary[:record_number] =Voeis::SiteDataCatalog.sum(:record_number)
+       @summary[:starting_timestamp] =Voeis::SiteDataCatalog.first(:order => [:starting_timestamp], :starting_timestamp.not => nil).starting_timestamp
+       @summary[:ending_timestamp] = Voeis::SiteDataCatalog.last(:order => [:ending_timestamp], :ending_timestamp.not => nil).ending_timestamp
+     end
+     respond_to do |format|
+       format_response(@summary, format)
+     end
+  end
+  
   # get_project_data_templates
   # API for getting a list of the data_templates within a Project
   #

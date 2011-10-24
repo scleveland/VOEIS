@@ -409,13 +409,13 @@ lamb
       <pre class="lines">
 
 
-46
-47
-48
-49</pre>
+49
+50
+51
+52</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 46</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 49</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id permissions_for'>permissions_for</span><span class='lparen'>(</span><span class='id user'>user</span><span class='rparen'>)</span>
   <span class='comment'># By default, all users can retrieve projects
@@ -439,9 +439,6 @@ lamb
       <pre class="lines">
 
 
-139
-140
-141
 142
 143
 144
@@ -455,10 +452,13 @@ lamb
 152
 153
 154
-155</pre>
+155
+156
+157
+158</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 139</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 142</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id store_site_to_system'>store_site_to_system</span><span class='lparen'>(</span><span class='id u_id'>u_id</span><span class='rparen'>)</span>
   <span class='id site_to_store'>site_to_store</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='id u_id'>u_id</span><span class='rparen'>)</span><span class='rbrace'>}</span>
@@ -552,9 +552,6 @@ Set of permissions the current user has
       <pre class="lines">
 
 
-57
-58
-59
 60
 61
 62
@@ -580,10 +577,13 @@ Set of permissions the current user has
 82
 83
 84
-85</pre>
+85
+86
+87
+88</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 57</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 60</span>
 
 <span class='kw'>def</span> <span class='id permissions_for'>permissions_for</span><span class='lparen'>(</span><span class='id user'>user</span><span class='rparen'>)</span>
   <span class='ivar'>@_permissions_for</span> <span class='op'>||=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -632,9 +632,6 @@ Set of permissions the current user has
       <pre class="lines">
 
 
-87
-88
-89
 90
 91
 92
@@ -682,10 +679,13 @@ Set of permissions the current user has
 134
 135
 136
-137</pre>
+137
+138
+139
+140</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 87</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 90</span>
 
 <span class='kw'>def</span> <span class='id publish_his'>publish_his</span>
   <span class='kw'>if</span> <span class='kw'>self</span><span class='period'>.</span><span class='id publish_to_his'>publish_to_his</span>
@@ -756,12 +756,12 @@ Set of permissions the current user has
       <pre class="lines">
 
 
-183
-184
-185</pre>
+186
+187
+188</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 183</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 186</span>
 
 <span class='kw'>def</span> <span class='id sites'>sites</span>
   <span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id all'>all</span> <span class='rbrace'>}</span>
@@ -784,16 +784,16 @@ Set of permissions the current user has
       <pre class="lines">
 
 
-157
-158
-159
 160
 161
 162
-163</pre>
+163
+164
+165
+166</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 157</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 160</span>
 
 <span class='kw'>def</span> <span class='id update_project_site_data_catalog'>update_project_site_data_catalog</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span> <span class='kw'>do</span>
@@ -820,12 +820,12 @@ Set of permissions the current user has
       <pre class="lines">
 
 
-36
-37
-38</pre>
+39
+40
+41</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 36</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 39</span>
 
 <span class='kw'>def</span> <span class='id upgrade_global_models'>upgrade_global_models</span>
   <span class='const'>DataMapper</span><span class='period'>.</span><span class='id auto_upgrade!'>auto_upgrade!</span>
@@ -859,12 +859,12 @@ fetch all variables from the Projects
       <pre class="lines">
 
 
-188
-189
-190</pre>
+191
+192
+193</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 188</span>
+      <pre class="code"><span class="info file"># File 'app/models/project.rb', line 191</span>
 
 <span class='kw'>def</span> <span class='id variables'>variables</span>
   <span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Variable</span><span class='period'>.</span><span class='id all'>all</span><span class='rbrace'>}</span>
@@ -879,7 +879,7 @@ fetch all variables from the Projects
 </div>
     
     <div id="footer">
-  Generated on Mon Oct  3 15:11:57 2011 by 
+  Generated on Fri Oct 21 14:31:59 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>
