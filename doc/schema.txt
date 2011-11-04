@@ -1,0 +1,1248 @@
+Delayed::Job
+----------------------------------------
+id                       	Serial              
+priority                 	Integer             
+attempts                 	Integer             
+handler                  	Yaml                
+last_error               	Text                
+run_at                   	DateTime            
+locked_at                	DateTime            
+failed_at                	DateTime            
+locked_by                	String              
+created_at               	DateTime            
+updated_at               	DateTime            
+
+
+Project
+----------------------------------------
+id                       	UUID                
+name                     	String              
+description              	Text                
+is_private               	Boolean             
+publish_to_his           	Boolean             
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::Site
+----------------------------------------
+id                       	Serial              
+code                     	String              
+name                     	String              
+latitude                 	Float               
+longitude                	Float               
+lat_long_datum_id        	Integer             
+elevation_m              	Float               
+vertical_datum_id        	Integer             
+local_x                  	Float               
+local_y                  	Float               
+local_projection_id      	Integer             
+pos_accuracy_m           	Float               
+state                    	String              
+county                   	String              
+comments                 	Text                
+description              	Text                
+time_zone_offset         	String              
+his_id                   	Integer             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::SiteDataCatalog
+----------------------------------------
+site_id                  	Integer             
+variable_id              	Integer             
+record_number            	Integer             
+starting_timestamp       	DateTime            
+ending_timestamp         	DateTime            
+
+
+Voeis::DataStream
+----------------------------------------
+id                       	Serial              
+name                     	String              
+description              	Text                
+filename                 	String              
+start_line               	Integer             
+type                     	String              
+utc_offset               	Integer             
+DST                      	Boolean             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::DataStreamColumn
+----------------------------------------
+id                       	Serial              
+name                     	String              
+type                     	String              
+unit                     	String              
+original_var             	String              
+column_number            	Integer             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::MetaTag
+----------------------------------------
+id                       	Serial              
+value                    	Text                
+name                     	String              
+category                 	String              
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::SensorType
+----------------------------------------
+id                       	Serial              
+name                     	String              
+min                      	Float               
+max                      	Float               
+difference               	Float               
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::SensorValue
+----------------------------------------
+id                       	Serial              
+value                    	Float               
+string_value             	String              
+units                    	String              
+timestamp                	DateTime            
+vertical_offset          	Float               
+published                	Boolean             
+sensor_id                	Integer             
+quality_control_level    	Integer             
+moved                    	Boolean             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::Source
+----------------------------------------
+id                       	Serial              
+organization             	String              
+source_description       	Text                
+source_link              	String              
+contact_name             	String              
+phone                    	String              
+email                    	String              
+address                  	String              
+city                     	String              
+state                    	String              
+zip_code                 	String              
+citation                 	String              
+metadata_id              	Integer             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::Unit
+----------------------------------------
+id                       	Serial              
+units_name               	String              
+units_type               	String              
+units_abbreviation       	String              
+his_id                   	Integer             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::Variable
+----------------------------------------
+id                       	Serial              
+variable_code            	String              
+variable_name            	String              
+speciation               	String              
+variable_units_id        	Integer             
+sample_medium            	String              
+value_type               	String              
+quality_control          	Integer             
+is_regular               	Boolean             
+time_support             	Float               
+time_units_id            	Integer             
+data_type                	String              
+general_category         	String              
+no_data_value            	String              
+detection_limit          	Float               
+lab_method_id            	Integer             
+lab_id                   	Integer             
+field_method_id          	Integer             
+spatial_units_id         	Integer             
+spatial_offset_type      	String              
+spatial_offset_value     	Float               
+logger_type              	String              
+logger_id                	String              
+sensor_type              	String              
+sensor_id                	String              
+his_id                   	Integer             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::LabMethod
+----------------------------------------
+id                       	Serial              
+lab_method_name          	Text                
+lab_method_description   	Text                
+lab_method_link          	Text                
+his_id                   	Integer             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::Sample
+----------------------------------------
+id                       	Serial              
+sample_type              	String              
+local_date_time          	DateTime            
+material                 	String              
+lab_sample_code          	String              
+lab_method_id            	Integer             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::SampleMaterial
+----------------------------------------
+id                       	Serial              
+material                 	String              
+description              	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::DataValue
+----------------------------------------
+id                       	Serial              
+data_value               	Float               
+value_accuracy           	Float               
+local_date_time          	DateTime            
+utc_offset               	Float               
+date_time_utc            	DateTime            
+observes_daylight_savings	Boolean             
+replicate                	String              
+vertical_offset          	Float               
+end_vertical_offset      	Float               
+string_value             	String              
+quality_control_level    	Integer             
+datatype                 	String              
+published                	Boolean             
+site_id                  	Integer             
+variable_id              	Integer             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::Apiv
+----------------------------------------
+id                       	Serial              
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::DataSet
+----------------------------------------
+id                       	Serial              
+name                     	String              
+description              	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Setting
+----------------------------------------
+id                       	Serial              
+name                     	String              
+value                    	Object              
+
+
+User
+----------------------------------------
+id                       	Serial              
+login                    	String              
+email                    	String              
+first_name               	String              
+last_name                	String              
+crypted_password         	BCryptHash          
+single_access_token      	String              
+login_count              	Integer             
+failed_login_count       	Integer             
+last_request_at          	DateTime            
+last_login_at            	DateTime            
+current_login_at         	DateTime            
+api_key                  	String              
+last_login_ip            	String              
+current_login_ip         	String              
+created_at               	DateTime            
+created_on               	Date                
+updated_at               	DateTime            
+updated_on               	Date                
+system_role_id           	Integer             
+
+
+Role
+----------------------------------------
+id                       	Serial              
+name                     	String              
+description              	Text                
+actions                  	Yaml                
+position                 	Integer             
+
+
+Membership
+----------------------------------------
+project_id               	UUID                
+role_id                  	Integer             
+user_id                  	Integer             
+
+
+Voeis::Site::Version
+----------------------------------------
+id                       	Integer             
+code                     	String              
+name                     	String              
+latitude                 	Float               
+longitude                	Float               
+lat_long_datum_id        	Integer             
+elevation_m              	Float               
+vertical_datum_id        	Integer             
+local_x                  	Float               
+local_y                  	Float               
+local_projection_id      	Integer             
+pos_accuracy_m           	Float               
+state                    	String              
+county                   	String              
+comments                 	Text                
+description              	Text                
+time_zone_offset         	String              
+his_id                   	Integer             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Feedback
+----------------------------------------
+id                       	Serial              
+user                     	String              
+url                      	String              
+issue                    	Text                
+
+
+His::Category
+----------------------------------------
+id                       	Serial              
+data_value               	Float               
+category_description     	String              
+
+
+His::CensorCodeCV
+----------------------------------------
+term                     	String              
+definition               	String              
+
+
+His::DataTypeCV
+----------------------------------------
+term                     	String              
+definition               	String              
+
+
+His::DataValue
+----------------------------------------
+id                       	Serial              
+data_value               	Float               
+value_accuracy           	Float               
+local_date_time          	DateTime            
+utc_offset               	Float               
+date_time_utc            	DateTime            
+site_id                  	Integer             
+variable_id              	Integer             
+offset_value             	Float               
+offset_type_id           	Integer             
+censor_code              	String              
+qualifier_id             	Integer             
+method_id                	Integer             
+source_id                	Integer             
+sample_id                	Integer             
+derived_from_id          	Integer             
+quality_control_level_id 	Integer             
+
+
+His::DerivedFrom
+----------------------------------------
+derived_from_id          	Integer             
+value_id                 	Integer             
+
+
+His::FieldMethod
+----------------------------------------
+id                       	Serial              
+method_description       	String              
+method_link              	String              
+
+
+His::GeneralCategoryCV
+----------------------------------------
+term                     	String              
+definition               	String              
+
+
+His::Group
+----------------------------------------
+id                       	Serial              
+value_id                 	Integer             
+group_id                 	Integer             
+
+
+His::GroupDescription
+----------------------------------------
+id                       	Serial              
+group_description        	String              
+
+
+His::ISOMetadata
+----------------------------------------
+id                       	Serial              
+topic_category           	String              
+title                    	String              
+abstract                 	String              
+profile_version          	String              
+metadata_link            	String              
+
+
+His::LabMethod
+----------------------------------------
+id                       	Serial              
+lab_name                 	String              
+lab_organization         	String              
+lab_method_name          	String              
+lab_method_description   	String              
+lab_method_link          	String              
+
+
+His::ODMVersion
+----------------------------------------
+version_number           	String              
+
+
+His::OffsetType
+----------------------------------------
+id                       	Serial              
+offset_units_id          	Integer             
+offset_description       	String              
+
+
+His::Qualifier
+----------------------------------------
+id                       	Serial              
+qualifier_code           	String              
+qualifier_description    	String              
+
+
+His::QualityControlLevel
+----------------------------------------
+id                       	Serial              
+quality_control_level_code	String              
+definition               	String              
+explanation              	String              
+
+
+His::Sample
+----------------------------------------
+id                       	Serial              
+sample_type              	String              
+lab_sample_code          	String              
+lab_method_id            	Integer             
+
+
+His::SampleMediumCV
+----------------------------------------
+term                     	String              
+definition               	String              
+
+
+His::SampleTypeCV
+----------------------------------------
+term                     	String              
+definition               	String              
+
+
+His::SeriesCatalog
+----------------------------------------
+SeriesID                 	Serial              
+SiteID                   	Integer             
+SiteCode                 	String              
+SiteName                 	String              
+VariableID               	Integer             
+VariableCode             	String              
+VariableName             	String              
+Speciation               	String              
+VariableUnitsID          	Integer             
+VariableUnitsName        	String              
+SampleMedium             	String              
+ValueType                	String              
+TimeSupport              	Float               
+TimeUnitsID              	Integer             
+TimeUnitsName            	String              
+DataType                 	String              
+GeneralCategory          	String              
+MethodID                 	Integer             
+MethodDescription        	String              
+SourceID                 	Integer             
+Organization             	String              
+SourceDescription        	String              
+Citation                 	String              
+QualityControlLevelID    	Integer             
+QualityControlLevelCode  	String              
+BeginDateTime            	DateTime            
+EndDateTime              	DateTime            
+BeginDateTimeUTC         	DateTime            
+EndDateTimeUTC           	DateTime            
+ValueCount               	Integer             
+
+
+His::Site
+----------------------------------------
+id                       	Serial              
+site_code                	String              
+site_name                	String              
+latitude                 	Float               
+longitude                	Float               
+lat_long_datum_id        	Integer             
+elevation_m              	Float               
+vertical_datum           	String              
+local_x                  	Float               
+local_y                  	Float               
+local_projection_id      	Integer             
+pos_accuracy_m           	Float               
+state                    	String              
+county                   	String              
+comments                 	String              
+
+
+His::Source
+----------------------------------------
+id                       	Serial              
+organization             	String              
+source_description       	String              
+source_link              	String              
+contact_name             	String              
+phone                    	String              
+email                    	String              
+address                  	String              
+city                     	String              
+state                    	String              
+zip_code                 	String              
+citation                 	String              
+metadata_id              	Integer             
+
+
+His::SpatialReference
+----------------------------------------
+id                       	Serial              
+srs_id                   	Integer             
+srs_name                 	String              
+is_geographic            	Integer             
+notes                    	String              
+
+
+His::SpeciationCV
+----------------------------------------
+term                     	String              
+definition               	String              
+
+
+His::SysDiagram
+----------------------------------------
+name                     	String              
+principal_id             	Integer             
+diagram_id               	Serial              
+version                  	Integer             
+definition               	Boolean             
+
+
+His::TopicCategoryCV
+----------------------------------------
+term                     	String              
+definition               	String              
+
+
+His::Unit
+----------------------------------------
+id                       	Serial              
+units_name               	String              
+units_type               	String              
+units_abbreviation       	String              
+
+
+His::ValueTypeCV
+----------------------------------------
+term                     	String              
+definition               	String              
+
+
+His::Variable
+----------------------------------------
+id                       	Serial              
+variable_code            	String              
+variable_name            	String              
+speciation               	String              
+variable_units_id        	Integer             
+sample_medium            	String              
+value_type               	String              
+is_regular               	Integer             
+time_support             	Float               
+time_units_id            	Integer             
+data_type                	String              
+general_category         	String              
+no_data_value            	Float               
+varialbe_id              	Integer             
+
+
+His::VariableNameCV
+----------------------------------------
+term                     	String              
+definition               	String              
+
+
+His::VerticalDatumCV
+----------------------------------------
+term                     	String              
+definition               	String              
+
+
+SystemRole
+----------------------------------------
+id                       	Serial              
+name                     	String              
+description              	String              
+actions                  	Yaml                
+position                 	Integer             
+
+
+Voeis::Campaign
+----------------------------------------
+id                       	Serial              
+date_begun               	DateTime            
+date_ended               	DateTime            
+description              	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::DataTypeCV
+----------------------------------------
+id                       	Serial              
+term                     	String              
+definition               	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::Equipment
+----------------------------------------
+id                       	Serial              
+name                     	String              
+description              	Text                
+serial_number            	String              
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::FieldMethod
+----------------------------------------
+id                       	Serial              
+method_name              	String              
+method_description       	Text                
+method_link              	Text                
+his_id                   	Integer             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::GeneralCategoryCV
+----------------------------------------
+id                       	Serial              
+term                     	String              
+definition               	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::Lab
+----------------------------------------
+id                       	Serial              
+lab_name                 	Text                
+lab_organization         	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::LoggerTypeCV
+----------------------------------------
+id                       	Serial              
+term                     	String              
+description              	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::QualityControlLevel
+----------------------------------------
+id                       	Serial              
+quality_control_level_code	String              
+definition               	String              
+explanation              	String              
+his_id                   	Integer             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::SampleMediumCV
+----------------------------------------
+id                       	Serial              
+term                     	String              
+definition               	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::SampleTypeCV
+----------------------------------------
+id                       	Serial              
+term                     	String              
+definition               	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::SensorTypeCV
+----------------------------------------
+id                       	Serial              
+term                     	String              
+description              	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::SpatialOffset
+----------------------------------------
+id                       	Serial              
+type                     	String              
+value                    	String              
+units_id                 	Integer             
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::SpatialOffsetType
+----------------------------------------
+id                       	Serial              
+type                     	String              
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::SpatialReference
+----------------------------------------
+id                       	Serial              
+srs_id                   	Integer             
+srs_name                 	String              
+is_geographic            	Boolean             
+notes                    	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::SpeciationCV
+----------------------------------------
+id                       	Serial              
+term                     	String              
+definition               	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::ValueTypeCV
+----------------------------------------
+id                       	Serial              
+term                     	String              
+definition               	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::VariableNameCV
+----------------------------------------
+id                       	Serial              
+term                     	String              
+definition               	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::VerticalDatumCV
+----------------------------------------
+id                       	Serial              
+term                     	String              
+definition               	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::Visit
+----------------------------------------
+id                       	Serial              
+date                     	DateTime            
+arrive                   	DateTime            
+depart                   	DateTime            
+description              	Text                
+provenance_comment       	Text                
+updated_at               	DateTime            
+updated_by               	Integer             
+updated_comment          	Text                
+created_at               	DateTime            
+deleted_at               	ParanoidDateTime    
+
+
+Voeis::DataStreamSite
+----------------------------------------
+site_id                  	Integer             
+data_stream_id           	Integer             
+
+
+Voeis::SensorTypeSite
+----------------------------------------
+site_id                  	Integer             
+sensor_type_id           	Integer             
+
+
+Voeis::SensorValueSite
+----------------------------------------
+site_id                  	Integer             
+sensor_value_id          	Integer             
+
+
+Voeis::DataValueSite
+----------------------------------------
+site_id                  	Integer             
+data_value_id            	Integer             
+
+
+Voeis::SampleSite
+----------------------------------------
+site_id                  	Integer             
+sample_id                	Integer             
+
+
+Voeis::SiteVariable
+----------------------------------------
+site_id                  	Integer             
+variable_id              	Integer             
+
+
+Voeis::DataStreamDataStreamColumn
+----------------------------------------
+data_stream_id           	Integer             
+data_stream_column_id    	Integer             
+
+
+Voeis::DataStreamDataValue
+----------------------------------------
+data_stream_id           	Integer             
+data_value_id            	Integer             
+
+
+Voeis::DataStreamSample
+----------------------------------------
+data_stream_id           	Integer             
+sample_id                	Integer             
+
+
+Voeis::DataStreamSource
+----------------------------------------
+data_stream_id           	Integer             
+source_id                	Integer             
+
+
+Voeis::DataStreamColumnSensorType
+----------------------------------------
+data_stream_column_id    	Integer             
+sensor_type_id           	Integer             
+
+
+Voeis::DataStreamColumnVariable
+----------------------------------------
+data_stream_column_id    	Integer             
+variable_id              	Integer             
+
+
+Voeis::DataStreamColumnUnit
+----------------------------------------
+data_stream_column_id    	Integer             
+unit_id                  	Integer             
+
+
+Voeis::DataStreamColumnMetaTag
+----------------------------------------
+data_stream_column_id    	Integer             
+meta_tag_id              	Integer             
+
+
+Voeis::MetaTagSensorValue
+----------------------------------------
+meta_tag_id              	Integer             
+sensor_value_id          	Integer             
+
+
+Voeis::DataValueMetaTag
+----------------------------------------
+meta_tag_id              	Integer             
+data_value_id            	Integer             
+
+
+Voeis::MetaTagVariable
+----------------------------------------
+meta_tag_id              	Integer             
+variable_id              	Integer             
+
+
+Voeis::SensorTypeSensorValue
+----------------------------------------
+sensor_type_id           	Integer             
+sensor_value_id          	Integer             
+
+
+Voeis::DataValueSensorType
+----------------------------------------
+sensor_type_id           	Integer             
+data_value_id            	Integer             
+
+
+Voeis::SensorTypeVariable
+----------------------------------------
+sensor_type_id           	Integer             
+variable_id              	Integer             
+
+
+Voeis::SensorValueSource
+----------------------------------------
+sensor_value_id          	Integer             
+source_id                	Integer             
+
+
+Voeis::SampleSource
+----------------------------------------
+source_id                	Integer             
+sample_id                	Integer             
+
+
+Voeis::DataValueSource
+----------------------------------------
+source_id                	Integer             
+data_value_id            	Integer             
+
+
+Voeis::UnitVariable
+----------------------------------------
+unit_id                  	Integer             
+variable_id              	Integer             
+
+
+Voeis::DataValueVariable
+----------------------------------------
+variable_id              	Integer             
+data_value_id            	Integer             
+
+
+Voeis::SampleVariable
+----------------------------------------
+variable_id              	Integer             
+sample_id                	Integer             
+
+
+Voeis::DataTypeCVVariable
+----------------------------------------
+variable_id              	Integer             
+data_type_cv_id          	Integer             
+data_type_cv_term        	String              
+
+
+Voeis::GeneralCategoryCVVariable
+----------------------------------------
+variable_id              	Integer             
+general_category_cv_id   	Integer             
+
+
+Voeis::SampleTypeCVVariable
+----------------------------------------
+variable_id              	Integer             
+sample_type_csv_id       	Integer             
+sample_type_cv_id        	Integer             
+
+
+Voeis::SpeciationCVVariable
+----------------------------------------
+variable_id              	Integer             
+speciation_cv_id         	Integer             
+speciation_cv_term       	String              
+
+
+Voeis::ValueTypeCVVariable
+----------------------------------------
+variable_id              	Integer             
+value_type_cv_id         	Integer             
+
+
+Voeis::VariableVariableNameCV
+----------------------------------------
+variable_id              	Integer             
+variable_name_cv_id      	Integer             
+
+
+Voeis::SpatialOffsetVariable
+----------------------------------------
+variable_id              	Integer             
+spatial_offset_id        	Integer             
+
+
+Voeis::LabMethodVariable
+----------------------------------------
+lab_method_id            	Integer             
+variable_id              	Integer             
+
+
+Voeis::DataValueSample
+----------------------------------------
+sample_id                	Integer             
+data_value_id            	Integer             
+
+
+Voeis::LabMethodSample
+----------------------------------------
+sample_id                	Integer             
+lab_method_id            	Integer             
+
+
+Voeis::SampleSampleMaterial
+----------------------------------------
+sample_id                	Integer             
+sample_material_id       	Integer             
+
+
+Voeis::DataSetDataValue
+----------------------------------------
+data_value_id            	Integer             
+data_set_id              	Integer             
+
+
+CampaignUser
+----------------------------------------
+campaign_id              	Integer             
+user_id                  	Integer             
+
+
+CampaignProject
+----------------------------------------
+campaign_id              	Integer             
+project_id               	UUID                
+
+
+Voeis::CampaignVisit
+----------------------------------------
+campaign_id              	Integer             
+visit_id                 	Integer             
+
+
+Voeis::EquipmentFieldMethod
+----------------------------------------
+equipment_id             	Integer             
+field_method_id          	Integer             
+
+
+Voeis::EquipmentLabMethod
+----------------------------------------
+equipment_id             	Integer             
+lab_method_id            	Integer             
+
+
+Voeis::FieldMethodVariable
+----------------------------------------
+field_method_id          	Integer             
+variable_id              	Integer             
+
+
+Voeis::LabVariable
+----------------------------------------
+lab_id                   	Integer             
+variable_id              	Integer             
+
+
+Voeis::SpatialOffsetSpatialOffsetType
+----------------------------------------
+spatial_offset_type_id   	Integer             
+spatial_offset_id        	Integer             
+
+
+Voeis::SiteSpatialReference
+----------------------------------------
+spatial_reference_id     	Integer             
+site_id                  	Integer             
+
+
+Voeis::SiteVerticalDatumCV
+----------------------------------------
+vertical_datum_cv_id     	Integer             
+site_id                  	Integer             
+
+
+UserVisit
+----------------------------------------
+visit_id                 	Integer             
+user_id                  	Integer             
+
+
+ProjectVisit
+----------------------------------------
+visit_id                 	Integer             
+project_id               	UUID                
+
+
