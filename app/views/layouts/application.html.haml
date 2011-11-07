@@ -136,6 +136,12 @@
             = link_to("Browse", projects_path, :dojoType => "yogo.ui.MenuLink")
             -if !current_user.nil?
               = link_to("New...", new_project_path, :dojoType => "yogo.ui.MenuLink")
+              -if current_user.system_role.name=='Administrator'
+                %div{:dojoType=>"dijit.PopupMenuItem"}
+                  %span Controlled Vocabulary
+                  %div{:dojoType=>"dijit.Menu", :id=>"manageCVmenu"}
+                    = link_to("Spatial Reference", "/spatial_references", :dojoType => "yogo.ui.MenuLink")
+                    = link_to("Vertical Datum", "/vertical_datum_c_vs", :dojoType => "yogo.ui.MenuLink")
               %div{:dojoType=>"dijit.MenuSeparator"}
               %div{:dojoType=>"dijit.PopupMenuItem"}
                 %span My Projects
@@ -176,6 +182,13 @@
                 
                 = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_sample_menu")
                 = link_to("Add Logger Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")
+
+                %div{:dojoType=>"dijit.PopupMenuItem"}
+                  %span Controlled Vocabulary
+                  %div{:dojoType=>"dijit.Menu", :id=>"projectCVmenu"}
+                    = link_to("Spatial Reference", "/projects/#{@project.id}/spatial_references", :dojoType => "yogo.ui.MenuLink")
+                    = link_to("Vertical Datum", "/projects/#{@project.id}/vertical_datum_c_vs", :dojoType => "yogo.ui.MenuLink")
+
                 = link_to("Settings...", edit_project_path(@project), :dojoType => "yogo.ui.MenuLink")
 
                 -#- if !@sites.nil? && @sites.count > 0
