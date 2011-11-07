@@ -254,27 +254,12 @@
 
   - if @global
     :javascript
-      // GLOBAL - HANDLE DELETE BUTTON
-      function cv_delete_button(used) {
-        $(delete_button.domNode).hide();
-        //$(delete_button.domNode).show();
-        delete_button.attr("disabled", false);
-      };
       // GLOBAL - PROCESS STORE NEW
       var cv_post_local = function(data) {
         cv_store_new(data);
       };
   - else
     :javascript
-      // LOCAL - HANDLE DELETE BUTTON
-      function cv_delete_button(used) {
-        //$(delete_button.domNode).show();
-        $(delete_button.domNode).hide();
-        if(used)
-          delete_button.attr("disabled", true);
-        else
-          delete_button.attr("disabled", false);
-      };
       // LOCAL - POST TO GLOBAL + LOCAL
       var cv_post_local = function(data0) {
         var data = cv_data_clean(data0);
@@ -478,19 +463,6 @@
               });
             };
             });
-    &nbsp;&nbsp;
-    %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"cv_dialog_box.hide();return false;"} Cancel
-    -#&nbsp;&nbsp;&nbsp;&nbsp;
-    -#%button{:dojoType=>"dijit.form.Button", :title=>'Delete', :jsId=>"delete_button", :style=>"display:none;"}
-    -#  %strong
-    -#    DELETE
-    -#  %script{:type=>"dojo/method", :event=>"onClick"}
-    -#    :plain
-    -#      var form = #{@cv_title2}_form.domNode;
-    -#      var cv_id = parseInt(form.elements['id'].value);
-    -#      var cv_idx = parseInt(form.elements['idx'].value);
-    -#      var item = cv_data[cv_idx];
-    -#      cv_delete(item, cv_dialog_box.hide);
 
 - if !@copy_data.nil?
   #copy_dialog_box{:dojoType=>"dijit.Dialog", :jsId=>"copy_dialog_box", :title=>"#{@cv_title}: Copy Global", :style=>"width:760px;"}
