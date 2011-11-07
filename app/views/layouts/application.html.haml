@@ -186,8 +186,8 @@
                 %div{:dojoType=>"dijit.PopupMenuItem"}
                   %span Controlled Vocabulary
                   %div{:dojoType=>"dijit.Menu", :id=>"projectCVmenu"}
-                    = link_to("Spatial Reference", {:controller=>"voeis/spatial_references", :action=>"index"}, :dojoType => "yogo.ui.MenuLink")
-                    = link_to("Vertical Datum", {:controller=>"voeis/vertical_datum_c_vs", :action=>"index"}, :dojoType => "yogo.ui.MenuLink")
+                    = link_to("Spatial Reference", project_vertical_datum_c_vs_path(@project.id), :dojoType => "yogo.ui.MenuLink")
+                    = link_to("Vertical Datum", project_spatial_references_path(@project.id), :dojoType => "yogo.ui.MenuLink")
 
                 = link_to("Settings...", edit_project_path(@project), :dojoType => "yogo.ui.MenuLink")
 
