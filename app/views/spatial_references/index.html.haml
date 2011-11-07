@@ -463,6 +463,8 @@
               });
             };
             });
+    &nbsp;&nbsp;
+    %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"cv_dialog_box.hide();return false;"} Cancel
 
 - if !@copy_data.nil?
   #copy_dialog_box{:dojoType=>"dijit.Dialog", :jsId=>"copy_dialog_box", :title=>"#{@cv_title}: Copy Global", :style=>"width:760px;"}
