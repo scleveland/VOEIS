@@ -8,6 +8,19 @@
 #
 namespace :yogo do
   namespace :db do
+
+    desc "Output DB Schema information"
+    task :view_schema => :environment do
+      DataMapper::Model.descendants.each do |m|
+        puts m.to_s
+        puts "-" * 40
+        m.properties.each do |p| 
+          puts "%-25s\t%-20s" % [p.name.to_s[0..25], p.class.to_s.split('::')[-1]]
+        end
+        puts "\n\n"
+      end
+    end
+
     desc "Import legacy database into Yogo."
     task :import, :db, :name, :needs => :environment do |task, args|
       # FIXME - we need to make this rake task work at some point

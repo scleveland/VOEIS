@@ -716,39 +716,6 @@
       };
     });
 
-  /* ***
-    dojo.subscribe("voeis/project/siteTables/refresh", function() {
-      console.log('REFRESH TABLES');
-      var tabs = dijit.byId('tab_browser');
-      var table0 = dijit.byId('project_sites');
-      var table1 = dijit.byId('SiteDisplayGrid');
-      psites.data = psites_json;
-      psites.close();
-      //table0.render();
-      //table1.render();
-    });
-
-    dojo.subscribe("voeis/project/siteTables/add", function(siteId,siteName,siteCode,siteState) {
-      console.log('UPDATE TABLES NEW');
-      var tabs = dijit.byId('tab_browser');
-      var table0 = dijit.byId('project_sites');
-      var table1 = dijit.byId('SiteDisplayGrid');
-      //var psites = dijit.byId('psites');
-      //psites
-      //pmarkers
-      psites.data = psites_json;
-      psites.close();
-    });
-
-    dojo.subscribe("voeis/project/siteTables/update", function(siteId,siteName,siteCode,siteState) {
-      console.log('UPDATE TABLES');
-      var tabs = dijit.byId('tab_browser');
-      var table0 = dijit.byId('project_sites');
-      var table1 = dijit.byId('SiteDisplayGrid');
-      
-    });
-  *** */
-
     dojo.subscribe("voeis/project/site/new", function() {
       console.log('NEW SITE');
       var tabs = dijit.byId('tab_browser');

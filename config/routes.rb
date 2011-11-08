@@ -44,8 +44,16 @@ Yogo::Application.routes.draw do
           post :data
         end
       end
-      resources :vertical_datum_c_vs
-      resources :spatial_references
+      resources :vertical_datum_c_vs do
+        collection do
+          get :versions
+        end
+      end
+      resources :spatial_references do
+        collection do
+          get :versions
+        end
+      end
       resources :variables
       resources :meta_tags
       resources :data_sets
@@ -183,8 +191,16 @@ Yogo::Application.routes.draw do
   resources :memberships
   resources :settings
   resources :search
-  resources :vertical_datum_c_vs
-  resources :spatial_references
+  resources :vertical_datum_c_vs do
+    collection do
+      get :versions
+    end
+  end
+  resources :spatial_references do
+    collection do
+      get :versions
+    end
+  end
   resources :variable_name_c_vs
   resources :sample_medium_c_vs
   resources :value_type_c_vs
