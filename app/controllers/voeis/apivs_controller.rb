@@ -191,7 +191,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # 
   # curl -F datafile=@Next100-sean.csv -F data_template_id=22 -F api_key=3b62ef7eda48955abc77a7647b4874e543edd7ffc2bb672a40215c8da51f6d09 http://voeis.msu.montana.edu/projects/a459c38c-f288-11df-b176-6e9ffb75bc80/apivs/upload_logger_data.json?
   # 
-  # curl -F datafile=@CR1000_BigSky_Weather_small.dat -F data_template_id=1 http://voeis.msu.montana.edu/projects/18402e48-f113-11df-9550-6e9ffb75bc80/apivs/upload_logger_data?api_key=2ac150bed4cfa21320d6f37cc6f007b807c603b6c8c33b6ba5a7db92ca821f35
+  # curl -F datafile=@CR1000_BigSky_Weather_small.dat -F data_template_id=13 -F site_id=19 http://localhost:3000/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_data?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
   
   # curl -F datafile=@CR1000_BigSky_Weather_small.dat -F data_template_id=1 http://voeis.msu.montana.edu/projects/a4c62666-f26b-11df-b8fe-002500d43ea0/apivs/upload_logger_data?api_key=2ac150bed4cfa21320d6f37cc6f007b807c603b6c8c33b6ba5a7db92ca821f35
   
@@ -293,6 +293,126 @@ class Voeis::ApivsController < Voeis::BaseController
       end
     end
   end
+  
+  
+  
+  
+  # alows user to upload csv file to be processed into data
+  # this requires that a site and a datastream has already been created
+  # to parse this file.  Can return json or xml as specified
+  #
+  # @example curl -F datafile=@CR1000_2_BigSky_NFork_small.dat -F data_template_id=1 -F site_id=1 http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
+  #
+  #
+  # @param [File] :datafile csv file to store
+  # @param [Integer] :data_template_id the id of the data stream used to parse a file
+  # @param [Integer] :site_id
+  # @param [Integer] :start_line the line which your data begins (if this is not specified the data-templates starting line will be used)
+  #
+  # @return [String] :success or :error message
+  # @return [Integer] :total_records_saved - the total number of records saved to Voeis
+  # @return [Integer] :total_rows_parsed - the total number of rows successfully parsed
+  # @return [String] :last_record  - the last record saved for the last variable in the row defined by the data-template - this will return the most recently created record
+  # @return[String]:last_record_for_this_field - this is the last record stored for this file- if the file has already been stored this field will have a message indicating that has occurred.
+  #
+  # @author Sean Cleveland
+  #
+  # @api public
+  def upload_data 
+    parent.managed_repository do
+      unless params[:site_id].nil?
+        site = Voeis::Site.get(params[:site_id].to_i)  
+        unless site.nil?
+          unless params[:data_template_id].nil?
+            first_row = Array.new
+            flash_error = Hash.new
+          
+            @msg = "There was a problem parsing this file."
+            name = Time.now.to_s + params[:datafile].original_filename 
+            directory = "temp_data"
+            @new_file = File.join(directory,name)
+            File.open(@new_file, "wb"){ |f| f.write(params['datafile'].read)}
+            begin 
+                data_stream_template = Voeis::DataStream.get(params[:data_template_id].to_i)
+                data_stream_template.data_stream_columns.each do |dc|
+                  unless dc.variables.empty?
+                    site.variables << dc.variables.first
+                    site.save
+                  end
+                end
+                if params[:start_line].nil?
+                  start_line = data_stream_template.start_line
+                else
+                  start_line = params[:start_line].to_i
+                end
+                if data_stream_template.utc_offset.nil?
+                  if site.time_zone_offset.nil? || site.time_zone_offset == "unknown"
+                    begin
+                      site.fetch_time_zone_offset
+                    rescue
+                      #do nothing
+                    end
+                  end
+                  data_stream_template.utc_offset = site.time_zone_offset
+                  data_stream_template.save!
+                end
+                lines =0
+                CSV.foreach(@new_file){|row| lines +=1}
+                if lines < start_line
+                  @msg = @msg + " Your start_line: #{start_line} for file parsing is beyond the end of the file."
+                end
+                csv = CSV.open(@new_file, "r")
+                (1..start_line).each do
+                  first_row = csv.readline
+                end
+                csv.close()
+                path = File.dirname(@new_file)
+              if first_row.count == data_stream_template.data_stream_columns.count
+                flash_error = flash_error.merge(parent.managed_repository{Voeis::DataValue.parse_logger_csv(@new_file, data_stream_template.id, site.id, start_line,nil,nil)})
+              else
+                #the file does not match the data_templates number of columns
+                flash_error[:error] = "File does not match the data_templates number of columns. Columns in First Row:" + first_row.count.to_s +  " Voeis expected:" + data_stream_template.data_stream_columns.count.to_s + " rows."
+                logger.info {"File does not match the data_templates number of columns."}
+              end
+            rescue   Exception => e
+                email_exception(e,request.env)
+                logger.info {e.to_s}
+                logger.info {"YEAH"}
+              #problem parsing file
+              flash_error[:error] = @msg + e.message
+              logger.info {@msg}
+            end
+          else
+            flash_error[:error] = "The data_template_id can not be blank!"
+          end
+        else
+          flash_error[:error] = "The site_id: #{params[:site_id]} does not exist in this project"
+        end
+      else
+        flash_error[:error] = "The site_id can not be blank!"
+      end
+      #parent.publish_his
+      respond_to do |format|
+        if params.has_key?(:api_key)
+          format.json
+        end
+        if flash_error[:error].nil?
+          flash_error[:success] = "File was parsed succesfully."
+          site.update_site_data_catalog
+          #flash_error = flash_error.merge({:last_record => data_stream_template.data_stream_columns.sensor_types.sensor_values.last(:order =>[:id.asc]).as_json}) 
+        end
+        format.json do
+          render :json => flash_error.to_json, :callback => params[:jsoncallback]
+        end
+        format.xml do
+          render :xml => flash_error.to_xml
+        end
+      end
+    end
+  end
+  
+  
+  
   
   
   # get_project_data_summary
