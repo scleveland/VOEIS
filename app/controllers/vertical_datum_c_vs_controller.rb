@@ -1,6 +1,10 @@
 class VerticalDatumCVsController < ApplicationController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
+  has_widgets do |root|
+    root << widget(:versions)
+  end
+
 
   # GLOBAL: GET /VerticalDatum/new
   def new
@@ -114,7 +118,26 @@ class VerticalDatumCVsController < ApplicationController
   
   #HISTORY!
   def versions
+    ### GLOBAL VERTICAL DATUM HISTORY
+    @global = true
+    @cv_item = Voeis::VerticalDatumCV.get(params[:id])
+    @cv_versions = @cv_item.versions
+    @cv_title = 'Vertical Datum'
+    @cv_title2 = 'vertical_datum'
+    @cv_term = 'term'
+    @cv_name = 'term'
+    @cv_id = 'id'
+
+    @cv_refs = []
+
+    @cv_properties = [
+#      {:label=>"Version", :name=>"version"},
+#      {:label=>"ID", :name=>"id"},
+      {:label=>"Term", :name=>"term"},
+      {:label=>"Defination", :name=>"defination"}
+      ]
     
+    render 'spatial_references/versions.html.haml'
   end
 
   def invalid_page

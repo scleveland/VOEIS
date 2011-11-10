@@ -6,24 +6,11 @@
   dojo.require("dijit.layout.TabContainer");
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
   
-  var version_data_site#{@site.id} = [
-     #{@versions_ref.map{|version| "        "+version.to_json}.join(",\n")}
-  ];
-  var pversions_json_site#{@site.id} = {
-      //identifier: 'updated_at',
-      identifier: 'version',
-      label: 'name',
-      items: version_data_site#{@site.id} };
   
-  function versionsTab(){
-      var tabs = dijit.byId('history-tabs-site#{@site.id}');
-      var pane = dijit.byId('#{'%s-site%s-versions'%[@project.id,@site.id]}');
-      tabs.selectChild(pane);
-  };
-  
-
 %h3{:style=>"margin-top:0;"}
-  History: #{'%s [Id:%s]'%[@site.name,@site.id]}
+  %span.small{:style=>"font-size:14px;"}
+    HISTORY: 
+  = '%s [Id:%s]'%[@site.name,@site.id]
 
 %strong
   SHOW SITE VERSIONS
@@ -32,63 +19,16 @@
 = link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history/update', [#{@site.id}]);")
 %br
 
-%div{:id=>"version_store_site#{@site.id}", :dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pversions_site#{@site.id}", :data=>"pversions_json_site#{@site.id}", :style=>"height:0;margin:0;padding:0;"}
 
-%div{:id=>"history-tabs-site#{@site.id}", :dojoType=>"dijit.layout.TabContainer", :style=>"width:870px;height:400px;margin-top:10px;padding-top:0;", 
-  :prop=>"parseOnLoad:true;", :tabPosition=>"top", :useSlider=>"true", :tabStrip=>"true"}
-  -#:prop=>"parseOnLoad:true;", :tabPosition=>"left-h", :tabStrip=>"false"}
-  %div{:id=>"#{'%s-site%s-versions'%[@project.id,@site.id]}", :dojoType=>"dijit.layout.ContentPane", 
-    :title=>"VERSIONS", :style=>"margin:0;padding:0;", :selected=>"true", :useSlider=>"false", :tabStrip=>"false"}
-    %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=>"{filter:true}",  :store=>"pversions_site#{@site.id}", :clientSort=>"true", 
-        :style=>"width:90%;margin:0;", :jsId=>"VersionDisplayGrid_site#{@site.id}", :id=>"VersionDisplayGrid_site#{@site.id}"}
-      -#  :style=>"width:90%;margin:0;", :rowSelector=>"20px", :jsId=>"VersionDisplayGrid", :id=>"VersionDisplayGrid"}
-      %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
-        :plain
-          //SELECT Version TAB
-          var item = this.getItem(idx);
-          var tabs = dijit.byId('history-tabs-site#{@site.id}');
-          var pane = dijit.byId(item['version_id'].toString());
-          console.log('ITEM:',item);
-          console.log('PANE:',pane);
-          this.selection.clear();
-          tabs.selectChild(pane);
-      %thead
-        %tr
-          %th{:field=>"version_ttl", :filterable=>false, :width=>"70px", :style=>"text-align:right;"} Version
-          %th{:field=>"version_ts", :filterable=>true, :width=>"130px"} Updated
-          %th{:field=>"updated_comment", :filterable=>true, :width=>"40%"} Update Comment
-          %th{:field=>"provenance_comment", :filterable=>true, :width=>"30%"} Provenance Comment
-  -### VERSION TABS
-  - @versions_sites.each do |version|
-    %div{:id=>"#{version[:version_id]}", :dojoType=>"dijit.layout.ContentPane", 
-      :title=>"#{version[:version_ttl]}", :style=>"margin:0;padding:0;", :selected=>"true"}
-      %table{:id=>"property-table-site#{@site.id}", :style=>'margin:20px 50px;width:80%;float:left;'}
-        %tr
-          %td{:style=>"text-align:right;width:25%;"}
-            %strong
-              Version
-              &nbsp;&nbsp;&nbsp;
-          %td
-            #{version[:version]==0 ? 'Current' : version[:version]}
-            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            %a{:href=>"javascript:", :onclick=>"versionsTab();return false;"}
-              [RETRUN TO VERSIONS TAB]
-        - reset_cycle
-        - @ver_properties.each do |prop|
-          %tr{:class=>cycle('row1','row0')}
-            %td{:style=>"text-align:right;width:25%;"}
-              %strong{:style=>"#{version[:dirty].include?(prop[:name])?'color:#B22800':''}"}
-                #{prop[:label]}
-                &nbsp;&nbsp;&nbsp;
-            %td
-              #{version[prop[:name].to_sym]}
-      
+- projId = @project.nil? ? '' : @project.id.to_s
+#cv-versions
+  = render_widget :versions, :display, :item=>@site,
+                                        :versions=>@versions,
+                                        :unique_id=>"%s_site%03d"%[projId,@site.id],
+                                        :unique_jsid=>"%s_site%03d"%[projId.tr('-','$'),@site.id],
+                                        :item_refs=>@site_refs,
+                                        :properties=>@ver_properties,
+                                        :user=>current_user
 
 
--#version_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pversions", :data=>"pversions_json"}
--#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{filter:true}",  :store=>"pversions", :clientSort=>"true", :style=>"width: 900px; height: 500px;", :rowSelector=>"20px", :jsId=>"VersionDisplayGrid", :id=>"VersionDisplayGrid", :title=>"Versions"}
--#  %thead
--#    %tr
--#      - @versions.properties.each do |prop|
--#        %th{:field=>"#{prop.name.to_s}", :filterable=>true, :width=>"150px"} #{prop.name.to_s.capitalize}
 

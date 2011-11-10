@@ -6,8 +6,8 @@ class ProjectsController < InheritedResources::Base
   layout :choose_layout
 
   has_widgets do |root|
-    root << widget(:vertical_datum)
     root << widget(:site_pane2)
+    root << widget(:versions)
   end
   
   def choose_layout

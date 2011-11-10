@@ -52,7 +52,7 @@
       //##### 
       //console.log('READY-load-done-NOW');
       //FIX datagrid clipping issue...
-      cv_management.sort();
+      cv_management_grid.sort();
     });
     
     // GRID DISPLAY FILTERS
@@ -78,12 +78,21 @@
         var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" />';
         var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" />';
         //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
-        var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
+        //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
+        var hist_link = '<a href="'+post_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;">'+hist_icon+'</a>\n';
         var delete_link = '<a href="javascript:" onclick="cv_delete('+idx+');return false;">'+delete_icon+'</a>\n';
         var spaces = '&nbsp;';
         if(item.used[0]) return spaces+hist_link;
         return spaces+hist_link+spaces+delete_link;
       }
+    };
+    
+    // GO BACK or if no history- CLOSE WINDOW
+    function back_or_close() {
+      if(window.history.length>1)
+        window.history.back();
+      else
+        window.close();
     };
     
     // DOJO STORE FETCH
@@ -416,6 +425,9 @@
       %label Notes
     %br
     %textarea{:type=>"text", :name=>"cv_text", :id=>"#{@cv_title2}_text", :style=>"width:95%;", :rows=>"4"}
+    %p{:id=>"cv_prov_com", :style=>"display:none;"}
+      %br
+      %textarea{:type=>"text", :name=>"cv_prov", :id=>"cv_prov_text", :style=>"width:95%;", :rows=>"4"}
     %br{:style=>'float:none; clear:both;'}
     %br
     %button{:dojoType=>"dijit.form.Button", :title=>'Create'}
