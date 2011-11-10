@@ -619,34 +619,34 @@ module Odhelper
     end
   end
   
-  def build_multi_variable_table(site_id, variables)
-    project.managed_repository do
-      qsql = "SELECT DISITINCT local_date_time FROME voeis_data_values WHERE local_date_time >= start_time AND local_date_time <= end_time AND site_id = site_id AND variable_id IN (VALUES"
-      qsql_array = Array.new
-      tsql_array = Array.new
-      tsql = "CREATE TABLE this_search_id { local_date_time timestamp,"
-      variables.each do |var|
-        qsql_array << "(#{var.id})"
-        tsql_array << "variable_#{var.id} integer"
-      end
-      tsql <<"#{tsql_array.join(',')} }"
-      qsql <<"#{qsql_array.join(',')} )"
-      
-      UPDATE 
-      #UPDATE owner SET picturemedium = dvds.picturemedium, title = dvds.title,
-      #titleOrder = dvds.title, releasedate = CAST(dvds.releasedate AS date) FROM
-      #(
-      #        SELECT DISTINCT
-      #        detail_dvd.asin,
-      #        detail_dvd.picturemedium,
-      #        detail_dvd.title,
-      #        detail_dvd.releasedate
-      #        FROM detail_dvd
-      #        WHERE releasedate IS NOT NULL AND releasedate <> '' AND
-      #(length(releasedate) = 10 OR length(releasedate) = 23)
-      #)
-      #AS dvds WHERE owner.asin = dvds.asin;
-  end
+  # def build_multi_variable_table(site_id, variables)
+  #   project.managed_repository do
+  #     qsql = "SELECT DISITINCT local_date_time FROME voeis_data_values WHERE local_date_time >= start_time AND local_date_time <= end_time AND site_id = site_id AND variable_id IN (VALUES"
+  #     qsql_array = Array.new
+  #     tsql_array = Array.new
+  #     tsql = "CREATE TABLE this_search_id { local_date_time timestamp,"
+  #     variables.each do |var|
+  #       qsql_array << "(#{var.id})"
+  #       tsql_array << "variable_#{var.id} integer"
+  #     end
+  #     tsql <<"#{tsql_array.join(',')} }"
+  #     qsql <<"#{qsql_array.join(',')} )"
+  #     
+  #     UPDATE 
+  #     #UPDATE owner SET picturemedium = dvds.picturemedium, title = dvds.title,
+  #     #titleOrder = dvds.title, releasedate = CAST(dvds.releasedate AS date) FROM
+  #     #(
+  #     #        SELECT DISTINCT
+  #     #        detail_dvd.asin,
+  #     #        detail_dvd.picturemedium,
+  #     #        detail_dvd.title,
+  #     #        detail_dvd.releasedate
+  #     #        FROM detail_dvd
+  #     #        WHERE releasedate IS NOT NULL AND releasedate <> '' AND
+  #     #(length(releasedate) = 10 OR length(releasedate) = 23)
+  #     #)
+  #     #AS dvds WHERE owner.asin = dvds.asin;
+  # end
   
   # sql ="SELECT * FROM voeis_data_values WHERE type IS NULL LIMIT 1"
   # results =repository.adapter.select(sql)

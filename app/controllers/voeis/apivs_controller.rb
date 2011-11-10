@@ -191,7 +191,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # 
   # curl -F datafile=@Next100-sean.csv -F data_template_id=22 -F api_key=3b62ef7eda48955abc77a7647b4874e543edd7ffc2bb672a40215c8da51f6d09 http://voeis.msu.montana.edu/projects/a459c38c-f288-11df-b176-6e9ffb75bc80/apivs/upload_logger_data.json?
   # 
-  # curl -F datafile=@CR1000_BigSky_Weather_small.dat -F data_template_id=1 http://voeis.msu.montana.edu/projects/18402e48-f113-11df-9550-6e9ffb75bc80/apivs/upload_logger_data?api_key=2ac150bed4cfa21320d6f37cc6f007b807c603b6c8c33b6ba5a7db92ca821f35
+  # curl -F datafile=@CR1000_BigSky_Weather_small.dat -F data_template_id=13 -F site_id=19 http://localhost:3000/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_data?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
   
   # curl -F datafile=@CR1000_BigSky_Weather_small.dat -F data_template_id=1 http://voeis.msu.montana.edu/projects/a4c62666-f26b-11df-b8fe-002500d43ea0/apivs/upload_logger_data?api_key=2ac150bed4cfa21320d6f37cc6f007b807c603b6c8c33b6ba5a7db92ca821f35
   
@@ -293,6 +293,126 @@ class Voeis::ApivsController < Voeis::BaseController
       end
     end
   end
+  
+  
+  
+  
+  # alows user to upload csv file to be processed into data
+  # this requires that a site and a datastream has already been created
+  # to parse this file.  Can return json or xml as specified
+  #
+  # @example curl -F datafile=@CR1000_2_BigSky_NFork_small.dat -F data_template_id=1 -F site_id=1 http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
+  #
+  #
+  # @param [File] :datafile csv file to store
+  # @param [Integer] :data_template_id the id of the data stream used to parse a file
+  # @param [Integer] :site_id
+  # @param [Integer] :start_line the line which your data begins (if this is not specified the data-templates starting line will be used)
+  #
+  # @return [String] :success or :error message
+  # @return [Integer] :total_records_saved - the total number of records saved to Voeis
+  # @return [Integer] :total_rows_parsed - the total number of rows successfully parsed
+  # @return [String] :last_record  - the last record saved for the last variable in the row defined by the data-template - this will return the most recently created record
+  # @return[String]:last_record_for_this_field - this is the last record stored for this file- if the file has already been stored this field will have a message indicating that has occurred.
+  #
+  # @author Sean Cleveland
+  #
+  # @api public
+  def upload_data 
+    parent.managed_repository do
+      unless params[:site_id].nil?
+        site = Voeis::Site.get(params[:site_id].to_i)  
+        unless site.nil?
+          unless params[:data_template_id].nil?
+            first_row = Array.new
+            flash_error = Hash.new
+          
+            @msg = "There was a problem parsing this file."
+            name = Time.now.to_s + params[:datafile].original_filename 
+            directory = "temp_data"
+            @new_file = File.join(directory,name)
+            File.open(@new_file, "wb"){ |f| f.write(params['datafile'].read)}
+            begin 
+                data_stream_template = Voeis::DataStream.get(params[:data_template_id].to_i)
+                data_stream_template.data_stream_columns.each do |dc|
+                  unless dc.variables.empty?
+                    site.variables << dc.variables.first
+                    site.save
+                  end
+                end
+                if params[:start_line].nil?
+                  start_line = data_stream_template.start_line
+                else
+                  start_line = params[:start_line].to_i
+                end
+                if data_stream_template.utc_offset.nil?
+                  if site.time_zone_offset.nil? || site.time_zone_offset == "unknown"
+                    begin
+                      site.fetch_time_zone_offset
+                    rescue
+                      #do nothing
+                    end
+                  end
+                  data_stream_template.utc_offset = site.time_zone_offset
+                  data_stream_template.save!
+                end
+                lines =0
+                CSV.foreach(@new_file){|row| lines +=1}
+                if lines < start_line
+                  @msg = @msg + " Your start_line: #{start_line} for file parsing is beyond the end of the file."
+                end
+                csv = CSV.open(@new_file, "r")
+                (1..start_line).each do
+                  first_row = csv.readline
+                end
+                csv.close()
+                path = File.dirname(@new_file)
+              if first_row.count == data_stream_template.data_stream_columns.count
+                flash_error = flash_error.merge(parent.managed_repository{Voeis::DataValue.parse_logger_csv(@new_file, data_stream_template.id, site.id, start_line,nil,nil)})
+              else
+                #the file does not match the data_templates number of columns
+                flash_error[:error] = "File does not match the data_templates number of columns. Columns in First Row:" + first_row.count.to_s +  " Voeis expected:" + data_stream_template.data_stream_columns.count.to_s + " rows."
+                logger.info {"File does not match the data_templates number of columns."}
+              end
+            rescue   Exception => e
+                email_exception(e,request.env)
+                logger.info {e.to_s}
+                logger.info {"YEAH"}
+              #problem parsing file
+              flash_error[:error] = @msg + e.message
+              logger.info {@msg}
+            end
+          else
+            flash_error[:error] = "The data_template_id can not be blank!"
+          end
+        else
+          flash_error[:error] = "The site_id: #{params[:site_id]} does not exist in this project"
+        end
+      else
+        flash_error[:error] = "The site_id can not be blank!"
+      end
+      #parent.publish_his
+      respond_to do |format|
+        if params.has_key?(:api_key)
+          format.json
+        end
+        if flash_error[:error].nil?
+          flash_error[:success] = "File was parsed succesfully."
+          site.update_site_data_catalog
+          #flash_error = flash_error.merge({:last_record => data_stream_template.data_stream_columns.sensor_types.sensor_values.last(:order =>[:id.asc]).as_json}) 
+        end
+        format.json do
+          render :json => flash_error.to_json, :callback => params[:jsoncallback]
+        end
+        format.xml do
+          render :xml => flash_error.to_xml
+        end
+      end
+    end
+  end
+  
+  
+  
   
   
   # get_project_data_summary
@@ -748,6 +868,49 @@ class Voeis::ApivsController < Voeis::BaseController
     end
   end
   
+  
+  # returns the number of data record from a within a project's site for a variable for sensor values
+  #
+  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_values_count_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  #
+  #
+  # @param [Integer] :site_id the id of the site to pull data for
+  # @param [Integer] :variable_id the id of the variable to get sensor values for
+  # @param [DateTime] :start_datetime pull data after this datetime
+  # @param [DateTime] :end_datetime pull date before this datetime
+  #
+  # @return [JSON] a JSON object with variable, site, and time_series_count fields
+  #
+  # @author Sean Cleveland
+  #
+  # @api public
+  def get_project_site_sensor_values_count_by_variable    
+   @site = ""
+   @data_values = Hash.new
+   @values = Array.new
+   parent.managed_repository do
+     @site= Voeis::Site.get(params[:site_id].to_i)
+     @variable = Voeis::Variable.get(params[:variable_id].to_i)
+     if @site.nil?
+        @data_values[:error] = "There is no Site with ID:"+ params[:site_id].to_s
+     elsif @variable.nil?
+        @data_values[:error] = "There is no Variable with ID:"+ params[:variable_id].to_s
+     elsif params[:start_datetime].nil? || params[:end_datetime].nil?
+        @data_values[:error] = "The start and end times must not be null"
+     else   
+       @data_values[:variable] = @variable.as_json
+       tseries=Voeis::DataValue.all(:datatype=>"Sensor", :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id => @site.id, :variable_id => @variable.id,:order => [:local_date_time.asc]).count 
+       @data_values[:site] = @site.as_json
+       @data_values[:time_series_count] = tseries
+     end
+     respond_to do |format|
+       format_response(@data_values, format)
+     end
+    end
+  end
+  
+  
+  
   # pulls data from a within a project's site for samples only
   #
   # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=7&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
@@ -805,6 +968,46 @@ class Voeis::ApivsController < Voeis::BaseController
          @data_values[:sample_min] =tseries.min(:data_value)
          @data_values[:sample_avg]=tseries.avg(:data_value)
        end
+     end
+     respond_to do |format|
+       format_response(@data_values, format)
+     end
+    end
+  end
+  
+  # returns the number of data record from a within a project's site for a variable for sample values
+  #
+  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_values_count_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=7&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  #
+  #
+  # @param [Integer] :site_id the id of the site to pull data for
+  # @param [Integer] :variable_id the id of the variable to get sensor values for
+  # @param [DateTime] :start_datetime pull data after this datetime
+  # @param [DateTime] :end_datetime pull date before this datetime
+  #
+  # @return [JSON] a JSON object with variable, site and data_count fields
+  # 
+  # @author Sean Cleveland
+  #
+  # @api public
+  def get_project_site_sample_values_count_by_variable    
+   @site = ""
+   @data_values = Hash.new
+   @values = Array.new
+   parent.managed_repository do
+     @site= Voeis::Site.get(params[:site_id].to_i)
+     @variable = Voeis::Variable.get(params[:variable_id].to_i)
+     if @site.nil?
+        @data_values[:error] = "There is no Site with ID:"+ params[:site_id].to_s
+     elsif @variable.nil?
+        @data_values[:error] = "There is no Variable with ID:"+ params[:variable_id].to_s
+     elsif params[:start_datetime].nil? || params[:end_datetime].nil?
+        @data_values[:error] = "The start and end times must not be null"
+     else
+         @data_values[:variable] = @variable.as_json
+         tseries = Voeis::DataValue.all(:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time, :site_id=>@site.id, :variable_id => @variable.id, :order => [:local_date_time.asc]).count 
+         @data_values[:site] = @site.as_json
+         @data_values[:sample_count] = tseries
      end
      respond_to do |format|
        format_response(@data_values, format)
@@ -956,6 +1159,7 @@ class Voeis::ApivsController < Voeis::BaseController
    # @param [DateTime] :end_datetime pull date before this datetime
    # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
    #
+   # @return [JSON] a JSON object with variable, site, project, time_series_count, time_series_max, time_series_min, time_series_avg, sample_count, sample_max, sample_min, sample_avg, times_series_data and sample_data fields
    # @author Sean Cleveland
    #
    # @api public
@@ -1006,10 +1210,10 @@ class Voeis::ApivsController < Voeis::BaseController
           @var_hash[:time_series_max] = tseries.max(:data_value)
           @var_hash[:time_series_min] =tseries.min(:data_value)
           @var_hash[:time_series_avg]=tseries.avg(:data_value)
-          @var_hash[:sample_count] = tseries.count
-          @var_hash[:sample_max] = tseries.max(:data_value)
-          @var_hash[:sample_min] =tseries.min(:data_value)
-          @var_hash[:sample_avg]=tseries.avg(:data_value)
+          @var_hash[:sample_count] = sseries.count
+          @var_hash[:sample_max] = sseries.max(:data_value)
+          @var_hash[:sample_min] =sseries.min(:data_value)
+          @var_hash[:sample_avg]=sseries.avg(:data_value)
           @values << @var_hash
           @data_values[:variable] = @values
           @data_values[:project] = parent.as_json
@@ -1020,6 +1224,48 @@ class Voeis::ApivsController < Voeis::BaseController
       format_response(@data_values, format)
     end
    end 
+   
+   
+   # pulls data from a within a project's by the variable and returns the number of records
+    #
+    # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+    #
+    #
+    # @param [Integer] :variable_id the id of the variable to pull data for
+    # @param [DateTime] :start_datetime pull data after this datetime
+    # @param [DateTime] :end_datetime pull date before this datetime
+    #
+    # @return [JSON] a JSON object with variable_object, site_object, project_object, time_series_count, and sample_count fields
+    # @author Sean Cleveland
+    #
+    # @api public
+    def get_project_variable_data_count    
+     @var = ""
+     @data_values = Hash.new
+     @values = Array.new
+     parent.managed_repository do
+       @var= Voeis::Variable.get(params[:variable_id].to_i)
+       if @var.nil?
+         @data_values[:error] = "There is no variable with the ID:"+params[:variable_id]
+       else
+         @var_hash = Hash.new
+         
+           @var_hash = @var.as_json
+           tseries = Voeis::DataValue.all(:datatype=>"Sensor", :variable_id=> @var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)
+           sseries = Voeis::DataValue.all(:datatype=>"Sample", :variable_id=> @var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)
+           @var_hash[:time_series_count] = tseries.count
+           @var_hash[:sample_count] = sseries.count
+           @values << @var_hash
+           @data_values[:variable] = @values
+           @data_values[:project] = parent.as_json
+           @data_values[:time_series_count] = tseries.count
+           @data_values[:sample_count] = sseries.count
+       end#end if
+     end #end repo
+     respond_to do |format|
+       format_response(@data_values, format)
+     end
+    end
    
    
    
@@ -1034,6 +1280,7 @@ class Voeis::ApivsController < Voeis::BaseController
    # @param [DateTime] :end_datetime pull date before this datetime
    # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
    #
+   # @return [JSON] a JSON object with variable, site, project, time_series_count, time_series_max, time_series_min, time_series_avg, sample_count, sample_max, sample_min, sample_avg, times_series_data and sample_data fields
    #
    # @author Sean Cleveland
    #
@@ -1052,6 +1299,7 @@ class Voeis::ApivsController < Voeis::BaseController
           @data_values[:error] = "There is no variable with the ID:" + params[:variable_id]
         else
           @var_hash = Hash.new
+          @var_hash = @var.as_json
           if params[:small_data]
             sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
             @var_hash = @var_hash.merge({'time_series_data' => repository.adapter.select(sql)})
@@ -1087,10 +1335,10 @@ class Voeis::ApivsController < Voeis::BaseController
             @var_hash[:time_series_max] = tseries.max(:data_value)
             @var_hash[:time_series_min] =tseries.min(:data_value)
             @var_hash[:time_series_avg]=tseries.avg(:data_value)
-            @var_hash[:sample_count] = tseries.count
-            @var_hash[:sample_max] = tseries.max(:data_value)
-            @var_hash[:sample_min] =tseries.min(:data_value)
-            @var_hash[:sample_avg]=tseries.avg(:data_value)
+            @var_hash[:sample_count] = sseries.count
+            @var_hash[:sample_max] = sseries.max(:data_value)
+            @var_hash[:sample_min] =sseries.min(:data_value)
+            @var_hash[:sample_avg]=sseries.avg(:data_value)
             
               #@var_hash = @var_hash.merge({'data' => @var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time) & @site.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})  
             @values << @var_hash
@@ -1106,6 +1354,54 @@ class Voeis::ApivsController < Voeis::BaseController
       format_response(@data_values, format)
     end
    end
+   
+    # counts the data records from a within a project's by site and the variable
+    #
+    # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_variable_data_count.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+    #
+    #
+    # @param [Integer] :site_id the id for site to pull data for
+    # @param [Integer] :variable_id the id of the variable to pull data for
+    # @param [DateTime] :start_datetime pull data after this datetime
+    # @param [DateTime] :end_datetime pull date before this datetime
+    #
+    # @return [JSON] a JSON object with variable_object, site_object, project_object, time_series_count, and sample_count fields
+    #
+    # @author Sean Cleveland
+    #
+    # @api public
+    def get_project_site_variable_data_count    
+     @var = ""
+     @data_values = Hash.new
+     @values = Array.new
+     parent.managed_repository do
+       @site = Voeis::Site.get(params[:site_id].to_i)
+       if @site.nil?
+         @data_values[:error] = "There is no site with the ID:" + params[:site_id]
+       else
+         @var= Voeis::Variable.get(params[:variable_id].to_i)
+         if @var.nil?
+           @data_values[:error] = "There is no variable with the ID:" + params[:variable_id]
+         else
+           @var_hash = Hash.new
+           @var_hash = @var.as_json
+           tseries = Voeis::DataValue.all(:datatype=>"Sensor", :site_id=>@site.id, :variable_id=>@var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)
+           sseries = Voeis::DataValue.all(:site_id=>@site.id, :variable_id=>@var.id,:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)
+           @var_hash[:time_series_count] = tseries.count
+           @var_hash[:sample_count] = sseries.count
+           @values << @var_hash
+           @data_values[:variable] = @values
+           @data_values[:site] = @site
+           @data_values[:time_series_count] = tseries.count
+           @data_values[:sample_count] = sseries.count
+           @data_values[:project] = parent.as_json
+         end
+       end
+     end
+     respond_to do |format|
+       format_response(@data_values, format)
+     end
+    end
    
    
    # create_project_variable
