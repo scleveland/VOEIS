@@ -1,0 +1,61 @@
+:javascript
+  dojo.require("dojox.grid.EnhancedGrid");
+  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+  dojo.require("dojox.grid.enhanced.plugins.Filter");
+  dojo.require("dojo.data.ItemFileReadStore");
+  dojo.require("dijit.layout.TabContainer");
+  dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+  
+  // ON LOAD
+  $(window).ready(function(){ 
+    //##### 
+    if(window.name=='HISTORY') {
+      $('#top').css('display','none');
+      $('#bottom').css('display','none');
+      $('#main_container').css('top','10px');
+      $('#main_container').css('height','100%');
+      
+    };
+  });
+  
+  // GO BACK or if no history- CLOSE WINDOW
+  function back_or_close() {
+    if(window.name=='HISTORY')
+      window.close();
+    else
+      window.history.back();
+  };
+  
+
+-#%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;", :class=>"icon icon-#{@global ? 'voeis' : 'project'}"}
+%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;"}
+  - if !@project.nil?
+    %span.small{:style=>"font-size:14px;"}
+      PROJECT: 
+    = @project.name
+    %br
+  %span.small{:style=>"font-size:14px;"}
+    HISTORY: 
+  :plain
+    #{'%s: <strong>%s</strong> [Id:%s]'%[@cv_title,@cv_item[@cv_term],@cv_item.id]}
+  -#= @cv_title+': '
+  -#= @cv_term
+
+%strong
+  = "SHOW %s VERSIONS"%((@global ? 'GLOBAL ' : '')+@cv_title.upcase)
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+= link_to('RETURN', 'javascript:', :class=>'icon icon-hist', :onclick=>"back_or_close();")
+%br
+
+- projId = @project.nil? ? '' : @project.id.to_s
+#cv-versions
+  = render_widget :versions, :display, :item=>@cv_item,
+                                        :versions=>@cv_versions,
+                                        :unique_id=>"%s_%s%03d"%[projId,@cv_title2,@cv_item.id],
+                                        :unique_jsid=>"%s_%s%03d"%[projId.tr('-','$'),@cv_title2,@cv_item.id],
+                                        :item_refs=>@cv_refs,
+                                        :properties=>@cv_properties,
+                                        :user=>current_user
+
+
