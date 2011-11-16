@@ -5,6 +5,7 @@
   dojo.require("dojo.data.ItemFileReadStore");
   dojo.require("dijit.layout.TabContainer");
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+  dojo.require("dijit.form.Button");
   
   var version_data_#{@unique_jsid} = [
      #{@versions_ref.map{|version| "        "+version.to_json}.join(",\n")}
@@ -18,10 +19,32 @@
     data: versions_json_#{@unique_jsid}
   });
   
+  //### RETURN TO VERSIONS TAB
   function versionsTab(){
       var tabs = dijit.byId('history-tabs-#{@unique_id}');
       var pane = dijit.byId('versions-tab-#{@unique_id}');
       tabs.selectChild(pane);
+  };
+  
+  //### RESTORE VERSION FROM HISTORY
+  function restoreVer(ver_item){
+      var item = ver_item;
+      item['provenance_comment'] = 'Restored from VERSION '+item.version
+      console.log('VER:',item);
+      //STRIP UNWANTED STUFF??
+      delete item.dirty;
+      delete item.created_at;
+      delete item.updated_at;
+      delete item.updated_by;
+      delete item.updated_by_name;
+      delete item.updated_comment;
+      delete item.version;
+      delete item.version_id;
+      delete item.version_ts;
+      delete item.version_ttl;
+      //ITEM SAVE CALLBACK
+      //var item_json = JSON.stringify(item);
+      window['#{@restore_callback}'](item);
   };
   
 
@@ -65,12 +88,16 @@
           %td{:style=>"text-align:right;width:25%;"}
             %strong
               Version
-              &nbsp;&nbsp;&nbsp;
           %td
             #{version[:version]==0 ? 'Current' : version[:version]}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            %a{:href=>"javascript:", :onclick=>"versionsTab();return false;"}
-              [RETRUN TO VERSIONS TAB]
+            -#%a{:href=>"javascript:", :onclick=>"versionsTab();return false;"}
+            -#  [RETRUN TO VERSIONS TAB]
+            %button{:dojoType=>"dijit.form.Button", :onclick=>"versionsTab();return false;"}
+              BACK TO VERSIONS
+            &nbsp;&nbsp;
+            %button{:dojoType=>"dijit.form.Button", :onclick=>"restoreVer(#{version.to_json});return false;"}
+              RESTORE THIS VERSION
         - reset_cycle
         - @ver_properties.each do |prop|
           %tr{:class=>cycle('row1','row0')}

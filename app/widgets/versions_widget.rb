@@ -10,6 +10,7 @@ class VersionsWidget < Apotomo::Widget
     @unique_jsid = options[:unique_jsid]
     @item_refs = options[:item_refs]
     @ver_properties = options[:properties]
+    @restore_callback = options[:restore_callback]
     ####
     @current_user = options[:user]
     #@auth = !@current_user.nil? && @current_user.projects.include?(@project)

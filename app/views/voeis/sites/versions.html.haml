@@ -6,6 +6,27 @@
   dojo.require("dijit.layout.TabContainer");
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
   
+  // SAVE CALLBACKs for ITEM RESTORE
+  function cv_item_restore(item) {
+    console.log('RESTORE:',item);
+    var tabs = dijit.byId('tab_browser');
+    var siteId = item.id;
+    //var sitePane = openSiteTab(tabs, item.id, true);
+    var sitePane = dojo.byId('site'+siteId);
+    console.log('site'+siteId, sitePane);
+    if(sitePane) {
+      sitePane = dijit.byNode(sitePane);
+    } else {
+      sitePane = new voeis.ui.SitePane2();
+      sitePane.setSite(siteId);
+      tabs.addChild(sitePane);
+      //console.log(sitePane);
+    };
+    sitePane.siteUpdate(item);
+    sitePane.setEdit();
+    tabs.selectChild(sitePane);
+  };
+  
   
 %h3{:style=>"margin-top:0;"}
   %span.small{:style=>"font-size:14px;"}
@@ -28,6 +49,7 @@
                                         :unique_jsid=>"%s_site%03d"%[projId.tr('-','$'),@site.id],
                                         :item_refs=>@site_refs,
                                         :properties=>@ver_properties,
+                                        :restore_callback=>"cv_item_restore",
                                         :user=>current_user
 
 

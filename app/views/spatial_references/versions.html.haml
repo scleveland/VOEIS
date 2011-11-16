@@ -26,6 +26,18 @@
       window.history.back();
   };
   
+  // SAVE CALLBACKs for ITEM RESTORE
+  function cv_item_restore(item) {
+    if(window.name=='HISTORY') {
+      var goto = window.opener.cv_item_restore0(item);
+      window.close();
+      goto(item);
+    } else {
+      window.history.back();
+      cv_item_restore0(item);
+    };
+  };
+  
 
 -#%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;", :class=>"icon icon-#{@global ? 'voeis' : 'project'}"}
 %h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;"}
@@ -56,6 +68,7 @@
                                         :unique_jsid=>"%s_%s%03d"%[projId.tr('-','$'),@cv_title2,@cv_item.id],
                                         :item_refs=>@cv_refs,
                                         :properties=>@cv_properties,
+                                        :restore_callback=>"cv_item_restore",
                                         :user=>current_user
 
 
