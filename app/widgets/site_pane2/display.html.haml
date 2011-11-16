@@ -543,6 +543,8 @@
           $('html #edit-site'+siteId).animate({scrollTop:0}, 'slow');//IE, FF
           $('body #edit-site'+siteId).animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
           if(parseInt(siteId)) {
+            var sitePane = window['site'+siteId+'ref'];
+            sitePane.siteUpdate(sitePane.getSite());
             $('#edit-site'+siteId).hide();
             $('#show-site'+siteId).show();
             return

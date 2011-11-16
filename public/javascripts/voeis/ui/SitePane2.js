@@ -244,7 +244,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		
 		//CREATE Global Ref
     var pane = this;
-    eval(this.id+'ref = pane');
+    //eval(this.id+'ref = pane');
+		window[this.id+'ref'] = pane;
 		
 		this.siteUpdate();
 		
