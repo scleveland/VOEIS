@@ -82,9 +82,14 @@ class Voeis::Site
     if !self.vertical_datum_id.nil? && self.vertical_datum_id != 0
       puts "Booyah" 
       @vert_datum_global = DataMapper.repository(:default){Voeis::VerticalDatumCV.get(self.vertical_datum_id)}
-      self.vertical_datum = Voeis::VerticalDatumCV.first_or_create(:id=>@vert_datum_global.id,
-                                             :term=>@vert_datum_global.term,
-                                             :definition=>@vert_datum_global.definition)
+      if @vert_datum_global.nil?
+        self.provenance_comment += " [Vertical Datum (id=%s) NO LONGER EXISTS!]"%self.vertical_datum_id
+        self.vertical_datum = nil
+      else
+        self.vertical_datum = Voeis::VerticalDatumCV.first_or_create(:id=>@vert_datum_global.id,
+                                               :term=>@vert_datum_global.term,
+                                               :definition=>@vert_datum_global.definition)
+      end
     end
     
     puts "HHEYE"
@@ -92,23 +97,32 @@ class Voeis::Site
     puts self.vertical_datum_id
     if !self.local_projection_id.nil? && self.local_projection_id !=0
       puts "HECKYA"
-      @spat_ref_global = DataMapper.repository(:default){Voeis::SpatialReference.get(self.local_projection_id)}
-      self.local_projection = Voeis::SpatialReference.first_or_create(:id=>@spat_ref_global.id,
-                                          :srs_id => @spat_ref_global.srs_id,
-                                          :srs_name=>@spat_ref_global.srs_name,
-                                          :is_geographic =>@spat_ref_global.is_geographic,
-                                          :notes=>@spat_ref_global.notes)
+      @local_proj_global = DataMapper.repository(:default){Voeis::SpatialReference.get(self.local_projection_id)}
+      if @local_proj_global.nil?
+        self.provenance_comment += " [Local Projection (id=%s) NO LONGER EXISTS!]"%self.local_projection_id
+        self.local_projection = nil
+      else
+        self.local_projection = Voeis::SpatialReference.first_or_create(:id=>@local_proj_global.id,
+                                            :srs_id => @local_proj_global.srs_id,
+                                            :srs_name=>@local_proj_global.srs_name,
+                                            :is_geographic =>@local_proj_global.is_geographic,
+                                            :notes=>@local_proj_global.notes)
+      end
     end
     if !self.lat_long_datum_id.nil? && self.lat_long_datum_id !=0
       puts "HECKYA"
-      @spat_ref_global = DataMapper.repository(:default){Voeis::SpatialReference.get(self.lat_long_datum_id)}
-      self.lat_long_datum = Voeis::SpatialReference.first_or_create(:id=>@spat_ref_global.id,
-                                          :srs_id => @spat_ref_global.srs_id,
-                                          :srs_name=>@spat_ref_global.srs_name,
-                                          :is_geographic =>@spat_ref_global.is_geographic,
-                                          :notes=>@spat_ref_global.notes)
+      @lat_long_datum_global = DataMapper.repository(:default){Voeis::SpatialReference.get(self.lat_long_datum_id)}
+      if @lat_long_datum_global.nil?
+        self.provenance_comment += " [Lat/Long Datum (id=%s) NO LONGER EXISTS!]"%self.lat_long_datum_id
+        self.lat_long_datum = nil
+      else
+        self.lat_long_datum = Voeis::SpatialReference.first_or_create(:id=>@lat_long_datum_global.id,
+                                            :srs_id => @lat_long_datum_global.srs_id,
+                                            :srs_name=>@lat_long_datum_global.srs_name,
+                                            :is_geographic =>@lat_long_datum_global.is_geographic,
+                                            :notes=>@lat_long_datum_global.notes)
+      end
     end
-    puts self.vertical_datum_id
   end
   
   def fetch_time_zone_offset
