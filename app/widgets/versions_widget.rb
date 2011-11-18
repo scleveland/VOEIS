@@ -34,7 +34,7 @@ class VersionsWidget < Apotomo::Widget
     temp[:provenance_comment] = @item.provenance_comment
     @versions_ref << temp
     temp[:dirty] = @item.get_dirty
-    @versions.properties.each{|prop| temp[prop.name] = @item[prop.name]}
+    @versions.properties.each{|prop| temp[prop.name] = @item[prop.name] unless skip_prop.include?(prop.name)}
     refs = @item_refs.shift
     refs.each{|k,v| temp[k] = v} unless refs.nil?
     upd_user = User.get(@item.updated_by)
