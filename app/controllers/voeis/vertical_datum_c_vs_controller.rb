@@ -173,7 +173,7 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
 #      {:label=>"Version", :name=>"version"},
 #      {:label=>"ID", :name=>"id"},
       {:label=>"Term", :name=>"term"},
-      {:label=>"Defination", :name=>"defination"}
+      {:label=>"Definition", :name=>"definition"}
       ]
     
     render 'spatial_references/versions.html.haml'
