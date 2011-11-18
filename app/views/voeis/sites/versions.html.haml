@@ -6,8 +6,38 @@
   dojo.require("dijit.layout.TabContainer");
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
   
-  // SAVE CALLBACKs for ITEM RESTORE
+  // SAVE CALLBACK for ITEM ROLLBACK
   function cv_item_restore(item) {
+    console.log('ROLLBACK:',item);
+    var pane = window['site'+item.id+'ref'];
+    var data = {site:item};
+    delete data.site.lat_long_datum;
+    delete data.site.local_projection;
+    delete data.site.vertical_datum;
+    data.site.id = parseInt(item.id);
+    data.site.latitude = parseFloat(item.latitude);
+    data.site.longitude = parseFloat(item.longitude);
+    data.site.lat_long_datum_id = parseInt(item.lat_long_datum_id);
+    data.site.local_projection_id = parseInt(item.local_projection_id);
+    data.site.vertical_datum_id = parseInt(item.vertical_datum_id);
+    for(prop in item)
+      if(item[prop]==null) delete data.site[prop];
+    // POST ITEM
+    $.ajax({
+      type: 'PUT',
+      url: '/projects/#{@project.id}/sites/'+item.id,
+      data: data,
+      success: function(e) {
+        console.log('UPDATED>>>',data);
+        pane.siteSave(item);
+        dojo.publish('voeis/project/map/clear',[item.id]);
+        dojo.publish('voeis/project/site/history/update',[item.id]);
+      },
+      dataType: 'json'
+    });
+  };
+  // SAVE CALLBACK-- OLD: open edit
+  function cv_item_restore000(item) {
     console.log('RESTORE:',item);
     var tabs = dijit.byId('tab_browser');
     var siteId = item.id;

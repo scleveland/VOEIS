@@ -29,7 +29,8 @@
   //### RESTORE VERSION FROM HISTORY
   function restoreVer(ver_item){
       var item = ver_item;
-      item['provenance_comment'] = 'Restored from VERSION '+item.version
+      if(!window.confirm('ARE YOU SURE?\nROLLBACK VERSION '+item.version)) return;
+      item['provenance_comment'] = 'ROLLBACK VERSION '+item.version
       console.log('VER:',item);
       //STRIP UNWANTED STUFF??
       delete item.dirty;
@@ -99,7 +100,7 @@
                 BACK TO VERSIONS
               &nbsp;&nbsp;
               %button{:dojoType=>"dijit.form.Button", :onclick=>"restoreVer(#{version.to_json});return false;"}
-                RESTORE THIS VERSION
+                ROLLBACK VERSION
               -#%a{:href=>"javascript:", :onclick=>"versionsTab();return false;"}
               -#  [RETRUN TO VERSIONS TAB]
         - reset_cycle
@@ -113,12 +114,6 @@
         %tr{:class=>cycle('row1','row0')}
           %td{:style=>"text-align:right;width:25%;"}
             %strong
-              Provenance Comment
-          %td
-            #{version[:provenance_comment]}
-        %tr{:class=>cycle('row1','row0')}
-          %td{:style=>"text-align:right;width:25%;"}
-            %strong
               Update Comment
           %td
             #{version[:updated_comment]}
@@ -128,6 +123,12 @@
               Updated
           %td
             #{version[:updated_by_name]+' -at- '+version[:version_ts]}
+        %tr{:class=>cycle('row1','row0')}
+          %td{:style=>"text-align:right;width:25%;"}
+            %strong
+              Provenance Comment
+          %td
+            #{version[:provenance_comment]}
 
 
 -#version_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pversions", :data=>"pversions_json"}

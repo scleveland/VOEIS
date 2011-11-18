@@ -26,8 +26,17 @@
       window.history.back();
   };
   
-  // SAVE CALLBACKs for ITEM RESTORE
+  // SAVE CALLBACKs for ITEM ROLLBACK
   function cv_item_restore(item) {
+    if(window.name=='HISTORY') {
+      window.opener.cv_item_restore0(item, window.location.reload);
+    } else {
+      cv_item_restore0(item);
+      window.location.reload();
+    };
+  };
+  // OLD ROLLBACK- close versions and edit form
+  function cv_item_restore00(item) {
     if(window.name=='HISTORY') {
       var goto = window.opener.cv_item_restore0(item);
       window.close();
