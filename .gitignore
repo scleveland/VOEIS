@@ -20,6 +20,9 @@ db/*.sqlite3
 db/**/*.sqlite3
 db/*.db
 db/**/*.db
+db/sqlite3/*
+db/backup/*
+db/stash-backup/*
 *.tmproj
 *.sw
 .svn
@@ -41,6 +44,6 @@ htmlreports/**/*
 app/stylesheets/screen.css
 doc/voeis-demo/*
 temp_data/*
-db/sqlite3/*
-db/backup/*.sql
 .vagrant
+.project
+dmlog.txt

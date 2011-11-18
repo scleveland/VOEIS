@@ -51,6 +51,9 @@
     $(window).ready(function(){ 
       //##### 
       //console.log('READY-load-done-NOW');
+      //FIX datagrid clipping issue...
+      cv_management_grid.sort();
+      cv_management_grid.update();
     });
     
     // GRID DISPLAY FILTERS
@@ -76,12 +79,21 @@
         var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" />';
         var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" />';
         //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
-        var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
+        //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
+        var hist_link = '<a href="'+post_url+'/versions/?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;">'+hist_icon+'</a>\n';
         var delete_link = '<a href="javascript:" onclick="cv_delete('+idx+');return false;">'+delete_icon+'</a>\n';
         var spaces = '&nbsp;';
         if(item.used[0]) return spaces+hist_link;
         return spaces+hist_link+spaces+delete_link;
       }
+    };
+    
+    // GO BACK or if no history- CLOSE WINDOW
+    function back_or_close() {
+      if(window.history.length>1)
+        window.history.back();
+      else
+        window.close();
     };
     
     // DOJO STORE FETCH
@@ -180,17 +192,18 @@
     // OPEN EDIT DIALOG
     var cv_datum_upd = function(item) {
       console.log('EDIT:',item);
-      console.log(arguments);
       cv_dialog_box.set('title', cv_title);
       cv_dialog_populate(item);
+      $('#cv_prov_com').show();
       //cv_delete_button(item.used[0]);
       cv_dialog_box.show();
     };
     // OPEN NEW DIALOG
     var cv_datum_new = function() {
-      console.log(arguments);
+      console.log('NEW');
       cv_dialog_box.set('title', 'NEW '+cv_title);
       cv_dialog_clear();
+      $('#cv_prov_com').hide();
       //$(delete_button.domNode).hide();
       cv_dialog_box.show();
     };
@@ -251,6 +264,12 @@
           };
       }});
     };
+    // SAVE CALLBACKs for ITEM RESTORE
+    function cv_item_restore0(item) {
+      var cv_item = cv_store_get(item.id);
+      item['idx'] = cv_item.idx;
+      cv_datum_upd(item);
+    };
 
   - if @global
     :javascript
@@ -301,7 +320,8 @@
       function cv_data_clean0(data0) {
         var cv_id = parseInt(data0['id']);
         var data = {term: data0['term'].toString(),
-        definition: data0['definition'].toString()};
+        definition: data0['definition'].toString(),
+        provenance_comment: data0['provenance_comment'].toString()};
         if(cv_id) data['id'] = cv_id;
         return data;
       };
@@ -314,6 +334,9 @@
         $('#vertical_datum_idx').val(cv_item.idx.toString());
         vertical_datum_term.set('value', cv_item.term.toString());
         $('#vertical_datum_text').val(cv_item.definition.toString());
+        if(cv_item.hasOwnProperty('provenance_comment'))
+          $('#cv_prov_text').val(cv_item.provenance_comment.toString());
+        else $('#cv_prov_text').val('');
         //delete_button.attr("disabled", false);
       };
       // CLEAR VERTICAL DATUM DIALOG
@@ -357,7 +380,8 @@
         var data = {srs_id: parseInt(data0['srs_id']),
           srs_name: data0['srs_name'].toString(),
           is_geographic: is_geo,
-          notes: data0['notes'].toString()};
+          notes: data0['notes'].toString(),
+          provenance_comment: data0['provenance_comment'].toString()};
         if(cv_id) data['id'] = cv_id;
         return data;
       };
@@ -372,6 +396,9 @@
         spatial_source_name.set('value', cv_item.srs_name.toString());
         spatial_source_geographic.set('value', cv_item.is_geographic[0]);
         $('#spatial_reference_text').val(cv_item.notes.toString());
+        if(cv_item.hasOwnProperty('provenance_comment'))
+          $('#cv_prov_text').val(cv_item.provenance_comment.toString());
+        else $('#cv_prov_text').val('');
         //delete_button.attr("disabled", false);
       };
       // CLEAR SPATIAL REFERENCE DIALOG
@@ -414,8 +441,13 @@
       %label Notes
     %br
     %textarea{:type=>"text", :name=>"cv_text", :id=>"#{@cv_title2}_text", :style=>"width:95%;", :rows=>"4"}
-    %br{:style=>'float:none; clear:both;'}
     %br
+    #cv_prov_com{:style=>"display:none;"}
+      %br
+      %label Provenance Comment
+      %br
+      %textarea{:type=>"text", :name=>"cv_prov", :id=>"cv_prov_text", :style=>"width:95%;", :rows=>"2"}
+    %br{:style=>'float:none; clear:both;'}
     %button{:dojoType=>"dijit.form.Button", :title=>'Create'}
       Save #{@cv_title}
       %script{:type=>"dojo/method", :event=>"startup"}
@@ -485,6 +517,7 @@
           this.focus.setFocusCell(col,idx);
           copy_dialog_box.hide();
           cv_dialog_populate(item);
+          $('#cv_prov_com').hide();
           $('##{@cv_title2}_idx').val('#'+item.idx);
           //$(delete_button.domNode).hide();
           cv_dialog_box.set('title', 'NEW '+cv_title);

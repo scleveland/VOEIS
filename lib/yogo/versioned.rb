@@ -11,7 +11,7 @@ module Yogo
     # for Dirty Field list
     @@updated_fields = 'Updated Fields: '
     # Fields ending _id that are NOT references
-    @@id_exceptions = ['his_id']
+    @@id_exceptions = ['his_id','srs_id']
     
     def yogo_versioned
       property :provenance_comment,     ::DataMapper::Property::Text, :required => false
@@ -26,7 +26,7 @@ module Yogo
       
       # Register before save hooks
       before(:save) do
-        dirty_props = self.dirty_attributes.keys.map{|k| k.name.to_s }-['id','updated_at','provenance_comment']
+        dirty_props = self.dirty_attributes.keys.map{|k| k.name.to_s }-['id','updated_at','provenance_comment','deleted_at']
         dirty_props = dirty_props.map{|p| 
           #p = p[0..-4] if (p[-3..-1]=='_id' && !@@id_exceptions.include?(p))
           (p[-3..-1]=='_id' && !::ID_EXCEPTIONS.include?(p)) ? p[0..-4] : p

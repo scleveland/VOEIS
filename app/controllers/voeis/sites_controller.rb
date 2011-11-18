@@ -13,7 +13,7 @@ class Voeis::SitesController < Voeis::BaseController
   respond_to :html, :json
   
   has_widgets do |root|
-    root << widget(:vertical_datum)
+    root << widget(:versions)
   end
   
   @project = parent
@@ -98,19 +98,9 @@ class Voeis::SitesController < Voeis::BaseController
     @project = parent
     @site =  parent.managed_repository{Voeis::Site.get(params[:id])}
     @versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
-    @versions_ref = []
-    @versions_sites = []
-    version_number = @versions.count
+    
+    @site_refs = []
     temp = {}
-    temp[:version] = 0
-    temp[:version_ttl] = 'Current'
-    temp[:version_id] = '%s-site%s-ver000'%[@project.id,@site.id]
-    temp[:version_ts] = @site.updated_at.strftime('%Y-%m-%d %H:%M:%S')
-    temp[:updated_comment] = @site.updated_comment
-    temp[:provenance_comment] = @site.provenance_comment
-    @versions_ref << temp
-    temp[:dirty] = @site.get_dirty
-    @versions.properties.each{|prop| temp[prop.name] = @site[prop.name]}
     temp[:lat_long_datum] = '-none-'
     temp[:vertical_datum] = '-none-'
     temp[:local_projection] = '-none-'
@@ -123,20 +113,9 @@ class Voeis::SitesController < Voeis::BaseController
     if !Voeis::SpatialReference.get(@site.local_projection_id).nil?
       temp[:local_projection] = Voeis::SpatialReference.get(@site.local_projection_id).srs_name
     end
-    upd_user = User.get(@site.updated_by)
-    temp[:updated_by_name] = upd_user.nil? ? '-' : '%s (%s)'%[upd_user.name,upd_user.login]
-    @versions_sites << temp
-    @versions.each{|ver|
+    @site_refs << temp
+    @versions.each{|ver| 
       temp = {}
-      temp[:version] = version_number
-      temp[:version_ttl] = 'Version %s'%version_number
-      temp[:version_id] = '%s-site%s-ver%03d'%[@project.id,@site.id,version_number]
-      temp[:version_ts] = ver.updated_at.strftime('%Y-%m-%d %H:%M:%S')
-      temp[:updated_comment] = ver.updated_comment
-      temp[:provenance_comment] = ver.provenance_comment
-      @versions_ref << temp
-      temp[:dirty] = @site.get_dirty(ver.updated_comment)
-      @versions.properties.each{|prop| temp[prop.name] = ver[prop.name]}
       temp[:lat_long_datum] = '-none-'
       temp[:vertical_datum] = '-none-'
       temp[:local_projection] = '-none-'
@@ -149,11 +128,9 @@ class Voeis::SitesController < Voeis::BaseController
       if !Voeis::SpatialReference.get(ver.local_projection_id).nil?
         temp[:local_projection] = Voeis::SpatialReference.get(ver.local_projection_id).srs_name
       end
-      upd_user = User.get(ver.updated_by)
-      temp[:updated_by_name] = upd_user.nil? ? '-' : '%s (%s)'%[upd_user.name,upd_user.login]
-      version_number-=1
-      @versions_sites << temp
+      @site_refs << temp
     }
+
     @ver_properties = [
 #      {:label=>"Version", :name=>"version"},
 #      {:label=>"Site ID", :name=>"id"},
@@ -172,12 +149,13 @@ class Voeis::SitesController < Voeis::BaseController
       {:label=>"County", :name=>"county"},
       {:label=>"Description", :name=>"description"},
       {:label=>"Comments", :name=>"comments"},
-      {:label=>"HIS ID", :name=>"his_id"},
-      {:label=>"Updated By", :name=>"updated_by_name"},
-      {:label=>"Update Comment", :name=>"updated_comment"},
-      {:label=>"Provenance Comment", :name=>"provenance_comment"}
+      {:label=>"HIS ID", :name=>"his_id"}
+#      {:label=>"Updated By", :name=>"updated_by_name"},
+#      {:label=>"Update Comment", :name=>"updated_comment"},
+#      {:label=>"Provenance Comment", :name=>"provenance_comment"}
       ]
     ###
+    #render 'versions2.html.haml'
   end
   
   def edit

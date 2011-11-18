@@ -1,0 +1,76 @@
+rake about                              # List versions of all Rails frameworks and the environment
+rake db:automigrate                     # Perform destructive automigration of all repositories in the current Rails.env
+rake db:autoupgrade                     # Perform non destructive automigration of all repositories in the current Rails.env
+rake db:create                          # Create all local databases defined for the current Rails.env
+rake db:create:all                      # Create all the local databases defined in config/database.yml
+rake db:drop                            # Drop all local databases defined for the current Rails.env
+rake db:drop:all                        # Drop all the local databases defined in config/database.yml
+rake db:migrate                         # Migrate the database to the latest version
+rake db:migrate:down[version]           # Migrate down using migrations
+rake db:migrate:up[version]             # Migrate up using migrations
+rake db:seed                            # Load the seed data from db/seeds.rb
+rake db:sessions:clear                  # Clear the sessions table for DataMapperStore
+rake db:sessions:create                 # Creates the sessions table for DataMapperStore
+rake db:setup                           # Create the database, load the schema, and initialize with the seed data
+rake dm:doc:graphviz:relational:png     # Generates a PNG GraphViz relational diagram of the DataMapper Models
+rake dm:doc:graphviz:relational:svg     # Generates a SVG GraphViz relational diagram of the DataMapper Models
+rake dm:doc:graphviz:schema:png         # Generates a PNG GraphViz schema diagram of the DataMapper Models
+rake dm:doc:graphviz:schema:svg         # Generates a SVG GraphViz schema diagram of the DataMapper Models
+rake doc:app                            # Generate docs for the app -- also availble doc:rails, doc:guides, doc:plugins (options: TEMPLATE=/rdoc-template.rb, TITLE="Custom Title")
+rake jobs:clear                         # Clear the delayed_job queue.
+rake jobs:stop                          # Stop the delayed_job worker.
+rake jobs:work                          # Start a delayed_job worker.
+rake log:clear                          # Truncates all *.log files in log/ to zero bytes
+rake middleware                         # Prints out your Rack middleware stack
+rake notes                              # Enumerate all annotations (use notes:optimize, :fixme, :todo for focus)
+rake notes:custom                       # Enumerate a custom annotation, specify with ANNOTATION=CUSTOM
+rake rails:template                     # Applies the template supplied by LOCATION=/path/to/template
+rake rails:update                       # Update both configs and public/javascripts from Rails (or use just update:javascripts or update:configs)
+rake routes                             # Print out all defined routes in match order, with names.
+rake secret                             # Generate a cryptographically secure secret key (this is typically used to generate a secret for cookie sessions).
+rake spec                               # Run all specs in spec directory (excluding plugin specs) / Run all specs in spec directory (excluding plugin specs)
+rake spec:controllers                   # Run the code examples in spec/controllers / Run the code examples in spec/controllers
+rake spec:db:fixtures:load              # Load fixtures (from spec/fixtures) into the current environment's database.
+rake spec:doc                           # Print Specdoc for all specs (excluding plugin specs)
+rake spec:helpers                       # Run the code examples in spec/helpers / Run the code examples in spec/helpers
+rake spec:integration                   # Run the code examples in spec/integration
+rake spec:lib                           # Run the code examples in spec/lib / Run the code examples in spec/lib
+rake spec:mailers                       # Run the code examples in spec/mailers
+rake spec:models                        # Run the code examples in spec/models / Run the code examples in spec/models
+rake spec:plugin_doc                    # Print Specdoc for all plugin examples
+rake spec:plugins                       # Run the code examples in vendor/plugins (except RSpec's own)
+rake spec:plugins:rspec_on_rails        # Runs the examples for rspec_on_rails
+rake spec:rcov                          # Run all specs with rcov / Run all specs in spec directory with RCov (excluding plugin specs)
+rake spec:requests                      # Run the code examples in spec/requests
+rake spec:routing                       # Run the code examples in spec/routing
+rake spec:views                         # Run the code examples in spec/views / Run the code examples in spec/views
+rake stats                              # Report code statistics (KLOCs, etc) from the application
+rake test:cells                         # Run tests for cells
+rake test:widgets                       # Run tests for widgets
+rake time:zones:all                     # Displays all time zones, also available: time:zones:us, time:zones:local -- filter with OFFSET parameter, e.g., OFFSET=-6
+rake tmp:clear                          # Clear session, cache, and socket files from tmp/ (narrow w/ tmp:sessions:clear, tmp:cache:clear, tmp:sockets:clear)
+rake tmp:create                         # Creates tmp directories for sessions, cache, sockets, and pids
+rake yard                               # Generate YARD Documentation
+rake yard:open                          # Opens the documentation in your browser
+rake yardstick:measure                  # Measure docs in ["lib/**/*.rb", "app/**/*.rb"] with yardstick
+rake yardstick:verify                   # Verify that yardstick coverage is at least 100%
+rake yogo:clean                         # Destroy the Yogo databases and restore everything to clean state.
+rake yogo:db:auto_upgrade               # Auto Migrate Global and Local DBs
+rake yogo:db:backup                     # Backup all databases
+rake yogo:db:backup_master              # Backup the databases with pg_backup
+rake yogo:db:backup_projects            # Backup project databases with pg_backup
+rake yogo:db:example:clear              # Clears the example database from persevere.
+rake yogo:db:example:load               # Copies the example database into persevere.
+rake yogo:db:import[db,name]            # Import legacy database into Yogo.
+rake yogo:db:load_from_backup           # Reload the databases
+rake yogo:db:load_master_from_backup    # Reload the master database
+rake yogo:db:load_projects_from_backup  # Reload project databases
+rake yogo:db:update_site_data_catalogs  # Update the Site Data Catlogs for All Projects
+rake yogo:destructive:firebird          # Destroy and reacreate the database from ashes.
+rake yogo:destructive:remove_all        # Remove all 'voeis_*' datababses (might not work)
+rake yogo:gems                          # Update and install the ruby gems required by yogo
+rake yogo:open                          # Open Yogo in a web browser
+rake yogo:restart                       # Restart the Yogo System
+rake yogo:start                         # Start the Yogo System
+rake yogo:stop                          # Stop the Yogo System
+rake yogo:update                        # Update the Yogo system from the source repository

@@ -78,7 +78,9 @@
       :plain
         console.log("SELECTED:");
         console.log(arguments);
-        if(goto_project) return;
+        //if(goto_project) return;
+        var this_col = this.focus.cell.index;
+        if(this_col==1) return;
         //console.log('URL: '+window.location);
         //console.log('STAT: '+window.deafultStatus);
         //if(window.defaultStatus=='LOADING...') return;
