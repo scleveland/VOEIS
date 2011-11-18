@@ -31,6 +31,7 @@ class Project
   after :create, :give_current_user_membership
   after :create,  :upgrade_global_models
   after :create, :create_data_value_indexes
+
   before :destroy, :destroy_cleanup
   after :save, :publish_his
 
@@ -70,7 +71,6 @@ class Project
                           "voeis/meta_tag$retrieve",
                           "voeis/source$retrieve",
                           "voeis/site$retrieve",
-                          #"voeis/site$update",
                           "voeis/unit$retrieve",
                           "voeis/variable$retrieve",
                           "voeis/lab_method$retrieve",
@@ -78,7 +78,8 @@ class Project
                           "voeis/sample_material$retrieve",
                           "voeis/data_set$retrieve",
                           "voeis/site_data_catalog$retrieve",
-                          #"voeis/site_data_catalog$update",
+                          "voeis/spatial_reference$retrieve",
+                          "voeis/vertical_datum_cv$retrieve",
                           "voeis/apiv$retrieve",
                           "voeis/data_value$retrieve"] unless self.is_private?
       return base_permission if user.nil?
