@@ -157,9 +157,8 @@
     -#    = hidden_field_tag('row_array', "$$$site-samps$$$")
     -#    = hidden_field_tag('file_name', "project_samples")
     -#    = submit_tag("Export Samples")
-
-        %br
-        %br    
+    -#  %br
+    -#  %br    
     %table{:id=>"site00-sample-table", :style=>"width:45%;"} 
       %tr{:class=>"row-gr"}
         - @sample_properties.each do |prop|
