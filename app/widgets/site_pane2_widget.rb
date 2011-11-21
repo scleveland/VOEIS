@@ -40,13 +40,13 @@ class SitePane2Widget < Apotomo::Widget
       @site_stats << {:vars=>site.variables.count, :count=>stats[0], :first=>stats[1], :last=>stats[2]}
     }
     
-    @sites.map{ |site| 
-      @temp_array = []
-      site.samples.all(:order => [:lab_sample_code.asc]).each { |samp|
-        @temp_array << Array[samp.sample_type, samp.lab_sample_code, samp.material, samp.local_date_time.strftime('%Y-%m-%d %H:%M:%S')]
-      }
-      @site_samps << @temp_array
-    }
+    # @sites.map{ |site| 
+    #   @temp_array = []
+    #   site.samples.all(:order => [:lab_sample_code.asc]).each { |samp|
+    #     @temp_array << Array[samp.sample_type, samp.lab_sample_code, samp.material, samp.local_date_time.strftime('%Y-%m-%d %H:%M:%S')]
+    #   }
+    #   @site_samps << @temp_array
+    # }
     
     #### CV stuff
     @vertical_datum_items = [['-none-', nil]]
