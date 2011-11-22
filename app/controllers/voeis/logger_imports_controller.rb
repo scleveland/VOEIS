@@ -240,19 +240,26 @@ class Voeis::LoggerImportsController < Voeis::BaseController
                                  :unit =>         "NA",
                                  :type =>         params["type"+i.to_s].empty? ? "unknown" : params["type"+i.to_s])
            if !params["ignore"+i.to_s]            
-             variable = Voeis::Variable.first_or_create(
-                         :variable_code => var.variable_code,
-                         :variable_name => var.variable_name,
-                         :speciation =>  var.speciation,
-                         :variable_units_id => var.variable_units_id,
-                         :sample_medium =>  var.sample_medium,
-                         :value_type => var.value_type,
-                         :is_regular => var.is_regular,
-                         :time_support => var.time_support,
-                         :time_units_id => var.time_units_id,
-                         :data_type => var.data_type,
-                         :general_category => var.general_category,
-                         :no_data_value => var.no_data_value)
+             # variable = Voeis::Variable.first_or_create(
+             #             :variable_code => var.variable_code,
+             #             :variable_name => var.variable_name,
+             #             :speciation =>  var.speciation,
+             #             :variable_units_id => var.variable_units_id,
+             #             :sample_medium =>  var.sample_medium,
+             #             :value_type => var.value_type,
+             #             :is_regular => var.is_regular,
+             #             :time_support => var.time_support,
+             #             :time_units_id => var.time_units_id,
+             #             :data_type => var.data_type,
+             #             :general_category => var.general_category,
+             #             :no_data_value => var.no_data_value)
+             if Voeis::Variable.get(var.id).nil?
+               variable = Voeis::Variable.new
+               variable.attributes = var.attributes
+               variable.save!
+             else
+              variable = Voeis::Variable.get(var.id)
+             end
              data_stream_column.variables << variable
              data_stream_column.data_streams << data_stream
              data_stream_column.save
@@ -541,8 +548,8 @@ class Voeis::LoggerImportsController < Voeis::BaseController
         difference_array = params["difference"+i.to_s]
         if params["column"+i.to_s] == "timestamp"
           timestamp_col = i-1
-        elsif params["column"+i.to_s] == "sample_id"
-          sample_id_col = i-1
+        # elsif params["column"+i.to_s] == "sample_id"
+        #           sample_id_col = i-1
         elsif params["column"+i.to_s] == "vertical_offset"
            vertical_offset_col = i-1
         elsif params["column"+i.to_s] == "starting_vertical_offset"
@@ -588,19 +595,26 @@ class Voeis::LoggerImportsController < Voeis::BaseController
         if columns_array[i] != nil && columns_array[i] != "ignore" && ignore_array[i] != i && i != timestamp_col && i != sample_id_col && i != vertical_offset_col && ending_vertical_offset_col != i && meta_tag_array[i].to_i == -1
           @var = Voeis::Variable.get(columns_array[i].to_i)
           parent.managed_repository do 
-            variable = Voeis::Variable.first_or_create(
-                       :variable_code => @var.variable_code,
-                       :variable_name => @var.variable_name,
-                       :speciation =>  @var.speciation,
-                       :variable_units_id => @var.variable_units_id,
-                       :sample_medium =>  @var.sample_medium,
-                       :value_type => @var.value_type,
-                       :is_regular => @var.is_regular,
-                       :time_support => @var.time_support,
-                       :time_units_id => @var.time_units_id,
-                       :data_type => @var.data_type,
-                       :general_category => @var.general_category,
-                       :no_data_value => @var.no_data_value)
+            # variable = Voeis::Variable.first_or_create(
+            #            :variable_code => @var.variable_code,
+            #            :variable_name => @var.variable_name,
+            #            :speciation =>  @var.speciation,
+            #            :variable_units_id => @var.variable_units_id,
+            #            :sample_medium =>  @var.sample_medium,
+            #            :value_type => @var.value_type,
+            #            :is_regular => @var.is_regular,
+            #            :time_support => @var.time_support,
+            #            :time_units_id => @var.time_units_id,
+            #            :data_type => @var.data_type,
+            #            :general_category => @var.general_category,
+            #            :no_data_value => @var.no_data_value)
+             if Voeis::Variable.get(@var.id).nil?
+                variable = Voeis::Variable.new
+                variable.attributes = @var.attributes
+                variable.save!
+              else
+               variable = Voeis::Variable.get(@var.id)
+              end
              @col_vars[i] = variable
              @variables << variable
            end#managed repo
@@ -790,19 +804,26 @@ class Voeis::LoggerImportsController < Voeis::BaseController
                                     :original_var => var.variable_name,
                                     :unit =>         "NA",
                                     :type =>         "NA")           
-              variable = Voeis::Variable.first_or_create(
-                          :variable_code => var.variable_code,
-                          :variable_name => var.variable_name,
-                          :speciation =>  var.speciation,
-                          :variable_units_id => var.variable_units_id,
-                          :sample_medium =>  var.sample_medium,
-                          :value_type => var.value_type,
-                          :is_regular => var.is_regular,
-                          :time_support => var.time_support,
-                          :time_units_id => var.time_units_id,
-                          :data_type => var.data_type,
-                          :general_category => var.general_category,
-                          :no_data_value => var.no_data_value)
+              # variable = Voeis::Variable.first_or_create(
+              #             :variable_code => var.variable_code,
+              #             :variable_name => var.variable_name,
+              #             :speciation =>  var.speciation,
+              #             :variable_units_id => var.variable_units_id,
+              #             :sample_medium =>  var.sample_medium,
+              #             :value_type => var.value_type,
+              #             :is_regular => var.is_regular,
+              #             :time_support => var.time_support,
+              #             :time_units_id => var.time_units_id,
+              #             :data_type => var.data_type,
+              #             :general_category => var.general_category,
+              #             :no_data_value => var.no_data_value)
+              if Voeis::Variable.get(var.id).nil?
+                 variable = Voeis::Variable.new
+                 variable.attributes = var.attributes
+                 variable.save!
+               else
+                variable = Voeis::Variable.get(var.id)
+               end
               data_stream_column.variables << variable
               data_stream_column.data_streams << @data_stream
               data_stream_column.save
