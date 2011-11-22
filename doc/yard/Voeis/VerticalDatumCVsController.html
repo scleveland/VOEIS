@@ -313,10 +313,6 @@ LOCAL: POST /VerticalDatum
       <pre class="lines">
 
 
-15
-16
-17
-18
 19
 20
 21
@@ -351,10 +347,14 @@ LOCAL: POST /VerticalDatum
 50
 51
 52
-53</pre>
+53
+54
+55
+56
+57</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='id create'>create</span>
   <span class='comment'>#@vertical_datum = parent.managed_repository{Voeis::VerticalDatumCV.new(params[:vertical_datum_c_v])}
@@ -424,10 +424,6 @@ LOCAL: DELETE /VerticalDatum
       <pre class="lines">
 
 
-117
-118
-119
-120
 121
 122
 123
@@ -458,10 +454,14 @@ LOCAL: DELETE /VerticalDatum
 148
 149
 150
-151</pre>
+151
+152
+153
+154
+155</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 117</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 121</span>
 
 <span class='kw'>def</span> <span class='id destroy'>destroy</span>
   <span class='ivar'>@project</span> <span class='op'>=</span> <span class='id parent'>parent</span>
@@ -527,10 +527,6 @@ LOCAL: List VerticalDatum entries
       <pre class="lines">
 
 
-80
-81
-82
-83
 84
 85
 86
@@ -556,10 +552,14 @@ LOCAL: List VerticalDatum entries
 106
 107
 108
-109</pre>
+109
+110
+111
+112
+113</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 80</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 84</span>
 
 <span class='kw'>def</span> <span class='id index'>index</span>
   <span class='comment'>### LOCAL VERTICAL DATUM
@@ -609,12 +609,12 @@ LOCAL: List VerticalDatum entries
       <pre class="lines">
 
 
-158
-159
-160</pre>
+182
+183
+184</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 158</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 182</span>
 
 <span class='kw'>def</span> <span class='id invalid_page'>invalid_page</span>
   <span class='id redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='symbol'>:back</span><span class='rparen'>)</span>
@@ -648,16 +648,16 @@ LOCAL: GET /VerticalDatum/new
       <pre class="lines">
 
 
-6
-7
-8
-9
 10
 11
-12</pre>
+12
+13
+14
+15
+16</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 6</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 10</span>
 
 <span class='kw'>def</span> <span class='id new'>new</span>
   <span class='ivar'>@vertical_datum</span> <span class='op'>=</span> <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>VerticalDatumCV</span><span class='period'>.</span><span class='id new'>new</span><span class='rbrace'>}</span>
@@ -684,12 +684,12 @@ LOCAL: GET /VerticalDatum/new
       <pre class="lines">
 
 
-112
-113
-114</pre>
+116
+117
+118</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 116</span>
 
 <span class='kw'>def</span> <span class='id show'>show</span>
   
@@ -723,10 +723,6 @@ LOCAL: PUT /VerticalDatum
       <pre class="lines">
 
 
-56
-57
-58
-59
 60
 61
 62
@@ -744,10 +740,14 @@ LOCAL: PUT /VerticalDatum
 74
 75
 76
-77</pre>
+77
+78
+79
+80
+81</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 56</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 60</span>
 
 <span class='kw'>def</span> <span class='id update'>update</span>
   <span class='id vertical_datum'>vertical_datum</span> <span class='op'>=</span> <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>VerticalDatumCV</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:vertical_datum_c_v</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='rbrace'>}</span>
@@ -800,15 +800,55 @@ HISTORY!
       <pre class="lines">
 
 
-154
-155
-156</pre>
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 154</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/vertical_datum_c_vs_controller.rb', line 158</span>
 
 <span class='kw'>def</span> <span class='id versions'>versions</span>
+  <span class='comment'>### LOCAL VERTICAL DATUM HISTORY
+</span>  <span class='ivar'>@global</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='ivar'>@project</span> <span class='op'>=</span> <span class='id parent'>parent</span>
+  <span class='ivar'>@cv_item</span> <span class='op'>=</span> <span class='ivar'>@project</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>VerticalDatumCV</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='rbrace'>}</span>
+  <span class='ivar'>@cv_versions</span> <span class='op'>=</span> <span class='ivar'>@cv_item</span><span class='period'>.</span><span class='id versions'>versions</span>
+  <span class='ivar'>@cv_title</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Vertical Datum</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_title2</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>vertical_datum</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_term</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>term</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_name</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>term</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_id</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>id</span><span class='tstring_end'>'</span></span>
+
+  <span class='ivar'>@cv_refs</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+
+  <span class='ivar'>@cv_properties</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+<span class='comment'>#      {:label=&gt;&quot;Version&quot;, :name=&gt;&quot;version&quot;},
+</span><span class='comment'>#      {:label=&gt;&quot;ID&quot;, :name=&gt;&quot;id&quot;},
+</span>    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Term</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>term</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Defination</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>defination</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
+    <span class='rbracket'>]</span>
   
+  <span class='id render'>render</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>spatial_references/versions.html.haml</span><span class='tstring_end'>'</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -820,7 +860,7 @@ HISTORY!
 </div>
     
     <div id="footer">
-  Generated on Tue Nov  8 12:48:41 2011 by 
+  Generated on Tue Nov 22 13:39:11 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

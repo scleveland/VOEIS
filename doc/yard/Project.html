@@ -599,16 +599,16 @@ Set of permissions the current user has
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/meta_tag$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/source$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/site$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                        <span class='comment'>#&quot;voeis/site$update&quot;,
-</span>                        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/unit$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/unit$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/variable$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/lab_method$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/sample$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/sample_material$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/data_set$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/site_data_catalog$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
-                        <span class='comment'>#&quot;voeis/site_data_catalog$update&quot;,
-</span>                        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/apiv$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/spatial_reference$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/vertical_datum_cv$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
+                        <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/apiv$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span>
                         <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>voeis/data_value$retrieve</span><span class='tstring_end'>&quot;</span></span><span class='rbracket'>]</span> <span class='kw'>unless</span> <span class='kw'>self</span><span class='period'>.</span><span class='id is_private?'>is_private?</span>
     <span class='kw'>return</span> <span class='id base_permission'>base_permission</span> <span class='kw'>if</span> <span class='id user'>user</span><span class='period'>.</span><span class='id nil?'>nil?</span>
     <span class='lparen'>(</span><span class='kw'>super</span> <span class='op'>+</span> <span class='id base_permission'>base_permission</span> <span class='op'>+</span> <span class='id user'>user</span><span class='period'>.</span><span class='id memberships'>memberships</span><span class='lparen'>(</span><span class='symbol'>:project_id</span> <span class='op'>=&gt;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id id'>id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id roles'>roles</span><span class='period'>.</span><span class='id map'>map</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id r'>r</span><span class='op'>|</span> <span class='id r'>r</span><span class='period'>.</span><span class='id actions'>actions</span> <span class='rbrace'>}</span><span class='rparen'>)</span><span class='period'>.</span><span class='id flatten'>flatten</span><span class='period'>.</span><span class='id uniq'>uniq</span>
@@ -879,7 +879,7 @@ fetch all variables from the Projects
 </div>
     
     <div id="footer">
-  Generated on Tue Nov  8 12:48:34 2011 by 
+  Generated on Tue Nov 22 13:39:04 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

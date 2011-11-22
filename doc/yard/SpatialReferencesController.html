@@ -352,10 +352,6 @@ GLOBAL: POST /SpatialReference
       <pre class="lines">
 
 
-15
-16
-17
-18
 19
 20
 21
@@ -370,10 +366,14 @@ GLOBAL: POST /SpatialReference
 30
 31
 32
-33</pre>
+33
+34
+35
+36
+37</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='id create'>create</span>
   <span class='ivar'>@spatial_reference</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id new'>new</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:spatial_reference</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -423,10 +423,6 @@ GLOBAL: DELETE /SpatialReference
       <pre class="lines">
 
 
-87
-88
-89
-90
 91
 92
 93
@@ -451,10 +447,14 @@ GLOBAL: DELETE /SpatialReference
 112
 113
 114
-115</pre>
+115
+116
+117
+118
+119</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 87</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 91</span>
 
 <span class='kw'>def</span> <span class='id destroy'>destroy</span>
   <span class='id spatial_reference'>spatial_reference</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -514,10 +514,6 @@ GLOBAL: List SpatialReference entries
       <pre class="lines">
 
 
-61
-62
-63
-64
 65
 66
 67
@@ -533,10 +529,14 @@ GLOBAL: List SpatialReference entries
 77
 78
 79
-80</pre>
+80
+81
+82
+83
+84</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 61</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 65</span>
 
 <span class='kw'>def</span> <span class='id index'>index</span>
   <span class='kw'>if</span> <span class='const'>User</span><span class='period'>.</span><span class='id current'>current</span><span class='period'>.</span><span class='id nil?'>nil?</span> <span class='op'>||</span> <span class='const'>User</span><span class='period'>.</span><span class='id current'>current</span><span class='period'>.</span><span class='id system_role'>system_role</span><span class='period'>.</span><span class='id name'>name</span><span class='op'>!=</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Administrator</span><span class='tstring_end'>'</span></span>
@@ -576,12 +576,12 @@ GLOBAL: List SpatialReference entries
       <pre class="lines">
 
 
-122
-123
-124</pre>
+161
+162
+163</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 122</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 161</span>
 
 <span class='kw'>def</span> <span class='id invalid_page'>invalid_page</span>
   <span class='id redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='symbol'>:back</span><span class='rparen'>)</span>
@@ -615,16 +615,16 @@ GLOBAL: GET /SpatialReference/new
       <pre class="lines">
 
 
-6
-7
-8
-9
 10
 11
-12</pre>
+12
+13
+14
+15
+16</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 6</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 10</span>
 
 <span class='kw'>def</span> <span class='id new'>new</span>
   <span class='ivar'>@spatial_reference</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id new'>new</span>
@@ -651,12 +651,12 @@ GLOBAL: GET /SpatialReference/new
       <pre class="lines">
 
 
-82
-83
-84</pre>
+86
+87
+88</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 82</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 86</span>
 
 <span class='kw'>def</span> <span class='id show'>show</span>
   
@@ -690,10 +690,6 @@ GLOBAL: PUT /SpatialReference
       <pre class="lines">
 
 
-36
-37
-38
-39
 40
 41
 42
@@ -712,10 +708,14 @@ GLOBAL: PUT /SpatialReference
 55
 56
 57
-58</pre>
+58
+59
+60
+61
+62</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 36</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 40</span>
 
 <span class='kw'>def</span> <span class='id update'>update</span>
   <span class='id spatial_reference'>spatial_reference</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:spatial_reference</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -769,14 +769,84 @@ HISTORY!
       <pre class="lines">
 
 
-118
-119
-120</pre>
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 118</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/spatial_references_controller.rb', line 122</span>
 
 <span class='kw'>def</span> <span class='id versions'>versions</span>
+  <span class='comment'>### GLOBAL SPATIAL REFERENCE HISTORY
+</span>  <span class='ivar'>@global</span> <span class='op'>=</span> <span class='kw'>true</span>
+  <span class='ivar'>@cv_item</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
+  <span class='ivar'>@cv_versions</span> <span class='op'>=</span> <span class='ivar'>@cv_item</span><span class='period'>.</span><span class='id versions'>versions</span>
+  <span class='ivar'>@cv_title</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Spatial Reference</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_title2</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>spatial_reference</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_term</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>srs_name</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_name</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>srs_name</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_id</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>id</span><span class='tstring_end'>'</span></span>
+  
+  <span class='ivar'>@cv_refs</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id temp'>temp</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:is_geo_string</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@cv_item</span><span class='period'>.</span><span class='id is_geographic'>is_geographic</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>True</span><span class='tstring_end'>'</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>False</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_refs</span> <span class='op'>&lt;&lt;</span> <span class='id temp'>temp</span>
+  <span class='ivar'>@cv_versions</span><span class='period'>.</span><span class='id each'>each</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id ver'>ver</span><span class='op'>|</span> 
+    <span class='id temp'>temp</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:is_geo_string</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@cv_item</span><span class='period'>.</span><span class='id is_geographic'>is_geographic</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>True</span><span class='tstring_end'>'</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>False</span><span class='tstring_end'>'</span></span>
+    <span class='ivar'>@cv_refs</span> <span class='op'>&lt;&lt;</span> <span class='id temp'>temp</span>
+  <span class='rbrace'>}</span>
+  
+  <span class='ivar'>@cv_properties</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+<span class='comment'>#      {:label=&gt;&quot;Version&quot;, :name=&gt;&quot;version&quot;},
+</span><span class='comment'>#      {:label=&gt;&quot;ID&quot;, :name=&gt;&quot;id&quot;},
+</span>    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Source Name</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>srs_name</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Source ID</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>srs_id</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Gergraphic</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>is_geo_string</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Notes</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>notes</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
+    <span class='rbracket'>]</span>
+  
+  <span class='ivar'>@cv_columns</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='lbrace'>{</span><span class='symbol'>:field</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>ID</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:width</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>5%</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:filterable</span><span class='op'>=&gt;</span><span class='kw'>false</span><span class='comma'>,</span> <span class='symbol'>:formatter</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:style</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
+                <span class='lbrace'>{</span><span class='symbol'>:field</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>srs_name</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Source Name</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:width</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>15%</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:filterable</span><span class='op'>=&gt;</span><span class='kw'>true</span><span class='comma'>,</span> <span class='symbol'>:formatter</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:style</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
+                <span class='lbrace'>{</span><span class='symbol'>:field</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>srs_id</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Source ID</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:width</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>10%</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:filterable</span><span class='op'>=&gt;</span><span class='kw'>true</span><span class='comma'>,</span> <span class='symbol'>:formatter</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:style</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
+                <span class='lbrace'>{</span><span class='symbol'>:field</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>is_geographic</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>GEO</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:width</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>5%</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:filterable</span><span class='op'>=&gt;</span><span class='kw'>true</span><span class='comma'>,</span> <span class='symbol'>:formatter</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>trueFalse</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:style</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
+                <span class='lbrace'>{</span><span class='symbol'>:field</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>notes</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Notes</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:width</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:filterable</span><span class='op'>=&gt;</span><span class='kw'>true</span><span class='comma'>,</span> <span class='symbol'>:formatter</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:style</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
+                <span class='lbrace'>{</span><span class='symbol'>:field</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>updated_at</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Updated</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:width</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>15%</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:filterable</span><span class='op'>=&gt;</span><span class='kw'>true</span><span class='comma'>,</span> <span class='symbol'>:formatter</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>dateTime</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:style</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='rbracket'>]</span>
   
 <span class='kw'>end</span></pre>
     </td>
@@ -789,7 +859,7 @@ HISTORY!
 </div>
     
     <div id="footer">
-  Generated on Tue Nov  8 12:48:39 2011 by 
+  Generated on Tue Nov 22 13:39:10 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

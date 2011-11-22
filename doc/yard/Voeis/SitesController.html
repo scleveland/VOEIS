@@ -308,12 +308,12 @@ site_samples  Returns the samples for a given site.
       <pre class="lines">
 
 
-299
-300
-301</pre>
+277
+278
+279</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 299</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 277</span>
 
 <span class='kw'>def</span> <span class='id add_site'>add_site</span>
   <span class='ivar'>@sites</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id all'>all</span>
@@ -336,6 +336,28 @@ site_samples  Returns the samples for a given site.
       <pre class="lines">
 
 
+219
+220
+221
+222
+223
+224
+225
+226
+227
+228
+229
+230
+231
+232
+233
+234
+235
+236
+237
+238
+239
+240
 241
 242
 243
@@ -370,32 +392,10 @@ site_samples  Returns the samples for a given site.
 272
 273
 274
-275
-276
-277
-278
-279
-280
-281
-282
-283
-284
-285
-286
-287
-288
-289
-290
-291
-292
-293
-294
-295
-296
-297</pre>
+275</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 241</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 219</span>
 
 <span class='kw'>def</span> <span class='id create'>create</span>
   <span class='ivar'>@project</span> <span class='op'>=</span> <span class='id parent'>parent</span>
@@ -472,12 +472,12 @@ site_samples  Returns the samples for a given site.
       <pre class="lines">
 
 
-183
-184
-185</pre>
+161
+162
+163</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 183</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 161</span>
 
 <span class='kw'>def</span> <span class='id edit'>edit</span>
   <span class='ivar'>@site</span> <span class='op'>=</span>  <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='rbrace'>}</span>
@@ -550,29 +550,29 @@ site_samples  Returns the samples for a given site.
       <pre class="lines">
 
 
-303
-304
-305
-306
-307
-308
-309
-310
-311
-312
-313
-314
-315
-316
-317
-318
-319
-320
-321
-322</pre>
+281
+282
+283
+284
+285
+286
+287
+288
+289
+290
+291
+292
+293
+294
+295
+296
+297
+298
+299
+300</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 303</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 281</span>
 
 <span class='kw'>def</span> <span class='id save_site'>save_site</span>
   <span class='id sys_site'>sys_site</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:site</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -835,22 +835,22 @@ Sean Cleveland
       <pre class="lines">
 
 
-337
-338
-339
-340
-341
-342
-343
-344
-345
-346
-347
-348
-349</pre>
+315
+316
+317
+318
+319
+320
+321
+322
+323
+324
+325
+326
+327</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 337</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 315</span>
 
 <span class='kw'>def</span> <span class='id site_samples'>site_samples</span>
   <span class='ivar'>@samples</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id new'>new</span>
@@ -883,6 +883,28 @@ Sean Cleveland
       <pre class="lines">
 
 
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
 187
 188
 189
@@ -913,32 +935,10 @@ Sean Cleveland
 214
 215
 216
-217
-218
-219
-220
-221
-222
-223
-224
-225
-226
-227
-228
-229
-230
-231
-232
-233
-234
-235
-236
-237
-238
-239</pre>
+217</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 187</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 165</span>
 
 <span class='kw'>def</span> <span class='id update'>update</span>
   <span class='comment'># This should be handled by the framework, but isn't when using jruby.
@@ -1073,29 +1073,7 @@ Sean Cleveland
 156
 157
 158
-159
-160
-161
-162
-163
-164
-165
-166
-167
-168
-169
-170
-171
-172
-173
-174
-175
-176
-177
-178
-179
-180
-181</pre>
+159</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 97</span>
@@ -1104,19 +1082,9 @@ Sean Cleveland
   <span class='ivar'>@project</span> <span class='op'>=</span> <span class='id parent'>parent</span>
   <span class='ivar'>@site</span> <span class='op'>=</span>  <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='rbrace'>}</span>
   <span class='ivar'>@versions</span> <span class='op'>=</span> <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id versions'>versions</span><span class='rbrace'>}</span>
-  <span class='ivar'>@versions_ref</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-  <span class='ivar'>@versions_sites</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
-  <span class='id version_number'>version_number</span> <span class='op'>=</span> <span class='ivar'>@versions</span><span class='period'>.</span><span class='id count'>count</span>
+  
+  <span class='ivar'>@site_refs</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='id temp'>temp</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
-  <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:version</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='int'>0</span>
-  <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:version_ttl</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Current</span><span class='tstring_end'>'</span></span>
-  <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:version_id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>%s-site%s-ver000</span><span class='tstring_end'>'</span></span><span class='op'>%</span><span class='lbracket'>[</span><span class='ivar'>@project</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span><span class='ivar'>@site</span><span class='period'>.</span><span class='id id'>id</span><span class='rbracket'>]</span>
-  <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:version_ts</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id updated_at'>updated_at</span><span class='period'>.</span><span class='id strftime'>strftime</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>%Y-%m-%d %H:%M:%S</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
-  <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:updated_comment</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id updated_comment'>updated_comment</span>
-  <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:provenance_comment</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id provenance_comment'>provenance_comment</span>
-  <span class='ivar'>@versions_ref</span> <span class='op'>&lt;&lt;</span> <span class='id temp'>temp</span>
-  <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:dirty</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id get_dirty'>get_dirty</span>
-  <span class='ivar'>@versions</span><span class='period'>.</span><span class='id properties'>properties</span><span class='period'>.</span><span class='id each'>each</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id prop'>prop</span><span class='op'>|</span> <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@site</span><span class='lbracket'>[</span><span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='rbracket'>]</span><span class='rbrace'>}</span>
   <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:lat_long_datum</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>-none-</span><span class='tstring_end'>'</span></span>
   <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:vertical_datum</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>-none-</span><span class='tstring_end'>'</span></span>
   <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:local_projection</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>-none-</span><span class='tstring_end'>'</span></span>
@@ -1129,20 +1097,9 @@ Sean Cleveland
   <span class='kw'>if</span> <span class='op'>!</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='ivar'>@site</span><span class='period'>.</span><span class='id local_projection_id'>local_projection_id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id nil?'>nil?</span>
     <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:local_projection</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='ivar'>@site</span><span class='period'>.</span><span class='id local_projection_id'>local_projection_id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id srs_name'>srs_name</span>
   <span class='kw'>end</span>
-  <span class='id upd_user'>upd_user</span> <span class='op'>=</span> <span class='const'>User</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='ivar'>@site</span><span class='period'>.</span><span class='id updated_by'>updated_by</span><span class='rparen'>)</span>
-  <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:updated_by_name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id upd_user'>upd_user</span><span class='period'>.</span><span class='id nil?'>nil?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>-</span><span class='tstring_end'>'</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>%s (%s)</span><span class='tstring_end'>'</span></span><span class='op'>%</span><span class='lbracket'>[</span><span class='id upd_user'>upd_user</span><span class='period'>.</span><span class='id name'>name</span><span class='comma'>,</span><span class='id upd_user'>upd_user</span><span class='period'>.</span><span class='id login'>login</span><span class='rbracket'>]</span>
-  <span class='ivar'>@versions_sites</span> <span class='op'>&lt;&lt;</span> <span class='id temp'>temp</span>
-  <span class='ivar'>@versions</span><span class='period'>.</span><span class='id each'>each</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id ver'>ver</span><span class='op'>|</span>
+  <span class='ivar'>@site_refs</span> <span class='op'>&lt;&lt;</span> <span class='id temp'>temp</span>
+  <span class='ivar'>@versions</span><span class='period'>.</span><span class='id each'>each</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id ver'>ver</span><span class='op'>|</span> 
     <span class='id temp'>temp</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
-    <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:version</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id version_number'>version_number</span>
-    <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:version_ttl</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Version %s</span><span class='tstring_end'>'</span></span><span class='op'>%</span><span class='id version_number'>version_number</span>
-    <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:version_id</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>%s-site%s-ver%03d</span><span class='tstring_end'>'</span></span><span class='op'>%</span><span class='lbracket'>[</span><span class='ivar'>@project</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span><span class='ivar'>@site</span><span class='period'>.</span><span class='id id'>id</span><span class='comma'>,</span><span class='id version_number'>version_number</span><span class='rbracket'>]</span>
-    <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:version_ts</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id ver'>ver</span><span class='period'>.</span><span class='id updated_at'>updated_at</span><span class='period'>.</span><span class='id strftime'>strftime</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>%Y-%m-%d %H:%M:%S</span><span class='tstring_end'>'</span></span><span class='rparen'>)</span>
-    <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:updated_comment</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id ver'>ver</span><span class='period'>.</span><span class='id updated_comment'>updated_comment</span>
-    <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:provenance_comment</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id ver'>ver</span><span class='period'>.</span><span class='id provenance_comment'>provenance_comment</span>
-    <span class='ivar'>@versions_ref</span> <span class='op'>&lt;&lt;</span> <span class='id temp'>temp</span>
-    <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:dirty</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@site</span><span class='period'>.</span><span class='id get_dirty'>get_dirty</span><span class='lparen'>(</span><span class='id ver'>ver</span><span class='period'>.</span><span class='id updated_comment'>updated_comment</span><span class='rparen'>)</span>
-    <span class='ivar'>@versions</span><span class='period'>.</span><span class='id properties'>properties</span><span class='period'>.</span><span class='id each'>each</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id prop'>prop</span><span class='op'>|</span> <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id ver'>ver</span><span class='lbracket'>[</span><span class='id prop'>prop</span><span class='period'>.</span><span class='id name'>name</span><span class='rbracket'>]</span><span class='rbrace'>}</span>
     <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:lat_long_datum</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>-none-</span><span class='tstring_end'>'</span></span>
     <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:vertical_datum</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>-none-</span><span class='tstring_end'>'</span></span>
     <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:local_projection</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>-none-</span><span class='tstring_end'>'</span></span>
@@ -1155,11 +1112,9 @@ Sean Cleveland
     <span class='kw'>if</span> <span class='op'>!</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id ver'>ver</span><span class='period'>.</span><span class='id local_projection_id'>local_projection_id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id nil?'>nil?</span>
       <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:local_projection</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id ver'>ver</span><span class='period'>.</span><span class='id local_projection_id'>local_projection_id</span><span class='rparen'>)</span><span class='period'>.</span><span class='id srs_name'>srs_name</span>
     <span class='kw'>end</span>
-    <span class='id upd_user'>upd_user</span> <span class='op'>=</span> <span class='const'>User</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id ver'>ver</span><span class='period'>.</span><span class='id updated_by'>updated_by</span><span class='rparen'>)</span>
-    <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:updated_by_name</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id upd_user'>upd_user</span><span class='period'>.</span><span class='id nil?'>nil?</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>-</span><span class='tstring_end'>'</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>%s (%s)</span><span class='tstring_end'>'</span></span><span class='op'>%</span><span class='lbracket'>[</span><span class='id upd_user'>upd_user</span><span class='period'>.</span><span class='id name'>name</span><span class='comma'>,</span><span class='id upd_user'>upd_user</span><span class='period'>.</span><span class='id login'>login</span><span class='rbracket'>]</span>
-    <span class='id version_number'>version_number</span><span class='op'>-=</span><span class='int'>1</span>
-    <span class='ivar'>@versions_sites</span> <span class='op'>&lt;&lt;</span> <span class='id temp'>temp</span>
+    <span class='ivar'>@site_refs</span> <span class='op'>&lt;&lt;</span> <span class='id temp'>temp</span>
   <span class='rbrace'>}</span>
+
   <span class='ivar'>@ver_properties</span> <span class='op'>=</span> <span class='lbracket'>[</span>
 <span class='comment'>#      {:label=&gt;&quot;Version&quot;, :name=&gt;&quot;version&quot;},
 </span><span class='comment'>#      {:label=&gt;&quot;Site ID&quot;, :name=&gt;&quot;id&quot;},
@@ -1178,12 +1133,13 @@ Sean Cleveland
     <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>County</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>county</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Description</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>description</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
     <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Comments</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>comments</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HIS ID</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>his_id</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Updated By</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>updated_by_name</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Update Comment</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>updated_comment</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Provenance Comment</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>provenance_comment</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
-    <span class='rbracket'>]</span>
+    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>HIS ID</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>his_id</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
+<span class='comment'>#      {:label=&gt;&quot;Updated By&quot;, :name=&gt;&quot;updated_by_name&quot;},
+</span><span class='comment'>#      {:label=&gt;&quot;Update Comment&quot;, :name=&gt;&quot;updated_comment&quot;},
+</span><span class='comment'>#      {:label=&gt;&quot;Provenance Comment&quot;, :name=&gt;&quot;provenance_comment&quot;}
+</span>    <span class='rbracket'>]</span>
   <span class='comment'>###
+</span>  <span class='comment'>#render 'versions2.html.haml'
 </span><span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -1195,7 +1151,7 @@ Sean Cleveland
 </div>
     
     <div id="footer">
-  Generated on Tue Nov  8 12:48:37 2011 by 
+  Generated on Tue Nov 22 13:39:08 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

@@ -313,10 +313,6 @@ LOCAL: POST /SpatialReference
       <pre class="lines">
 
 
-15
-16
-17
-18
 19
 20
 21
@@ -361,10 +357,14 @@ LOCAL: POST /SpatialReference
 60
 61
 62
-63</pre>
+63
+64
+65
+66
+67</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 15</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 19</span>
 
 <span class='kw'>def</span> <span class='id create'>create</span>
   <span class='comment'>#@spatial_reference = parent.managed_repository{Voeis::SpatialReference.new(params[:spatial_reference])}
@@ -444,10 +444,6 @@ LOCAL: DELETE /SpatialReference
       <pre class="lines">
 
 
-134
-135
-136
-137
 138
 139
 140
@@ -477,10 +473,14 @@ LOCAL: DELETE /SpatialReference
 164
 165
 166
-167</pre>
+167
+168
+169
+170
+171</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 134</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 138</span>
 
 <span class='kw'>def</span> <span class='id destroy'>destroy</span>
   <span class='id spatial_reference'>spatial_reference</span> <span class='op'>=</span> <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='rbrace'>}</span>
@@ -545,10 +545,6 @@ LOCAL: List SpatialReference entries
       <pre class="lines">
 
 
-90
-91
-92
-93
 94
 95
 96
@@ -581,10 +577,14 @@ LOCAL: List SpatialReference entries
 123
 124
 125
-126</pre>
+126
+127
+128
+129
+130</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 90</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 94</span>
 
 <span class='kw'>def</span> <span class='id index'>index</span>
   <span class='comment'>### LOCAL SPATIAL REFERENCE
@@ -641,12 +641,12 @@ LOCAL: List SpatialReference entries
       <pre class="lines">
 
 
-174
-175
-176</pre>
+209
+210
+211</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 174</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 209</span>
 
 <span class='kw'>def</span> <span class='id invalid_page'>invalid_page</span>
   <span class='id redirect_to'>redirect_to</span><span class='lparen'>(</span><span class='symbol'>:back</span><span class='rparen'>)</span>
@@ -680,16 +680,16 @@ LOCAL: GET /SpatialReference/new
       <pre class="lines">
 
 
-6
-7
-8
-9
 10
 11
-12</pre>
+12
+13
+14
+15
+16</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 6</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 10</span>
 
 <span class='kw'>def</span> <span class='id new'>new</span>
   <span class='ivar'>@spatial_reference</span> <span class='op'>=</span> <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id new'>new</span><span class='rbrace'>}</span>
@@ -716,12 +716,12 @@ LOCAL: GET /SpatialReference/new
       <pre class="lines">
 
 
-129
-130
-131</pre>
+133
+134
+135</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 129</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 133</span>
 
 <span class='kw'>def</span> <span class='id show'>show</span>
   
@@ -755,10 +755,6 @@ LOCAL: PUT /SpatialReference
       <pre class="lines">
 
 
-66
-67
-68
-69
 70
 71
 72
@@ -776,10 +772,14 @@ LOCAL: PUT /SpatialReference
 84
 85
 86
-87</pre>
+87
+88
+89
+90
+91</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 66</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 70</span>
 
 <span class='kw'>def</span> <span class='id update'>update</span>
   <span class='id spatial_reference'>spatial_reference</span> <span class='op'>=</span> <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:spatial_reference</span><span class='rbracket'>]</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='rbrace'>}</span>
@@ -832,15 +832,77 @@ HISTORY!
       <pre class="lines">
 
 
-170
-171
-172</pre>
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+206
+207</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 170</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/spatial_references_controller.rb', line 174</span>
 
 <span class='kw'>def</span> <span class='id versions'>versions</span>
+  <span class='comment'>### LOCAL SPATIAL REFERENCE HISTORY
+</span>  <span class='ivar'>@global</span> <span class='op'>=</span> <span class='kw'>false</span>
+  <span class='ivar'>@project</span> <span class='op'>=</span> <span class='id parent'>parent</span>
+  <span class='ivar'>@cv_item</span> <span class='op'>=</span> <span class='ivar'>@project</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>SpatialReference</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='rbrace'>}</span>
+  <span class='comment'>#@cv_versions = @project.managed_repository{Voeis::SpatialReference.get(params[:id]).versions}
+</span>  <span class='ivar'>@cv_versions</span> <span class='op'>=</span> <span class='ivar'>@cv_item</span><span class='period'>.</span><span class='id versions'>versions</span>
+  <span class='ivar'>@cv_title</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Spatial Reference</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_title2</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>spatial_reference</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_term</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>srs_name</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_name</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>srs_name</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_id</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>id</span><span class='tstring_end'>'</span></span>
+
+  <span class='ivar'>@cv_refs</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='id temp'>temp</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+  <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:is_geo_string</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@cv_item</span><span class='period'>.</span><span class='id is_geographic'>is_geographic</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>True</span><span class='tstring_end'>'</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>False</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_refs</span> <span class='op'>&lt;&lt;</span> <span class='id temp'>temp</span>
+  <span class='ivar'>@cv_versions</span><span class='period'>.</span><span class='id each'>each</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id ver'>ver</span><span class='op'>|</span> 
+    <span class='id temp'>temp</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
+    <span class='id temp'>temp</span><span class='lbracket'>[</span><span class='symbol'>:is_geo_string</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='ivar'>@cv_item</span><span class='period'>.</span><span class='id is_geographic'>is_geographic</span> <span class='op'>?</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>True</span><span class='tstring_end'>'</span></span> <span class='op'>:</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>False</span><span class='tstring_end'>'</span></span>
+    <span class='ivar'>@cv_refs</span> <span class='op'>&lt;&lt;</span> <span class='id temp'>temp</span>
+  <span class='rbrace'>}</span>
+
+  <span class='ivar'>@cv_properties</span> <span class='op'>=</span> <span class='lbracket'>[</span>
+<span class='comment'>#      {:label=&gt;&quot;Version&quot;, :name=&gt;&quot;version&quot;},
+</span><span class='comment'>#      {:label=&gt;&quot;ID&quot;, :name=&gt;&quot;id&quot;},
+</span>    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Source Name</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>srs_name</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Source ID</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>srs_id</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Gergraphic</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>is_geo_string</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
+    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Notes</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>notes</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
+    <span class='rbracket'>]</span>
   
+  <span class='id render'>render</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>spatial_references/versions.html.haml</span><span class='tstring_end'>'</span></span>
 <span class='kw'>end</span></pre>
     </td>
   </tr>
@@ -852,7 +914,7 @@ HISTORY!
 </div>
     
     <div id="footer">
-  Generated on Tue Nov  8 12:48:40 2011 by 
+  Generated on Tue Nov 22 13:39:11 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>
