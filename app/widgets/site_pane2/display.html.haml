@@ -151,6 +151,7 @@
   %div
     %h4{:style=>"margin-top:0;"}
       Existing Samples
+
     -##all_variables-site00{:style=>"$$$export-style$$$"}
     -#  = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
     -#    = hidden_field_tag('column_array', @sample_labels.to_json)
@@ -158,7 +159,8 @@
     -#    = hidden_field_tag('file_name', "project_samples")
     -#    = submit_tag("Export Samples")
     -#  %br
-    -#  %br    
+    -#  %br
+
     %table{:id=>"site00-sample-table", :style=>"width:45%;"} 
       %tr{:class=>"row-gr"}
         - @sample_properties.each do |prop|

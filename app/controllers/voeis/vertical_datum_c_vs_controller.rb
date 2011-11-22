@@ -165,24 +165,24 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
     ### LOCAL VERTICAL DATUM HISTORY
     @global = false
     @project = parent
-    @cv_item = @project.managed_repository{Voeis::VerticalDatumCV.get(params[:id])}
-    @cv_versions = @project.managed_repository{Voeis::VerticalDatumCV.get(params[:id]).versions}
-    #@cv_versions = @cv_item.versions
-    @cv_title = 'Vertical Datum'
-    @cv_title2 = 'vertical_datum'
-    @cv_term = 'term'
-    @cv_name = 'term'
-    @cv_id = 'id'
+    @project.managed_repository{
+      @cv_item = Voeis::VerticalDatumCV.get(params[:id])
+      @cv_versions = @cv_item.versions
+      @cv_title = 'Vertical Datum'
+      @cv_title2 = 'vertical_datum'
+      @cv_term = 'term'
+      @cv_name = 'term'
+      @cv_id = 'id'
 
-    @cv_refs = []
+      @cv_refs = []
 
-    @cv_properties = [
-#      {:label=>"Version", :name=>"version"},
-#      {:label=>"ID", :name=>"id"},
-      {:label=>"Term", :name=>"term"},
-      {:label=>"Definition", :name=>"definition"}
-      ]
-    
+      @cv_properties = [
+        #{:label=>"Version", :name=>"version"},
+        #{:label=>"ID", :name=>"id"},
+        {:label=>"Term", :name=>"term"},
+        {:label=>"Definition", :name=>"definition"}
+        ]
+    }
     render 'spatial_references/versions.html.haml'
   end
 

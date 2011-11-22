@@ -16,7 +16,6 @@ class VersionsWidget < Apotomo::Widget
     #@auth = !@current_user.nil? && @current_user.projects.include?(@project)
     #@root_url = options[:root_url]
     #@id = UUIDTools::UUID.timestamp_create
-    skip_prop = [:deleted_at]
     ####
     #@project = parent
     #@site =  parent.managed_repository{Voeis::Site.get(params[:id])}
@@ -25,6 +24,9 @@ class VersionsWidget < Apotomo::Widget
     @versions_ref = []
     @versions_items = []
     version_number = @versions.count
+    #ignore listed properties
+    #props = @versions.properties.to_a - [:deleted_at]
+    props = @item.class.properties.to_a - [:id,:deleted_at]
     temp = {}
     temp[:version] = 0
     temp[:version_ttl] = 'Current'
@@ -34,7 +36,7 @@ class VersionsWidget < Apotomo::Widget
     temp[:provenance_comment] = @item.provenance_comment
     @versions_ref << temp
     temp[:dirty] = @item.get_dirty
-    @versions.properties.each{|prop| temp[prop.name] = @item[prop.name] unless skip_prop.include?(prop.name)}
+    props.each{|prop| temp[prop.name] = @item[prop.name]}
     refs = @item_refs.shift
     refs.each{|k,v| temp[k] = v} unless refs.nil?
     upd_user = User.get(@item.updated_by)
@@ -50,7 +52,7 @@ class VersionsWidget < Apotomo::Widget
       temp[:provenance_comment] = ver.provenance_comment
       @versions_ref << temp
       temp[:dirty] = @item.get_dirty(ver.updated_comment)
-      @versions.properties.each{|prop| temp[prop.name] = ver[prop.name] unless skip_prop.include?(prop.name)}
+      props.each{|prop| temp[prop.name] = ver[prop.name]}
       refs = @item_refs.shift
       refs.each{|k,v| temp[k] = v} unless refs.nil?
       upd_user = User.get(ver.updated_by)
