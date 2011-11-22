@@ -606,6 +606,53 @@ module Odhelper
     end
   end
   
+  def set_local_variable_id_to_global(project)
+    puts project.name
+    variables = Voeis::Variable.all
+    project.managed_repository do
+      Voeis::Variable.all.each do |var|
+        begin
+          old_id = var.id
+          puts old_id
+          g_var = variables.first(:variable_code => var.variable_code)
+          puts g_var.id
+          if g_var.nil?
+            puts "Oh no can't find code!"
+          elsif old_id == g_var.id
+            puts "Oh I'm already Done with that Variable"
+          else
+            new_id = g_var.id
+            # begin
+              var.attributes = g_var.attributes
+              var.id = g_var.id
+              var.save!
+            # rescue Exception => e  
+            #   puts var.variable_name + ':' + var.variable_code+ ":" +var.id.to_s+'|'+old_id.to_s+" - - did not want to save - continueing as if it did in case one variable has been assigned multiple times! #{e.message}"
+            # end
+            sql = "UPDATE voeis_data_stream_column_variables SET variable_id = #{new_id.to_s} WHERE variable_id = #{old_id.to_s}"
+            repository.adapter.execute(sql)
+            sql = "UPDATE voeis_data_value_variables SET variable_id = #{new_id.to_s} WHERE variable_id = #{old_id.to_s}"
+            repository.adapter.execute(sql)
+            sql = "UPDATE voeis_data_values SET variable_id = #{new_id.to_s} WHERE variable_id = #{old_id.to_s}"
+            repository.adapter.execute(sql)
+            sql = "UPDATE voeis_site_variables SET variable_id = #{new_id.to_s} WHERE variable_id = #{old_id.to_s}"
+            repository.adapter.execute(sql)
+            sql = "UPDATE voeis_sample_variables SET variable_id = #{new_id.to_s} WHERE variable_id = #{old_id.to_s}"
+            repository.adapter.execute(sql)
+            sql = "UPDATE voeis_site_data_catalogs SET variable_id = #{new_id.to_s} WHERE variable_id = #{old_id.to_s}"
+            repository.adapter.execute(sql)
+            sql = "UPDATE voeis_unit_variables SET variable_id = #{new_id.to_s} WHERE variable_id = #{old_id.to_s}"
+            repository.adapter.execute(sql)
+            sql = "UPDATE voeis_sensor_type_variables SET variable_id = #{new_id.to_s} WHERE variable_id = #{old_id.to_s}"
+            repository.adapter.execute(sql)
+          end
+        rescue Exception => e  
+          puts var.variable_name + ": did not want to save! #{e.message}"
+        end
+      end
+    end
+  end
+  
   def set_variable_quality_control(project)
     puts project.name
     project.managed_repository do
