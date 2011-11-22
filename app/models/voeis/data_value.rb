@@ -125,7 +125,7 @@ class Voeis::DataValue
     user_id = User.current.id
     create_comment = "Created at #{created_at} by #{User.current.first_name} #{User.current.last_name} [#{User.current.login}]"
     rows = CSV.read(csv_file)
-    results = Array.new
+    results = Hash.new
     total_results = Array.new
     total_records = 0
     skipped_rows = 0
@@ -143,11 +143,15 @@ class Voeis::DataValue
           Rails.logger.info '#{row.join(', ')}'
           #puts row.join(', ')
             results = parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id)
-            if results.empty?
+            
+            if results[:result_ids].empty?
               skipped_rows += 1
+              unless results[:errors].empty?
+                errors = errors + " | " + results[:errors]
+              end
             else
-              total_records = total_records + results.length
-              total_results << results
+              total_records = total_records + results[:result_ids].length
+              total_results << results[:result_ids]
             end
           else 
             #puts "EMPTY ROW"
@@ -190,23 +194,24 @@ class Voeis::DataValue
     variable = 0
     sensor = 0
     unit = 1
+    errors = ""
     result_ids = Array.new
-    
+    begin
     #Voeis::SensorValue.transaction do
     #timestamp = (data_timestamp_col == "") ? Time.parse(row[date_col].to_s + ' ' + row[time_col].to_s).strftime("%Y-%m-%dT%H:%M:%S%z") : row[data_timestamp_col.to_i]
     vertical_offset = vertical_offset_col == "" ? 0.0 : row[vertical_offset_col.to_i].to_f
     end_vertical_offset = end_vertical_offset_col == "" ? 0.0 : row[end_vertical_offset_col.to_i].to_f
     data_stream = Voeis::DataStream.get(data_stream_id)
-    # if DateTime.parse(row[data_timestamp_col])
-    #       sample_datetime = DateTime.parse(row[data_timestamp_col])
-    #     else
+    if DateTime.parse(row[data_timestamp_col])
+      sample_datetime = DateTime.parse(row[data_timestamp_col])
+    else
       sample_datetime = Chronic.parse(row[data_timestamp_col]).to_datetime
-    # end
+    end
     # timestamp = DateTime.civil(sample_datetime.year,sample_datetime.month,
     #                sample_datetime.day,sample_datetime.hour,sample_datetime.min,
     #                sample_datetime.sec, (data_stream.utc_offset+dst_time)/24.to_r)
     timestamp = sample_datetime.change(:offset => "#{(data_stream.utc_offset+dst_time)}:00")
-    debugger
+    
     #if t = Date.parse(timestamp) rescue nil?
     #if (Voeis::DataValue.first(:local_date_time => timestamp) & 
     if Voeis::DataValue.first(:datatype=>data_stream.type, :local_date_time=>timestamp, :site_id=> site_id, :variable_id => data_col_array[variable_cols[0]][variable].id).nil?
@@ -277,7 +282,10 @@ class Voeis::DataValue
         end#end if
 
     end
-    return result_ids
+    rescue Exception => e
+      errors = "Row: #{row} - - did not store correclty.  ERROR:#{e}"
+    end
+    return {:result_ids => result_ids, :errors => errors}
   end
   
 end
