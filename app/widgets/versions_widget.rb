@@ -29,8 +29,8 @@ class VersionsWidget < Apotomo::Widget
     props = @item.class.properties.to_a - [:id,:deleted_at]
     temp = {}
     temp[:version] = 0
-    temp[:version_ttl] = 'Current'
-    temp[:version_id] = '%s-ver000'%[@unique_id]
+    temp[:version_ttl] = "Current"
+    temp[:version_id] = "%s-ver000"%@unique_id
     temp[:version_ts] = @item.updated_at.strftime('%Y-%m-%d %H:%M:%S')
     temp[:updated_comment] = @item.updated_comment
     temp[:provenance_comment] = @item.provenance_comment
@@ -40,13 +40,14 @@ class VersionsWidget < Apotomo::Widget
     refs = @item_refs.shift
     refs.each{|k,v| temp[k] = v} unless refs.nil?
     upd_user = User.get(@item.updated_by)
-    temp[:updated_by_name] = upd_user.nil? ? '-' : '%s (%s)'%[upd_user.name,upd_user.login]
+    temp[:updated_by_name] = upd_user.nil? ? "-" : "%s (%s)"%[upd_user.name,upd_user.login]
     @versions_items << temp
-    @versions.each{|ver|
+    @versions.each{|ver0|
+      ver = ver0.to_model
       temp = {}
       temp[:version] = version_number
-      temp[:version_ttl] = 'Version %s'%version_number
-      temp[:version_id] = '%s-ver%03d'%[@unique_id,version_number]
+      temp[:version_ttl] = "Version %s"%version_number
+      temp[:version_id] = "%s-ver%03d"%[@unique_id,version_number]
       temp[:version_ts] = ver.updated_at.strftime('%Y-%m-%d %H:%M:%S')
       temp[:updated_comment] = ver.updated_comment
       temp[:provenance_comment] = ver.provenance_comment

@@ -183,7 +183,7 @@ class Voeis::SpatialReferencesController < Voeis::BaseController
     @project = parent
     @project.managed_repository{
       @cv_item = Voeis::SpatialReference.get(params[:id])
-      @cv_versions = @cv_item.versions
+      @cv_versions = @cv_item.versions.to_a
       @cv_title = 'Spatial Reference'
       @cv_title2 = 'spatial_reference'
       @cv_term = 'srs_name'
@@ -194,6 +194,7 @@ class Voeis::SpatialReferencesController < Voeis::BaseController
       temp = {}
       temp[:is_geo_string] = @cv_item.is_geographic ? 'True' : 'False'
       @cv_refs << temp
+      #debugger
       @cv_versions.each{|ver| 
         temp = {}
         temp[:is_geo_string] = ver.is_geographic ? 'True' : 'False'
