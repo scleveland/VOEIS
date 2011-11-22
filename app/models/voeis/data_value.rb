@@ -19,6 +19,7 @@ class Voeis::DataValue
   property :published,                  Boolean,  :required => false
   property :site_id,                    Integer,  :index => true
   property :variable_id,                Integer, :index => true
+  property :filename,                   String, :required => true, :length => 512, :default=>"unknown"
   yogo_versioned
   #timestamps :at
   
@@ -66,7 +67,7 @@ class Voeis::DataValue
   # @api publicsenosr
   def self.parse_logger_csv(csv_file, data_stream_template_id, site_id, start_line, sample_type, sample_medium)
     #Determine how the time is stored
-    
+    errors = ""
     if !Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "Timestamp").nil?
       data_timestamp_col = Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "Timestamp").column_number
       date_col=""
@@ -142,7 +143,7 @@ class Voeis::DataValue
           if !row[data_timestamp_col].nil? && !row[data_timestamp_col].empty?        
           Rails.logger.info '#{row.join(', ')}'
           #puts row.join(', ')
-            results = parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id)
+            results = parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id, csv_file)
             
             if results[:result_ids].empty?
               skipped_rows += 1
@@ -167,7 +168,7 @@ class Voeis::DataValue
     else
        data_value = {:message => "No new Records were saved - it appears this file has already been parsed and stored."}
     end
-    return_hash = {:total_records_saved => total_records, :rows_skipped => skipped_rows, :total_rows_parsed => rows_parsed, :last_record => Voeis::DataValue.last(:site_id=> site_id, :variable_id => data_col_array[variable_cols.last][0].id, :order => [:created_at]).as_json, :last_record_for_this_file => data_value.as_json}
+    return_hash = {:total_records_saved => total_records, :rows_skipped => skipped_rows, :total_rows_parsed => rows_parsed, :last_record => Voeis::DataValue.last(:site_id=> site_id, :variable_id => data_col_array[variable_cols.last][0].id, :order => [:created_at]).as_json, :last_record_for_this_file => data_value.as_json,:errors=>errors}
   end
   
   
@@ -188,7 +189,7 @@ class Voeis::DataValue
   # @author Yogo Team
   #
   # @api public
-  def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id)
+  def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id,filename)
     require 'chronic'  #for robust timestamp parsing
     name = 2
     variable = 0
@@ -221,11 +222,11 @@ class Voeis::DataValue
           (0..row.size-1).each do |i|
             if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore"
                 cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
-                row_values << "(#{cv.to_s}, '#{timestamp.to_s}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc.to_s}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id} )"
+                row_values << "(#{cv.to_s}, '#{timestamp.to_s}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc.to_s}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id},  '#{filename}' )"
               end #end if
           end #end loop
           if !row_values.empty?
-            sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\", \"site_id\", \"variable_id\") VALUES "
+            sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\", \"site_id\", \"variable_id\", \"filename\") VALUES "
             sql << row_values.join(',')
             sql << " RETURNING \"id\""
             result_ids = repository.adapter.select(sql)
