@@ -165,9 +165,13 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
     ### LOCAL VERTICAL DATUM HISTORY
     @global = false
     @project = parent
-    @project.managed_repository{
-      @cv_item = Voeis::VerticalDatumCV.get(params[:id])
-      @cv_versions = @cv_item.versions
+    #@project.managed_repository{
+      #@cv_item = Voeis::VerticalDatumCV.get(params[:id])
+      #@cv_versions = @cv_item.versions
+      @cv_item = @project.managed_repository{Voeis::VerticalDatumCV.get(params[:id])}
+      #@cv_versions = @project.managed_repository{Voeis::VerticalDatumCV.get(params[:id]).versions}
+      @cv_versions = @project.managed_repository.adapter.select('SELECT * FROM voeis_vertical_datum_cv_versions WHERE id=%s ORDER BY updated_at DESC'%@cv_item.id)
+      #@cv_versions = @project.managed_repository{@cv_item.versions_array}
       @cv_title = 'Vertical Datum'
       @cv_title2 = 'vertical_datum'
       @cv_term = 'term'
@@ -182,7 +186,7 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
         {:label=>"Term", :name=>"term"},
         {:label=>"Definition", :name=>"definition"}
         ]
-    }
+    #}
     render 'spatial_references/versions.html.haml'
   end
 

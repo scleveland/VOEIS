@@ -29,7 +29,10 @@
   // SAVE CALLBACKs for ITEM ROLLBACK
   function cv_item_restore(item) {
     if(window.name=='HISTORY') {
-      window.opener.cv_item_restore0(item, window.location.reload);
+      var goto = window.opener.cv_item_restore0;
+      window.close();
+      goto(item, window.location.reload);
+      //window.opener.cv_item_restore0(item, window.location.reload);
     } else {
       cv_item_restore0(item);
       window.location.reload();

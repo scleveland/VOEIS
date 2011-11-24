@@ -42,8 +42,7 @@ class VersionsWidget < Apotomo::Widget
     upd_user = User.get(@item.updated_by)
     temp[:updated_by_name] = upd_user.nil? ? "-" : "%s (%s)"%[upd_user.name,upd_user.login]
     @versions_items << temp
-    @versions.each{|ver0|
-      ver = ver0.to_model
+    @versions.each{|ver|
       temp = {}
       temp[:version] = version_number
       temp[:version_ttl] = "Version %s"%version_number

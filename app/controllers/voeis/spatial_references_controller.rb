@@ -181,9 +181,15 @@ class Voeis::SpatialReferencesController < Voeis::BaseController
     ### LOCAL SPATIAL REFERENCE HISTORY
     @global = false
     @project = parent
-    @project.managed_repository{
-      @cv_item = Voeis::SpatialReference.get(params[:id])
-      @cv_versions = @cv_item.versions.to_a
+    #@project.managed_repository{
+      #@cv_item = Voeis::SpatialReference.get(params[:id])
+      #@cv_versions = @cv_item.versions.to_a
+      @cv_item = @project.managed_repository{Voeis::SpatialReference.get(params[:id])}
+      #@cv_versions = @project.managed_repository{Voeis::SpatialReference.get(params[:id]).versions}
+      #@cv_versions = @cv_versions.to_a
+      #@cv_versions = @cv_item.versions.to_a
+      @cv_versions = @project.managed_repository.adapter.select('SELECT * FROM voeis_spatial_reference_versions WHERE id=%s ORDER BY updated_at DESC'%@cv_item.id)
+      ##@cv_versions = @project.managed_repository{@cv_item.versions_array}
       @cv_title = 'Spatial Reference'
       @cv_title2 = 'spatial_reference'
       @cv_term = 'srs_name'
@@ -209,7 +215,7 @@ class Voeis::SpatialReferencesController < Voeis::BaseController
         {:label=>"Gergraphic", :name=>"is_geo_string"},
         {:label=>"Notes", :name=>"notes"}
         ]
-    }
+    #}
     render 'spatial_references/versions.html.haml'
   end
 

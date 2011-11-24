@@ -124,6 +124,10 @@ class Voeis::Site
       end
     end
   end
+
+  def versions_array
+    self.versions.to_a
+  end
   
   def fetch_time_zone_offset
     require "geonames"

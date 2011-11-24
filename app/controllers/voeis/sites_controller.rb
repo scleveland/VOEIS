@@ -97,7 +97,11 @@ class Voeis::SitesController < Voeis::BaseController
   def versions
     @project = parent
     @site =  parent.managed_repository{Voeis::Site.get(params[:id])}
-    @versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
+    #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
+    #@versions = parent.managed_repository.adapter.select('SELECT * FROM voeis_site_versions WHERE id=%s ORDER BY updated_at DESC'%@site.id)
+    ##@versions = @versions.to_a
+    ##@versions = @site.versions
+    @versions = @project.managed_repository{@site.versions_array}
     
     @site_refs = []
     temp = {}
