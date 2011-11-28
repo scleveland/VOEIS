@@ -130,8 +130,8 @@ class Voeis::DataValue
     total_results = Array.new
     total_records = 0
     skipped_rows = 0
-    #CSV.foreach(csv_file) do |row|
-    rows.each do |row|
+    CSV.foreach(csv_file) do |row|
+    #rows.each do |row|
       if !row.nil?
         results = Array.new
         if rows_parsed >= start_line-1# || start_line == 1
