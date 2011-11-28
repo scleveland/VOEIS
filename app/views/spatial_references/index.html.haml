@@ -15,7 +15,7 @@
     dojo.require("dojo.data.ItemFileWriteStore");
     
     var cv_title = "#{@cv_title}";
-    var cv_name = "#{@cv_title=='Vertical Datum' ? 'term' : 'srs_name'}";
+    var cv_name = "#{@cv_name}";
     
     var cv_data = #{@cv_data.to_json};
     
@@ -56,6 +56,11 @@
       cv_management_grid.update();
     });
     
+    // ITEM VALUE toString w/ null
+    function cleanString(val) {
+      if(val==null) return '';
+      return val.toString();
+    };
     // GRID DISPLAY FILTERS
     var Formatter = {
       trueFalse: function(value) {
@@ -192,6 +197,7 @@
     // OPEN EDIT DIALOG
     var cv_datum_upd = function(item) {
       console.log('EDIT:',item);
+      delete item.provenance_comment;
       cv_dialog_box.set('title', cv_title);
       cv_dialog_populate(item);
       $('#cv_prov_com').show();
@@ -264,35 +270,43 @@
           };
       }});
     };
-    // SAVE CALLBACKs for ITEM RESTORE
-    function cv_item_restore0(item) {
-      var cv_item = cv_store_get(item.id);
-      item['idx'] = cv_item.idx;
-      cv_datum_upd(item);
+    // SAVE ITEM
+    function cv_save(id, data, call_back) {
+      var cv_id = parseInt(id);
+      if(cv_id) {
+        //UPDATE (id>0)
+        var post_type = 'PUT';
+        var post_result = cv_store_upd;
+        var post_url = save_url+'/'+cv_id+'.json';
+      } else {
+        //NEW (id=0)
+        var post_type = 'POST';
+        var post_result = cv_post_local;
+        var post_url = global_post_url+'.json';
+      };
+      console.log('POST:',data);
+      console.log(post_type+' TO: '+post_url);
+      //AJAX POST/PUT
+      $.ajax({
+        type: post_type,
+        url: post_url,
+        data: data,
+        success: function(e) {
+          post_result(e);
+          if(call_back) call_back();
+        },
+        dataType: 'json'
+      });
     };
-
-  - if @global
-    :javascript
-      // GLOBAL - PROCESS STORE NEW
-      var cv_post_local = function(data) {
-        cv_store_new(data);
-      };
-  - else
-    :javascript
-      // LOCAL - POST TO GLOBAL + LOCAL
-      var cv_post_local = function(data0) {
-        var data = cv_data_clean(data0);
-        $.ajax({
-          type: 'POST',
-          url: "#{@project.nil? ? '' : '/projects/'+@project.id}"+global_post_url+'.json',
-          data: data,
-          success: function(e) {
-            cv_store_new(e);
-          },
-          dataType: 'json'
-        });
-        return true;
-      };
+    // SAVE CALLBACK for ITEM ROLLBACK
+    function cv_item_restore0(item, call_back) {
+      var data = cv_data_clean(item);
+      cv_save(item.id, data, call_back);
+      // OPEN SAVE FORM... 
+      //var cv_item = cv_store_get(item.id);
+      //item['idx'] = cv_item.idx;
+      //cv_datum_upd(item);
+    };
 
   - if @cv_title=='Vertical Datum'
     :javascript
@@ -304,8 +318,9 @@
         var cv_id = parseInt(form.elements['id'].value);
         var data = {vertical_datum_c_v: {
         term: form.elements['vertical_datum_term'].value,
-        definition: form.elements['cv_text'].value}};
-        //definition: $("#vertical_datum_definition").val()}};
+        definition: form.elements['cv_text'].value,
+        //definition: $("#vertical_datum_definition").val(),
+        provenance_comment: form.elements['cv_prov'].value}};
         if(cv_id) data.vertical_datum_c_v['id'] = cv_id;
         return data;
       };
@@ -319,9 +334,9 @@
       };
       function cv_data_clean0(data0) {
         var cv_id = parseInt(data0['id']);
-        var data = {term: data0['term'].toString(),
-        definition: data0['definition'].toString(),
-        provenance_comment: data0['provenance_comment'].toString()};
+        var data = {term: cleanString(data0['term']),
+        definition: cleanString(data0['definition']),
+        provenance_comment: cleanString(data0['provenance_comment'])};
         if(cv_id) data['id'] = cv_id;
         return data;
       };
@@ -334,9 +349,9 @@
         $('#vertical_datum_idx').val(cv_item.idx.toString());
         vertical_datum_term.set('value', cv_item.term.toString());
         $('#vertical_datum_text').val(cv_item.definition.toString());
+        $('#cv_prov_text').val('');
         if(cv_item.hasOwnProperty('provenance_comment'))
           $('#cv_prov_text').val(cv_item.provenance_comment.toString());
-        else $('#cv_prov_text').val('');
         //delete_button.attr("disabled", false);
       };
       // CLEAR VERTICAL DATUM DIALOG
@@ -361,8 +376,9 @@
           srs_id: parseInt(form.elements['source_id'].value),
           srs_name: form.elements['source_name'].value,
           is_geographic: is_geo,
-          notes: form.elements['cv_text'].value}};
-          //notes: $("#spatial_source_notes").val()}};
+          notes: form.elements['cv_text'].value,
+          //notes: $("#spatial_source_notes").val(),
+          provenance_comment: form.elements['cv_prov'].value}};
         if(cv_id) data.spatial_reference['id'] = cv_id;
         return data;
       };
@@ -378,10 +394,10 @@
         var is_geo = data0['is_geographic'] ? true : false;
         var cv_id = parseInt(data0['id']);
         var data = {srs_id: parseInt(data0['srs_id']),
-          srs_name: data0['srs_name'].toString(),
+          srs_name: cleanString(data0['srs_name']),
           is_geographic: is_geo,
-          notes: data0['notes'].toString(),
-          provenance_comment: data0['provenance_comment'].toString()};
+          notes: cleanString(data0['notes']),
+          provenance_comment: cleanString(data0['provenance_comment'])};
         if(cv_id) data['id'] = cv_id;
         return data;
       };
@@ -396,9 +412,9 @@
         spatial_source_name.set('value', cv_item.srs_name.toString());
         spatial_source_geographic.set('value', cv_item.is_geographic[0]);
         $('#spatial_reference_text').val(cv_item.notes.toString());
+        $('#cv_prov_text').val('');
         if(cv_item.hasOwnProperty('provenance_comment'))
           $('#cv_prov_text').val(cv_item.provenance_comment.toString());
-        else $('#cv_prov_text').val('');
         //delete_button.attr("disabled", false);
       };
       // CLEAR SPATIAL REFERENCE DIALOG
@@ -411,6 +427,34 @@
         $('#spatial_reference_text').val('');
       };
 
+  - if @global
+    :javascript
+      // GLOBAL - URLs
+      var save_url = global_post_url;
+      // GLOBAL - PROCESS STORE NEW
+      var cv_post_local = function(data) {
+        cv_store_new(data);
+      };
+  - else
+    :javascript
+      // LOCAL - URLs
+      var save_url = post_url;
+      // LOCAL - POST TO GLOBAL + LOCAL
+      var cv_post_local = function(data0) {
+        var data = cv_data_clean(data0);
+        console.log('POST-LOCAL-RAW:',data0);
+        console.log('POST-LOCAL:',data);
+        $.ajax({
+          type: 'POST',
+          url: "#{@project.nil? ? '' : '/projects/'+@project.id}"+global_post_url+'.json',
+          data: data,
+          success: function(e) {
+            cv_store_new(e);
+          },
+          dataType: 'json'
+        });
+        return true;
+      };
 
 #cv_dialog_box{:dojoType=>"dijit.Dialog", :jsId=>"cv_dialog_box", :title=>"#{@cv_title}", :style=>"width:400px;"}
   %form(id="#{@cv_title2}_form" jsId="#{@cv_title2}_form" dojoType="dijit.form.Form" method="post")
@@ -462,17 +506,6 @@
             var cv_id = parseInt(form.elements['id'].value);
             var cv_idx = form.elements['idx'].value;
             var data = cv_data_populate(form);
-            if(cv_id) {
-              //UPDATE (id>0)
-              var post_type = 'PUT';
-              var post_result = cv_store_upd;
-              var post_id = '/'+cv_id;
-            } else {
-              //NEW (id=0)
-              var post_type = 'POST';
-              var post_result = cv_post_local;
-              var post_id = '';
-            };
             console.log('POST:',data);
             if(cv_id && cv_idx[0]=='#') {
               //COPY GLOBAL
@@ -483,18 +516,9 @@
               var del_item = copy_data[copy_idx];
               cv_store_del(del_item,copy_store);
             } else {
-              //AJAX POST/PUT -ALWAYS GLOBAL
-              $.ajax({
-                type: post_type,
-                url: global_post_url+post_id+'.json',
-                data: data,
-                success: function(e) {
-                  post_result(e);
-                },
-                dataType: 'json'
-              });
+              cv_save(cv_id, data);
             };
-            });
+          });
     &nbsp;&nbsp;
     %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"cv_dialog_box.hide();return false;"} Cancel
 

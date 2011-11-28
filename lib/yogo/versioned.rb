@@ -4,7 +4,7 @@ require 'dm-is-versioned'
 # for Dirty Field list
 UPDATED_FIELDS = 'Updated Fields: '
 # Fields ending _id that are NOT references
-ID_EXCEPTIONS = ['his_id']
+ID_EXCEPTIONS = ['his_id','srs_id']
 
 module Yogo
   module Versioned

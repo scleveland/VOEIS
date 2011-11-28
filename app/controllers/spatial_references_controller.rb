@@ -123,7 +123,7 @@ class SpatialReferencesController < ApplicationController
     ### GLOBAL SPATIAL REFERENCE HISTORY
     @global = true
     @cv_item = Voeis::SpatialReference.get(params[:id])
-    @cv_versions = @cv_item.versions
+    @cv_versions = @cv_item.versions.to_a
     @cv_title = 'Spatial Reference'
     @cv_title2 = 'spatial_reference'
     @cv_term = 'srs_name'

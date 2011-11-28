@@ -26,68 +26,74 @@ class Voeis::SpatialReferencesController < Voeis::BaseController
     #                                                      :provenance_comment=>params[:spatial_reference][:provenance_comment],
     #                                                      :deleted_at=>nil))}
     
-    @spatial_reference = parent.managed_repository{Voeis::SpatialReference.with_deleted{Voeis::SpatialReference.get(params[:spatial_reference][:id])}}
-    if @spatial_reference.nil?
-      @spatial_reference = parent.managed_repository{Voeis::SpatialReference.create(:id=>params[:spatial_reference][:id],
-                                :srs_id=>params[:spatial_reference][:srs_id],
-                                :srs_name=>params[:spatial_reference][:srs_name],
-                                :is_geographic=>params[:spatial_reference][:is_geographic],
-                                :notes=>params[:spatial_reference][:notes],
-                                :provenance_comment=>params[:spatial_reference][:provenance_comment])}
-    else
-      #@spatial_reference.deleted_at  #need to reference 'deleted_at' because of lazy loading
-      @spatial_reference.update(:id=>params[:spatial_reference][:id],
-                                :srs_id=>params[:spatial_reference][:srs_id],
-                                :srs_name=>params[:spatial_reference][:srs_name],
-                                :is_geographic=>params[:spatial_reference][:is_geographic],
-                                :notes=>params[:spatial_reference][:notes],
-                                :provenance_comment=>params[:spatial_reference][:provenance_comment],
-                                :deleted_at=>nil)
-    end
+    @project = parent
+    @project.managed_repository{
+      @spatial_reference = Voeis::SpatialReference.with_deleted{Voeis::SpatialReference.get(params[:spatial_reference][:id])}
+      if @spatial_reference.nil?
+        @spatial_reference = Voeis::SpatialReference.create(:id=>params[:spatial_reference][:id],
+                                  :srs_id=>params[:spatial_reference][:srs_id],
+                                  :srs_name=>params[:spatial_reference][:srs_name],
+                                  :is_geographic=>params[:spatial_reference][:is_geographic],
+                                  :notes=>params[:spatial_reference][:notes],
+                                  :provenance_comment=>params[:spatial_reference][:provenance_comment])
+      else
+        #@spatial_reference.deleted_at  #need to reference 'deleted_at' because of lazy loading
+        @spatial_reference.update(:id=>params[:spatial_reference][:id],
+                                  :srs_id=>params[:spatial_reference][:srs_id],
+                                  :srs_name=>params[:spatial_reference][:srs_name],
+                                  :is_geographic=>params[:spatial_reference][:is_geographic],
+                                  :notes=>params[:spatial_reference][:notes],
+                                  :provenance_comment=>params[:spatial_reference][:provenance_comment],
+                                  :deleted_at=>nil)
+      end
     
-    #params[:spatial_reference].each do |key, value|
-    #  @spatial_reference[key] = value.blank? ? nil : value
-    #end
-    
-    respond_to do |format|
-      #if @spatial_reference.save
-        format.html do
-          flash[:notice] = 'Local Projection was successfully created.'
-          redirect_to(spatial_reference_path())
-        end
-        format.json do
-          render :json => @spatial_reference.as_json, :callback => params[:jsoncallback]
-        end
-      #else
-      #  flash[:error] = 'Local Projection create FAILED!'
-      #  #format.html { render :action => "new" }
-      #  redirect_to(spatial_reference_path())
+      #params[:spatial_reference].each do |key, value|
+      #  @spatial_reference[key] = value.blank? ? nil : value
       #end
-    end
+    
+      respond_to do |format|
+        #if @spatial_reference.save
+          format.html do
+            flash[:notice] = 'Local Projection was successfully created.'
+            redirect_to(spatial_reference_path())
+          end
+          format.json do
+            render :json => @spatial_reference.as_json, :callback => params[:jsoncallback]
+          end
+        #else
+        #  flash[:error] = 'Local Projection create FAILED!'
+        #  #format.html { render :action => "new" }
+        #  redirect_to(spatial_reference_path())
+        #end
+      end
+    }
   end
 
   # LOCAL: PUT /SpatialReference
   def update
-    spatial_reference = parent.managed_repository{Voeis::SpatialReference.get(params[:spatial_reference][:id])}
+    @project = parent
+    @project.managed_repository{
+      spatial_reference = Voeis::SpatialReference.get(params[:spatial_reference][:id])
     
-    params[:spatial_reference].each do |key, value|
-      spatial_reference[key] = value.blank? ? nil : value
-    end
-    spatial_reference.updated_at = Time.now
-    
-    respond_to do |format|
-      if spatial_reference.save
-        format.html do
-          flash[:notice] = 'Spatial Reference was successfully updated.'
-          redirect_to(spatial_reference_path())
-        end
-        format.json do
-          render :json => spatial_reference.as_json, :callback => params[:jsoncallback]
-        end
-      else
-        format.html { render :action => "update" }
+      params[:spatial_reference].each do |key, value|
+        spatial_reference[key] = value.blank? ? nil : value
       end
-    end
+      spatial_reference.updated_at = Time.now
+    
+      respond_to do |format|
+        if spatial_reference.save
+          format.html do
+            flash[:notice] = 'Spatial Reference was successfully updated.'
+            redirect_to(spatial_reference_path())
+          end
+          format.json do
+            render :json => spatial_reference.as_json, :callback => params[:jsoncallback]
+          end
+        else
+          format.html { render :action => "update" }
+        end
+      end
+    }
   end
 
   # LOCAL: List SpatialReference entries
@@ -175,34 +181,41 @@ class Voeis::SpatialReferencesController < Voeis::BaseController
     ### LOCAL SPATIAL REFERENCE HISTORY
     @global = false
     @project = parent
-    @cv_item = @project.managed_repository{Voeis::SpatialReference.get(params[:id])}
-    #@cv_versions = @project.managed_repository{Voeis::SpatialReference.get(params[:id]).versions}
-    @cv_versions = @cv_item.versions
-    @cv_title = 'Spatial Reference'
-    @cv_title2 = 'spatial_reference'
-    @cv_term = 'srs_name'
-    @cv_name = 'srs_name'
-    @cv_id = 'id'
+    #@project.managed_repository{
+      #@cv_item = Voeis::SpatialReference.get(params[:id])
+      #@cv_versions = @cv_item.versions.to_a
+      @cv_item = @project.managed_repository{Voeis::SpatialReference.get(params[:id])}
+      #@cv_versions = @project.managed_repository{Voeis::SpatialReference.get(params[:id]).versions}
+      #@cv_versions = @cv_versions.to_a
+      #@cv_versions = @cv_item.versions.to_a
+      @cv_versions = @project.managed_repository.adapter.select('SELECT * FROM voeis_spatial_reference_versions WHERE id=%s ORDER BY updated_at DESC'%@cv_item.id)
+      ##@cv_versions = @project.managed_repository{@cv_item.versions_array}
+      @cv_title = 'Spatial Reference'
+      @cv_title2 = 'spatial_reference'
+      @cv_term = 'srs_name'
+      @cv_name = 'srs_name'
+      @cv_id = 'id'
 
-    @cv_refs = []
-    temp = {}
-    temp[:is_geo_string] = @cv_item.is_geographic ? 'True' : 'False'
-    @cv_refs << temp
-    @cv_versions.each{|ver| 
+      @cv_refs = []
       temp = {}
       temp[:is_geo_string] = @cv_item.is_geographic ? 'True' : 'False'
       @cv_refs << temp
-    }
+      #debugger
+      @cv_versions.each{|ver| 
+        temp = {}
+        temp[:is_geo_string] = ver.is_geographic ? 'True' : 'False'
+        @cv_refs << temp
+      }
 
-    @cv_properties = [
-#      {:label=>"Version", :name=>"version"},
-#      {:label=>"ID", :name=>"id"},
-      {:label=>"Source Name", :name=>"srs_name"},
-      {:label=>"Source ID", :name=>"srs_id"},
-      {:label=>"Gergraphic", :name=>"is_geo_string"},
-      {:label=>"Notes", :name=>"notes"}
-      ]
-    
+      @cv_properties = [
+        #{:label=>"Version", :name=>"version"},
+        #{:label=>"ID", :name=>"id"},
+        {:label=>"Source Name", :name=>"srs_name"},
+        {:label=>"Source ID", :name=>"srs_id"},
+        {:label=>"Gergraphic", :name=>"is_geo_string"},
+        {:label=>"Notes", :name=>"notes"}
+        ]
+    #}
     render 'spatial_references/versions.html.haml'
   end
 

@@ -10,4 +10,9 @@ class Voeis::VerticalDatumCV
   yogo_versioned
 
   has n, :sites,             :model => "Voeis::Site",         :through => Resource, :required=>false
+
+  def versions_array
+    self.versions.to_a
+  end
+  
 end

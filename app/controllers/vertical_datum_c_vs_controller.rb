@@ -121,11 +121,11 @@ class VerticalDatumCVsController < ApplicationController
     ### GLOBAL VERTICAL DATUM HISTORY
     @global = true
     @cv_item = Voeis::VerticalDatumCV.get(params[:id])
-    @cv_versions = @cv_item.versions
+    @cv_versions = @cv_item.versions.to_a
     @cv_title = 'Vertical Datum'
     @cv_title2 = 'vertical_datum'
-    @cv_term = 'term'
     @cv_name = 'term'
+    @cv_term = 'term'
     @cv_id = 'id'
 
     @cv_refs = []
@@ -134,7 +134,7 @@ class VerticalDatumCVsController < ApplicationController
 #      {:label=>"Version", :name=>"version"},
 #      {:label=>"ID", :name=>"id"},
       {:label=>"Term", :name=>"term"},
-      {:label=>"Defination", :name=>"defination"}
+      {:label=>"Definition", :name=>"definition"}
       ]
     
     render 'spatial_references/versions.html.haml'
