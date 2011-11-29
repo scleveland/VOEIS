@@ -110,12 +110,7 @@ Form Progress:
       =hidden_field_tag "ignore"+col.to_s;
       -if !@data_template.nil?
         -if !(ds_col = @data_template.data_stream_columns.first(:column_number => col-1)).nil?
-          -if ds_col.name == "SampleID"
-            :javascript
-              $(document).ready(function() {
-              assignSample(#{col.to_s});
-              });
-          -elsif ds_col.name == "Timestamp"
+          -if ds_col.name == "Timestamp"
             :javascript
               $(document).ready(function() {
               assignTimestamp(#{col.to_s});

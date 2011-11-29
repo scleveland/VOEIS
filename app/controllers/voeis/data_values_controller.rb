@@ -1410,6 +1410,17 @@ class Voeis::DataValuesController < Voeis::BaseController
 
             data_stream_column.save
           end #managed_repository
+        elsif  columns_array[i] == "ignore" || ignore_array[i] == i.to_s
+          parent.managed_repository do
+            data_stream_column = Voeis::DataStreamColumn.create(
+                                  :column_number => i,
+                                  :name => "Ignore",
+                                  :type =>"Ignore",
+                                  :unit => "NA",
+                                  :original_var => "NA")
+            data_stream_column.data_streams << @data_stream
+            data_stream_column.save
+          end #managed_repository
         elsif i == sample_id_col.to_i
            parent.managed_repository do
              data_stream_column = Voeis::DataStreamColumn.create(
@@ -1438,17 +1449,6 @@ class Voeis::DataValuesController < Voeis::BaseController
                                   :column_number => i,
                                   :name => "EndingVerticalOffset",
                                   :type =>"EndingVerticalOffset",
-                                  :unit => "NA",
-                                  :original_var => "NA")
-            data_stream_column.data_streams << @data_stream
-            data_stream_column.save
-          end #managed_repository
-        elsif  columns_array[i] == "ignore" || ignore_array[i] == i.to_s
-          parent.managed_repository do
-            data_stream_column = Voeis::DataStreamColumn.create(
-                                  :column_number => i,
-                                  :name => "Ignore",
-                                  :type =>"Ignore",
                                   :unit => "NA",
                                   :original_var => "NA")
             data_stream_column.data_streams << @data_stream
