@@ -59,7 +59,7 @@ namespace :yogo do
     end
     
     desc "Remove all 'voeis_*' datababses (might not work)"
-    task :remove_all, :needs => :environment do
+    task :remove_all => :environment do
      databases = repository(:default).adapter.select("SELECT datname FROM pg_database WHERE datname like 'voeis_%'")
 
       puts 'Deleting those tables'
@@ -71,7 +71,7 @@ namespace :yogo do
     end
     
     desc "Destroy and reacreate the database from ashes."
-    task :firebird, :needs => :environment do
+    task :firebird => :environment do
       puts 'Reworking master database'
       DataMapper.finalize
 
