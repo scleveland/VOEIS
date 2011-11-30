@@ -1,0 +1,74 @@
+:css
+  #head {
+    background-color: #69C;
+    //margin-left: 1em;
+    margin-top: 10px;
+    width: 100%;
+    font-size: 20pt;
+    font-family: 'Arial Black', Gadget, sans-serif;
+    font-weight: bold;
+    //font-style: italic;
+    //color: #1767a7; //#3A4491;
+  }
+  #head-voeis {
+    font-size: 16pt;
+    font-weight: normal;
+    font-family: Georgia, serif;
+    font-style: italic;
+  }
+  #content { margin:0px 20px}
+  #wrapper {
+    //background-color: #69C;//#ccb;
+    padding-top: 1px;
+  }
+  #login-image img { margin-right:20px; }
+  #login-description { margin-right:30px; }
+  #links {
+    margin-left: 0;
+    list-style-type: none;
+    list-style-position: outside;
+    
+    
+  }
+  #links li {
+    list-style-position: inside;
+    margin-left: 0;
+    margin-bottom: 20px;
+    font-size: 12pt;
+    font-weight: bold;
+    
+  }
+  
+  #title{
+    min-height:10em;
+    display:table-cell;
+    vertical-align:top;
+    padding-top: 10px;
+  }
+
+#content
+  #wrapper
+
+    #head
+      %h3 VOIES Video Tutorials
+    %ul{:id=>"links", :style=>""}
+      %li
+        %span{:class => "icon datahub-icon-25"}
+          = link_to("  Exploring an individual Project", 'http://camtasia.msu.montana.edu/Relay/Files/g23x269/Exploring%20Individual%20Projects/Exploring_Individual_Projects_-_Flash_%28Small%29_-_20111128_02.11.45PM.html', {:style=>"margin-left:10px;",:target=>'_blank'}) 
+      %li
+        %span{:class => "icon datahub-icon-25"}
+          = link_to("  Exploring among mulitple Projects", 'http://camtasia.msu.montana.edu/Relay/Files/g23x269/Exploring%20among%20multiple%20projects/Exploring_among_multiple_projects_-_Flash_%28Small%29_-_20111129_11.38.57AM.html',  {:style=>"margin-left:10px;",:target=>'_blank'})
+      %li
+        %span{:class => "icon datahub-icon-25"}
+          = link_to("  Simple Search/Browse for Data in a Project", 'http://camtasia.msu.montana.edu/Relay/Files/g23x269/Simple%20Search%20Data%20Browse/Simple_Search_Data_Browse_-_Flash_%28Small%29_-_20111120_02.35.33PM.html',  {:style=>"margin-left:10px;",:target=>'_blank'})
+      %li
+        %span{:class => "icon datahub-icon-25"}
+          = link_to("  Creating a new Project", 'http://camtasia.msu.montana.edu/Relay/Files/g23x269/Tutorial%20Project%20Creation/Tutorial_Project_Creation_-_Flash_%28Small%29_-_20111102_01.49.08PM.html',  {:style=>"margin-left:10px;",:target=>'_blank'})
+      %li
+        %span{:class => "icon datahub-icon-25"}
+          = link_to("  Creating a new Site in a Project", 'http://camtasia.msu.montana.edu/Relay/Files/g23x269/Site%20Creation/Site_Creation_-_Flash_%28Small%29_-_20111112_04.49.29PM.html', {:style=>"margin-left:10px;",:target=>'_blank'})
+        
+
+      
+    %br 
+    %br
