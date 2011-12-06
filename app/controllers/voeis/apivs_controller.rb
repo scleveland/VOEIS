@@ -260,7 +260,21 @@ class Voeis::ApivsController < Voeis::BaseController
             csv.close()
             path = File.dirname(@new_file)
           if first_row.count == data_stream_template.data_stream_columns.count
-            flash_error = flash_error.merge(parent.managed_repository{Voeis::DataValue.parse_logger_csv(@new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil)})
+            unless params[:queue] == "true"
+              user = nil
+              repository("default") do
+                user = current_user
+              end
+              flash_error = flash_error.merge(parent.managed_repository{Voeis::DataValue.parse_logger_csv(@new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,user.id)})
+            else
+              puts "***********ADDING DELAYED JOB******************"
+              dj = nil
+              repository("default") do
+                dj = Delayed::Job.enqueue(ProcessAFile.new(parent, @new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,current_user))
+              end
+              puts dj.attributes
+              puts dj.repository.name
+            end
           else
             #the file does not match the data_templates number of columns
             flash_error[:error] = "File does not match the data_templates number of columns. Columns in First Row:" + first_row.count.to_s +  " Voeis expected:" + data_stream_template.data_stream_columns.count.to_s + " rows."
@@ -368,7 +382,25 @@ class Voeis::ApivsController < Voeis::BaseController
                 csv.close()
                 path = File.dirname(@new_file)
               if first_row.count == data_stream_template.data_stream_columns.count
-                flash_error = flash_error.merge(parent.managed_repository{Voeis::DataValue.parse_logger_csv(@new_file, data_stream_template.id, site.id, start_line,nil,nil)})
+                unless params[:queue] == "true"
+                  user = nil
+                  repository("default") do
+                    user = current_user
+                  end
+                  flash_error = flash_error.merge(parent.managed_repository{Voeis::DataValue.parse_logger_csv(@new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,user.id)})
+                else
+                  puts "***********ADDING DELAYED JOB******************"
+                  dj = nil
+                  repository("default") do
+                    dj = Delayed::Job.enqueue(ProcessAFile.new(parent, @new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,current_user))
+                  end
+                  puts dj.attributes
+                  puts dj.repository.name
+                end
+                user = nil
+                repository("default") do
+                  user = current_user
+                end
               else
                 #the file does not match the data_templates number of columns
                 flash_error[:error] = "File does not match the data_templates number of columns. Columns in First Row:" + first_row.count.to_s +  " Voeis expected:" + data_stream_template.data_stream_columns.count.to_s + " rows."
