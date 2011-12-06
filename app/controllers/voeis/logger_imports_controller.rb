@@ -624,7 +624,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
       #create csv_row array
       @results=""
       parent.managed_repository do 
-         @results = Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, nil, nil)
+         @results = Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, nil, nil,current_user.id)
          
       # @csv_row = Array.new
       #       csv_temp_data = CSV.read(params[:datafile])
