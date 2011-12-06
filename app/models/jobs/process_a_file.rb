@@ -8,13 +8,19 @@ class ProcessAFile
   attr_accessor :file_path
   attr_accessor :data_stream_template_id
   attr_accessor :site_id
+  attr_accessor :start_line
+  attr_accessor :sample_type
+  attr_accessor :sample_medium
   
-  def initialize(project, user, path, template_id, site_id)
+  def initialize(project,file, data_stream_template_id, site_id, start_line, sample_type, sample_medium, user)
     self.project_id = project.id
     self.user_id = user.id
-    self.file_path = path
-    self.data_stream_template_id = template_id
-    self.site_id
+    self.file_path = file
+    self.data_stream_template_id = data_stream_template_id
+    self.site_id = site_id
+    self.start_line = start_line
+    self.sample_type = sample_type
+    self.sample_medium = sample_medium
   end
   
   def perform
@@ -24,7 +30,7 @@ class ProcessAFile
     
     # Perform the action
     project.managed_repository {
-      Voeis::SensorVariable.parse_logger_csv(self.file_path, self.data_stream_template_id, self.site_id)
+      Voeis::DataValue.parse_logger_csv(self.file_path, self.data_stream_template_id, self.site_id, self.start_line, self.sample_type,self.sample_medium, self.user_id)
     }
     
     # Message the user when action is complete.
