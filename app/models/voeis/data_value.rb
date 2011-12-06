@@ -65,7 +65,8 @@ class Voeis::DataValue
   # @author Yogo Team
   #
   # @api publicsenosr
-  def self.parse_logger_csv(csv_file, data_stream_template_id, site_id, start_line, sample_type, sample_medium)
+  def self.parse_logger_csv(csv_file, data_stream_template_id, site_id, start_line, sample_type, sample_medium, user_id)
+    puts "USER ID: #{user_id} ********************************"
     #Determine how the time is stored
     errors = ""
     if !Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "Timestamp").nil?
@@ -123,8 +124,11 @@ class Voeis::DataValue
        dst_time = 1
        dst = true
     end
-    user_id = User.current.id
-    create_comment = "Created at #{created_at} by #{User.current.first_name} #{User.current.last_name} [#{User.current.login}]"
+    user = nil
+    repository("default") do
+      user = User.get(user_id)
+    end
+    create_comment = "Created at #{created_at} by #{user.first_name} #{user.last_name} [#{user.login}]"
     rows = CSV.read(csv_file)
     results = Hash.new
     total_results = Array.new
