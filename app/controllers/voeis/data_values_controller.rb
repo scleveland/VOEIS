@@ -1282,7 +1282,7 @@ class Voeis::DataValuesController < Voeis::BaseController
      #i = params[:start_line].to_i
      @results =""
      parent.managed_repository do 
-       @results = Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, params[:sample_type], params[:sample_medium])
+       @results = Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, params[:sample_type], params[:sample_medium],current_user.id)
      
      # csv_data[params[:start_line].to_i-1..-1].each do |row|
      #   @csv_row[i] = row
