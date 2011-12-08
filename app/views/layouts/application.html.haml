@@ -176,9 +176,11 @@
               -if !current_user.nil? && current_user.projects.include?(@project)
                 - if atroot
                   -#= link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
-                  = link_to("Add Site", "javascript:", :dojoType => "yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/site/new');")
+                  = link_to("Add Site", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/site/new');")
+                  -#= link_to('Add Variable', 'javascript:', :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/variable', [0,'',0]);")
                 - else
                   = link_to("Add Site", project_path(@project)+'?tab=newsite', :dojoType => "yogo.ui.MenuLink")
+                  -#= link_to('Add Variable', project_path(@project)+'?tab=newvar', :dojoType=>"yogo.ui.MenuLink")
                 
                 = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_sample_menu")
                 = link_to("Add Logger Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")
