@@ -579,8 +579,35 @@
       tabs.selectChild(sitePane);
     };
 
+    var openDataQueryTab = function(tabs, projectId, siteId) {
+      var tabTitle = 'Data Search: Site-'+siteId;
+      var projDataId = '#{@project.id}-site'+siteId+'-data';
+      var projDataHref = "/projects/#{@project.id}/samples/query";
+      if(parseInt(siteId)) projDataHref += '?site_id='+siteId
+      var projDataLoad = function(varId,varName) {
+      };
+      openProjTab(tabs, projDataHref, projDataId, tabTitle, projDataLoad);
+      //##
+    };
+
+    var openSampsTab = function(tabs, projectId, varId, varName, siteId) {
+      var tabTitle = 'Samples: Site-'+siteId;
+      var projVarId = '#{@project.id}-site'+siteId+'-var'+varId;
+      var projVarHref = "/projects/#{@project.id}/samples/";
+      //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
+      //projectSitePath(this.projectId, this.siteId)
+      var saveStrip = tabs.tabStrip;
+      console.log('TABSTRIP:',tabs.tabStrip);
+      //tabs.tabStrip = false;
+      var projVarLoad = function(varId,varName) {
+      };
+      openProjTab(tabs, projVarHref, projVarId, tabTitle, projVarLoad);
+      //##
+    };
+
     var openVarTab = function(tabs, projectId, varId, varName, siteId) {
-      //var varPane = new voeis.ui.VariablePane();
+      var tabTitle = 'NEW VARIABLE';
+      if(parseInt(varId)) tabTitle = 'Site-'+siteId+': '+varName;
       var projVarId = '#{@project.id}-site'+siteId+'-var'+varId;
       var projVarHref = "/projects/#{@project.id}/variables/"+varId+".html?&site_id="+siteId;
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
@@ -589,22 +616,24 @@
       console.log('TABSTRIP:',tabs.tabStrip);
       //tabs.tabStrip = false;
       var projVarLoad = function(varId,varName) {
-        graphInit(varId,varName);
+        initPage();
+        //if(parseInt(varId)) graphInit(varId,varName);
         
       };
-      openProjTab(tabs, projVarHref, projVarId, varName, projVarLoad);
+      openProjTab(tabs, projVarHref, projVarId, tabTitle, projVarLoad);
       //##
     };
 
     var openSampTab = function(tabs, projectId, sampId, sampName) {
       //var varPane = new voeis.ui.VariablePane();
+      var tabTitle = 'Site-'+siteId+': '+sampName;
       var projSampId = '#{@project.id}-samp'+sampId;
       var projSampHref = "/projects/#{@project.id}/samples/"+sampId+".html";
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
       var projSampLoad = function(varId,varName) {
       };
-      openProjTab(tabs, projSampHref, projSampId, sampName, projSampLoad);
+      openProjTab(tabs, projSampHref, projSampId, tabTitle, projSampLoad);
       //##
     };
 
@@ -742,6 +771,20 @@
       tabs.selectChild(projPane);
       pmarkers[site.idx].pop();
       pmarkers[site.idx].selsite();
+    });
+
+    dojo.subscribe("voeis/project/dataquery", function(siteId) {
+      console.log('DATA-QUERY',arguments);
+      var projectId = "#{@project.id}";
+      var tabs = dijit.byId('tab_browser');
+      openDataQueryTab(tabs, projectId, siteId);
+    });
+
+    dojo.subscribe("voeis/project/samples", function(siteId) {
+      console.log('SAMPLES',arguments);
+      var projectId = "#{@project.id}";
+      var tabs = dijit.byId('tab_browser');
+      openSampTab(tabs, projectId, sampId, sampName);
     });
 
     dojo.subscribe("voeis/project/sample", function(sampId,sampName) {

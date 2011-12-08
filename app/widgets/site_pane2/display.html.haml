@@ -99,6 +99,10 @@
     = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show-site00').hide();$('#edit-site00').show();")
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    = link_to('DATA', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    = link_to('SAMPLES', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
   %br
   
   -#%table{:style=>"width:90%;"}
@@ -136,6 +140,11 @@
 
   %h4{:style=>"margin-top:0;"}
     Variable Data
+    -if @auth
+      %span{:style=>"font-size:11px;"}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        = link_to('NEW VARIABLE', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/project/variable', [0,'',$$$id$$$]);")
+    
   %table{:id=>"site00-variable-table", :style=>"width:48%;foat:left;"}
     %tr{:class=>"row-gr"}
       %th{:width=>"30%"} Variable
@@ -148,37 +157,30 @@
         $$$site-variable-data$$$
 
   -#%br{:style=>'float:none; clear:both;'}
-  %div
-    %h4{:style=>"margin-top:0;"}
-      Existing Samples
+  -#%div
+  -#  %h4{:style=>"margin-top:0;"}
+  -#    Existing Samples
 
-    -##all_variables-site00{:style=>"$$$export-style$$$"}
-    -#  = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
-    -#    = hidden_field_tag('column_array', @sample_labels.to_json)
-    -#    = hidden_field_tag('row_array', "$$$site-samps$$$")
-    -#    = hidden_field_tag('file_name', "project_samples")
-    -#    = submit_tag("Export Samples")
-    -#  %br
-    -#  %br
+  -##all_variables-site00{:style=>"$$$export-style$$$"}
+  -#  = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
+  -#    = hidden_field_tag('column_array', @sample_labels.to_json)
+  -#    = hidden_field_tag('row_array', "$$$site-samps$$$")
+  -#    = hidden_field_tag('file_name', "project_samples")
+  -#    = submit_tag("Export Samples")
+  -#  %br
+  -#  %br
 
-    %table{:id=>"site00-sample-table", :style=>"width:45%;"} 
-      %tr{:class=>"row-gr"}
-        - @sample_properties.each do |prop|
-          %th{:style=>"width:20%;align:center;"}
-            %strong
-              = prop[:label]
-      %tr
-        %td{:style=>"width:23%;align:center;"}
-          $$$site-sample-data$$$
+  -#%table{:id=>"site00-sample-table", :style=>"width:45%;"} 
+  -#  %tr{:class=>"row-gr"}
+  -#    - @sample_properties.each do |prop|
+  -#      %th{:style=>"width:20%;align:center;"}
+  -#        %strong
+  -#          = prop[:label]
+  -#  %tr
+  -#    %td{:style=>"width:23%;align:center;"}
+  -#      $$$site-sample-data$$$
       
       
-      -#  %td{:colspan=>"4"}
-      -#    %div{:class=>"sample-list"}  
-      -#      %table
-      -#        %tr
-      -#          %td{:style=>"width:23%;align:center;"}
-      -#            $$$site-sample-data$$$
-
   -##testing-site00{:dojoType=>"dijit.form.Button"}
   -#  TESTING
   -#  %script{:type=>"dojo/method", :event=>"onClick", :args=>"evt"}
@@ -746,7 +748,7 @@
               %span{:class=>'label'}
                 %label{:for=>"site_provenance_comment"} Provenance Comment
             %textarea( name="site_provenance_comment" id="site00_provenance_comment" rows="2")
-              $$$provenance_comment$$$
+              -#$$$provenance_comment$$$
         
         %tr
           %td{:colspan=>"2"}
@@ -768,7 +770,8 @@
                   console.log('INIT-FORM:',form0,form);
                   form0 = form.domNode;
                   //var pane = dijit.byNode(dojo.byId('site00'));
-                  eval('var pane = site00ref');
+                  //eval('var pane = site00ref');
+                  var pane = window['site00ref']
                   var site = pane.site;
                   console.log('GO PANE_UPDATE:',pane);
                   //INITIALIZE PANE: drop-downs, etc...

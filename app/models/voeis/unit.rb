@@ -23,6 +23,14 @@ class Voeis::Unit
   has n, :data_stream_columns,  :model => "Voeis::DataStreamColumn", :through =>Resource
   has n, :variables,            :model => "Voeis::Variable",         :through => Resource
   
+  def short_format
+    '%s (%s)'%[self.units_abbreviation,self.units_type]
+  end
+  
+  def type_format
+    '%s: %s'%[self.units_type,self.units_abbreviation]
+  end
+  
   def self.load_from_his
     his_units = His::Unit.all
     his_units.each do |his_u|
