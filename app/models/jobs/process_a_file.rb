@@ -11,8 +11,9 @@ class ProcessAFile
   attr_accessor :start_line
   attr_accessor :sample_type
   attr_accessor :sample_medium
+  attr_accessor :project_job_id
   
-  def initialize(project,file, data_stream_template_id, site_id, start_line, sample_type, sample_medium, user)
+  def initialize(project,file, data_stream_template_id, site_id, start_line, sample_type, sample_medium, user, project_job_id)
     self.project_id = project.id
     self.user_id = user.id
     self.file_path = file
@@ -21,19 +22,32 @@ class ProcessAFile
     self.start_line = start_line
     self.sample_type = sample_type
     self.sample_medium = sample_medium
+    self.project_job_id = project_job_id
   end
   
   def perform
     # Get the user and the project associated with this action
-    user = User.get(self.user_id)
+    puts user = User.get(self.user_id)
     project = Project.get(self.project_id)
-    
+    project.managed_repository do
+      job = Voeis::Job.get(self.project_job_id)
+      job.status = "running"
+      job.save
+    end
     # Perform the action
+    results = nil
     project.managed_repository {
-      Voeis::DataValue.parse_logger_csv(self.file_path, self.data_stream_template_id, self.site_id, self.start_line, self.sample_type,self.sample_medium, self.user_id)
+      results =  Voeis::DataValue.parse_logger_csv(self.file_path, self.data_stream_template_id, self.site_id, self.start_line, self.sample_type,self.sample_medium, self.user_id)
+      Voeis::Site.get(self.site_id).update_site_data_catalog
     }
-    
+    project.managed_repository do
+      job = Voeis::Job.get(self.project_job_id)
+      job.status = "complete"
+      job.completed_time = Time.now
+      job.results = results
+      job.save
+    end
     # Message the user when action is complete.
-    VoeisMailer.email(user.login, "Job complete", "Your job completed successfully.")
+    VoeisMailer.email(user.login, "Job complete", results)
   end
 end
