@@ -99,7 +99,7 @@ class ApplicationController < ActionController::Base
   end
   
   def email_exception(e, env)
-    if RAILS_ENV == 'production'
+    if Rails.env == 'production'
       VoeisMailer.email_rescued_exception(e, env)
       #ExceptionNotifier::Notifier.exception_notification(request.env, e).deliver
     else
