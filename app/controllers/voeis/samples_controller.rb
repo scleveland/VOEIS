@@ -194,8 +194,8 @@ class Voeis::SamplesController < Voeis::BaseController
   end
   
   
-  
   def search
+    @tabId = params[:tab_id]
     @start_date =  Date.civil(params[:range][:"start_date(1i)"].to_i,params[:range]      [:"start_date(2i)"].to_i,params[:range][:"start_date(3i)"].to_i)
     @end_date = Date.civil(params[:range][:"end_date(1i)"].to_i,params[:range]    [:"end_date(2i)"].to_i,params[:range][:"end_date(3i)"].to_i)
     @start_date = @start_date.to_datetime

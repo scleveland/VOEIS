@@ -39,7 +39,12 @@
     #{@site.name+': '}
   Search Data:
 = form_for(:query, @query, :url => { :action=>'search'}, :remote=>true, :html=>{:id=>tabId}) do |f|
-  - if site_id==0
+  -#%input{:type=>"hidden", :name=>"tab_id", :value=>"#{tabId}"}
+  =hidden_field_tag('tab_id', tabId)
+  - if site_id>0
+    -#%input{:type=>"hidden", :name=>"site", :value=>"#{site_id.to_s}"}
+    =hidden_field_tag('site', site_id.to_s)
+  - else
     Site: 
     = select_tag("site", @site_options.html_safe)
     = clear_break
@@ -59,7 +64,7 @@
 
   -#= f.submit('Search', :onclick => "dijit.byId('loading_dialog').show();")
   -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
-  %button(dojoType="dijit.form.Button" name="submit" value="Search" onclick="dijit.byId('loading_dialog').show();") 
+  %button(dojoType="dijit.form.Button" type="submit" name="submit_form" value="Search" onclick="dijit.byId('#{tabId}_loading_dialog').show();") 
     Search
   &nbsp;&nbsp;&nbsp;
   %button(dojoType="dijit.form.Button" name="cancel" value="Cancel" onclick="window.location=#{project_path(@project)}") 
@@ -81,9 +86,10 @@
   
 = clear_break
 
-%div{:dojoType=>"dijit.Dialog", :disableCloseButton => true, :id=>"loading_dialog", :title=>"Loading..."}
+%div{:dojoType=>"dijit.Dialog", :disableCloseButton => true, :id=>"#{tabId}_loading_dialog", :title=>"Loading..."}
   #search-div-loader
-#search_results
+
+%div{:id=>"#{tabId}_search_results"}
   :javascript  
     $(function() { 
     $("#site").change(function() { 

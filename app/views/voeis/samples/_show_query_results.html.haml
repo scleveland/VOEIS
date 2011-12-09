@@ -21,7 +21,7 @@ For: Variable(
 -if row_array.empty?
   Sorry.  There is no Data for your search.
 -else
-  -form_tag("export") do 
+  -form_tag({:controller=>'samples', :action=>'export'}) do 
     =hidden_field_tag('column_array', column_array.to_json)
     =hidden_field_tag('row_array', row_array.to_json)
     =hidden_field_tag('site_name', site)
@@ -83,6 +83,9 @@ For: Variable(
 
     var value_data = #{data_vals.to_json};
     var data = #{graph_data.as_json};
+    for(var i=0;i<value_data.length;i++)
+      value_data[i].idx = i;
+    
     var values_json = {identifier: 'id', label: 'name', items: value_data };
     var value_store = new dojo.data.ItemFileReadStore({data: values_json});
     
@@ -174,17 +177,44 @@ For: Variable(
        clientSort: true,
        rowSelector: '20px',
        structure: val_layout,
+       style: 'width:95%;',
        plugins: {filter:true, pagination:true, exporter:true
+       },
+       onSelected: function(idx) {
+         var item = this.getItem(idx);
+         var idx = parseInt(item.idx.toString());
+         console.log('SELECT:',item);
+         var point = data[idx];
+         console.log('SELECT-PT:',point);
+         /**
+         var pg_pos = plot.pointOffset({x:point[0],y:point[1]})
+         var pageX = plot.offset().left+pg_pos.left-20;
+         var pageY = plot.offset().top+pg_pos.top-20;
+         plot.unhighlight();
+         plot.highlight(0,idx);
+         
+         $("#tooltip").remove();
+         var x = point[0].toFixed(2),
+             y = point[1].toFixed(2);
+             var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+             dDate = new Date();
+             dDate.setTime(mEpoch);
+         showTooltip(pageX, pageY,
+           //*****You will need to change the sensor name here to the appropriate one selected above
+                    dDate.toLocaleString() + " = " + y + " " + "#{variable}|#{units}" );
+         //**/
        }
     },
     document.createElement('div'));
 
     // append the new grid to the div "gridContainer":
-    dojo.byId("gridContainer").appendChild(val_grid.domNode);
+    //dojo.byId("gridContainer").appendChild(val_grid.domNode);
+    $('##{tabId}_search_results #gridContainer').append(val_grid.domNode);
 
     // Call startup, in order to render the grid:
     val_grid.startup();
-    var plot =$.plot($("#placeholder"), [data],{
+    
+    var plot = $.plot($("##{tabId}_search_results #placeholder"), [data],{
            series: {
                color : "blue",
                lines: { show: true },
@@ -192,7 +222,6 @@ For: Variable(
               },
 
            grid:  { hoverable: true, clickable: true },
-           xaxis: { mode: "time" },
            xaxis: { mode: "time" },
            pan:   { interactive: true },
            zoom: {interative: true}
@@ -230,7 +259,7 @@ For: Variable(
      //NOTE-- the time string for #x is in UTC format and currently is in GMT time
      var previousPoint = null;
      
-     $("#placeholder").bind("plothover", function (event, pos, item) {
+     $("##{tabId}_search_results #placeholder").bind("plothover", function (event, pos, item) {
          var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
          dDate = new Date();
          dDate.setTime(mEpoch);
@@ -250,8 +279,7 @@ For: Variable(
                    //*****You will need to change the sensor name here to the appropriate one selected above
                             dDate.toLocaleString() + " = " + y + " " + "#{variable}|#{units}" );
              }
-         }
-         else {
+         } else {
              $("#tooltip").remove();
              previousPoint = null;            
          }
@@ -269,6 +297,7 @@ For: Variable(
   -#%th{:field=>"local_date_time", :width=>"190px", :filterable=>true} Timestamp
   -#%th{:field=>"vertical_offset", :width=>"130px", :filterable=>true} Vertical Offset
   -#%th{:field=>"data_value", :width=>"100px", :filterable=>true} Value
+  %br
   #gridContainer{:style=>"width:900px;height:300px;"}
   -# %button{:onclick=>"exportAll()"}
   -#   Export all to CSV
