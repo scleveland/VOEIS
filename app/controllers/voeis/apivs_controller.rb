@@ -199,7 +199,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # this requires that a datastream has already been created
   # to parse this file.  Can return json or xml as specified
   #
-  # @example curl -F datafile=@CR1000_2_BigSky_NFork_small.dat -F data_template_id=1 http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_logger_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
+  # @example curl -F site_id=15 -F queue=true -F datafile=@CR1000_2_BigSky_NFork_smallp2.csv -F data_template_id=31 http://localhost:3000/projects/cfee5aec-c520-11e0-a45c-c82a14fffebf/apivs/upload_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
   #
   #
   # @param [File] :datafile csv file to store
@@ -283,8 +283,8 @@ class Voeis::ApivsController < Voeis::BaseController
         rescue   Exception => e
             email_exception(e,request.env)
             logger.info {e.to_s}
-            logger.info {"YEAH"}
-          #problem parsing file
+          #problem parsing file - run the data catalog to update things
+          data_stream_template.sites.first.update_site_data_catalog
           flash_error[:error] = @msg + e.message
           logger.info {@msg}
         end
@@ -315,7 +315,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # this requires that a site and a datastream has already been created
   # to parse this file.  Can return json or xml as specified
   #
-  # @example curl -F datafile=@CR1000_2_BigSky_NFork_small.dat -F data_template_id=1 -F site_id=1 http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
+  # @example curl -F datafile=@CR1000_2_BigSky_NFork_small.dat -F data_template_id=1 -F site_id=1 http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
   #
   #
   # @param [File] :datafile csv file to store
@@ -340,7 +340,7 @@ class Voeis::ApivsController < Voeis::BaseController
           unless params[:data_template_id].nil?
             first_row = Array.new
             flash_error = Hash.new
-          
+          debugger
             @msg = "There was a problem parsing this file."
             name = Time.now.to_s + params[:datafile].original_filename 
             directory = "temp_data"
@@ -381,25 +381,29 @@ class Voeis::ApivsController < Voeis::BaseController
                 end
                 csv.close()
                 path = File.dirname(@new_file)
+              user = nil
+              repository("default") do
+                user = current_user
+              end
               if first_row.count == data_stream_template.data_stream_columns.count
                 unless params[:queue] == "true"
-                  user = nil
-                  repository("default") do
-                    user = current_user
-                  end
                   flash_error = flash_error.merge(parent.managed_repository{Voeis::DataValue.parse_logger_csv(@new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,user.id)})
                 else
                   puts "***********ADDING DELAYED JOB******************"
                   dj = nil
+                  req = Hash.new
+                  req[:url]= request.url
+                  req[:ip_address] = request.remote_ip
+                  req [:parameters] = request.filtered_parameters.as_json
+                  job = Voeis::Job.create(:job_type=>"File Upload", :job_parameters=>req.to_json, :status => "queued", :submitted_at=>Time.now, :user_id => current_user.id)
                   repository("default") do
-                    dj = Delayed::Job.enqueue(ProcessAFile.new(parent, @new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,current_user))
+                    dj = Delayed::Job.enqueue(ProcessAFile.new(parent, @new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,current_user, job.id))
                   end
+                  job.delayed_job_id = dj.id
+                  job.save
                   puts dj.attributes
                   puts dj.repository.name
-                end
-                user = nil
-                repository("default") do
-                  user = current_user
+                  flash_error[:job_queue_id] = job.id
                 end
               else
                 #the file does not match the data_templates number of columns
@@ -408,9 +412,10 @@ class Voeis::ApivsController < Voeis::BaseController
               end
             rescue   Exception => e
                 email_exception(e,request.env)
+                logger.info {e}
                 logger.info {e.to_s}
-                logger.info {"YEAH"}
               #problem parsing file
+              site.update_site_data_catalog
               flash_error[:error] = @msg + e.message
               logger.info {@msg}
             end
@@ -443,9 +448,64 @@ class Voeis::ApivsController < Voeis::BaseController
     end
   end
   
+  # get_job_status
+  # API for getting the status of a job within a project
+  #
+  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_job_status.json?job_id = 1
+  #
+  # @param [Integer] :job_id
+  #
+  # @author Sean Cleveland
+  #
+  # @return [JSON String] a JSON object with the job object including status, completed_time, submitted_at, results, job_type and user_id
+  # 
+  # @api public
+  def get_job_status
+    @job = nil
+    unless params[:job_id].nil?
+      parent.managed_repository do
+        if job = Voeis::Job.get(params[:job_id].to_i)
+          job.check_status
+          @job = job.attributes
+        else
+          @job[:errors] = "There is no job with id = #{params[:job_id]}"
+        end
+      end
+    else
+      @job[:errors] = "A job_id parameter is required!"
+    end
+    respond_to do |format|
+     format_response(@job, format)
+    end
+  end
   
-  
-  
+  # get_project_jobs
+  # API for getting the jobs within a project -either all or by job status
+  #
+  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_job_status.json?job_id = 1
+  #
+  # @params[String] :job_status [queued, running, complete, failed, canceled] leaving this blank will fetch all jobs
+  #
+  # @author Sean Cleveland
+  #
+  # @return [JSON String] a JSON object with the job object including status, completed_time, submitted_at, results, job_type and user_id
+  # 
+  # @api public
+  def get_project_jobs
+    @jobs = Hash.new
+    unless params[:job_status].nil?
+      if ['queued', 'running', 'complete','failed','canceled'].include? params[:job_status]
+        @jobs[:jobs] =  parent.managed_repository{Voeis::Job.all(:status=>params[:job_status])}.as_json
+      else
+        @jobs[:error] = "The Status: #{params[:job_status]} is not a valid option.  Please use: queued,running, complete, failed, or canceled.}"
+      end
+    else
+      @jobs = parent.managed_repository{Voeis::Job.all}
+    end
+    respond_to do |format|
+     format_response(@jobs, format)
+    end
+  end
   
   # get_project_data_summary
   # API for getting a list of the data within a Project
