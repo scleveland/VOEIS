@@ -58,6 +58,7 @@ class Role
       Voeis::VariableNameCV,
       Voeis::Equipment,
       Voeis::DataSet,
+      Voeis::Job,
       Voeis::Visit,
       Voeis::Campaign]
   end
