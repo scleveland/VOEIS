@@ -147,7 +147,7 @@ class Voeis::DataValue
           if !row[data_timestamp_col].nil? && !row[data_timestamp_col].empty?        
           Rails.logger.info '#{row.join(', ')}'
           #puts row.join(', ')
-            results = parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id, csv_file)
+            results = parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols, source_id, dst_time, dst, user, csv_file)
             
             if results[:result_ids].empty?
               skipped_rows += 1
@@ -193,8 +193,9 @@ class Voeis::DataValue
   # @author Yogo Team
   #
   # @api public
-  def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array,sensor_cols, source_id, dst_time, dst, user_id,filename)
+  def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array,sensor_cols, source_id, dst_time, dst, user,filename)
     require 'chronic'  #for robust timestamp parsing
+     puts "INSIDE USER ID: #{user.id} ********************************"
     name = 2
     variable = 0
     sensor = 0
@@ -219,14 +220,15 @@ class Voeis::DataValue
     
     #if t = Date.parse(timestamp) rescue nil?
     #if (Voeis::DataValue.first(:local_date_time => timestamp) & 
+    
     if Voeis::DataValue.first(:datatype=>data_stream.type, :local_date_time=>timestamp, :site_id=> site_id, :variable_id => data_col_array[variable_cols[0]][variable].id).nil?
           created_at = updated_at = Time.now.strftime("%Y-%m-%dT%H:%M:%S%z")
-          create_comment = "Created at #{created_at} by #{User.current.first_name} #{User.current.last_name} [#{User.current.login}]"
+          create_comment = "Created at #{created_at} by #{user.first_name} #{user.last_name} [#{user.login}]"
           row_values = []
           (0..row.size-1).each do |i|
             if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore"
                 cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
-                row_values << "(#{cv.to_s}, '#{timestamp.to_s}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc.to_s}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id},  '#{filename}' )"
+                row_values << "(#{cv.to_s}, '#{timestamp.to_s}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc.to_s}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id},  '#{filename}' )"
               end #end if
           end #end loop
           if !row_values.empty?
@@ -260,7 +262,7 @@ class Voeis::DataValue
             if sample_id != -1
               sample_value=[]
               sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\") VALUES "
-              sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}','#{created_at}', '#{updated_at}', #{user_id},'#{create_comment}')"
+              sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}','#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}')"
               #sql << sample_value.join(',')
               sql << " RETURNING \"id\""
               newsample_id = repository.adapter.execute(sql)
