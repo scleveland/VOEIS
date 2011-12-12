@@ -48,6 +48,8 @@ class ProcessAFile
       job.save
     end
     # Message the user when action is complete.
-    VoeisMailer.email_user(user.email, "From VOEIS:: Your Job is complete!", results)
+    puts results
+    puts "****** USER EMAIL #{user.email}  **************"
+    puts VoeisMailer.email_user(user.email, "From VOEIS:: Your Job is complete!", results)
   end
 end
