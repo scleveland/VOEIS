@@ -17,6 +17,7 @@ class Voeis::JobsController < Voeis::BaseController
     @jobs  = parent.managed_repository{Voeis::Job.all}
     @job_array = Array.new
     @jobs.each do |j|
+      j.check_status
       job_temp = Hash.new
       job_temp = j.attributes.merge({:user_name => j.user_name})
       @job_array << job_temp
