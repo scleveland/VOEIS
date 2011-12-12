@@ -213,6 +213,7 @@
                 -#= link_to("Browse", campaigns_path, :dojoType => "yogo.ui.MenuLink")
                 -#= link_to("Browse Data Streams", query_project_data_streams_path(@project), :dojoType => "yogo.ui.MenuLink")
                 = link_to("Browse/Simple Search Data", query_project_samples_path(@project), :dojoType => "yogo.ui.MenuLink")
+                = link_to("Job Queue", project_jobs_path(@project), :dojoType => "yogo.ui.MenuLink")
                 -if !current_user.nil?
                   -#= link_to("Search", campaigns_path, :dojoType => "yogo.ui.MenuLink")
                   %div{:dojoType=>"dijit.MenuSeparator"}
@@ -220,7 +221,7 @@
                     %span My Saved Searches
                     %div{:dojoType=>"dijit.Menu", :id=>"dataSubMenu"}
                       = render_cell(:data_menu, :display, :current_user => current_user)
-        
+              
         -##dataButton{:dojoType => "dijit.form.DropDownButton"}
         -#  %span{:style => "font-weight:bold"}
         -#    Data
