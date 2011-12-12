@@ -37,4 +37,12 @@ class Voeis::Job
     end
     return self.status
   end
+  
+  def user_name
+    login= ""
+    DataMapper.repository('default') do
+      login = User.get(self.user_id).login
+    end
+    return login
+  end
 end

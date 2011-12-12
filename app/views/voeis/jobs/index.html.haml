@@ -1,0 +1,33 @@
+- content_for(:javascripts) do
+  :javascript
+    dojo.require("dojox.grid.EnhancedGrid");
+    dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+    dojo.require("dojox.grid.enhanced.plugins.Filter");
+    var jobs_json = {
+      identifier: 'id',
+      label: 'name',
+      items: #{@job_array.to_json} };
+
+    var jobs = new dojo.data.ItemFileWriteStore({
+      data: jobs_json
+    });
+
+%h1
+  Jobs
+
+
+#job-grid{:style=>"margin:0;padding:0;"}
+  %table{:id=>'project_jobs', :dojoType=>"dojox.grid.EnhancedGrid", 
+    :plugins=> "{nestedSorting:false, filter:true, indirectSelection:false}",  
+    :jsId=>"JobsGrid", 
+    :store=>"jobs", 
+    :autoWidth=>"false",
+      :style=>"width:600px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
+    %thead
+      %tr
+        %th{:field => "id", :width => "auto"} Job ID
+        %th{:field => "job_type", :width => "auto"} Type
+        %th{:field => "submitted_at", :width => "auto"} Time Submitted
+        %th{:field => "user_name", :width => "auto"} User
+        %th{:field => "status", :width => "auto"} Status
+  = clear_break

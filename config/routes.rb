@@ -113,6 +113,7 @@ Yogo::Application.routes.draw do
         end
       end
       resources :sensor_types
+      resources :jobs
       resources :data_stream_columns
       resources :samples do
         collection do
