@@ -95,13 +95,45 @@
   
   
 
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#versions_array-instance_method" title="#versions_array (instance method)">- (Object) <strong>versions_array</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
 
   
   
   
   
   
-  <h2>Method Summary</h2>
+  
   
   <h3 class="inherited">Methods included from <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html" title="Yogo::Versioned::DataMapper::Resource (module)">Yogo::Versioned::DataMapper::Resource</a></span></h3>
   <p class="inherited"><span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#get_dirty-instance_method" title="Yogo::Versioned::DataMapper::Resource#get_dirty (method)">#get_dirty</a></span>, <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#included-class_method" title="Yogo::Versioned::DataMapper::Resource.included (method)">included</a></span>, <span class='object_link'><a href="../Yogo/Versioned/DataMapper/Resource.html#to_hash-instance_method" title="Yogo::Versioned::DataMapper::Resource#to_hash (method)">#to_hash</a></span></p>
@@ -118,10 +150,44 @@
 
   
 
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="versions_array-instance_method">
+  
+    - (<tt><span class='object_link'><a href="../Object.html" title="Object (class)">Object</a></span></tt>) <strong>versions_array</strong> 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+14
+15
+16</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'app/models/voeis/vertical_datum_cv.rb', line 14</span>
+
+<span class='kw'>def</span> <span class='id versions_array'>versions_array</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id versions'>versions</span><span class='period'>.</span><span class='id to_a'>to_a</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
 </div>
     
     <div id="footer">
-  Generated on Tue Nov 22 13:39:06 2011 by 
+  Generated on Mon Dec 12 16:16:00 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

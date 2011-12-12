@@ -341,7 +341,7 @@ Robbie Lamb robbie.lamb@gmail.com
   <span class='id setting'>setting</span> <span class='op'>=</span> <span class='kw'>if</span> <span class='cvar'>@@cache</span><span class='period'>.</span><span class='id has_key?'>has_key?</span><span class='lparen'>(</span><span class='id key'>key</span><span class='rparen'>)</span> 
       <span class='cvar'>@@cache</span><span class='lbracket'>[</span><span class='id key'>key</span><span class='rbracket'>]</span> 
     <span class='kw'>else</span>
-      <span class='id temp'>temp</span> <span class='op'>=</span> <span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:name</span> <span class='op'>=&gt;</span> <span class='id key'>key</span><span class='period'>.</span><span class='id to_s'>to_s</span><span class='rparen'>)</span>
+      <span class='id temp'>temp</span> <span class='op'>=</span> <span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:name</span> <span class='op'>=&gt;</span> <span class='id key'>key</span><span class='rparen'>)</span>
       <span class='cvar'>@@cache</span><span class='lbracket'>[</span><span class='id key'>key</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id temp'>temp</span><span class='period'>.</span><span class='id nil?'>nil?</span> <span class='op'>?</span> <span class='kw'>nil</span> <span class='op'>:</span> <span class='id temp'>temp</span><span class='period'>.</span><span class='id value'>value</span>
   <span class='kw'>end</span>
   <span class='id setting'>setting</span><span class='period'>.</span><span class='id nil?'>nil?</span> <span class='op'>?</span> <span class='kw'>false</span> <span class='op'>:</span> <span class='id setting'>setting</span>
@@ -568,7 +568,7 @@ Robbie Lamb robbie.lamb@gmail.com
 </div>
     
     <div id="footer">
-  Generated on Tue Nov 22 13:39:04 2011 by 
+  Generated on Mon Dec 12 16:15:58 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

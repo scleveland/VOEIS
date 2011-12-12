@@ -308,12 +308,12 @@ site_samples  Returns the samples for a given site.
       <pre class="lines">
 
 
-277
-278
-279</pre>
+281
+282
+283</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 277</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 281</span>
 
 <span class='kw'>def</span> <span class='id add_site'>add_site</span>
   <span class='ivar'>@sites</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id all'>all</span>
@@ -336,10 +336,6 @@ site_samples  Returns the samples for a given site.
       <pre class="lines">
 
 
-219
-220
-221
-222
 223
 224
 225
@@ -392,10 +388,14 @@ site_samples  Returns the samples for a given site.
 272
 273
 274
-275</pre>
+275
+276
+277
+278
+279</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 219</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 223</span>
 
 <span class='kw'>def</span> <span class='id create'>create</span>
   <span class='ivar'>@project</span> <span class='op'>=</span> <span class='id parent'>parent</span>
@@ -472,12 +472,12 @@ site_samples  Returns the samples for a given site.
       <pre class="lines">
 
 
-161
-162
-163</pre>
+165
+166
+167</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 161</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 165</span>
 
 <span class='kw'>def</span> <span class='id edit'>edit</span>
   <span class='ivar'>@site</span> <span class='op'>=</span>  <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='rbrace'>}</span>
@@ -550,10 +550,6 @@ site_samples  Returns the samples for a given site.
       <pre class="lines">
 
 
-281
-282
-283
-284
 285
 286
 287
@@ -569,10 +565,14 @@ site_samples  Returns the samples for a given site.
 297
 298
 299
-300</pre>
+300
+301
+302
+303
+304</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 281</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 285</span>
 
 <span class='kw'>def</span> <span class='id save_site'>save_site</span>
   <span class='id sys_site'>sys_site</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id first'>first</span><span class='lparen'>(</span><span class='symbol'>:id</span> <span class='op'>=&gt;</span> <span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:site</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -835,10 +835,6 @@ Sean Cleveland
       <pre class="lines">
 
 
-315
-316
-317
-318
 319
 320
 321
@@ -847,10 +843,14 @@ Sean Cleveland
 324
 325
 326
-327</pre>
+327
+328
+329
+330
+331</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 315</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 319</span>
 
 <span class='kw'>def</span> <span class='id site_samples'>site_samples</span>
   <span class='ivar'>@samples</span> <span class='op'>=</span> <span class='const'>Hash</span><span class='period'>.</span><span class='id new'>new</span>
@@ -883,10 +883,6 @@ Sean Cleveland
       <pre class="lines">
 
 
-165
-166
-167
-168
 169
 170
 171
@@ -935,10 +931,14 @@ Sean Cleveland
 214
 215
 216
-217</pre>
+217
+218
+219
+220
+221</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 165</span>
+      <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 169</span>
 
 <span class='kw'>def</span> <span class='id update'>update</span>
   <span class='comment'># This should be handled by the framework, but isn't when using jruby.
@@ -1073,7 +1073,11 @@ Sean Cleveland
 156
 157
 158
-159</pre>
+159
+160
+161
+162
+163</pre>
     </td>
     <td>
       <pre class="code"><span class="info file"># File 'app/controllers/voeis/sites_controller.rb', line 97</span>
@@ -1081,7 +1085,11 @@ Sean Cleveland
 <span class='kw'>def</span> <span class='id versions'>versions</span>
   <span class='ivar'>@project</span> <span class='op'>=</span> <span class='id parent'>parent</span>
   <span class='ivar'>@site</span> <span class='op'>=</span>  <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='rbrace'>}</span>
-  <span class='ivar'>@versions</span> <span class='op'>=</span> <span class='id parent'>parent</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='const'>Voeis</span><span class='op'>::</span><span class='const'>Site</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span><span class='period'>.</span><span class='id versions'>versions</span><span class='rbrace'>}</span>
+  <span class='comment'>#@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
+</span>  <span class='comment'>#@versions = parent.managed_repository.adapter.select('SELECT * FROM voeis_site_versions WHERE id=%s ORDER BY updated_at DESC'%@site.id)
+</span>  <span class='comment'>##@versions = @versions.to_a
+</span>  <span class='comment'>##@versions = @site.versions
+</span>  <span class='ivar'>@versions</span> <span class='op'>=</span> <span class='ivar'>@project</span><span class='period'>.</span><span class='id managed_repository'>managed_repository</span><span class='lbrace'>{</span><span class='ivar'>@site</span><span class='period'>.</span><span class='id versions_array'>versions_array</span><span class='rbrace'>}</span>
   
   <span class='ivar'>@site_refs</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
   <span class='id temp'>temp</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -1151,7 +1159,7 @@ Sean Cleveland
 </div>
     
     <div id="footer">
-  Generated on Tue Nov 22 13:39:08 2011 by 
+  Generated on Mon Dec 12 16:16:02 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>

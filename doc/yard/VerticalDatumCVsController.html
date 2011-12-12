@@ -795,11 +795,11 @@ HISTORY!
   <span class='comment'>### GLOBAL VERTICAL DATUM HISTORY
 </span>  <span class='ivar'>@global</span> <span class='op'>=</span> <span class='kw'>true</span>
   <span class='ivar'>@cv_item</span> <span class='op'>=</span> <span class='const'>Voeis</span><span class='op'>::</span><span class='const'>VerticalDatumCV</span><span class='period'>.</span><span class='id get'>get</span><span class='lparen'>(</span><span class='id params'>params</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
-  <span class='ivar'>@cv_versions</span> <span class='op'>=</span> <span class='ivar'>@cv_item</span><span class='period'>.</span><span class='id versions'>versions</span>
+  <span class='ivar'>@cv_versions</span> <span class='op'>=</span> <span class='ivar'>@cv_item</span><span class='period'>.</span><span class='id versions'>versions</span><span class='period'>.</span><span class='id to_a'>to_a</span>
   <span class='ivar'>@cv_title</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>Vertical Datum</span><span class='tstring_end'>'</span></span>
   <span class='ivar'>@cv_title2</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>vertical_datum</span><span class='tstring_end'>'</span></span>
-  <span class='ivar'>@cv_term</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>term</span><span class='tstring_end'>'</span></span>
   <span class='ivar'>@cv_name</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>term</span><span class='tstring_end'>'</span></span>
+  <span class='ivar'>@cv_term</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>term</span><span class='tstring_end'>'</span></span>
   <span class='ivar'>@cv_id</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>id</span><span class='tstring_end'>'</span></span>
 
   <span class='ivar'>@cv_refs</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -808,7 +808,7 @@ HISTORY!
 <span class='comment'>#      {:label=&gt;&quot;Version&quot;, :name=&gt;&quot;version&quot;},
 </span><span class='comment'>#      {:label=&gt;&quot;ID&quot;, :name=&gt;&quot;id&quot;},
 </span>    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Term</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>term</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span><span class='comma'>,</span>
-    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Defination</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>defination</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
+    <span class='lbrace'>{</span><span class='symbol'>:label</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Definition</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='symbol'>:name</span><span class='op'>=&gt;</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>definition</span><span class='tstring_end'>&quot;</span></span><span class='rbrace'>}</span>
     <span class='rbracket'>]</span>
   
   <span class='id render'>render</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>spatial_references/versions.html.haml</span><span class='tstring_end'>'</span></span>
@@ -823,7 +823,7 @@ HISTORY!
 </div>
     
     <div id="footer">
-  Generated on Tue Nov 22 13:39:10 2011 by 
+  Generated on Mon Dec 12 16:16:04 2011 by 
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.6.3 (ruby-1.9.2).
 </div>
