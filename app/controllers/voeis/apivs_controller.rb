@@ -267,13 +267,22 @@ class Voeis::ApivsController < Voeis::BaseController
               end
               flash_error = flash_error.merge(parent.managed_repository{Voeis::DataValue.parse_logger_csv(@new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,user.id)})
             else
+              
               puts "***********ADDING DELAYED JOB******************"
               dj = nil
+              req = Hash.new
+              req[:url]= request.url
+              req[:ip_address] = request.remote_ip
+              req [:parameters] = request.filtered_parameters.as_json
+              job = Voeis::Job.create(:job_type=>"File Upload", :job_parameters=>req.to_json, :status => "queued", :submitted_at=>Time.now, :user_id => current_user.id)
               repository("default") do
-                dj = Delayed::Job.enqueue(ProcessAFile.new(parent, @new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,current_user))
+                dj = Delayed::Job.enqueue(ProcessAFile.new(parent, @new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,current_user, job.id))
               end
+              job.delayed_job_id = dj.id
+              job.save
               puts dj.attributes
               puts dj.repository.name
+              flash_error[:job_queue_id] = job.id
             end
           else
             #the file does not match the data_templates number of columns
