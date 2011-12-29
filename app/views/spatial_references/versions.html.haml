@@ -69,7 +69,7 @@
   = "SHOW %s VERSIONS"%((@global ? 'GLOBAL ' : '')+@cv_title.upcase)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('RETURN', 'javascript:', :class=>'icon icon-hist', :onclick=>"back_or_close();")
+= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
 %br
 
 - projId = @project.nil? ? '' : @project.id.to_s

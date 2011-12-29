@@ -12,7 +12,7 @@ class Voeis::SamplesController < Voeis::BaseController
   end
 
   def index
-    @samples =  parent.managed_repository{Voeis::Sample.all}
+    @samples =  parent.managed_repository{Voeis::Sample.all(:order=>[:created_at.desc], :limit=>100)}
     @project = parent
   end
 
@@ -146,7 +146,10 @@ class Voeis::SamplesController < Voeis::BaseController
   end
   
   def query
+    siteid = params[:site_id]
     parent.managed_repository do
+      @site = Voeis::Site.get(siteid) if !siteid.nil? && siteid.to_i>0
+      
       # @start_year = Voeis::DataValue.first(:order => [:local_date_time.asc])
       # @end_year = Voeis::DataValue.last(:order => [:local_date_time.asc])
       
@@ -187,12 +190,12 @@ class Voeis::SamplesController < Voeis::BaseController
     @sites.all(:order => [:name.asc]).each do |site|
       @site_opts_array << [site.name.capitalize+" | "+site.code, site.id.to_s]
     end
-    @site_options = opts_for_select(@site_opts_array)
+    @site_options = opts_for_select(@site_opts_array,  selected=siteid)
   end
   
   
-  
   def search
+    @tabId = params[:tab_id]
     @start_date =  Date.civil(params[:range][:"start_date(1i)"].to_i,params[:range]      [:"start_date(2i)"].to_i,params[:range][:"start_date(3i)"].to_i)
     @end_date = Date.civil(params[:range][:"end_date(1i)"].to_i,params[:range]    [:"end_date(2i)"].to_i,params[:range][:"end_date(3i)"].to_i)
     @start_date = @start_date.to_datetime
