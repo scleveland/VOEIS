@@ -105,11 +105,12 @@
     -if @auth && @site
       = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('##{varId}_show').hide();$('##{varId}_edit').show();")
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('DATA', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('SAMPLES', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+      -#= link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+      -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+    -#= link_to('DATA', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+    -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    -#= link_to('SAMPLES', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
     %br
     %br
     -#placeholder{:style=>"width:300px;height:150px;"}
@@ -195,37 +196,74 @@
 
       :javascript
         TEST = 'TESTING ShowVariable';
+        #{varId} = {};
+        
+        var date_formatter = function(value) {
+          if(value==null || value=='') return '-';
+          // Format DateTime string
+          var d = new Date(value);
+          //var fmt = d.getMonth()+'/'+d.getFullYear()
+          return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+        };
         
         function initPage() {
           console.log('initPage: NOW');
-          this_pane_id = '#{@project.id}-site'+site_id+'-var'+var_id;
-          this_pane = dojo.byId(this_pane_id);
-          if(this_pane) this_pane = dijit.byNode(this_pane);
+          //this_pane_id = '#{@project.id}-site'+site_id+'-var'+var_id;
+          //this_pane = dojo.byId(this_pane_id);
+          //if(this_pane) this_pane = dijit.byNode(this_pane);
 
-          if(parseInt(var_id)) graphInit(variable.id, variable.variable_name);
+          //if(parseInt(#{@var_id})) graphInit(variable.id, variable.variable_name);
+          #{varId}_gdata = #{@graph_data.to_json};
+          if(parseInt(#{@var_id})) graphInit(#{@site.nil? ? 0 : @site.id},#{@variable[:id].to_s},'#{@variable[:variable_name]}',#{varId}_gdata);
+          else $('##{varId}-provenance-row').hide();
           
+          console.log('initPage: DONE');
+        };
+        
+        function cancel_edit(varID) {
+          console.log('CANCEL!',varID);
+          var var_id = parseInt(#{@var_id});
+          var site_id = parseInt(#{@site.nil? ? 0 : @site.id});
+          var this_pane_id = '#{@project.id}-site'+site_id+'-var'+var_id;
+          var this_pane = dojo.byId(this_pane_id);
+          if(this_pane) this_pane = dijit.byNode(this_pane);
+          console.log('CANCEL_THIS_PANE:',this_pane);
+          //###SCROLL TO TOP
+          //window.scrollTo(0,0);
+          $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
+          $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
+          if(parseInt(#{@var_id})) {
+            $('#'+varID+'_edit').hide();
+            $('#'+varID+'_show').show();
+          } else {
+            var tabs = dijit.byId('tab_browser');
+            tabs.removeChild(this_pane);
+            this_pane.onClose();
+            this_pane.destroyRecursive();  
+          };
         };
         
         //var gdata = #{@variable.last_ten_values_graph(@site).to_json};
-        var gdata = #{@graph_data.to_json};
-        gdata = gdata ? gdata : {};
+        var #{varId}_gdata = #{@graph_data.to_json};
+        #{varId}_gdata = #{varId}_gdata || {};
         //gdata = {};
 
         //graphInit();
-        var graphInit = function(varId,varName) {
+        var graphInit = function(siteId,varId,varName,gdata) {
+            gdata = gdata || {};
             console.log('>>>graphInit');
             console.log('SITE-ID= ', '#{@site.id}');
             console.log('VAR-ID= ', '#{@variable.id}');
             console.log('GDATA= ', gdata);
             console.log('TEST= ', TEST);
-            plotGraph();
+            plotGraph(gdata,siteId,varId);
             handleGraph(varName);
         };
-        var plotGraph = function() {
+        var plotGraph = function(gdata,siteId,varId) {
             //console.debug(gdata);
             //console.log('GDATA= ', gdata);
             console.log('>>>plotGraph:', TEST);
-            var plot = $.plot($("#graph#{'-site%s-var%s'%[@site.id,@variable.id]}"), [gdata],{
+            var plot = $.plot($("#graph-site"+siteId+"-var"+varId), [gdata],{
                 series: {
                     color : "blue",
                     lines: { show: true },
@@ -245,9 +283,16 @@
         //I would only mess with the css if you really need to otherwise this
         //shouldn't need any modification
         var showTooltip = function(x, y, contents) {
-            $('<div id="tooltip" style="z-index:200;">' + contents + '</div>').css( {
+            //console.log('>>>tooltip:',contents);
+            //var divpos = $("body ##{varId}_show").offset();
+            //x = x - divpos.left;
+            //y = y - divpos.top;
+            $('<div id="tooltip">' + contents + '</div>').css( {
                 position: 'absolute',
+                //'min-width': '50%',
                 display: 'none',
+                //overflow: 'visible',
+                'z-index': 1000,
                 top: y + 5,
                 left: x + 5,
                 border: '1px solid #fdd',
@@ -255,6 +300,7 @@
                 'background-color': '#fee',
                 opacity: 0.80
             }).appendTo("body").fadeIn(200);
+            //}).appendTo("body ##{varId}_show").fadeIn(200);
         };
 
         //Most of this should remain the same
@@ -262,10 +308,12 @@
         var handleGraph = function(variable_name) {
             console.log('>>>handleGraph');
             var previousPoint = null;
-            $("#graph#{@variable.id.to_s}").bind("plothover", function (event, pos, item) {
+            //$("#graph#{@variable.id.to_s}").bind("plothover", function (event, pos, item) {
+            $("#{"#graph-site"+@site.id.to_s+"-var"+@variable.id.to_s}").bind("plothover", function (event, pos, item) {
                 var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
                 dDate = new Date();
                 dDate.setTime(mEpoch);
+                //console.log('>>>plothover');
                 $("#x").text(dDate.toLocaleString());
                 $("#y").text(pos.y);
 
@@ -281,7 +329,7 @@
                         showTooltip(item.pageX, item.pageY,
                         //*****You will need to change the sensor name here to the appropriate one selected above
                             //***dDate.toLocaleString() + " = " + y + " " + "#{@variable.variable_name}|" );
-                            dDate.toLocaleString()+" = "+y+" "+variable_name + "| #{@units.units_name}");
+                            date_formatter(dDate.toLocaleString())+" = "+y+" "+variable_name+" | #{@units.units_name}");
                     };
                 } else {
                     $("#tooltip").remove();
@@ -300,7 +348,7 @@
     &nbsp;&nbsp;&nbsp; (* Required)
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{varId}_cancel_edit();")
+    = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"cancel_edit('#{varId}');")
     %br
     %br
   
@@ -329,7 +377,7 @@
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"var_units"} Units *
-            %select(id="var_untis_id" name="var_units")
+            %select(name="var_units")
               = options_for_select(@units_all.map{|u| [u.type_format,u.id]}, selected=@variable.variable_units_id)
               -#- @units_all.each do |item|
               -#  %option(value="#{item.id}") #{item.type_format}
@@ -339,7 +387,7 @@
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"var_gcat"} General Category *
-              %input(name="var_gcat" dojoType="dijit.form.ValidationTextBox" id="site00_name" type="text" value="#{@variable.general_category}" required="true")
+              %input(name="var_gcat" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.general_category}" required="true")
       
         %tr
           %td
@@ -357,7 +405,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_name"} Data Type *
+                %label{:for=>"var_dtype"} Data Type *
               %input(name="var_dtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.data_type}" required="true")
           %td
             .from-element
@@ -369,18 +417,18 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_name"} Time Support *
+                %label{:for=>"var_time_support"} Time Support *
               %input(name="var_time_support" class="TextBox_half" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'#######.####'}" type="text" value="#{@variable.time_support}" required="true")
               &nbsp;&nbsp;&nbsp;
               -#%input(name="var_reg" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.is_regular}" required="true")
-              %input(name="var_regular" dojoType="dijit.form.CheckBox" id="var_reg_id" jsId="var_reg_id" checked="#{@variable.is_regular}")
+              %input(name="var_regular" dojoType="dijit.form.CheckBox" checked="#{@variable.is_regular}")
               Regular Interval
       
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_units"} Time Units *
-            %select(id="site00_vertical_datum" name="site_vertical_datum")
+                %label{:for=>"var_time_units"} Time Units *
+            %select(name="var_time_units")
               = options_for_select(@units_all.all(:units_type=>'Time').map{|u| [u.units_name,u.id]}, selected=@variable.time_units_id)
             -#- @units_all.all(:units_type=>'Time').each do |item|
             -#  %option(value="#{item.id}") #{item.units_name}
@@ -390,7 +438,7 @@
             .from-element{:style=>"cursor:pointer;"}
               %span{:class=>'label', :style=>"cursor:pointer;"}
                 -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
-                %label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
+                %label{:for=>"var_lab", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
                   Labratory
             %select(name="var_lab")
               %option(value="0") NA
@@ -403,7 +451,7 @@
             .from-element{:style=>"cursor:pointer;"}
               %span{:class=>'label', :style=>"cursor:pointer;"}
                 -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
-                %label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
+                %label{:for=>"var_lab_method", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
                   Lab Method
             %select(name="var_lab_method")
               %option(value="0") NA
@@ -415,7 +463,7 @@
             .from-element{:style=>"cursor:pointer;"}
               %span{:class=>'label', :style=>"cursor:pointer;"}
                 -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
-                %label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
+                %label{:for=>"var_field_method", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
                   Field Method
             %select(name="var_field_method")
               %option(value="0") NA
@@ -432,8 +480,8 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_spat_val"} Spatial Offset Value
-              %input(name="var_spat_val" class="TextBox_value" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########.######'}" type="text" value="#{@variable.spatial_offset_value}" required="false")
+                %label{:for=>"var_spat_value"} Spatial Offset Value
+              %input(name="var_spat_value" class="TextBox_value" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########.######'}" type="text" value="#{@variable.spatial_offset_value}" required="false")
         %tr
           %td{:colspan=>"2"}
             .from-element
@@ -484,20 +532,21 @@
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"var_his_id"} HIS ID
-              %input(name="var_his_id" class="TextBox_value" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.his_id}" required="false")
+              %input(name="var_his_id" class="TextBox_value" dojoType="dijit.form.NumberTextBox" type="text" value="#{@variable.detection_limit}" required="false")
+              -#%input(name="var_his_id" class="TextBox_value" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.his_id}" required="false")
       
-        %tr{:id=>"site00-provenance-row"}
+        %tr{:id=>"#{varId}-provenance-row"}
           %td{:colspan=>"2"}
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"site_provenance_comment"} Provenance Comment
-            %textarea( name="site_provenance_comment" id="site00_provenance_comment" rows="2")
+                %label{:for=>"var_provenance_comment"} Provenance Comment
+            %textarea( name="var_provenance_comment" rows="2")
               -
       
         %tr
           %td{:colspan=>"2"}
             %br
-            %button(dojoType="dijit.form.Button" id="site00_voeis_site_submit" name="commit" value="Save Site" disabled="true") 
+            %button(dojoType="dijit.form.Button" name="commit" value="Save Site" disabled="true") 
               Save Variable
               %script{:type=>"dojo/method", :event=>"startup"}
                 :plain
@@ -510,15 +559,20 @@
                   if(this_pane) this_pane = dijit.byNode(this_pane);
                   console.log('INIT-FORM:',form);
                   console.log('FOR VAR:',variable);
-                  if(parseInt(#{@var_id})) graphInit(variable.id,variable.name);
-                  function #{varId}_cancel_edit() {
+                  console.log('THIS_PANE:',this_pane);
+                  //if(parseInt(#{@var_id})) graphInit(variable.id,variable.name,#{varId}_gdata);
+                  //else $('##{varId}-provenance-row').hide();
+                  function cancel_edit(varID) {
+                    console.log('CANCEL!',varID);
+                    var this_pane = this_pane;
+                    console.log('CANCEL_THIS_PANE:',this_pane);
                     //###SCROLL TO TOP
                     //window.scrollTo(0,0);
                     $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
                     $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
                     if(parseInt(#{@var_id})) {
-                      $('##{varId}_edit').hide();
-                      $('##{varId}_show').show();
+                      $('#'+varID+'_edit').hide();
+                      $('#'+varID+'_show').show();
                     } else {
                       var tabs = dijit.byId('tab_browser');
                       tabs.removeChild(this_pane);
@@ -527,7 +581,7 @@
                     };
                   };
                   this_pane.connect(this_pane, "onShow", function(state){
-                    if(parseInt(#{@var_id})) graphInit(variable.id,variable.name);
+                    if(parseInt(#{@var_id})) graphInit(site_id,variable.id,variable.name,#{varId}_gdata);
                   });
                   var form0 = form.domNode;
                   //var pane = dijit.byNode(dojo.byId('site00'));
@@ -563,7 +617,7 @@
                       data_type:form0.elements['var_dtype'].value, 
                       quality_control:form0.elements['var_qcval'].value, 
                       time_support:form0.elements['var_time_support'].value, 
-                      is_regular:form0.elements['var_regular'].value, 
+                      is_regular:form0.elements['var_regular'].value=='on' ? 'true' : 'false', 
                       time_units_id:form0.elements['var_time_units'].value, 
                       lab_id:form0.elements['var_lab'].value, 
                       lab_method_id:form0.elements['var_lab_method'].value, 
@@ -587,7 +641,7 @@
                       //###EDIT VAR
                       var post_type = 'PUT';
                       var post_url = '/projects/#{@project.id}/variables/'+var_id+'.json';
-                      data.variable['id'] = var_id.toString();
+                      //data.variable['id'] = var_id.toString();
                     } else {
                       //###NEW VAR (var_id==0)
                       var post_type = 'POST';
@@ -605,7 +659,14 @@
                           return;
                         };
                         data.variable['id'] = parseInt(newValue.id);
-                        site_var_data.append(data.variable);
+                        var var_data = {
+                          varname: data.variable.variable_name,
+                          varid: data.variable.id,
+                          varunits: data.variable.variable_units.untis_abbreviation+' ('+data.variable.data_type+')',
+                          count: 0,
+                          first: 'NA',
+                          last: 'NA'};
+                        site_var_data[site_id-1].append(var_data);
                         site_pane.siteUpdate();
                         #{varId}_cancel_edit();
                       },
@@ -614,16 +675,8 @@
                     return false;
                   });
             
-            
             &nbsp;&nbsp;
-            -#%button(dojoType="dijit.form.Button" onclick="console.log('CANCEL!');$('#edit-site00').hide();$('#show-site00').show();") 
-            -#%button(id="site00_voeis_cancel" dojoType="dijit.form.Button") Cancel
-            %button(dojoType="dijit.form.Button" id="site00_voeis_cancel" value="Cancel" onclick="#{varId}_cancel_edit();") Cancel
-            -#&nbsp;&nbsp;
-            -#= link_to('Cancel', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit-site00').hide();$('#show-site00').show();") 
-            -#= link_to('TEST', 'javascript:', :class=>'icon icon-cancel', :onclick=>"dijit.byNode(dojo.byId('site00')).siteFormSave(this);") 
-            -#%input{:type=>"button", :value=>"TEST", :onclick=>"dijit.byNode(dojo.byId('site00')).siteFormSave(this.form);"}
-            -#= link_to('Cancel', '#', :class=>'icon icon-cancel', :onclick=>'window.history.back();return false;') 
+            %button(dojoType="dijit.form.Button" value="Cancel" onclick="cancel_edit('#{varId}');") Cancel
 
 
 %br{:style=>'float:none; clear:both;'}

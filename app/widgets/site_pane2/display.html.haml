@@ -100,9 +100,9 @@
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('DATA', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('SAMPLES', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+  = link_to('DATA', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  = link_to('SAMPLES', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
   %br
   
   -#%table{:style=>"width:90%;"}
@@ -246,7 +246,6 @@
           //###CLICK-MAP
           $('body').click( function(e){
             console.log('DOMCLICK:',e);
-            //setTimeout(function(){
             if(!mapclick) return;
             var clickat = mapclick.latLng;
             var mapzoom = site00_lat_long.map.getZoom();
@@ -255,7 +254,6 @@
             site00_lat_long.map.setCenter(clickat);
             site00_lat_long.map.setZoom(mapzoom);
             mapclick = false;
-            //},50);
           });
           //google.maps.event.addDomListener(mapdiv, 'click', function(ev){ domclick = ev; });
           google.maps.event.addListener(site00_lat_long.map, 'click', function(mapev){ 

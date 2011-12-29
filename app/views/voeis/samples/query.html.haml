@@ -4,12 +4,13 @@
 - else
   - atroot = false
 - site_id = @site.nil? ? 0 : @site.id
-- tabId = @project.id.to_s+'-site'+site_id.to_s+'-data'
+-# tabId = @project.id.to_s+'-site'+site_id.to_s+'-data'
+- tabId = 'site'+site_id.to_s+'_data'
 
 :javascript
   function update_site_vars() {
     var site_id = #{site_id} || $('#site').val();
-    var form_id = '##{tabId} ';
+    var form_id = '##{tabId}_query ';
     console.log('SITE-ID:',site_id);
     $.get("#{site_sample_variables_project_samples_path}"+".json?site_id="+site_id,
       function(data) {
@@ -30,15 +31,19 @@
   };
   $(window).ready(function(){
     console.log('**LOADED**');
+    console.log('TABID: #{tabId}');
     update_site_vars();
   });
   
 
-%h2
-  - if site_id>0
+- if site_id>0
+  %h3{:style=>"margin-top:0;"}
     #{@site.name+': '}
-  Search Data:
-= form_for(:query, @query, :url => { :action=>'search'}, :remote=>true, :html=>{:id=>tabId}) do |f|
+    Search Data
+- else
+  %h2
+    Search Data:
+= form_for(:query, @query, :url => { :action=>'search'}, :remote=>true, :html=>{:id=>tabId+'_query'}) do |f|
   -#%input{:type=>"hidden", :name=>"tab_id", :value=>"#{tabId}"}
   =hidden_field_tag('tab_id', tabId)
   - if site_id>0
@@ -66,7 +71,8 @@
   -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
   %button(dojoType="dijit.form.Button" type="submit" name="submit_form" value="Search" onclick="dijit.byId('#{tabId}_loading_dialog').show();") 
     Search
-  &nbsp;&nbsp;&nbsp;
+  
+  &nbsp;&nbsp;
   %button(dojoType="dijit.form.Button" name="cancel" value="Cancel" onclick="window.location=#{project_path(@project)}") 
     Cancel
     %script{:type=>"dojo/method", :event=>"onClick"}

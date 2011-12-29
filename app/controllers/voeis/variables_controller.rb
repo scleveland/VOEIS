@@ -17,39 +17,6 @@ class Voeis::VariablesController < Voeis::BaseController
     #@sites = Voeis::Site.all
     @auth = !current_user.nil? && current_user.projects.include?(@project)
     @var_id = params[:id].to_i
-    @variablexx = {
-      :id=>0,
-      :variable_name=>'',
-      :variable_code=>'',
-      :sample_medium=>'Unknown',
-      :variable_untis_id=>0,
-      :general_category=>'Unknown',
-      :value_type=>'Unknown',
-      :speciation=>'Not Applicable',
-      :data_type=>'Unknown',
-      :quality_control=>0,
-      :time_support=>1.0,
-      :is_regular=>false,
-      :time_units_id=>103,
-      :lab_id=>nil,
-      :lab_method_id=>nil,
-      :field_method_id=>nil,
-      :spatial_offset_type=>'',
-      :spatial_offset_value=>nil,
-      :spatial_units_id=>nil,
-      :no_data_value=>'-9999',
-      :detection_limit=>nil,
-      :logger_type=>'',
-      :logger_id=>'',
-      :sensor_type=>'',
-      :sensor_id=>'',
-      :his_id=>nil,
-      :updated_at=>'',
-      :updated_by=>'',
-      :updated_comment=>'',
-      :provenance_comment=>'',
-      :created_at=>''
-    }
     @variable = Voeis::Variable.new
     @variable.id = 0
     @variable_ref = {}
@@ -147,6 +114,51 @@ class Voeis::VariablesController < Voeis::BaseController
     end
   end
   
+  # PUT /variables
+  def update
+    @project = parent
+    varparams = params[:variable]
+    @project.managed_repository{
+      @variable = Voeis::Variable.get(params[:id].to_i)
+      varparams.each do |key, value|
+        @variable[key] = value.blank? ? nil : value
+      end
+      logger.info '### VARPARAMS ###'
+      logger.info varparams
+      logger.info '### RAW VARIABLE ###'
+      logger.info @variable.to_hash
+      #@variable.is_regular = ck_param(varparams[:is_regular],is_bool=true,null=false)
+      #@variable.variable_units_id = ck_param(varparams[:variable_untis_id],is_id=true)
+      #@variable.time_units_id = ck_param(varparams[:time_units_id],is_id=true)
+      #@variable.spatial_units_id = ck_param(varparams[:spatial_units_id],is_id=true)
+      #@variable.lab_id = ck_param(varparams[:lab_id],is_id=true)
+      #@variable.lab_method_id = ck_param(varparams[:lab_method_id],is_id=true)
+      #@variable.field_method_id = ck_param(varparams[:field_method_id],is_id=true)
+      #@variable.quality_control = ck_param(varparams[:quality_control],is_int=true,null=false)
+      #@variable.his_id = ck_param(varparams[:his_id],is_int=true)
+      #@variable.detection_limit = ck_param(varparams[:detection_limit])
+      #@variable.spatial_offset_type = ck_param(varparams[:spatial_offset_type])
+      #@variable.spatial_offset_value = ck_param(varparams[:spatial_offset_value],is_float=true)
+      #@variable.time_support = ck_param(varparams[:time_support],is_float=true,null=false)
+      #@variable.valid?
+      #@variable.updated_at = Time.now
+      logger.info '### READY TO SAVE VARIABLE ###'
+      logger.info @variable.to_hash
+      
+      respond_to do |format|
+        if @variable.save
+          format.html{
+            flash[:notice] = "Variable was Updated successfully."
+            redirect_to project_url(@project)
+          }
+          format.json{
+            render :json => @variable.as_json, :callback => params[:jsoncallback]
+          }
+        end
+      end
+    }
+  end
+  
   # POST /variables
   def create
 
@@ -190,5 +202,29 @@ class Voeis::VariablesController < Voeis::BaseController
         return
       end
     end
+  end
+  
+  ###CK_PARAM function
+  def ck_param(val, is_id=false, is_int=false, is_float=false, is_bool=false, null=true)
+    if null || is_id
+      return nil if val.nil? || val=='NaN' || val=='null'
+    end
+    if null && (is_id || is_int || is_float || is_bool)
+      return nil if val.empty?
+    end
+    if is_id
+      return nil if val=='0'
+    end
+    if is_bool
+      return 0 if val.nil? || val.downcase=='false' || val=='0' || val=='' || val=='NaN' || val=='null'
+      return 1
+    end
+    if is_int || is_float
+      return 0 if val.nil? || val=='0' || val=='' || val=='NaN' || val=='null'
+    end
+    return '' if val.nil? || val=='null' || val=='NaN' || val.empty?
+    return val.to_i if is_int || is_id
+    return val.to_f if is_float
+    return val
   end
 end
