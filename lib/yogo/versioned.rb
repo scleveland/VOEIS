@@ -10,13 +10,13 @@ module Yogo
   module Versioned
     
     def yogo_versioned
-      property :provenance_comment,     ::DataMapper::Property::Text, :required => false
+      property :provenance_comment,     ::DataMapper::Property::Text, :required=>false, :lazy=>false
       # User update comment -- avoid hook updates
       # Add properties required for versioning
       property :updated_at,          ::DataMapper::Property::DateTime#, :key=>true, :default=>DateTime.now
       property :updated_by,          ::DataMapper::Property::Integer
-      property :updated_comment,     ::DataMapper::Property::Text
-      property :created_at,          ::DataMapper::Property::DateTime, :required => false
+      property :updated_comment,     ::DataMapper::Property::Text,    :lazy=>false
+      property :created_at,          ::DataMapper::Property::DateTime, :required=>false
       property :deleted_at,          ::DataMapper::Property::ParanoidDateTime
       timestamps :created_at
       

@@ -1,0 +1,84 @@
+-# VARIABLE VERSIONS PANE
+:javascript
+  dojo.require("dojox.grid.EnhancedGrid");
+  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+  dojo.require("dojox.grid.enhanced.plugins.Filter");
+  dojo.require("dojo.data.ItemFileReadStore");
+  dojo.require("dijit.layout.TabContainer");
+  dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+  
+  // SAVE CALLBACK for ITEM ROLLBACK
+  function item_restore(item) {
+    console.log('ROLLBACK:',item);
+    var var_id = item.id;
+    var varPane = window['site'+item.id+'ref'];
+    var varPaneId = '#{@project.id}-site#{@site.id}-var'+var_id;
+    var varPane = dojo.byId(varPaneId);
+    
+    var data = {variable:item};
+    
+    delete data.variable.variable_units;
+    delete data.variable.time_units;
+    delete data.variable.lab;
+    delete data.variable.lab_method;
+    delete data.variable.field_method;
+    delete data.variable.spatial_units;
+    
+    data.variable.id = parseInt(item.id);
+    data.variable.time_support = parseFloat(item.time_support);
+    data.variable.detection_limit = parseFloat(item.detection_limit);
+    data.variable.spatial_offset_value = parseFloat(item.spatial_offset_value);
+    
+    data.variable.variable_units_id = parseInt(item.variable_units_id);
+    data.variable.time_units_id = parseInt(item.time_units_id);
+    data.variable.lab_id = parseInt(item.lab_id);
+    data.variable.lab_method_id = parseInt(item.lab_method_id);
+    data.variable.field_method_id = parseInt(item.field_method_id);
+    data.variable.spatial_units_id = parseInt(item.spatial_units_id);
+    
+    for(prop in item)
+      if(item[prop]==null) delete data.variable[prop];
+    // POST ITEM
+    $.ajax({
+      type: 'PUT',
+      url: '/projects/#{@project.id}/variables/'+var_id+'.json',
+      data: data,
+      success: function(e) {
+        console.log('UPDATED>>>',data);
+        if(varPane) {
+          varPane = dijit.byNode(varPane);
+          varPane.refresh();
+        };
+        dojo.publish('voeis/project/variable/history/update',[item.id,#{@site.id}]);
+      },
+      dataType: 'json'
+    });
+  };
+  
+  
+%h3{:style=>"margin-top:0;"}
+  %span.small{:style=>"font-size:14px;"}
+    HISTORY: 
+  = '%s [site-%s]'%[@variable.variable_name,@site.id]
+
+%strong
+  SHOW VARIABLE VERSIONS
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history/update', [#{@variable.id},#{@site.id}]);")
+%br
+
+
+- projId = @project.nil? ? '' : @project.id.to_s
+#cv-versions
+  = render_widget :versions, :display, :item=>@variable,
+                                        :versions=>@versions,
+                                        :unique_id=>"%s_site%s_var%s"%[projId,@site.id,@variable.id],
+                                        :unique_jsid=>"%s_site%s_var%s"%[projId.tr('-','$'),@site.id,@variable.id],
+                                        :item_refs=>@var_refs,
+                                        :properties=>@ver_properties,
+                                        :restore_callback=>"item_restore",
+                                        :user=>current_user
+
+
+

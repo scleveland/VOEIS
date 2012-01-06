@@ -101,6 +101,10 @@ class Voeis::Variable
   has n, :spatial_offsets,      :model => "Voeis::SpatialOffset",    :through => Resource
   
   
+  def versions_array
+    self.versions.to_a
+  end
+  
   def self.load_from_his
     his_variables = repository(:his){ His::Variable.all }
 

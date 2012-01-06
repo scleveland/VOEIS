@@ -821,6 +821,16 @@
       openVarHistoryTab(tabs, projectId, varId, varName, siteId);
     });
 
+    dojo.subscribe("voeis/project/variable/history/update", function(varId,siteId) {
+      console.log('VARIABLE HISTORY UPDATE:',arguments);
+      var projHistId = '#{@project.id}-site'+siteId+'-var'+varId+'-history';
+      var histPane = dojo.byId(projHistId);
+      if(histPane) {
+        histPane = dijit.byNode(histPane);
+        histPane.refresh();
+      };
+    });
+
     dojo.subscribe("voeis/project/site/history", function(siteId) {
       console.log('SITE HISTORY',arguments);
       var projectId = "#{@project.id}";

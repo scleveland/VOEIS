@@ -9,9 +9,11 @@ class Voeis::VariablesController < Voeis::BaseController
             :resource_class => Voeis::Variable
 
   has_widgets do |root|
+    root << widget(:versions)
     root << widget(:flot_graph)
   end
-
+  
+  
   def show
     @project = parent
     #@sites = Voeis::Site.all
@@ -37,12 +39,12 @@ class Voeis::VariablesController < Voeis::BaseController
       #@tunits = Voeis::Unit.get(@variable.time_units_id)
       @units = @variable.variable_units
       sunits = @variable.spatial_units
-      @variable_ref[:variable_units] = '%s (%s)'%[@units[:units_abbreviation],@units[:units_type]]
+      @variable_ref[:variable_units] = '%s (%s)'% @units.to_hash.values_at(:units_abbreviation,:units_type)
       @variable_ref[:time_units] = @variable.time_units[:units_name]
       @variable_ref[:lab_method] = @variable.lab_method.nil? ? 'NA' : @variable.lab_method.lab_method_name
       @variable_ref[:lab] = @variable.lab.nil? ? 'NA' : '%s (%s)'%[@variable.lab.lab_name,@variable.lab.lab_organization]
       @variable_ref[:field_method] = @variable.field_method.nil? ? 'NA' : @variable.field_method.method_name
-      @variable_ref[:spatial_units] = sunits.nil? ? 'NA' : '%s (%s)'%[sunits[:units_abbreviation],sunits[:units_type]]
+      @variable_ref[:spatial_units] = sunits.nil? ? 'NA' : '%s (%s)'% sunits.to_hash.values_at(:units_abbreviation,:units_type)
     end
     @variable_properties = [
       {:label=>"Variable ID", :name=>"id"},
@@ -120,30 +122,34 @@ class Voeis::VariablesController < Voeis::BaseController
     varparams = params[:variable]
     @project.managed_repository{
       @variable = Voeis::Variable.get(params[:id].to_i)
+      
+      logger.info '### VARPARAMS ###'
+      logger.info varparams
+      logger.info '### ORG. VARIABLE ###'
+      logger.info @variable.to_hash
+      
+      ### FIX NON-STRING VALS
+      varparams.each{|prop| 
+        varparams[prop] = nil if ['NaN','null'].include?(varparams[prop])}
+      [:variable_units_id,:time_units_id,:quality_control].each{|prop| 
+        varparams[prop] = varparams[prop].to_i}
+      [:lab_id,:lab_method_id,:field_method_id,:spatial_units_id].each{|prop| 
+        varparams[prop] = nil if varparams[prop]=='0'}
+      [:time_support,:detection_limit,:spatial_offset_value].each{|prop| 
+        varparams[prop] = varparams[prop]=='' ? nil : varparams[prop].to_f }
+      varparams[:is_regular] = varparams[:is_regular]==true || varparams[:is_regular]=~(/(true|t|yes|y|1)$/i) ? true : false
+      
       varparams.each do |key, value|
         @variable[key] = value.blank? ? nil : value
       end
-      logger.info '### VARPARAMS ###'
-      logger.info varparams
-      logger.info '### RAW VARIABLE ###'
+
+      #logger.info '### VARPARAMS UPDATED ###'
+      #logger.info varparams
+      logger.info '### VARIABLE UPDATED ###'
       logger.info @variable.to_hash
-      #@variable.is_regular = ck_param(varparams[:is_regular],is_bool=true,null=false)
-      #@variable.variable_units_id = ck_param(varparams[:variable_untis_id],is_id=true)
-      #@variable.time_units_id = ck_param(varparams[:time_units_id],is_id=true)
-      #@variable.spatial_units_id = ck_param(varparams[:spatial_units_id],is_id=true)
-      #@variable.lab_id = ck_param(varparams[:lab_id],is_id=true)
-      #@variable.lab_method_id = ck_param(varparams[:lab_method_id],is_id=true)
-      #@variable.field_method_id = ck_param(varparams[:field_method_id],is_id=true)
-      #@variable.quality_control = ck_param(varparams[:quality_control],is_int=true,null=false)
-      #@variable.his_id = ck_param(varparams[:his_id],is_int=true)
-      #@variable.detection_limit = ck_param(varparams[:detection_limit])
-      #@variable.spatial_offset_type = ck_param(varparams[:spatial_offset_type])
-      #@variable.spatial_offset_value = ck_param(varparams[:spatial_offset_value],is_float=true)
-      #@variable.time_support = ck_param(varparams[:time_support],is_float=true,null=false)
-      #@variable.valid?
-      #@variable.updated_at = Time.now
-      logger.info '### READY TO SAVE VARIABLE ###'
-      logger.info @variable.to_hash
+      
+      #logger.info '### READY TO SAVE VARIABLE ###'
+      #logger.info @variable.to_hash
       
       respond_to do |format|
         if @variable.save
@@ -202,6 +208,100 @@ class Voeis::VariablesController < Voeis::BaseController
         return
       end
     end
+  end
+  
+  def versions
+    @project = parent
+    @variable = @project.managed_repository{ Voeis::Variable.get(params[:id].to_i) }
+    @site =  @project.managed_repository{ Voeis::Site.get(params[:site_id].to_i) }
+    @versions = @project.managed_repository{ @variable.versions_array }
+    
+    @var_refs = []
+    temp = {}
+    temp[:id] = @variable.id
+    temp[:lab] = 'NA'
+    temp[:lab_method] = 'NA'
+    temp[:field_method] = 'NA'
+    temp[:spatial_units] = 'NA'
+    
+    #temp[:variable_units_raw] = Voeis::Unit.get(@variable.variable_units_id)
+    #temp[:variable_units] = '%s (%s)'% temp[:variable_units_raw].to_hash.values_at(:units_abbreviation,:units_type)
+    temp[:variable_units] = '%s (%s)'% Voeis::Unit.get(@variable.variable_units_id).to_hash.values_at(:units_abbreviation,:units_type)
+    temp[:time_units] = Voeis::Unit.get(@variable.time_units_id).units_name
+    
+    if !Voeis::Lab.get(@variable.lab_id).nil?
+      temp[:lab] = '%s (%)'% Voeis::Lab.get(@variable.lab_id).to_hash.values_at(:lab_name,:lab_organization)
+    end
+    if !Voeis::LabMethod.get(@variable.lab_method_id).nil?
+      temp[:lab_method] = Voeis::LabMethod.get(@variable.lab_method_id).lab_method_name
+    end
+    if !Voeis::FieldMethod.get(@variable.field_method_id).nil?
+      temp[:field_method] = Voeis::FieldMethod.get(@variable.field_method_id).method_name
+    end
+    if !Voeis::Unit.get(@variable.spatial_units_id).nil?
+      temp[:spatial_units] = '%s (%s)'% Voeis::Unit.get(@variable.spatial_units_id).to_hash.values_at(:units_abbreviation,:units_type)
+    end
+    @var_refs << temp
+    @versions.each{|ver| 
+      temp = {}
+      temp[:id] = @variable.id
+      temp[:lab] = 'NA'
+      temp[:lab_method] = 'NA'
+      temp[:field_method] = 'NA'
+      temp[:spatial_units] = 'NA'
+      
+      #temp[:variable_units_raw] = Voeis::Unit.get(ver.variable_units_id)
+      #temp[:variable_units] = '%s (%s)'%temp[:variable_units_raw].to_hash.values_at(:units_abbreviation,:units_type)
+      temp[:variable_units] = '%s (%s)'% Voeis::Unit.get(ver.variable_units_id).to_hash.values_at(:units_abbreviation,:units_type)
+      temp[:time_units] = Voeis::Unit.get(ver.time_units_id).units_name
+      
+      if !Voeis::Lab.get(ver.lab_id).nil?
+        temp[:lab] = '%s (%)'% Voeis::Lab.get(ver.lab_id).to_hash.values_at(:lab_name,:lab_organization)
+      end
+      if !Voeis::LabMethod.get(ver.lab_method_id).nil?
+        temp[:lab_method] = Voeis::LabMethod.get(ver.lab_method_id).lab_method_name
+      end
+      if !Voeis::FieldMethod.get(ver.field_method_id).nil?
+        temp[:field_method] = Voeis::FieldMethod.get(ver.field_method_id).method_name
+      end
+      if !Voeis::Unit.get(ver.spatial_units_id).nil?
+        temp[:spatial_units] = '%s (%s)'% Voeis::Unit.get(ver.spatial_units_id).to_hash.values_at(:units_abbreviation,:units_type)
+      end
+      @var_refs << temp
+    }
+    @ver_properties = [
+      {:label=>"Variable ID", :name=>"id"},
+      {:label=>"Name", :name=>"variable_name"},
+      {:label=>"Code", :name=>"variable_code"},
+      {:label=>"Sample Medium", :name=>"sample_medium"},
+      {:label=>"Units", :name=>"variable_units"},
+      {:label=>"General Category", :name=>"general_category"},
+      {:label=>"Value Type", :name=>"value_type"},
+      {:label=>"Speciation", :name=>"speciation"},
+      {:label=>"Data Type", :name=>"data_type"},
+      {:label=>"Quality Control", :name=>"quality_control"},
+      {:label=>"Time Support", :name=>"time_support"},
+      {:label=>"Regular Interval", :name=>"is_regular"},
+      {:label=>"Time Units", :name=>"time_units"},
+      {:label=>"Laboratory", :name=>"lab"},
+      {:label=>"Lab Method", :name=>"lab_method"},
+      {:label=>"Field Method", :name=>"field_method"},
+      {:label=>"Spatial Offset Type", :name=>"spatial_offset_type"},
+      {:label=>"Spatial Offset Value", :name=>"spatial_offset_value"},
+      {:label=>"Spatial Units", :name=>"spatial_units"},
+      {:label=>"Null Value", :name=>"no_data_value"},
+      {:label=>"Detection Limit", :name=>"detection_limit"},
+      {:label=>"Logger Type", :name=>"logger_type"},
+      {:label=>"Logger ID", :name=>"logger_id"},
+      {:label=>"Sensor Type", :name=>"sensor_type"},
+      {:label=>"Sensor ID", :name=>"sensor_id"},
+      {:label=>"HIS ID", :name=>"his_id"},
+#      {:label=>"Updated", :name=>"updated_at"},
+#      {:label=>"Updated By", :name=>"updated_by"},
+#      {:label=>"Update Comment", :name=>"updated_comment"},
+#      {:label=>"Provenance Comment", :name=>"provenance_comment"},
+#      {:label=>"Created", :name=>"created_at"}
+      ]
   end
   
   ###CK_PARAM function
