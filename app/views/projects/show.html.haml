@@ -412,6 +412,258 @@
 -#site_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"psites", :data=>"psites_json"}
 -#site_store{:dojoType=>"dojo.data.ItemFileWriteStore", :jsId=>"psites", :data=>"psites_json"}
 
+#site_lat_long_picker{:dojoType=>"dijit.Dialog", :jsId=>"site_lat_long_picker", :title=>"Select location for Latitude/Longitude (click/shift-click to zoom in/out)", 
+  :style=>"padding:0;"}
+  %script{:type=>"dojo/method", :event=>"startup"}
+    :plain
+      //OPEN function -Set Site & Show
+      site_lat_long_picker.open = function(siteId){
+        site_lat_long_picker.siteId = siteId;
+        site_lat_long_picker.show();
+      };
+      //###ON-SHOW
+      this.connect(this, "onShow", function(){
+        //var form = dijit.byId("site00_vertical_datum_form");
+        var siteN = 'site'+site_lat_long_picker.siteId;
+        var site = window[siteN+'ref'];
+        var form = window[siteN+'_edit_form'];
+        var me = site_lat_long_picker;
+        me.lat_long = {};
+        //var mapdiv = dojo.byId("site00_loat_long_mapdiv");
+        var mapdiv = document.getElementById('site_lat_long_mapdiv');
+        var innerdiv = document.getElementById('site_lat_long_innerdiv');
+        var button = document.getElementById('site_lat_long_map_control')
+        var mapclick = false;
+        var crosshairShape = {coords:[0,0,0,0],type:'rect'};
+        var crosshairImg = '/images/cross-hairs.gif';
+        var map_center = new google.maps.LatLng(39.707187,-96.152344);
+        var map_zoom = 3;
+        if(!site.newSite) {
+          map_center = new google.maps.LatLng(parseFloat(site00ref.site.latitude),parseFloat(site00ref.site.longitude));
+          map_zoom = 15;
+          console.log('EDIT SITE MAP:',map_center);
+        };
+        me.lat_long.map_opts = {
+          //center: new google.maps.LatLng(46.739861,-110.786133), 
+          center: map_center,
+          zoom: map_zoom,
+          mapTypeId: google.maps.MapTypeId.HYBRID,
+          //mapTypeId: google.maps.MapTypeId.SATELLITE,
+          //mapTypeId: google.maps.MapTypeId.TERRAIN,
+          draggableCursor: 'crosshair',
+          scaleControl: true, 
+          zoomControl: true, 
+          mapTypeControl: true,
+          scrollwheel: true
+        };
+        var myOptions = {
+          zoom:12,
+          center:new google.maps.LatLng(39.707187,-96.152344),
+          mapTypeId:google.maps.MapTypeId.SATELLITE,
+          draggableCursor:'crosshair',
+          mapTypeControlOptions:{style:google.maps.MapTypeControlStyle.DROPDOWN_MENU}
+        };
+    
+        me.lat_long.map = new google.maps.Map(mapdiv, me.lat_long.map_opts);
+        me.lat_long.crosshair = new google.maps.Marker({
+          map: me.lat_long.map,
+          icon: crosshairImg,
+          shape: crosshairShape
+        });
+        me.lat_long.crosshair.bindTo('position',me.lat_long.map,'center');
+        me.lat_long.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(button);
+        //###CLICK-MAP
+        $('body').click( function(e){
+          console.log('DOMCLICK:',e);
+          if(!mapclick) return;
+          var clickat = mapclick.latLng;
+          var mapzoom = me.lat_long.map.getZoom();
+          if(e.shiftKey) mapzoom -= 1;
+          else mapzoom += 1;
+          me.lat_long.map.setCenter(clickat);
+          me.lat_long.map.setZoom(mapzoom);
+          mapclick = false;
+        });
+        //google.maps.event.addDomListener(mapdiv, 'click', function(ev){ domclick = ev; });
+        google.maps.event.addListener(me.lat_long.map, 'click', function(mapev){ 
+          mapclick = mapev;
+          //mapclick['mapCenter'] = site00_lat_long.map.getCenter();
+          var clickat = mapev.latLng;
+          console.log('CLICKAT:',clickat.toString());
+        });
+        //###SELECT FUNCTION
+        me.map_select = function(){
+          //var form = site00_edit_form.domNode;
+          var me = site_lat_long_picker;
+          var siteN = 'site'+site_lat_long_picker.siteId;
+          //var site = window[siteN+'ref'];
+          //var form = window[siteN+'_edit_form'].domNode;
+          var formlat = dijit.byId(siteN+'_latitude');
+          var formlong = dijit.byId(siteN+'_longitude');
+          var mapCenter = me.lat_long.map.getCenter();
+          formlat.set('value',mapCenter.lat());
+          formlong.set('value',mapCenter.lng());
+          me.hide();
+        };
+      });
+      //###ON-HIDE
+      this.connect(this, "onHide", function(){
+        //var form = site00_edit_form.domNode;
+        //form.elements['site_lat_long_datum'].focus();
+        //var formlat = dijit.byId('site00_latitude');
+        var siteN = 'site'+site_lat_long_picker.siteId;
+        var formlat = dijit.byId(siteN+'_latitude');
+        formlat.focus();
+      });
+  #site_lat_long_mapdiv{:style=>"margin:0!important;"}
+    #site_lat_long_map_control{:onclick=>"site_lat_long_picker.map_select();"}
+
+-#%a{:href=>"javascript:", :onclick=>"alert('TESTING!!!');this.hide();return false;"}
+
+-#site00_xnew_local_projection{:dojoType=>"dijit.Dialog", :title=>"NEW Local Projection"}
+-##site00_new_local_projection{:dojoType=>"dijit.Dialog", :jsId=>"site00_new_local_projection", :title=>"NEW Local Projection"}
+-#  TESTING Local Projection
+-##site00_new_vertical_datum{:dojoType=>"dijit.Dialog", :jsId=>"site00_new_local_projection", :title=>"NEW Local Projection"}
+-#  TESTING Vertical Datum
+
+#site_new_vertical_datum{:dojoType=>"dijit.Dialog", :jsId=>"site_new_vertical_datum", :title=>"NEW Vertical Datum", :style=>"width:400px;"}
+  %form(id="site_vertical_datum_form" jsId="site_vertical_datum_form" dojoType="dijit.form.Form" method="post")
+    %label Term
+    %br
+    %input(name="vertical_datum_term" dojoType="dijit.form.ValidationTextBox" id="site_vertical_datum_term" size="30" required="true")
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    %label Definition
+    %br
+    %textarea{:type=>"text", :name=>"vertical_datum_definition", :id=>"site_vertical_datum_definition", :style=>"width:95%;", :rows=>"4"}
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    %button{:dojoType=>"dijit.form.Button", :title=>'Create'}
+      Create Vertical Datum
+      %script{:type=>"dojo/method", :event=>"startup"}
+        :plain
+          //var form = dijit.byId("site00_vertical_datum_form");
+          var form = site_vertical_datum_form;
+          //OPEN function -Set Site & Show
+          site_new_vertical_datum.open = function(show_elems,sel_elem){
+            site_new_vertical_datum.show_elems = show_elems;
+            site_new_vertical_datum.sel_elem = sel_elem;
+            //site_new_vertical_datum.siteId = siteId;
+            site_new_vertical_datum.show();
+          };
+          //###ON-SHOW
+          this.connect(this, "onShow", function(){
+            var form = site_vertical_datum_form;
+            form.reset();
+            // set initial state
+            this.attr("disabled", !form.isValid());
+          });
+          //###ON-CHANGE
+          this.connect(form, "onValidStateChange", function(state){
+            this.attr("disabled", !state);
+          });
+          // SAVE BUTTON
+          this.connect(this, "onClick", function(){
+            //var siteId = site_new_vertical_datum.siteId;
+            //var siteN = 'site'+site_new_vertical_datum.siteId;
+            var show_elems = site_new_vertical_datum.show_elems;
+            var sel_elem = site_new_vertical_datum.sel_elem;
+            var data = {vertical_datum_c_v: {
+              term: $("#site_vertical_datum_term").val(),
+              definition: $("#site_vertical_datum_definition").val()}};
+            console.log('POST:',data);
+            $.post("/vertical_datum_c_vs.json", data, function(dat) {
+              show_elems.append($("<option></option>").attr("value",dat['id']).text($('#site_vertical_datum_term').val()));
+              sel_elem.val(dat['id']);
+              site_new_vertical_datum.hide();
+            });
+          });
+    &nbsp;&nbsp;
+    %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"site_new_vertical_datum.hide();return false;"} Cancel
+
+-#site00_xnew_local_projection{:title=>"NEW Local Projection", :style=>"display:none;"}
+#site_new_spatial_reference{:dojoType=>"dijit.Dialog", :jsId=>"site_new_spatial_reference", :title=>"NEW Spatial Reference", :style=>"width:400px;"}
+  %form(id="site_spatial_reference_form" jsId="site_spatial_reference_form" dojoType="dijit.form.Form" method="post")
+    %label Source ID
+    %br
+    -#=f.text_field :quality_control_level_code, :size => 30
+    -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
+    -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :style=>"width:95%;"}
+    %input(name="source_id" dojoType="dijit.form.NumberTextBox" id="site_source_id" size="30" required="true")
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    %label Source Name
+    %br
+    -#=f.text_field :quality_control_level_code, :size => 30
+    -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
+    -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :style=>"width:95%;"}
+    %input(name="source_name" dojoType="dijit.form.ValidationTextBox" id="site_source_name" size="50" required="true")
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    %input(name="source_geographic" dojoType="dijit.form.CheckBox" id="site_source_geographic")
+    Geographic
+    
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    %label Notes
+    %br
+    -#=f.text_area :definition, :cols=>50, :rows=>3
+    -#%input{:type=>"text", :name=>"local_projection_definition", :id=>"site00_local_projection_definition", :dojoType=>"dijit.form.ValidationTextBox", :style=>"width:50em", :size=>50, :rows=>"3"}
+    %textarea{:type=>"text", :name=>"source_notes", :id=>"site_source_notes", :style=>"width:95%;", :rows=>"4"}
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    -#%button{:id=> 'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"site00_createLocalProjection();"}
+    -#%button{:id=>'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create'}
+    -#%button{:id=>'site00_new_local_projection_button', :value=>"Create Local Projection", :onclick=>"submit_site_dialog($$$id$$$,'local_projection');site00ref.dialog.hide();return false;"}
+    %button{:dojoType=>"dijit.form.Button", :title=>'Create'}
+      Create Spatial Reference
+      %script{:type=>"dojo/method", :event=>"startup"}
+        :plain
+          //var form = dijit.byId("site00_spatial_reference_form");
+          var form = site_spatial_reference_form;
+          //OPEN function -Set Site & Show
+          site_new_spatial_reference.open = function(show_elems,sel_elem){
+            site_new_spatial_reference.show_elems = show_elems;
+            site_new_spatial_reference.sel_elem = sel_elem;
+            //site_new_spatial_reference.siteId = siteId;
+            site_new_spatial_reference.show();
+          };
+          //###ON-SHOW
+          this.connect(this, "onShow", function(){
+            var form = site_spatial_reference_form;
+            form.reset();
+            // set initial state
+            this.attr("disabled", !form.isValid());
+          });
+          //###ON-CHANGE
+          this.connect(form, "onValidStateChange", function(state){
+            this.attr("disabled", !state);
+          });
+          // SAVE BUTTON
+          this.connect(this, "onClick", function(){
+            //var siteN = 'site'+site_new_spatial_reference.siteId;
+            //var site = window[siteN+'ref'];
+            //var form = site_spatial_reference_form;
+            var show_elems = site_new_spatial_reference.show_elems;
+            var sel_elem = site_new_spatial_reference.sel_elem;
+            var is_geo = (dojo.byId("site_source_geographic").checked) ? true : false;
+            var data = {spatial_reference: {
+              srs_id: parseInt($("#site_source_id").val()),
+              srs_name: $("#site_source_name").val(),
+              is_geographic: is_geo,
+              notes: $("#site_source_notes").val()}};
+            console.log('POST:',data);
+            $.post("/spatial_references.json", data, function(dat) {
+              show_elems.append($("<option></option>").attr("value",dat['id']).text($('#site_source_name').val()));
+              sel_elem.val(dat['id']);
+              site_new_spatial_reference.hide();
+            });
+          });
+    &nbsp;&nbsp;
+    -#%button{:onclick=>"site00ref.dialog.hide();return false;", :value=>"Cancel"} Cancel
+    %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"site_new_spatial_reference.hide();return false;"} Cancel
+
+
 #content-title{:style=>"margin:0;padding:0;"} 
   %a{:href=>"javascript:", :onclick=>"dijit.byId('overview_dialog').show();return false;", 
       :title=>"click for overview",

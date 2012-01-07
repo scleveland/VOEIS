@@ -606,7 +606,7 @@
         %tr
           %td{:colspan=>"2"}
             .from-element{:style=>"cursor:pointer;margin-top:10px;"}
-            %a{:style=>"cursor:pointer;", :class=>"icon icon-notice", :href=>"javascript:", :onclick=>"site00_lat_long_picker.show();return false;"}
+            %a{:style=>"cursor:pointer;", :class=>"icon icon-notice", :href=>"javascript:", :onclick=>"site_lat_long_picker.open($$$id$$$);return false;"}
               Select MAP location to populate Latitude & Longitude
         %tr
           %td
@@ -630,11 +630,11 @@
           %td{:colspan=>"2"}
             .from-element{:style=>"cursor:pointer;"}
               %span{:class=>'label', :style=>"cursor:pointer;"}
-                %label{:for=>"site_lat_long_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"SRfrom='LLD';site00_new_spatial_reference.show();"}
+                %label{:for=>"site_lat_long_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site_new_spatial_reference.open($('.site00_spatial_ref'),$('#site00_lat_long_datum'));"}
                   Latitude Longitude Datum
             -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
             -#= f.select('local_projection',  options_for_select(@local_projection_items, '$$$local_projection$$$'), :class=>"form-dropdown")
-            %select(id="site00_lat_long_datum" name="site_lat_long_datum")
+            %select(id="site00_lat_long_datum" class="site00_spatial_ref" name="site_lat_long_datum")
               - @local_projection_items.each do |item|
                 %option(value="#{item[1]}") #{item[0]}
 
@@ -666,11 +666,11 @@
           %td{:colspan=>"2"}
             .from-element{:style=>"cursor:pointer;"}
               %span{:class=>'label', :style=>"cursor:pointer;"}
-                %label{:for=>"site_local_projection", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"SRfrom='LP';site00_new_spatial_reference.show();"}
+                %label{:for=>"site_local_projection", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site_new_spatial_reference.open($('.site00_spatial_ref'),$('#site00_local_projection'));"}
                   Local Projection
             -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
             -#= f.select('local_projection',  options_for_select(@local_projection_items, '$$$local_projection$$$'), :class=>"form-dropdown")
-            %select(id="site00_local_projection" name="site_local_projection")
+            %select(id="site00_local_projection" class="site00_spatial_ref" name="site_local_projection")
               - @local_projection_items.each do |item|
                 %option(value="#{item[1]}") #{item[0]}
             -#%td{:style=>"padding-top:20px;"}
@@ -684,7 +684,7 @@
             .from-element{:style=>"cursor:pointer;"}
               %span{:class=>'label', :style=>"cursor:pointer;"}
                 -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
-                %label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
+                %label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site_new_vertical_datum.open($('#site00_vertical_datum'),$('#site00_vertical_datum'));"}
                   Vertical Datum
             -#= f.text_field("vertical_datum", :value=>"$$$vertical_datum_id$$$") 
             -#= f.select("site00_vertical_datum", options_for_select([]), :class=>"form-dropdown")
