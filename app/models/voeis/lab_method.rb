@@ -32,7 +32,7 @@ class Voeis::LabMethod
   property :his_id,               Integer
   
   has n, :variables, :model => "Voeis::Variable", :through => Resource
-  has 1, :equipment, :model => "Voeis::Equipment"
+  #has 1, :equipment, :model => "Voeis::Equipment"
   yogo_versioned
   
   def self.load_from_his

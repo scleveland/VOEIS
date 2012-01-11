@@ -31,7 +31,7 @@ class Voeis::FieldMethod
   yogo_versioned
  
   has n, :variables, :model => "Voeis::Variable", :through => Resource
-  has 1, :field_method, :model =>"Voeis::Equipment"
+  #has 1, :field_method, :model =>"Voeis::Equipment"
   
   # def self.load_from_his
   #     his_field_methods = His::FieldMethod.all
