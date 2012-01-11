@@ -40,8 +40,8 @@ GIT
 
 GIT
   remote: git://github.com/yogo/rql-ruby.git
-  revision: 77e659b6df438bf9fae45401e36aa8c647cb7b49
-  branch: topic/voeis
+  revision: 9ddf77fd732c43d13c2b0719ab46950df30e12b1
+  branch: master
   specs:
     rql (0.0.1)
       execjs (~> 0.1.1)
@@ -285,7 +285,7 @@ GEM
     sass (3.1.2)
     sinatra (1.2.6)
       rack (~> 1.1)
-      tilt (< 2.0, >= 1.2.2)
+      tilt (>= 1.2.2, < 2.0)
     sinatra-advanced-routes (0.5.1)
       monkey-lib (~> 0.5.0)
       sinatra (~> 1.0)

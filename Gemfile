@@ -48,7 +48,7 @@ gem "cells", "~> 3.5.4"
 gem 'apotomo', "~> 1.1"
 gem 'aaronh-chronic',  :git =>"git://github.com/scleveland/chronic.git"
 
-gem 'rql', ">= 0.0.1",        :git => "git://github.com/yogo/rql-ruby.git", :branch => "topic/voeis"
+gem 'rql', ">= 0.0.1",        :git => "git://github.com/yogo/rql-ruby.git"
 
 platforms(:ruby_19) {
   gem "therubyracer", :require => "v8"
