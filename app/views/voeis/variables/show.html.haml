@@ -1,3 +1,39 @@
+:css
+  #content { margin:10px 50px }
+  #wrapper {
+    padding-bottom: 20px;
+    background-color: #ccb;
+    padding-top: 1px;
+  }
+  #wrapper img { margin-right:12px }
+  #wrapper p { margin:0 20px }
+
+  #site00-sample-table td { text-align:center; }
+  #site00-sample-table td.time0 { text-align:left; }
+
+  #form-table { width:600px; }
+  #form-table td { width:50%; }
+  .form_element { width:20em; }
+  
+  .dijitTextBox { width:24em !important; }
+  .TextBox_qcval { width:5em !important; }
+  .TextBox_time { width:10em !important; }
+  .TextBox_half { width:10em !important; }
+  .TextBox_value { width:18em !important; }
+  
+  .new_voeis_site input { width:18em; }
+  .new_voeis_site textarea { width:45em; }
+  .new_voeis_site select { width:21em; }
+
+  .row-lt1 { background-color:#ddd; }
+  .row-gr { background-color: #6AA128; }
+  .row-gr { background-color: #97C253; }
+  .row-gr { background-color: #97D8AB; }
+  .row-gr th { background-color: #97D8AB!important; }
+  .row-gr td { background-color: #97D8AB!important; }
+  .smfont, .smfont * { font-size:10px }
+
+
 = javascript_include_tag("jquery.flot.js")
 - content_for(:javascripts) do
   :javascript
@@ -6,11 +42,18 @@
     dojo.require("dojox.layout.TableContainer");
     dojo.require("dijit.form.TextBox");
     
+    //GLOBALS
+    var variable = #{@variable.to_json};
+    var var_id = parseInt(variable.id);
+    var site_id = parseInt(#{@site.nil? ? 0 : @site.id});
+    var this_pane_id, this_pane;
+    
     $(window).ready(function(){ 
       //##### 
       console.log('READY-load-done-NOW');
-      graphInit(#{@variable.id},"#{@variable.variable_name}");
+      initPage();
     });
+    
 
     
 -# content_for(:toolbar) do
@@ -39,252 +82,601 @@
   -#    -if !current_user.nil? && current_user.projects.include?(@project)
   -#      = link_to("Edit Site", edit_project_site_path(@project,resource.id), :dojoType => "yogo.ui.MenuLink")
 
-#var-container{:style=>"width:900px;"}
-  %h3{:style=>"margin-top:0;"}
-    -if !@site.nil? 
+
+- siteId = @site.nil? ? "site0" : "site"+@site.id.to_s
+- varId = siteId+'_var'+@variable[:id].to_s
+
+%h3{:style=>"margin-top:0;"}
+  - if @var_id>0
+    - if @site 
       #{@site.name}: #{@variable.variable_name}
-    -else
+    - else
       #{@variable.variable_name}
-      
-  %strong
-    SHOW VARIABLE DETAILS
-  %br
-  %br
-  -#placeholder{:style=>"width:300px;height:150px;"}
+  - else
+    NEW VARIABLE
+    
 
-  -#%strong
-  -#  UNITS:
-  -#- if !@units.nil?
-  -#  #{@units[:units_abbreviation]} (#{@units[:units_type]})
-  -#- else
-  -#  UNKNOWN
-  -#%br
-  -#%br
+- if @var_id>0
+  %div{:id=>"#{varId}_show", :style=>"width:900px;"}
+      
+    %strong SHOW VARIABLE DETAILS
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    -if @auth && @site
+      = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('##{varId}_show').hide();$('##{varId}_edit').show();")
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{@site.id}]);")
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+    -#= link_to('DATA', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+    -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    -#= link_to('SAMPLES', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+    %br
+    %br
+    -#placeholder{:style=>"width:300px;height:150px;"}
+
+    -#%strong
+    -#  UNITS:
+    -#- if !@units.nil?
+    -#  #{@units[:units_abbreviation]} (#{@units[:units_type]})
+    -#- else
+    -#  UNKNOWN
+    -#%br
+    -#%br
   
-  %table{:id => "property-table", :style=>'float:left;margin-right:15px;'}
+    %table{:id => "property-table", :style=>'float:left;margin-right:15px;'}
+      -if @site
+        %tr{:class=>"row#{cycle('1','0')}"}
+          %td{:style=>"text-align:right;width:30%;"}
+            %strong
+              Site
+          %td
+            #{'%s [Id:%s]'%[@site.site_name,@site.id]}
+      - @variable_properties.each do |prop|
+        %tr{:class=>"row#{cycle('1','0')}"}
+          %td{:style=>"text-align:right;width:30%;"}
+            %strong
+              #{prop[:label]}
+          %td
+            #{@variable_ref[prop[:name].to_sym]}
+            -#{@variable[prop.name]}
+  
     -if @site
-      %tr{:class=>"row#{cycle('1','0')}"}
-        %td{:style=>"text-align:right;"}
-          %strong
-            Site
-            &nbsp;&nbsp;&nbsp;
-        %td
-          #{'%s [Id:%s]'%[@site.site_name,@site.id]}
-    - @variable_properties.each do |prop|
-      %tr{:class=>"row#{cycle('1','0')}"}
-        %td{:style=>"text-align:right;"}
-          %b
-            #{prop[:label]}
-            &nbsp;&nbsp;&nbsp;
-        %td
-          #{@variable_ref[prop[:name].to_sym]}
-          -#{@variable[prop.name]}
-  
-  -if @site
-    %div{:id=>"graph-site"+@site.id.to_s+"-var"+@variable.id.to_s, :style=>"width:300px;height:150px;margin:0 0 25px 50px;float:left;"}
+      %div{:id=>"graph-site"+@site.id.to_s+"-var"+@variable.id.to_s, :style=>"width:300px;height:150px;margin:0 0 25px 50px;float:left;"}
 
     
-    %br
-    %br
+      %br
+      %br
     
-    -# COLLECTED DATA STATS
-    -# COMMENTED OUT because lack of SITE ID to select
-    - var_stats = @site_variable_stats.first(:variable_id=>@variable.id)
-    %table{:id => "var-stats-table", :style=>'float:left;margin-left:5px;width:45%'}
-      %tr{:class=>"row#{cycle('0','1')}"}
-        %td{:colspan=>"2"}
-          %h4{:style=>"margin:0 0 5px 0;"}
-            Collected Data
-      %tr{:class=>"row-gr"}
-        %td
-          %b
-            &nbsp;&nbsp; Count
-        %td
-          = var_stats.record_number
-      %tr{:class=>""}
-        %td
-          %b
-            &nbsp;&nbsp; Starting
-        %td
-          = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
-      %tr{:class=>"row-gr"}
-        %td
-          %b
-            &nbsp;&nbsp; Ending
-        %td
-          = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
-      %tr
-        %td{:colspan=>"2"}
-          %h4{:style=>"margin:20px 0 5px 0;"}
-            Recent Data Values
-      %tr{:class=>"row-gr"}
-        %th
-          Timestamp
-        %th
-          Value   
-      -if !@data.nil?
-        -@data.each do |dv|
-          %tr{:class=>"row-lt#{cycle('0','1')} smfont",:style=>""}
-            %td{:style=>"text-align:center;"}
-              = dv[0].strftime('%Y-%m-%d %H:%M:%S')
-            %td
-              %strong
-                = dv[1].to_s+' '
-              &nbsp;#{@units[:units_abbreviation]} (#{@units[:units_type]})
+      -# COLLECTED DATA STATS
+      -# COMMENTED OUT because lack of SITE ID to select
+      - var_stats = @site_variable_stats.first(:variable_id=>@variable.id)
+      %table{:id => "var-stats-table", :style=>'float:left;margin-left:5px;width:45%'}
+        %tr{:class=>"row#{cycle('0','1')}"}
+          %td{:colspan=>"2"}
+            %h4{:style=>"margin:0 0 5px 0;"}
+              Collected Data
+        %tr{:class=>"row-gr"}
+          %td
+            %b
+              &nbsp;&nbsp; Count
+          %td
+            = var_stats.record_number
+        %tr{:class=>""}
+          %td
+            %b
+              &nbsp;&nbsp; Starting
+          %td
+            = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
+        %tr{:class=>"row-gr"}
+          %td
+            %b
+              &nbsp;&nbsp; Ending
+          %td
+            = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
+        %tr
+          %td{:colspan=>"2"}
+            %h4{:style=>"margin:20px 0 5px 0;"}
+              Recent Data Values
+        %tr{:class=>"row-gr"}
+          %th
+            Timestamp
+          %th
+            Value   
+        -if !@data.nil?
+          -@data.each do |dv|
+            %tr{:class=>"row-lt#{cycle('0','1')} smfont",:style=>""}
+              %td{:style=>"text-align:center;"}
+                = dv[0].strftime('%Y-%m-%d %H:%M:%S')
+              %td
+                %strong
+                  = dv[1].to_s+' '
+                &nbsp;#{@units[:units_abbreviation]} (#{@units[:units_type]})
   
 
-    :javascript
-      TEST = 'TESTING ShowVariable';
-      //var gdata = #{@variable.last_ten_values_graph(@site).to_json};
-      var gdata = #{@graph_data.to_json};
-      gdata = gdata ? gdata : {};
-      //gdata = {};
+      :javascript
+        TEST = 'TESTING ShowVariable';
+        #{varId} = {};
+        
+        var date_formatter = function(value) {
+          if(value==null || value=='') return '-';
+          // Format DateTime string
+          var d = new Date(value);
+          //var fmt = d.getMonth()+'/'+d.getFullYear()
+          return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+        };
+        
+        function initPage() {
+          console.log('initPage: NOW');
+          //this_pane_id = '#{@project.id}-site'+site_id+'-var'+var_id;
+          //this_pane = dojo.byId(this_pane_id);
+          //if(this_pane) this_pane = dijit.byNode(this_pane);
 
-      //graphInit();
-      var graphInit = function(varId,varName) {
-          console.log('>>>graphInit');
-          console.log('SITE-ID= ', '#{@site.id}');
-          console.log('VAR-ID= ', '#{@variable.id}');
-          console.log('GDATA= ', gdata);
-          console.log('TEST= ', TEST);
-          plotGraph();
-          handleGraph(varName);
-      };
-      var plotGraph = function() {
-          //console.debug(gdata);
-          //console.log('GDATA= ', gdata);
-          console.log('>>>plotGraph:', TEST);
-          var plot = $.plot($("#graph#{'-site%s-var%s'%[@site.id,@variable.id]}"), [gdata],{
-              series: {
-                  color : "blue",
-                  lines: { show: true },
-                  points: { show: true }
-              },
-              ticks: 10,
-              grid:  { hoverable: true, clickable: true },
-              xaxis: { mode: "time" },
-              pan:   { interactive: true },
-              zoom:  { interactive: true }
-          });
-      };
+          //if(parseInt(#{@var_id})) graphInit(variable.id, variable.variable_name);
+          #{varId}_gdata = #{@graph_data.to_json};
+          if(parseInt(#{@var_id})) graphInit(#{@site.nil? ? 0 : @site.id},#{@variable[:id].to_s},'#{@variable[:variable_name]}',#{varId}_gdata);
+          else $('##{varId}-provenance-row').hide();
+          
+          console.log('initPage: DONE');
+        };
+        
+        function cancel_edit(varID) {
+          console.log('CANCEL!',varID);
+          var var_id = parseInt(#{@var_id});
+          var site_id = parseInt(#{@site.nil? ? 0 : @site.id});
+          var this_pane_id = '#{@project.id}-site'+site_id+'-var'+var_id;
+          var this_pane = dojo.byId(this_pane_id);
+          if(this_pane) this_pane = dijit.byNode(this_pane);
+          console.log('CANCEL_THIS_PANE:',this_pane);
+          //###SCROLL TO TOP
+          //window.scrollTo(0,0);
+          $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
+          $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
+          if(parseInt(#{@var_id})) {
+            $('#'+varID+'_edit').hide();
+            $('#'+varID+'_show').show();
+          } else {
+            var tabs = dijit.byId('tab_browser');
+            tabs.removeChild(this_pane);
+            this_pane.onClose();
+            this_pane.destroyRecursive();  
+          };
+        };
+        
+        //var gdata = #{@variable.last_ten_values_graph(@site).to_json};
+        var #{varId}_gdata = #{@graph_data.to_json};
+        #{varId}_gdata = #{varId}_gdata || {};
+        //gdata = {};
 
-      //Function ShowToolTip and previousPoint allow the hover function to display
-      //a message for each data point on the graph when the cursor hoversover
+        //graphInit();
+        var graphInit = function(siteId,varId,varName,gdata) {
+            gdata = gdata || {};
+            console.log('>>>graphInit');
+            console.log('SITE-ID= ', '#{@site.id}');
+            console.log('VAR-ID= ', '#{@variable.id}');
+            console.log('GDATA= ', gdata);
+            console.log('TEST= ', TEST);
+            plotGraph(gdata,siteId,varId);
+            handleGraph(varName);
+        };
+        var plotGraph = function(gdata,siteId,varId) {
+            //console.debug(gdata);
+            //console.log('GDATA= ', gdata);
+            console.log('>>>plotGraph:', TEST);
+            var plot = $.plot($("#graph-site"+siteId+"-var"+varId), [gdata],{
+                series: {
+                    color : "blue",
+                    lines: { show: true },
+                    points: { show: true }
+                },
+                ticks: 10,
+                grid:  { hoverable: true, clickable: true },
+                xaxis: { mode: "time" },
+                pan:   { interactive: true },
+                zoom:  { interactive: true }
+            });
+        };
 
-      //I would only mess with the css if you really need to otherwise this
-      //shouldn't need any modification
-      var showTooltip = function(x, y, contents) {
-          $('<div id="tooltip" style="z-index:200;">' + contents + '</div>').css( {
-              position: 'absolute',
-              display: 'none',
-              top: y + 5,
-              left: x + 5,
-              border: '1px solid #fdd',
-              padding: '2px',
-              'background-color': '#fee',
-              opacity: 0.80
-          }).appendTo("body").fadeIn(200);
-      };
+        //Function ShowToolTip and previousPoint allow the hover function to display
+        //a message for each data point on the graph when the cursor hoversover
 
-      //Most of this should remain the same
-      //NOTE-- the time string for #x is in UTC format and currently is in GMT time
-      var handleGraph = function(variable_name) {
-          console.log('>>>handleGraph');
-          var previousPoint = null;
-          $("#graph#{@variable.id.to_s}").bind("plothover", function (event, pos, item) {
-              var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
-              dDate = new Date();
-              dDate.setTime(mEpoch);
-              $("#x").text(dDate.toLocaleString());
-              $("#y").text(pos.y);
+        //I would only mess with the css if you really need to otherwise this
+        //shouldn't need any modification
+        var showTooltip = function(x, y, contents) {
+            //console.log('>>>tooltip:',contents);
+            //var divpos = $("body ##{varId}_show").offset();
+            //x = x - divpos.left;
+            //y = y - divpos.top;
+            $('<div id="tooltip">' + contents + '</div>').css( {
+                position: 'absolute',
+                //'min-width': '50%',
+                display: 'none',
+                //overflow: 'visible',
+                'z-index': 1000,
+                top: y + 5,
+                left: x + 5,
+                border: '1px solid #fdd',
+                padding: '2px',
+                'background-color': '#fee',
+                opacity: 0.80
+            }).appendTo("body").fadeIn(200);
+            //}).appendTo("body ##{varId}_show").fadeIn(200);
+        };
 
-              if (item) {
-                  if (previousPoint != item.datapoint) {
-                      previousPoint = item.datapoint;
-                      $("#tooltip").remove();
-                      var x = item.datapoint[0].toFixed(2),
-                      y = item.datapoint[1].toFixed(2);
-                      var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
-                      dDate = new Date();
-                      dDate.setTime(mEpoch);
-                      showTooltip(item.pageX, item.pageY,
-                      //*****You will need to change the sensor name here to the appropriate one selected above
-                          //***dDate.toLocaleString() + " = " + y + " " + "#{@variable.variable_name}|" );
-                          dDate.toLocaleString()+" = "+y+" "+variable_name + "| #{@units.units_name}");
-                  };
-              } else {
-                  $("#tooltip").remove();
-                  previousPoint = null;            
-              }
-          });
-      };
+        //Most of this should remain the same
+        //NOTE-- the time string for #x is in UTC format and currently is in GMT time
+        var handleGraph = function(variable_name) {
+            console.log('>>>handleGraph');
+            var previousPoint = null;
+            //$("#graph#{@variable.id.to_s}").bind("plothover", function (event, pos, item) {
+            $("#{"#graph-site"+@site.id.to_s+"-var"+@variable.id.to_s}").bind("plothover", function (event, pos, item) {
+                var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+                dDate = new Date();
+                dDate.setTime(mEpoch);
+                //console.log('>>>plothover');
+                $("#x").text(dDate.toLocaleString());
+                $("#y").text(pos.y);
+
+                if (item) {
+                    if (previousPoint != item.datapoint) {
+                        previousPoint = item.datapoint;
+                        $("#tooltip").remove();
+                        var x = item.datapoint[0].toFixed(2),
+                        y = item.datapoint[1].toFixed(2);
+                        var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+                        dDate = new Date();
+                        dDate.setTime(mEpoch);
+                        showTooltip(item.pageX, item.pageY,
+                        //*****You will need to change the sensor name here to the appropriate one selected above
+                            //***dDate.toLocaleString() + " = " + y + " " + "#{@variable.variable_name}|" );
+                            date_formatter(dDate.toLocaleString())+" = "+y+" "+variable_name+" | #{@units.units_name}");
+                    };
+                } else {
+                    $("#tooltip").remove();
+                    previousPoint = null;            
+                }
+            });
+        };
       
+    %br{:style=>'float:none; clear:both;'}
 
+
+-if @auth
+  %div{:id=>"#{varId}_edit", :style=>"width:900px;#{@var_id>0 ? 'display:none;' : ''}"}
+
+    %strong EDIT VARIABLE
+    &nbsp;&nbsp;&nbsp; (* Required)
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"cancel_edit('#{varId}');")
+    %br
+    %br
   
-  -#= render_widget :flot_graph, :display, :variable=>@variable, :data=>@graph_data
--#%table{:id=>'stats', :class=>'', :style=>'width:50%; padding:0; float:left; margin-left:50px;'}
--#  %tr
--#    %td
--#      %h4{:style=>'margin-top:0;'}
--#        Variable Data
--#    %td
--#      %h4{:style=>'margin-top:0;'}
--#        Count
--#    %td
--#      %h4{:style=>'margin-top:0;'}
--#        Start
--#    %td
--#      %h4{:style=>'margin-top:0;'}
--#        End
--#  %tr
--#    %td
--#      %b
--#        = link_to(@variable.variable_name, project_variable_path(@project,@variable.id)) 
--#    - if !var_stats.nil?
--#      %td
--#        -#= 'ID = %s'%var.id
--#        = var_stats.record_number
--#      %td
--#        = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
--#      %td
--#        = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
--#    - else
--#      %td
--#        NA
--#      %td
--#        NA
--#      %td
--#        NA
+    -#%form(accept-charset="UTF-8" action="/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/sites/$$$id$$$" class="new_voeis_site" data-remote="true" id="site00-edit-form" method="put")
+    %form(accept-charset="UTF-8" class="new_voeis_site" data-remote="true" id="#{varId}-edit-form" jsId="#{varId}_edit_form" dojoType="dijit.form.Form")
+
+      %table{:id=>"form-table"}
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_name"} Variable Name *
+              %input(name="var_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.variable_name}" required="true")
+          %td{:colspan=>"2"}
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_code"} Variable Code *
+              %input(name="var_code" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.variable_code}" required="true")
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_medium"} Sample Medium *
+              %input(name="var_medium" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.sample_medium}" required="true")
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_units"} Units *
+            %select(name="var_units")
+              = options_for_select(@units_all.map{|u| [u.type_format,u.id]}, selected=@variable.variable_units_id)
+              -#- @units_all.each do |item|
+              -#  %option(value="#{item.id}") #{item.type_format}
+      
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_gcat"} General Category *
+              %input(name="var_gcat" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.general_category}" required="true")
+      
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_vtype"} Value Type *
+              %input(name="var_vtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.value_type}" required="true")
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_spec"} Speciation *
+              %input(name="var_spec" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.speciation}" required="true")
+      
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_dtype"} Data Type *
+              %input(name="var_dtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.data_type}" required="true")
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_qcval"} Quality Control *
+              %input(name="var_qcval" class="TextBox_half" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########'}" type="text" value="#{@variable.quality_control}" required="true")
+      
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_time_support"} Time Support *
+              %input(name="var_time_support" class="TextBox_half" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'#######.####'}" type="text" value="#{@variable.time_support}" required="true")
+              &nbsp;&nbsp;&nbsp;
+              -#%input(name="var_reg" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.is_regular}" required="true")
+              %input(name="var_regular" dojoType="dijit.form.CheckBox" checked="#{@variable.is_regular}")
+              Regular Interval
+      
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_time_units"} Time Units *
+            %select(name="var_time_units")
+              = options_for_select(@units_all.all(:units_type=>'Time').map{|u| [u.units_name,u.id]}, selected=@variable.time_units_id)
+            -#- @units_all.all(:units_type=>'Time').each do |item|
+            -#  %option(value="#{item.id}") #{item.units_name}
+      
+        %tr
+          %td{:colspan=>"2"}
+            .from-element{:style=>"cursor:pointer;"}
+              %span{:class=>'label', :style=>"cursor:pointer;"}
+                -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
+                %label{:for=>"var_lab", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
+                  Labratory
+            %select(name="var_lab")
+              %option(value="0") NA
+              = options_for_select(@laboratories.map{|item| ['%s (%s)'%[item.lab_name,item.lab_organization],item.id]}, selected=@variable.lab_id)
+              -#- @laboratories.each do |item|
+              -#  %option(value="#{item.id}") #{'%s (%s)'%[item.lab_name,item.lab_organization]}
+      
+        %tr
+          %td
+            .from-element{:style=>"cursor:pointer;"}
+              %span{:class=>'label', :style=>"cursor:pointer;"}
+                -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
+                %label{:for=>"var_lab_method", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
+                  Lab Method
+            %select(name="var_lab_method")
+              %option(value="0") NA
+              = options_for_select(@lab_methods.map{|m| [m.lab_method_name,m.id]}, selected=@variable.lab_method_id)
+              -#- @lab_methods.each do |item|
+              -#  %option(value="#{item.id}") #{item.lab_method_name}
+      
+          %td
+            .from-element{:style=>"cursor:pointer;"}
+              %span{:class=>'label', :style=>"cursor:pointer;"}
+                -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
+                %label{:for=>"var_field_method", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
+                  Field Method
+            %select(name="var_field_method")
+              %option(value="0") NA
+              = options_for_select(@field_methods.map{|m| [m.method_name,m.id]}, selected=@variable.field_method_id)
+              -#- @field_methods.each do |item|
+              -#  %option(value="#{item.id}") #{item.method_name}
+      
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_spat_type"} Spatial Offset Type
+              %input(name="var_spat_type" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.spatial_offset_type}" required="false")
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_spat_value"} Spatial Offset Value
+              %input(name="var_spat_value" class="TextBox_value" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########.######'}" type="text" value="#{@variable.spatial_offset_value}" required="false")
+        %tr
+          %td{:colspan=>"2"}
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_spat_units"} Spatial Units
+            %select(name="var_spat_units")
+              %option(value="0") NA
+              = options_for_select(@units_all.all(:units_type=>'Length').map{|u| [u.units_name,u.id]}, selected=@variable.spatial_units_id)
+              -#- @units_all.all(:units_type=>'Length').each do |item|
+              -#  %option(value="#{item.id}") #{item.units_name}
+      
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_null"} Null Value *
+              %input(name="var_null" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.no_data_value}" required="true")
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_detlimit"} Detection Limit
+              %input(name="var_detlimit" class="TextBox_value" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'#######.####'}" type="text" value="#{@variable.detection_limit}" required="false")
+      
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_log_type"} Logger Type
+              %input(name="var_log_type" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.logger_type}" required="false")
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_log_id"} Logger ID
+              %input(name="var_log_id" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.logger_id}" required="false")
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_sens_type"} Sensor Type
+              %input(name="var_sens_type" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.sensor_type}" required="false")
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_sens_id"} Sensor ID
+              %input(name="var_sens_id" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.sensor_id}" required="false")
+        %tr
+          %td{:colspan=>"2"}
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_his_id"} HIS ID
+              %input(name="var_his_id" class="TextBox_value" dojoType="dijit.form.NumberTextBox" type="text" value="#{@variable.detection_limit}" required="false")
+              -#%input(name="var_his_id" class="TextBox_value" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.his_id}" required="false")
+      
+        %tr{:id=>"#{varId}-provenance-row"}
+          %td{:colspan=>"2"}
+            .from-element
+              %span{:class=>'label'}
+                %label{:for=>"var_provenance_comment"} Provenance Comment
+            %textarea( name="var_provenance_comment" rows="2")
+              -
+      
+        %tr
+          %td{:colspan=>"2"}
+            %br
+            %button(dojoType="dijit.form.Button" name="commit" value="Save Site" disabled="true") 
+              Save Variable
+              %script{:type=>"dojo/method", :event=>"startup"}
+                :plain
+                  var form = #{varId}_edit_form;
+                  var variable = #{@variable.to_json};
+                  var var_id = parseInt(variable.id);
+                  var site_id = parseInt(#{@site.nil? ? 0 : @site.id});
+                  var this_pane_id = '#{@project.id}-site'+site_id+'-var'+var_id;
+                  var this_pane = dojo.byId(this_pane_id);
+                  if(this_pane) this_pane = dijit.byNode(this_pane);
+                  console.log('INIT-FORM:',form);
+                  console.log('FOR VAR:',variable);
+                  console.log('THIS_PANE:',this_pane);
+                  //if(parseInt(#{@var_id})) graphInit(variable.id,variable.name,#{varId}_gdata);
+                  //else $('##{varId}-provenance-row').hide();
+                  function cancel_edit(varID) {
+                    console.log('CANCEL!',varID);
+                    var this_pane = this_pane;
+                    console.log('CANCEL_THIS_PANE:',this_pane);
+                    //###SCROLL TO TOP
+                    //window.scrollTo(0,0);
+                    $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
+                    $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
+                    if(parseInt(#{@var_id})) {
+                      $('#'+varID+'_edit').hide();
+                      $('#'+varID+'_show').show();
+                    } else {
+                      var tabs = dijit.byId('tab_browser');
+                      tabs.removeChild(this_pane);
+                      this_pane.onClose();
+                      this_pane.destroyRecursive();  
+                    };
+                  };
+                  this_pane.connect(this_pane, "onShow", function(state){
+                    if(parseInt(#{@var_id})) graphInit(site_id,variable.id,variable.name,#{varId}_gdata);
+                  });
+                  var form0 = form.domNode;
+                  //var pane = dijit.byNode(dojo.byId('site00'));
+                  //eval('var pane = site00ref');
+                  var site_pane = window['#{siteId}ref']
+                  //var site = site_pane.site;
+                  console.log('GO VAR_UPDATE:',this_pane);
+                  //INITIALIZE: submit button
+                  if(var_id) this.attr("disabled", !form.validate());
+                  form0.elements['var_name'].focus();
+                  //IS FORM VALID?
+                  console.log('FORM-CONNECT: '+site_id);
+                  //###ON-STATE-CHANGE
+                  this.connect(form, "onValidStateChange", function(state){
+                    //console.log('formStateChange:',state);
+                    this.attr("disabled", !state);
+                  });
+                  //###ON-SUBMIT
+                  this.connect(this, "onClick", function(){
+                    console.log('CREATE VAR: '+variable.id);
+                    //###SCROLL TO TOP
+                    //window.scrollTo(0,0);
+                    $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
+                    $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
+                    var data = {variable:{
+                      variable_name:form0.elements['var_name'].value, 
+                      variable_code:form0.elements['var_code'].value, 
+                      sample_medium:form0.elements['var_medium'].value, 
+                      variable_units_id:form0.elements['var_units'].value, 
+                      general_category:form0.elements['var_gcat'].value, 
+                      value_type:form0.elements['var_vtype'].value, 
+                      speciation:form0.elements['var_spec'].value, 
+                      data_type:form0.elements['var_dtype'].value, 
+                      quality_control:form0.elements['var_qcval'].value, 
+                      time_support:form0.elements['var_time_support'].value, 
+                      is_regular:form0.elements['var_regular'].value=='on' ? 'true' : 'false', 
+                      time_units_id:form0.elements['var_time_units'].value, 
+                      lab_id:form0.elements['var_lab'].value, 
+                      lab_method_id:form0.elements['var_lab_method'].value, 
+                      field_method_id:form0.elements['var_field_method'].value, 
+                      spatial_offset_type:form0.elements['var_spat_type'].value, 
+                      spatial_offset_value:form0.elements['var_spat_value'].value, 
+                      spatial_units_id:form0.elements['var_spat_units'].value, 
+                      no_data_value:form0.elements['var_null'].value, 
+                      detection_limit:form0.elements['var_detlimit'].value, 
+                      logger_type:form0.elements['var_log_type'].value, 
+                      logger_id:form0.elements['var_log_id'].value, 
+                      sensor_type:form0.elements['var_sens_type'].value, 
+                      sensor_id:form0.elements['var_sens_id'].value,
+                      his_id:form0.elements['var_his_id'].value, 
+                      provenance_comment:form0.elements['var_provenance_comment'].value, 
+                    }};
+                    //console.log('LatLongDatum ID:',pane.local.lat_long_datum_dd.value,pane.local.lat_long_datum_dd.text());
+                    //console.log('VerticalDatum ID:',pane.local.vertical_datum_dd.value,pane.local.vertical_datum_dd.text());
+                    //console.log('LocalProjection ID:',pane.local.local_projection_dd.value,pane.local.local_projection_dd.text());
+                    if(var_id) {
+                      //###EDIT VAR
+                      var post_type = 'PUT';
+                      var post_url = '/projects/#{@project.id}/variables/'+var_id+'.json';
+                      //data.variable['id'] = var_id.toString();
+                    } else {
+                      //###NEW VAR (var_id==0)
+                      var post_type = 'POST';
+                      var post_url = '/projects/#{@project.id}/variables.json';
+                    };
+                    $.ajax({
+                      type: post_type,
+                      url: post_url,
+                      data: data,
+                      success: function(newValue){
+                        //callback
+                        if(var_id) {
+                          //###EDIT VAR
+                          this_pane.refresh();
+                          return;
+                        };
+                        data.variable['id'] = parseInt(newValue.id);
+                        var var_data = {
+                          varname: data.variable.variable_name,
+                          varid: data.variable.id,
+                          varunits: data.variable.variable_units.untis_abbreviation+' ('+data.variable.data_type+')',
+                          count: 0,
+                          first: 'NA',
+                          last: 'NA'};
+                        site_var_data[site_id-1].append(var_data);
+                        site_pane.siteUpdate();
+                        #{varId}_cancel_edit();
+                      },
+                      dataType: 'json'
+                    });
+                    return false;
+                  });
+            
+            &nbsp;&nbsp;
+            %button(dojoType="dijit.form.Button" value="Cancel" onclick="cancel_edit('#{varId}');") Cancel
 
 
 %br{:style=>'float:none; clear:both;'}
-%br
-%br
-
--##all_variables
--#  %h3
--#    Existing Samples    
--#  = form_for("export", :url => {:controller => '/projects', :action => 'export'}) do 
--#    = hidden_field_tag('column_array', @label_array.to_json)
--#    = hidden_field_tag('row_array', @current_samples.to_json)
--#    = hidden_field_tag('file_name', "project_samples")
--#    = submit_tag("Export Samples")
--#  #variables_list
--#    - visualization("sample-table", 'table', :height => 200) do |table|
--#      - if @label_array.length > 1
--#        - @label_array[0..-1].each do |label|
--#          - table.register_column(:string, label)
--#        - table.add_rows(@current_samples)
--# if @versions.count > 0
--#  %h3
--#    Versions
-    
--# @versions.each do |ver|
--#%table
--#  - resource.properties.each do |prop|
--#    %tr
--#      %td
--#        %b
--#          #{prop.name.to_s.capitalize}
--#      %td
--#        #{ver[prop.name.to_s]}

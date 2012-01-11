@@ -1,5 +1,6 @@
-$("#search_results").html( '<%= escape_javascript(render(:partial => "show_query_results",
-                                      :locals => {:site => @site_name,
+$("#<%= @tabId %>_search_results").html( '<%= escape_javascript(render(:partial => "show_query_results",
+                                      :locals => {:tabId => @tabId,
+                                      :site => @site_name,
                                       :variable => @var_name,
                                       :variable_data => @variable,
                                       :site_data => @site,
@@ -12,7 +13,7 @@ $("#search_results").html( '<%= escape_javascript(render(:partial => "show_query
                                       :graph_data => @graph_data,
                                       :column_array => @column_array }))%>' )
 
-dijit.byId('loading_dialog').hide();
+dijit.byId('<%= @tabId %>_loading_dialog').hide();
 
 
 

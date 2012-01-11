@@ -4,23 +4,19 @@ require 'dm-is-versioned'
 # for Dirty Field list
 UPDATED_FIELDS = 'Updated Fields: '
 # Fields ending _id that are NOT references
-ID_EXCEPTIONS = ['his_id','srs_id']
+ID_EXCEPTIONS = ['his_id','srs_id','sensor_id','logger_id']
 
 module Yogo
   module Versioned
-    # for Dirty Field list
-    @@updated_fields = 'Updated Fields: '
-    # Fields ending _id that are NOT references
-    @@id_exceptions = ['his_id','srs_id']
     
     def yogo_versioned
-      property :provenance_comment,     ::DataMapper::Property::Text, :required => false
+      property :provenance_comment,     ::DataMapper::Property::Text, :required=>false, :lazy=>false
       # User update comment -- avoid hook updates
       # Add properties required for versioning
       property :updated_at,          ::DataMapper::Property::DateTime#, :key=>true, :default=>DateTime.now
       property :updated_by,          ::DataMapper::Property::Integer
-      property :updated_comment,     ::DataMapper::Property::Text
-      property :created_at,          ::DataMapper::Property::DateTime, :required => false
+      property :updated_comment,     ::DataMapper::Property::Text,    :lazy=>false
+      property :created_at,          ::DataMapper::Property::DateTime, :required=>false
       property :deleted_at,          ::DataMapper::Property::ParanoidDateTime
       timestamps :created_at
       
@@ -35,7 +31,6 @@ module Yogo
         self.updated_by = User.current.id
         self.updated_comment = "Edited at %s by %s %s [%s] - " % 
           [self.updated_at.strftime('%Y-%m-%d %H:%M:%S'), User.current.first_name, User.current.last_name ,User.current.login]
-        #self.updated_comment += @@updated_fields+(dirty_props.join(', '))
         self.updated_comment += ::UPDATED_FIELDS+(dirty_props.join(', '))
         ##self.updated_comment = "Edited at #{Time.now.strftime('%Y-%m-%d %H:%M:%S')} by #{User.current.first_name} #{User.current.last_name} [#{User.current.login}]"
       end
@@ -55,8 +50,6 @@ module Yogo
 
         # Dirty Field list
         def get_dirty(updated_comment=self.updated_comment)
-          #if !(dirty_props = /#{Regexp.quote(@@updated_fields)}(.*)$/.match(updated_comment)).blank?
-          #  return dirty_props[1].split(/, ?/)
           if !(dirty_props = /#{Regexp.quote(::UPDATED_FIELDS)}(.*)$/.match(updated_comment)).blank?
             return dirty_props[1].split(/, ?/)
           else

@@ -47,12 +47,17 @@ class VersionsWidget < Apotomo::Widget
       temp[:version] = version_number
       temp[:version_ttl] = "Version %s"%version_number
       temp[:version_id] = "%s-ver%03d"%[@unique_id,version_number]
-      temp[:version_ts] = ver.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+      #temp[:version_ts] = ver.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+      if ver.updated_comment.nil?
+        temp[:version_ts] = ver.created_at.strftime('%Y-%m-%d %H:%M:%S')
+      else
+        temp[:version_ts] = ver.updated_comment[10..28]
+      end
       temp[:updated_comment] = ver.updated_comment
       temp[:provenance_comment] = ver.provenance_comment
       @versions_ref << temp
       temp[:dirty] = @item.get_dirty(ver.updated_comment)
-      props.each{|prop| temp[prop.name] = ver[prop.name]}
+      props.each{|prop| temp[prop.name] = ver[prop.name] unless [:id,:deleted_at].include?(prop.name)}
       refs = @item_refs.shift
       refs.each{|k,v| temp[k] = v} unless refs.nil?
       upd_user = User.get(ver.updated_by)
@@ -60,35 +65,17 @@ class VersionsWidget < Apotomo::Widget
       version_number-=1
       @versions_items << temp
     }
+    @xtra = [
+      :created_at,
+      :updated_at,
+      :updated_by,
+      :updated_by_name,
+      :updated_comment,
+      :version_id,
+      :version_ts,
+      :version_ttl,
+      :dirty]
     ####
-    
-
-    @xver_properties = [
-#      {:label=>"Version", :name=>"version"},
-#      {:label=>"Site ID", :name=>"id"},
-      {:label=>"Name", :name=>"name"},
-      {:label=>"Code", :name=>"code"},
-      {:label=>"Latitude", :name=>"latitude"},
-      {:label=>"Longitude", :name=>"longitude"},
-      {:label=>"Lat/Long Datum", :name=>"lat_long_datum"},
-      {:label=>"Elevation", :name=>"elevation_m"},
-      {:label=>"Local X", :name=>"local_x"},
-      {:label=>"Local Y", :name=>"local_y"},
-      {:label=>"Local Projection", :name=>"local_projection"},
-      {:label=>"Vertical Datum", :name=>"vertical_datum"},
-      {:label=>"Position Accuracy", :name=>"pos_accuracy_m"},
-      {:label=>"State", :name=>"state"},
-      {:label=>"County", :name=>"county"},
-      {:label=>"Description", :name=>"description"},
-      {:label=>"Comments", :name=>"comments"},
-      {:label=>"HIS ID", :name=>"his_id"},
-      {:label=>"Updated By", :name=>"updated_by_name"},
-      {:label=>"Update Comment", :name=>"updated_comment"},
-      {:label=>"Provenance Comment", :name=>"provenance_comment"}
-      ]
-    ###
-
-
     render
   end
   

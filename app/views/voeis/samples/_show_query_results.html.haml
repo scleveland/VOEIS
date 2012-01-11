@@ -1,37 +1,38 @@
-%h3Query Results
-For: Variable(
-=variable
-), Site(
+- dataId = tabId+'_data'
+%h3{:style=>"margin:5px 0;"}
+  Query Results
+%strong Site: 
 =site
-)
+%br
+%strong Variable: 
+=variable
+&ndash;
+%strong Date: 
 -if !start_date.nil?
-  , Date(
   -if start_date > end_date
     ERROR - start date should not come after end date
   -else
     =start_date.to_date.to_formatted_s(:long).gsub('00:00','')
     ="-" 
     = end_date.to_date.to_formatted_s(:long).gsub('00:00','')
-  ) 
 =clear_break
+%br
 -# #pagination-links
 -# = pagination_links(@query, params[:page], 10)  
 
-
 -if row_array.empty?
   Sorry.  There is no Data for your search.
+
+  :javascript
+    console.log('FAILURR RESULT TABID: #{tabId}');
+    console.log('FAILURR RESULT DATAID: #{dataId}');
+    var #{dataId} = {};
+    #{dataId}.value_data = #{data_vals.to_json};
+    #{dataId}.data = #{graph_data.as_json};
+    console.log('DATAID object:',#{dataId});
+
 -else
-  -form_tag("export") do 
-    =hidden_field_tag('column_array', column_array.to_json)
-    =hidden_field_tag('row_array', row_array.to_json)
-    =hidden_field_tag('site_name', site)
-    =hidden_field_tag('site', site_data.to_json)
-    =hidden_field_tag('variable', variable_data.to_json)
-    =hidden_field_tag('start_date', start_date)
-    =hidden_field_tag('data_vals', data_vals.to_json)
-    =hidden_field_tag('end_date', end_date)
-    =submit_tag("Export Results")
-    = javascript_include_tag(:defaults, "jquery.flot.min.js", "jquery.flot.selection.min.js","jquery.flot.navigate.min.js")
+  = javascript_include_tag(:defaults, "jquery.flot.min.js", "jquery.flot.selection.min.js","jquery.flot.navigate.min.js")
   
   
   :css
@@ -66,34 +67,82 @@ For: Variable(
     dojo.require("dojox.grid.EnhancedGrid");
     dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
     dojo.require("dojox.grid.enhanced.plugins.Filter");
-    dojo.require("dojo.data.ItemFileReadStore");
     dojo.require("dijit.layout.TabContainer");
     dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
     dojo.require("dojox.grid.enhanced.plugins.Pagination");
     //dojo.require("dojox.charting.Chart2D");
     //dojo.require("dojox.charting.DataChart");
-    dojo.require("dojo.data.ItemFileWriteStore");
     //dojo.require("dojox.charting.StoreSeries");
     //dojo.require("dojox.charting.DataSeries");
     //dojo.require("dojo.store.Observable");
     //dojo.require("dojo.store.Memory");
     //dojo.require("dojox.charting.themes.Claro");
+    dojo.require("dojo.data.ItemFileReadStore");
     dojo.require("dojo.data.ItemFileWriteStore");
     dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
 
-    var value_data = #{data_vals.to_json};
-    var data = #{graph_data.as_json};
-    var values_json = {identifier: 'id', label: 'name', items: value_data };
-    var value_store = new dojo.data.ItemFileReadStore({data: values_json});
+    console.log('RESULT -TABID: #{tabId}');
+    var #{dataId} = {};
+    #{dataId}.value_data = #{data_vals.to_json};
+    for(var i=0;i<#{dataId}.value_data.length;i++) 
+      #{dataId}.value_data[i]['selected'] = 0;
+    #{dataId}.data = #{graph_data.as_json};
     
-    var val_store = new dojo.data.ItemFileReadStore({data: values_json});
-    var dvalue_store = dojo.store.Observable(new dojo.store.Memory({
+    console.log('1RESULT -DATAID(#{dataId}):',#{dataId});
+    
+    //#{dataId}.values_json = {identifier: 'id', items: #{dataId}.value_data };
+    
+    console.log('2RESULT -DATAID(#{dataId}):',#{dataId});
+    
+    //#{dataId}.val_store = new dojo.data.ItemFileReadStore({data: {identifier: 'id', items: #{dataId}.value_data }});
+    #{dataId}.val_store = new dojo.data.ItemFileWriteStore({data: {identifier: 'id', items: #{dataId}.value_data }});
+    
+    /***
+    #{dataId}.dvalue_store = dojo.store.Observable(new dojo.store.Memory({
         data: {
             identifier: "id",
             label: "data values",
-            items: value_data
+            items: #{dataId}.value_data
         }
     }));
+    ***/
+    console.log('3RESULT -DATAID(#{dataId}):',#{dataId});
+    
+    //create select array / clear array
+    /***
+    #{dataId}.value_selection = [];
+    function value_selection_clear(data_vals) {
+      data_vals.value_selection = [];
+      for(var i=0;i<data_vals.value_data.length;i++)
+        data_vals.value_selection[i] = 0;
+    };
+    value_selection_clear(#{dataId});
+    ***/
+    #{dataId}.clear_value_selection = function() {
+      var store = #{dataId}.val_store;
+      var len = #{dataId}.value_data.length;
+      for(var i=0;i<len;i++) {
+        var item0 = #{dataId}.value_data[i];
+        store.setValue(item0,'selected',0);
+      };
+      store.save({
+        onError: function() {
+          console.log('SAVE FAILED: clear_value_selection');
+        }
+      });
+    }; 
+    #{dataId}.select_value = function(item,value) {
+      var store = #{dataId}.val_store;
+      store.setValue(item,'selected',value);
+    }; 
+    #{dataId}.value_selected = function(item) {
+      var store = #{dataId}.val_store;
+      var val = store.getValue(item,'selected',0);
+      if(typeof val=='boolean' && val) return true;
+      if(typeof val!='boolean' && parseInt(val)) return true;
+      return false;
+    }; 
+    
     //var chart1 = new dojox.charting.Chart2D("simplechart");
     function trans1(store, item){
       // let's create our object
@@ -131,10 +180,37 @@ For: Variable(
       return local_date_time.slice(0,local_date_time.length-6);
     }
     
+    //formatter: 'val_grid_formatter.dateTime',
+    // grid formatters
+    var val_grid_formatter = {};
+    val_grid_formatter.dateTime = function(value) {
+      if(value==null || value=='') return '-';
+      // Format DateTime string
+      var d = new Date(value);
+      //var fmt = d.getMonth()+'/'+d.getFullYear()
+      return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+    };
+    val_grid_formatter.selectItem = function(item) {
+      //var checked_img = '<img src="/images/notice.png" alt="SELCT" />';
+      var selected_img = '<img src="/images/1abu007.gif" alt="SELCT" />';
+      var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
+      
+      if(#{dataId}.value_selected(item)) 
+        return selected_img;
+      return blank_img;
+    };
+
     var val_layout = [{
+       field: '_item',
+       name: '-',
+       formatter: val_grid_formatter.selectItem,
+       width: '24px'
+    },
+    {
        field: 'local_date_time',
        name: 'Timestamp',
-       width: '200px'
+       formatter: val_grid_formatter.dateTime,
+       width: '185px'
     },
     {
        field: 'vertical_offset',
@@ -169,22 +245,58 @@ For: Variable(
     ];
 
     // create a new grid:
-    var val_grid = new dojox.grid.EnhancedGrid({
-       store: val_store,
+    var val_grid_click = false;
+    #{dataId}.val_grid = new dojox.grid.EnhancedGrid({
+       store: #{dataId}.val_store,
+       grid_click: false,
        clientSort: true,
-       rowSelector: '20px',
+       //rowSelector: '20px',
+       rowSelector: '0',
        structure: val_layout,
-       plugins: {filter:true, pagination:true, exporter:true
+       style: 'width:95%;',
+       plugins: {filter:true, exporter:true,
+         pagination:{
+           sizeSwitch: true,
+           position: "top",
+           itemTitle: "Data Points"
+       }},
+       onClick: function(ev) {
+         this.grid_click = ev;
+       },
+       onSelected: function(idx) {
+         var item = this.getItem(idx);
+         console.log('SELECT:',item);
+         var point = #{dataId}.data[item._0];
+         console.log('SELECT-PT:',point);
+         if(!this.grid_click) return;
+         //EDIT datavalue
+         console.log('GRID CLICK:',item);
+         console.log('CLICK EV:',this.grid_click);
+         
+         this.grid_click = false;
+       },
+       onFetchError: function(err) {
+         console.log('GRID FETCH ERROR:',err);
        }
     },
     document.createElement('div'));
+    #{dataId}.val_grid.changePageSize(10);
 
     // append the new grid to the div "gridContainer":
-    dojo.byId("gridContainer").appendChild(val_grid.domNode);
+    //dojo.byId("gridContainer").appendChild(val_grid.domNode);
+    $('##{tabId}_search_results #gridContainer').append(#{dataId}.val_grid.domNode);
 
     // Call startup, in order to render the grid:
-    val_grid.startup();
-    var plot =$.plot($("#placeholder"), [data],{
+    #{dataId}.val_grid.startup();
+    
+    // Setup tooltip removal on tab switch
+    //var tabs = dijit.byId('tab_browser');
+    //tabs.watch("selectedChild", function(name, oval, nval){
+    //    console.log("changed TABs from: ", oval, " to ", nval);
+    //    $("#tooltip").remove();
+    //});    
+    
+    #{dataId}.plot = $.plot($("##{tabId}_search_results #placeholder"), [#{dataId}.data],{
            series: {
                color : "blue",
                lines: { show: true },
@@ -193,7 +305,6 @@ For: Variable(
 
            grid:  { hoverable: true, clickable: true },
            xaxis: { mode: "time" },
-           xaxis: { mode: "time" },
            pan:   { interactive: true },
            zoom: {interative: true}
     });
@@ -201,11 +312,11 @@ For: Variable(
     // add zoom out button 
     $('<div class="zobutton" style="right:20px;top:20px">-</div>').appendTo($("#placeholder")).click(function (e) {
        e.preventDefault();
-       plot.zoomOut();
+       #{dataId}.plot.zoomOut();
     });
     $('<div class="zibutton" style="right:20px;top:43px">+</div>').appendTo($("#placeholder")).click(function (e) {
        e.preventDefault();
-       plot.zoom();
+       #{dataId}.plot.zoom();
     });
 
     //Function ShowToolTip and previousPoint allow the hover function to display
@@ -214,32 +325,44 @@ For: Variable(
      //I would only mess with the css if you really need to otherwise this
      //shouldn't need any modification
      function showTooltip(x, y, contents) {
-         $('<div id="tooltip">' + contents + '</div>').css( {
-             position: 'absolute',
-             display: 'none',
-             top: y + 5,
-             left: x + 5,
-             border: '1px solid #fdd',
-             padding: '2px',
-             'background-color': '#fee',
-             opacity: 0.80
-         }).appendTo("body").fadeIn(200);
+       //delete tooltip_timeout;
+       //var tooltip_timeout = setTimeout(function() {
+       //  $("#tooltip").remove();
+       //  delete tooltip_timeout;
+       //},4000);
+       $('<div id="tooltip">' + contents + '</div>').css( {
+           position: 'absolute',
+           display: 'none',
+           'z-index': 1000,
+           top: y + 5,
+           left: x + 5,
+           border: '1px solid #fdd',
+           padding: '2px',
+           'background-color': '#fee',
+           opacity: 0.80
+       }).appendTo("body").fadeIn(200);
      };
+
+     //remove tooltip on mouseout
+     //$("##{tabId}_search_results #placeholder").bind("onmouseout", function (event) {
+     //  $("#tooltip").remove();
+     //};
+
 
      //Most of this should remain the same
      //NOTE-- the time string for #x is in UTC format and currently is in GMT time
-     var previousPoint = null;
+     #{dataId}.previousPoint = null;
      
-     $("#placeholder").bind("plothover", function (event, pos, item) {
+     $("##{tabId}_search_results #placeholder").bind("plothover", function (event, pos, item) {
          var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
-         dDate = new Date();
+         var dDate = new Date();
          dDate.setTime(mEpoch);
          $("#x").text(dDate.toLocaleString());
          $("#y").text(pos.y);
 
          if (item) {
-             if (previousPoint != item.datapoint) {
-                 previousPoint = item.datapoint;
+             if (#{dataId}.previousPoint != item.datapoint) {
+                 #{dataId}.previousPoint = item.datapoint;
                  $("#tooltip").remove();
                  var x = item.datapoint[0].toFixed(2),
                      y = item.datapoint[1].toFixed(2);
@@ -248,16 +371,63 @@ For: Variable(
                      dDate.setTime(mEpoch);
                  showTooltip(item.pageX, item.pageY,
                    //*****You will need to change the sensor name here to the appropriate one selected above
-                            dDate.toLocaleString() + " = " + y + " " + "#{variable}|#{units}" );
+                            //dDate.toLocaleString() + " = " + y + " " + "#{variable}|#{units}" );
+                            val_grid_formatter.dateTime(dDate) + " = " + y + " " + "#{variable}|#{units}" );
              }
-         }
-         else {
+         } else {
              $("#tooltip").remove();
-             previousPoint = null;            
+             #{dataId}.previousPoint = null;            
          }
      });
-  %h3   
+     
+     // PLOTCLICK event to scroll to point on datagrid
+     
+     $("##{tabId}_search_results #placeholder").bind("plotclick", function (event, pos, item) {
+         if(item) {
+           //###SCROLL TO TOP of GRID
+           //window.scrollTo(0,0);
+           //$('html #main_container').animate({scrollTop:580}, 'slow');//IE, FF
+           //$('body #main_container').animate({scrollTop:580}, 'slow');//chrome, safari
+           var idx = item.dataIndex;
+           var val_item = #{dataId}.value_data[idx];
+           //var val_grid = dijit.byNode($('##{tabId}_search_results #gridContainer div')[0]);
+           var val_grid = #{dataId}.val_grid;
+           var store = #{dataId}.val_store;
+           
+           val_grid.selection.deselectAll();
+           val_grid.scrollTo(0);
+           val_grid.scrollToRow(idx);
+           val_grid.selection.addToSelection(val_item);
+           
+           //value_selection_clear(#{dataId});
+           //#{dataId}.value_selection[idx] = 1;
+           #{dataId}.clear_value_selection();
+           #{dataId}.select_value(val_item,1);
+           
+           val_grid.update();
+         };
+     });
+     
+     //###SCROLL TO SEARCH DIV
+     //window.scrollTo(0,0);
+     $('html #main_container').animate({scrollTop:220}, 'slow');//IE, FF
+     $('body #main_container').animate({scrollTop:220}, 'slow');//chrome, safari
+     //$('##{tabId}_search_results').animate({scrollTop:200}, 'slow');
+
+  %h3{:style=>"margin:0 0 10px 0;width:56%;float:left;"}
     ="#{variable}|#{units}"
+  -if !row_array.empty?
+    -form_tag({:html=>{:style=>'float:left;'}, :controller=>'samples', :action=>'export'}) do 
+      =hidden_field_tag('column_array', column_array.to_json)
+      =hidden_field_tag('row_array', row_array.to_json)
+      =hidden_field_tag('site_name', site)
+      =hidden_field_tag('site', site_data.to_json)
+      =hidden_field_tag('variable', variable_data.to_json)
+      =hidden_field_tag('start_date', start_date)
+      =hidden_field_tag('data_vals', data_vals.to_json)
+      =hidden_field_tag('end_date', end_date)
+      =submit_tag("Export Results")
+    =clear_break
   -#simplechart{:style=>"width: 250px; height: 150px;"}
   -#chartDiv{:style=>"width: 250px; height: 150px;"}
   #placeholder{:style=>"width:600px;height:300px;"}
@@ -269,7 +439,11 @@ For: Variable(
   -#%th{:field=>"local_date_time", :width=>"190px", :filterable=>true} Timestamp
   -#%th{:field=>"vertical_offset", :width=>"130px", :filterable=>true} Vertical Offset
   -#%th{:field=>"data_value", :width=>"100px", :filterable=>true} Value
-  #gridContainer{:style=>"width:900px;height:300px;"}
+  %br
+  #gridContainer{:style=>"width:900px;height:475px;"}
+  %br
+  %br
+  
   -# %button{:onclick=>"exportAll()"}
   -#   Export all to CSV
   -# %button{:onclick=>"exportSelected()"}

@@ -13,6 +13,7 @@
 
     
     = javascript_include_tag(:defaults, 'jquery-snippet.js', "dojo_old/dojo.js", "voeislayer.js", "jquery.flot.min.js")
+    -#= javascript_include_tag('rails.js', 'jquery.1.7.1.min.js', 'jquery-snippet.js', "dojo_old/dojo.js", "voeislayer.js", "jquery.flot.min.js")
     = csrf_meta_tag
 
     = stylesheet_link_tag('jquery-ui-1.8.1.custom')
@@ -177,9 +178,11 @@
               -if !current_user.nil? && current_user.projects.include?(@project)
                 - if atroot
                   -#= link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
-                  = link_to("Add Site", "javascript:", :dojoType => "yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/site/new');")
+                  = link_to("Add Site", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/site/new');")
+                  -#= link_to('Add Variable', 'javascript:', :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/variable', [0,'',0]);")
                 - else
                   = link_to("Add Site", project_path(@project)+'?tab=newsite', :dojoType => "yogo.ui.MenuLink")
+                  -#= link_to('Add Variable', project_path(@project)+'?tab=newvar', :dojoType=>"yogo.ui.MenuLink")
                 
                 = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_sample_menu")
                 = link_to("Add Logger Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")

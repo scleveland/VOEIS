@@ -54,7 +54,11 @@ Yogo::Application.routes.draw do
           get :versions
         end
       end
-      resources :variables
+      resources :variables do
+        collection do
+          get :versions
+        end
+      end
       resources :meta_tags
       resources :data_sets
       resources :spatial_offsets
