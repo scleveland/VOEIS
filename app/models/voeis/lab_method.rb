@@ -28,12 +28,12 @@ class Voeis::LabMethod
   property :lab_method_name,        Text, :required => true, :default => 'Unknown', :format => /[^\t|\n|\r]/
   property :lab_method_description, Text, :required => true, :default => 'Unknown'
   property :lab_method_link,        Text
-  
   property :his_id,               Integer
+  
+  yogo_versioned
   
   has n, :variables, :model => "Voeis::Variable", :through => Resource
   has 1, :equipment, :model => "Voeis::Equipment"
-  yogo_versioned
   
   def self.load_from_his
     puts "loading lab methods"

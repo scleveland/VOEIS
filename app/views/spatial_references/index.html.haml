@@ -213,9 +213,68 @@
       //$(delete_button.domNode).hide();
       cv_dialog_box.show();
     };
+    
+    // NICE Dijit ConfirmDialog
+    function confirmDialog(title, body, callbackFn, options) {
+      var theDialog = new dijit.Dialog({
+        id: 'confirmDialog',
+        title: title,
+        draggable: false,
+        style: 'width:220px;',
+        onHide: function() {
+          theDialog.destroyRecursive();
+        }
+      });
+      for(var prop in options) theDialog.attr(prop,options[prop]);
+      
+      var callback = function(yes) {
+        theDialog.hide();
+        theDialog.destroyRecursive(false);
+        callbackFn(yes);
+      };
+      
+      var message = dojo.create("p", {
+        style: {
+          marginTop: "5px"
+        },
+        innerHTML: body
+      });
+      var btnsDiv = dojo.create("div", {
+        style: {
+          textAlign: "center"
+        }
+      });
+      var okBtn = new dijit.form.Button({label: theDialog.buttonOk, 
+        id: "confirmDialogOKButton", 
+        style: "margin:5px 10px;",
+        onClick: function(){ callback(true) } });
+      var cancelBtn = new dijit.form.Button({label: theDialog.buttonCancel, 
+        id: "confirmDialogCancelButton", 
+        style: "margin:5px 10px;",
+        onClick: function(){ callback(false) } });
+      
+      theDialog.containerNode.appendChild(message);
+      theDialog.containerNode.appendChild(btnsDiv);
+      btnsDiv.appendChild(okBtn.domNode);
+      btnsDiv.appendChild(cancelBtn.domNode);
+
+      theDialog.show();
+    };
+    
     // CONFIRM DIALOG
     function confirm_now(text) {
-      return window.confirm(text);
+      //return window.confirm(text);
+      confirm_now.confirm = 0;
+      confirm_now.done = false;
+      confirmDialog('Please confirm &mdash;', text, 
+        function(yes) {
+          confirm_now.confirm = yes;
+          confirm_now.done = true;
+        }, 
+        {buttonOk: 'YES', buttonCancel: 'Cancel'});
+      while(!confirm_now.done) var x = 0;
+      return 123;
+      return confirm_now.confirm;
       // #### CUSTOM CONFIRM
       confirm_box.confirmed = false;
       confirm_box.done = false;
@@ -225,50 +284,44 @@
       console.log('CONFIRM THIS:',confirm_box.confirmed);
       return confirm_box.confirmed;
     };
-    // CONFRIM DIALOG
-    function confirm_nowxx(text) {
-      //return window.confirm('Are you quite sure you want to\n DELETE this #{@cv_title}?');
-      // #### CUSTOM CONFIRM
-      var confirm_this = false;
-      var confirm_done = false;
-      console.log('DO CONFIRM');
-      confirm_box.show();
-      while(!confirm_done) confirm_done = confirm_done;
-      console.log('CONFIRM THIS:',confirm_this);
-      return confirm_this;
-    };
     // DELETE ITEM
     function cv_delete(item_idx, call_back) {
       console.log('DELETE?');
       var item = cv_data[item_idx];
       //var confirm = window.confirm('Are you quite sure you want to\n DELETE this #{@cv_title}?');
-      var confirm = confirm_now('Are you quite sure you want to\n DELETE this #{@cv_title}?');
-      if(!confirm) {
-        cv_dialog_box.hide();
-        return;
-      };
-      console.log('DELETE');
-      //return;     //TESTING
-      var cv_id = item.id;
-      var cv_idx = item.idx;
-      //AJAX DELETE
-      $.ajax({
-        type: 'DELETE',
-        url: post_url+'/'+cv_id+'.json',
-        data: {},
-        dataType: 'json',
-        success: function(result) {
-          var errs = result.errors;
-          if(errs && errs.length) {
-            console.log('FAILED ERRORS:\n'+errs.join('/n'));
-          } else {
-            console.log('DELETED!');
-            //var item = cv_data[cv_idx];
-            cv_store_del(item);
-            cv_store_new(item,copy_store);
-            if(call_back) call_back();
+      //var confirm = confirm_now('Are you quite sure you want to\n DELETE this #{@cv_title}?');
+      var text = 'Are you quite sure you want to\n DELETE this #{@cv_title}?';
+      confirmDialog('Please confirm &mdash;', text, 
+        function(yes) {
+          console.log('CONFIRM:',yes);
+          if(yes) {
+            //DELETE
+            console.log('DELETE');
+            //return;     //TESTING
+            var cv_id = item.id;
+            var cv_idx = item.idx;
+            //AJAX DELETE
+            $.ajax({
+              type: 'DELETE',
+              url: post_url+'/'+cv_id+'.json',
+              data: {},
+              dataType: 'json',
+              success: function(result) {
+                var errs = result.errors;
+                if(errs && errs.length) {
+                  console.log('FAILED ERRORS:\n'+errs.join('/n'));
+                } else {
+                  console.log('DELETED!');
+                  //var item = cv_data[cv_idx];
+                  cv_store_del(item);
+                  cv_store_new(item,copy_store);
+                  if(call_back) call_back();
+                };
+            }});
           };
-      }});
+          cv_dialog_box.hide();
+        }, 
+        {buttonOk: 'YES', buttonCancel: 'Cancel'});
     };
     // SAVE ITEM
     function cv_save(id, data, call_back) {

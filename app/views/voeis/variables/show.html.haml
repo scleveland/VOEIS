@@ -15,7 +15,7 @@
   #form-table td { width:50%; }
   .form_element { width:20em; }
   
-  .dijitTextBox { width:24em !important; }
+  .dijitTextBox { width:18em !important; }
   .TextBox_qcval { width:5em !important; }
   .TextBox_time { width:10em !important; }
   .TextBox_half { width:10em !important; }
@@ -436,22 +436,24 @@
         %tr
           %td{:colspan=>"2"}
             .from-element{:style=>"cursor:pointer;"}
-              %span{:class=>'label', :style=>"cursor:pointer;"}
+              -#%span{:class=>'label', :style=>"cursor:pointer;"}
+              %a{:href=>"javascript:", :onclick=>"thisForm=#{varId}_edit_form;var_new_lab.show();"}
                 -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
-                %label{:for=>"var_lab", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
-                  Labratory
+                %label{:for=>"var_lab", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
+                  Laboratory
             %select(name="var_lab")
               %option(value="0") NA
-              = options_for_select(@laboratories.map{|item| ['%s (%s)'%[item.lab_name,item.lab_organization],item.id]}, selected=@variable.lab_id)
+              = options_for_select(@laboratories.map{|item| [item.lab_name,item.id]}, selected=@variable.lab_id)
               -#- @laboratories.each do |item|
               -#  %option(value="#{item.id}") #{'%s (%s)'%[item.lab_name,item.lab_organization]}
       
         %tr
           %td
             .from-element{:style=>"cursor:pointer;"}
-              %span{:class=>'label', :style=>"cursor:pointer;"}
+              -#%span{:class=>'label', :style=>"cursor:pointer;"}
+              %a{:href=>"javascript:", :onclick=>"thisForm=#{varId}_edit_form;var_new_lab_method.show();"}
                 -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
-                %label{:for=>"var_lab_method", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
+                %label{:for=>"var_lab_method", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                   Lab Method
             %select(name="var_lab_method")
               %option(value="0") NA
@@ -461,9 +463,10 @@
       
           %td
             .from-element{:style=>"cursor:pointer;"}
-              %span{:class=>'label', :style=>"cursor:pointer;"}
+              -#%span{:class=>'label', :style=>"cursor:pointer;"}
+              %a{:href=>"javascript:", :onclick=>"thisForm=#{varId}_edit_form;var_new_field_method.show();"}
                 -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
-                %label{:for=>"var_field_method", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
+                %label{:for=>"var_field_method", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                   Field Method
             %select(name="var_field_method")
               %option(value="0") NA
@@ -532,7 +535,7 @@
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"var_his_id"} HIS ID
-              %input(name="var_his_id" class="TextBox_value" dojoType="dijit.form.NumberTextBox" type="text" value="#{@variable.detection_limit}" required="false")
+              %input(name="var_his_id" class="TextBox_value" dojoType="dijit.form.NumberTextBox" type="text" value="#{@variable.his_id}" required="false")
               -#%input(name="var_his_id" class="TextBox_value" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.his_id}" required="false")
       
         %tr{:id=>"#{varId}-provenance-row"}
@@ -540,8 +543,9 @@
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"var_provenance_comment"} Provenance Comment
-            %textarea( name="var_provenance_comment" rows="2")
-              -
+            -#%textarea( name="var_provenance_comment" rows="2")
+            %input(name="var_provenance_comment" dojoType="dijit.form.SimpleTextarea" rows="3" 
+                  style="width:45em!important;line-height:16px!important;")
       
         %tr
           %td{:colspan=>"2"}
@@ -571,6 +575,13 @@
                     $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
                     $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
                     if(parseInt(#{@var_id})) {
+                      var elems = #{varId}_edit_form.domNode.elements;
+                      $(elems['var_units']).val(#{@variable.variable_units_id})
+                      $(elems['var_time_units']).val(#{@variable.time_units_id})
+                      $(elems['var_lab']).val(#{@variable.lab_id})
+                      $(elems['var_lab_method']).val(#{@variable.lab_method_id})
+                      $(elems['var_field_method']).val(#{@variable.field_method_id})
+                      $(elems['var_spat_units']).val(#{@variable.spatial_units_id})
                       $('#'+varID+'_edit').hide();
                       $('#'+varID+'_show').show();
                     } else {

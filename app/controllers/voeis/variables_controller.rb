@@ -45,6 +45,8 @@ class Voeis::VariablesController < Voeis::BaseController
       @variable_ref[:lab] = @variable.lab.nil? ? 'NA' : '%s (%s)'%[@variable.lab.lab_name,@variable.lab.lab_organization]
       @variable_ref[:field_method] = @variable.field_method.nil? ? 'NA' : @variable.field_method.method_name
       @variable_ref[:spatial_units] = sunits.nil? ? 'NA' : '%s (%s)'% sunits.to_hash.values_at(:units_abbreviation,:units_type)
+      upd_user = User.get(@variable.updated_by)
+      @variable_ref[:updated_user] = upd_user.nil? ? '-' : '%s (%s)'% [upd_user.name,upd_user.login]
     end
     @variable_properties = [
       {:label=>"Variable ID", :name=>"id"},
@@ -74,16 +76,16 @@ class Voeis::VariablesController < Voeis::BaseController
       {:label=>"Sensor ID", :name=>"sensor_id"},
       {:label=>"HIS ID", :name=>"his_id"},
       {:label=>"Updated", :name=>"updated_at"},
-      {:label=>"Updated By", :name=>"updated_by"},
+      {:label=>"Updated By", :name=>"updated_user"},
       {:label=>"Update Comment", :name=>"updated_comment"},
       {:label=>"Provenance Comment", :name=>"provenance_comment"},
       {:label=>"Created", :name=>"created_at"}
       ]
     
     @units_all = Voeis::Unit.all(:order=>"units_type")
-    @laboratories = Voeis::Lab.all
-    @lab_methods = Voeis::LabMethod.all
-    @field_methods = Voeis::FieldMethod.all
+    @laboratories = @project.managed_repository{ Voeis::Lab.all }
+    @lab_methods = @project.managed_repository{ Voeis::LabMethod.all }
+    @field_methods = @project.managed_repository{ Voeis::FieldMethod.all }
     
     #logger.debug('>>>> graph_data = '+@graph_data.to_s)
     #logger.debug('>>>> data = '+@data.to_s)
@@ -129,15 +131,45 @@ class Voeis::VariablesController < Voeis::BaseController
       logger.info @variable.to_hash
       
       ### FIX NON-STRING VALS
-      varparams.each{|prop| 
-        varparams[prop] = nil if ['NaN','null'].include?(varparams[prop])}
+      #varparams.each{|prop,value| 
+      #  v = value.strip
+      #  varparams[prop] = nil if v=='NaN' || v=='null'
+      #  varparams[prop] = v.to_i if [:variable_units_id,:time_units_id,:quality_control].include?(prop)
+      #  if [:lab_id,:lab_method_id,:field_method_id,:spatial_units_id].include?(prop)
+      #    if v=='0' || v=='NaN' || v=='null'
+      #      varparams[prop] = nil
+      #    else
+      #      varparams[prop] = varparams[prop].to_i
+      #    end
+      #  end
+      #  if [:time_support,:detection_limit,:spatial_offset_value].include?(prop)
+      #    varparams[prop] = v=='' ? nil : varparams[prop].to_f
+      #  end
+      #  if prop==:his_id
+      #    varparams[prop] = v=='' ? nil : varparams[prop].to_i
+      #  end
+      #  if prop==:is_regular
+      #    varparams[prop] = v=~(/(true|t|yes|y|1)$/i) ? true : false
+      #  end
+      #  
+      #  @variable[prop] = varparams[prop].blank? ? nil : varparams[prop]
+      #}
+      
+      varparams.each{|prop,value| 
+        v = value.strip
+        varparams[prop] = nil if v=='NaN' || v=='null' }
       [:variable_units_id,:time_units_id,:quality_control].each{|prop| 
         varparams[prop] = varparams[prop].to_i}
       [:lab_id,:lab_method_id,:field_method_id,:spatial_units_id].each{|prop| 
-        varparams[prop] = nil if varparams[prop]=='0'}
+        if varparams[prop]=='0' || varparams[prop]==nil
+          varparams[prop] = nil
+        else
+          varparams[prop] = varparams[prop].to_i
+        end }
       [:time_support,:detection_limit,:spatial_offset_value].each{|prop| 
         varparams[prop] = varparams[prop]=='' ? nil : varparams[prop].to_f }
-      varparams[:is_regular] = varparams[:is_regular]==true || varparams[:is_regular]=~(/(true|t|yes|y|1)$/i) ? true : false
+      #varparams[:hid_id] = varparams[:his_id]=='' ? nil : varparams[:hid_id].to_i
+      varparams[:is_regular] = varparams[:is_regular]=~(/(true|t|yes|y|1)$/i) ? true : false
       
       varparams.each do |key, value|
         @variable[key] = value.blank? ? nil : value
@@ -172,21 +204,11 @@ class Voeis::VariablesController < Voeis::BaseController
     if @variable.variable_code.nil? || @variable_code =="undefined"
       @variable.variable_code = @variable.id.to_s+@variable.variable_name+@variable.speciation+Voeis::Unit.get(@variable.variable_units_id).units_name
     end
-    if params[:variable][:detection_limit].empty?
-      @variable.detection_limit = nil
-    end
-    if params[:variable][:field_method_id].empty?
-      @variable.field_method_id = nil
-    end
-    if params[:variable][:lab_id].empty?
-      @variable.lab_id = nil
-    end
-    if params[:variable][:lab_method_id].empty?
-      @variable.lab_method_id = nil
-    end
-    if params[:variable][:spatial_offset_type].empty?
-      @variable.spatial_offset_type = nil
-    end
+    @variable.detection_limit = nil if params[:variable][:detection_limit].empty?
+    @variable.field_method_id = nil if params[:variable][:field_method_id].empty?
+    @variable.lab_id = nil if params[:variable][:lab_id].empty?
+    @variable.lab_method_id = nil if params[:variable][:lab_method_id].empty?
+    @variable.spatial_offset_type = nil if params[:variable][:spatial_offset_type].empty?
     @variable.valid?
     puts @variable.errors.inspect()
     if @variable.save  
@@ -200,7 +222,7 @@ class Voeis::VariablesController < Voeis::BaseController
       end
     else
       respond_to do |format|
-        flash[:warning] = 'There was a problem saving the Variables.'
+        flash[:warning] = 'There was a problem saving the Variable.'
         format.html { render :action => "new" }
         format.json do
            render :json => @variable.as_json, :callback => params[:jsoncallback]
