@@ -80,6 +80,9 @@ class ProjectsController < InheritedResources::Base
     #                   [ timestamp, site.sensor.variable.value, site.sensor.variable.value ]
     #                   [ ... ]
     #                  ]
+    @project = Project.get(params[:id])
+    @auth = !current_user.nil? && current_user.projects.include?(@project)
+    
     if resource.nil?
       flash[:error] = "Could not find that project"
       redirect_to(projects_path()) and return

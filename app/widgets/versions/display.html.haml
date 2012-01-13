@@ -29,23 +29,31 @@
   //### RESTORE VERSION FROM HISTORY
   function restoreVer(ver_item){
       var item = ver_item;
-      if(!window.confirm('ARE YOU SURE?\nROLLBACK VERSION '+item.version)) return;
-      item['provenance_comment'] = 'ROLLBACK VERSION '+item.version
-      console.log('VER:',item);
-      //STRIP UNWANTED STUFF??
-      delete item.version;
-      //delete item.dirty;
-      //delete item.created_at;
-      //delete item.updated_at;
-      //delete item.updated_by;
-      //delete item.updated_by_name;
-      //delete item.updated_comment;
-      //delete item.version_id;
-      //delete item.version_ts;
-      //delete item.version_ttl;
-      //ITEM SAVE CALLBACK
-      //var item_json = JSON.stringify(item);
-      window['#{@restore_callback}'](item);
+      //if(!window.confirm('ARE YOU SURE?\nROLLBACK VERSION '+item.version)) return;
+      console.log('ROLLBACK?',item);
+      confirmDialog('Confirm Rollback &mdash;',
+        'ARE YOU SURE?\n<br/>ROLLBACK VERSION '+item.version,
+        function(yes){
+          console.log('CONFIRM:',yes);
+          if(!yes) return;
+          item['provenance_comment'] = 'ROLLBACK VERSION '+item.version
+          console.log('VER:',item);
+          //STRIP UNWANTED STUFF??
+          delete item.version;
+          //delete item.dirty;
+          //delete item.created_at;
+          //delete item.updated_at;
+          //delete item.updated_by;
+          //delete item.updated_by_name;
+          //delete item.updated_comment;
+          //delete item.version_id;
+          //delete item.version_ts;
+          //delete item.version_ttl;
+          //ITEM SAVE CALLBACK
+          //var item_json = JSON.stringify(item);
+          window['#{@restore_callback}'](item);
+        }, 
+        { buttonOk:'YES', buttonCancel:'Cancel' });
   };
   
 

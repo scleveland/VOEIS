@@ -129,6 +129,7 @@ Yogo::Application.routes.draw do
       end
       resources :sample_materials
       resources :lab_methods
+      resources :field_methods
       resources :sources
       resources :logger_imports do
         collection do
@@ -219,10 +220,10 @@ Yogo::Application.routes.draw do
   resources :data_type_c_vs
   resources :general_category_c_vs
   resources :sample_type_c_vs
-  resources :lab_methods
   resources :labs
-  resources :sample_materials
+  resources :lab_methods
   resources :field_methods
+  resources :sample_materials
   resource  :password,                :only => [:show, :update, :edit]
   resources :dashboards,              :only => [:show], :requirements => {:id => /[\w]+/}
   resources :pages,                   :only => [:show], :requirements => {:id => /[\w]+/}

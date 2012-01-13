@@ -22,13 +22,16 @@ class Voeis::LabsController < Voeis::BaseController
       @lab = Voeis::Lab.new(params[:lab])
       respond_to do |format|
         if @lab.save
-          flash[:notice] = 'Lab Method was successfully created.'
-           format.json do
-              render :json => @lab.as_json, :callback => params[:jsoncallback]
-            end
-          format.html { (redirect_to(new_project_lab_path())) }
+          format.json {
+            render :json => @lab.as_json, :callback => params[:jsoncallback]
+          }
+          format.html {
+            flash[:notice] = 'Lab was successfully created.'
+            (redirect_to(new_project_lab_path()))
+          }
           format.js
         else
+          flash[:warning] = 'There was a problem saving the Lab.'
           format.html { render :action => "new" }
         end
       end

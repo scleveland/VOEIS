@@ -22,17 +22,32 @@ class Voeis::LabMethodsController < Voeis::BaseController
       # if params[:lab_method].nil?
       #   @lab_method = Voeis::LabMethod.new(:lab_name=> params[:lab_name], :lab_organization => params[:lab_organization], :lab_method_name => params[:lab_method_name], :lab_method_description => params[:lab_method_description])
       # else
-        @lab_method = Voeis::LabMethod.new(params[:lab_method])
+      @lab_method = Voeis::LabMethod.new(params[:lab_method])
       # end
+      
+      #logger.info '### LabMethod to be saved ###'
+      #logger.info @lab_method.to_hash
+      #debugger
+      @lab_method.lab_method_link = nil if @lab_method.lab_method_link.empty?
+      if @lab_method.his_id.empty?
+        @lab_method.his_id = nil
+      else
+        @lab_method.his_id = params[:lab_method][:his_id].to_i
+      end
+      
       respond_to do |format|
         if @lab_method.save
           flash[:notice] = 'Lab Method was successfully created.'
-           format.json do
-              render :json => @lab_method.as_json, :callback => params[:jsoncallback]
-            end
-          format.html { (redirect_to(new_project_lab_method_path())) }
+          format.json {
+            render :json => @lab_method.as_json, :callback => params[:jsoncallback]
+          }
+          format.html {
+            flash[:notice] = 'Lab Method was successfully created.'
+            (redirect_to(new_project_lab_method_path()))
+          }
           format.js
         else
+          flash[:warning] = 'There was a problem saving the Lab Method.'
           format.html { render :action => "new" }
         end
       end

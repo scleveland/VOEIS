@@ -193,7 +193,7 @@
   -##edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>'EDIT', :style=>"margin-top:0;padding-top:0;display:none;"}
   #edit-site00{:style=>"margin-top:0;padding-top:0;display:none;"}
 
-    #site00_lat_long_picker{:dojoType=>"dijit.Dialog", :jsId=>"site00_lat_long_picker", :title=>"Select location for Latitude/Longitude (click/shift-click to zoom in/out)", 
+    #site00_lat_long_picker{:dojoType=>"dijit.Dialog", :jsId=>"site00_lat_long_picker", :title=>"Select location for Latitude/Longitude v0 (click/shift-click to zoom in/out)", 
       :style=>"padding:0;"}
       %script{:type=>"dojo/method", :event=>"onShow"}
         :plain
@@ -544,6 +544,7 @@
           $('html #edit-site'+siteId).animate({scrollTop:0}, 'slow');//IE, FF
           $('body #edit-site'+siteId).animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
           if(parseInt(siteId)) {
+            //EXISTING SITE
             var sitePane = window['site'+siteId+'ref'];
             sitePane.siteUpdate(sitePane.getSite());
             $('#edit-site'+siteId).hide();
@@ -606,8 +607,14 @@
         %tr
           %td{:colspan=>"2"}
             .from-element{:style=>"cursor:pointer;margin-top:10px;"}
-            %a{:style=>"cursor:pointer;", :class=>"icon icon-notice", :href=>"javascript:", :onclick=>"site00_lat_long_picker.show();return false;"}
+            -#%a{:style=>"cursor:pointer;", :class=>"icon icon-notice", :href=>"javascript:", :onclick=>"site_lat_long_picker.open($$$id$$$);return false;"}
+            %a{:style=>"cursor:pointer;", :class=>"icon icon-notice", :href=>"javascript:", :onclick=>"thisSite='site00';site_lat_long_picker.show();return false;"}
               Select MAP location to populate Latitude & Longitude
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            -#%br
+            -#%a{:style=>"cursor:pointer;", :class=>"icon icon-notice", :href=>"javascript:", :onclick=>"site00_lat_long_picker.show();return false;"}
+            -#  Select MAP location to populate Latitude & Longitude v0
+            
         %tr
           %td
             .from-element
@@ -629,12 +636,14 @@
         %tr
           %td{:colspan=>"2"}
             .from-element{:style=>"cursor:pointer;"}
-              %span{:class=>'label', :style=>"cursor:pointer;"}
-                %label{:for=>"site_lat_long_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"SRfrom='LLD';site00_new_spatial_reference.show();"}
+              -#%span{:class=>'label', :style=>"cursor:pointer;"}
+              -#%label{:for=>"site_lat_long_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site_new_spatial_reference.open($('.site00_spatial_ref'),$('#site00_lat_long_datum'));"}
+              %a{:href=>"javascript:", :onclick=>"thisSite='site00';site_new_spatial_reference.show();return false;"}
+                %label{:for=>"site_lat_long_datum", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                   Latitude Longitude Datum
             -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
             -#= f.select('local_projection',  options_for_select(@local_projection_items, '$$$local_projection$$$'), :class=>"form-dropdown")
-            %select(id="site00_lat_long_datum" name="site_lat_long_datum")
+            %select(id="site00_lat_long_datum" class="site00_spatial_ref" name="site_lat_long_datum")
               - @local_projection_items.each do |item|
                 %option(value="#{item[1]}") #{item[0]}
 
@@ -665,12 +674,13 @@
         %tr
           %td{:colspan=>"2"}
             .from-element{:style=>"cursor:pointer;"}
-              %span{:class=>'label', :style=>"cursor:pointer;"}
-                %label{:for=>"site_local_projection", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"SRfrom='LP';site00_new_spatial_reference.show();"}
+              -#%span{:class=>'label', :style=>"cursor:pointer;"}
+              %a{:href=>"javascript:", :onclick=>"thisSite='site00';site_new_spatial_reference.show();return false;"}
+                %label{:for=>"site_local_projection", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                   Local Projection
             -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
             -#= f.select('local_projection',  options_for_select(@local_projection_items, '$$$local_projection$$$'), :class=>"form-dropdown")
-            %select(id="site00_local_projection" name="site_local_projection")
+            %select(id="site00_local_projection" class="site00_spatial_ref" name="site_local_projection")
               - @local_projection_items.each do |item|
                 %option(value="#{item[1]}") #{item[0]}
             -#%td{:style=>"padding-top:20px;"}
@@ -682,9 +692,11 @@
         %tr
           %td{:colspan=>"2"}
             .from-element{:style=>"cursor:pointer;"}
-              %span{:class=>'label', :style=>"cursor:pointer;"}
-                -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
-                %label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site00_new_vertical_datum.show();"}
+              -#%span{:class=>'label', :style=>"cursor:pointer;"}
+              -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
+              -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site_new_vertical_datum.open($('#site00_vertical_datum'),$('#site00_vertical_datum'));"}
+              %a{:href=>"javascript:", :onclick=>"thisSite='site00';site_new_vertical_datum.show();return false;"}
+                %label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                   Vertical Datum
             -#= f.text_field("vertical_datum", :value=>"$$$vertical_datum_id$$$") 
             -#= f.select("site00_vertical_datum", options_for_select([]), :class=>"form-dropdown")
@@ -728,8 +740,9 @@
             -#= f.text_area("description", :value=>"$$$description$$$")
             -#%textarea( name="site_description" id="site00_description" rows="5")
             -#site00-description(name="site_description" dojoType="dijit.form.Textarea")
-            %textarea( name="site_description" id="site00_description" rows="5")
-              $$$description$$$
+            -#%textarea( name="site_description" id="site00_description" rows="5")
+            %input(name="site_description" dojoType="dijit.form.Textarea" id="site00_description" 
+                  style="width:490px!important;line-height:16px!important;" value="$$$description$$$")
         %tr
           %td{:colspan=>"2"}
             .from-element
@@ -738,15 +751,18 @@
             -#= f.text_area("comments", :value=>"$$$comments$$$")
             -#%textarea( name="site_comments" id="site00_comments" rows="5")
             -#site00-comments(name="site_comments" dojoType="dijit.form.Textarea")
-            %textarea( name="site_comments" id="site00_comments" rows="5")
-              $$$comments$$$
+            -#%textarea( name="site_comments" id="site00_comments" rows="5")
+            %input(name="site_comments" dojoType="dijit.form.Textarea" id="site00_comments" 
+                  style="width:490px!important;line-height:16px!important;" value="$$$comments$$$")
         %tr{:id=>"site00-provenance-row"}
           %td{:colspan=>"2"}
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"site_provenance_comment"} Provenance Comment
-            %textarea( name="site_provenance_comment" id="site00_provenance_comment" rows="2")
-              -#$$$provenance_comment$$$
+            -#%textarea( name="site_provenance_comment" id="site00_provenance_comment" rows="2")
+            -#$$$provenance_comment$$$
+            %input(name="site_provenance_comment" dojoType="dijit.form.SimpleTextarea" id="site00_provenance_comment" 
+                  style="width:485px!important;line-height:16px!important;" rows="3")
         
         %tr
           %td{:colspan=>"2"}

@@ -20,16 +20,26 @@ class Voeis::FieldMethodsController < Voeis::BaseController
   def create
     parent.managed_repository do
       @field_method = Voeis::FieldMethod.new(params[:field_method])
-  
+      
+      @field_method.method_link = nil if @field_method.method_link.empty?
+      if @field_method.his_id.empty?
+        @field_method.his_id = nil
+      else
+        @field_method.his_id = params[:field_method][:his_id].to_i
+      end
+      
       respond_to do |format|
         if @field_method.save
-          flash[:notice] = 'Field Method was successfully created.'
-           format.json do
-              render :json => @field_method.as_json, :callback => params[:jsoncallback]
-            end
-          format.html { (redirect_to(new_project_field_method_path())) }
+          format.json {
+            render :json => @field_method.as_json, :callback => params[:jsoncallback]
+          }
+          format.html {
+            flash[:notice] = 'Field Method was successfully created.'
+            (redirect_to(new_project_field_method_path()))
+          }
           format.js
         else
+          flash[:warning] = 'There was a problem saving the Field Method.'
           format.html { render :action => "new" }
         end
       end
