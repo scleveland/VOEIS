@@ -334,8 +334,9 @@ class Voeis::ApivsController < Voeis::BaseController
   # @param [Integer] :data_template_id the id of the data stream used to parse a file
   # @param [Integer] :site_id
   # @param [Integer] :start_line the line which your data begins (if this is not specified the data-templates starting line will be used)
+  # @param [Boolean] :queue, setting this parameter to true will queue the upload job for processing later - this is recommended for large files.  
   #
-  # @return [String] :success or :error message
+  # @return [JSON Object] :success or :error message, if queue is set to true a job_queue_id will be returned
   # @return [Integer] :total_records_saved - the total number of records saved to Voeis
   # @return [Integer] :total_rows_parsed - the total number of rows successfully parsed
   # @return [String] :last_record  - the last record saved for the last variable in the row defined by the data-template - this will return the most recently created record
@@ -1895,10 +1896,113 @@ class Voeis::ApivsController < Voeis::BaseController
      end
   end
    
-   
-   
-   
-   private
+  #########DataSets######################################
+  
+  # create_project_data_set
+   # API for creating a new data set object
+   #
+   #
+   # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/get_project_data_sets&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
+   # 
+   # @param [String] :name  -the unique name of this dataset for the project
+   # @param [String] :type - specify a data set type to retreive all of. If not specifed the type will be "default"
+   # # @param [Text] :description - the description of the data set. Optional
+   #
+   # @return [JSON String] The created data set object
+   #
+   # @author Sean Cleveland
+   #
+   # @api public
+   def create_project_data_set
+     @data_set =""
+     parent.managed_repository do
+       if params[:name]
+         if Voeis::DataSet.first(:name => params[:name]).nil?
+           if params[:type].nil?
+             params[:type] = "default"
+           end
+           if params[:description].nil?
+             params[:description] = ""
+           end
+           @data_set = Voeis::DataSet.create(:name=>params[:name], :type=>params[:type], :description=>params[:description])
+         else
+           @data_set = {"error" => "The name: #{params[:name]} already exists as data set."}
+         end
+       else
+         @data_set = {"error" => "The name parameter is required to create a new data set."}
+       end
+     end
+     respond_to do |format|
+        format_response(@data_set, format)
+     end
+   end
+  
+  # get_project_data_sets
+  # API for fetching all data sets objects from a project.  NOTE this does not return the data values for a data set
+  #
+  #
+  # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/get_project_data_sets&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
+  # 
+  # @param [String] :type specify a data set type to retreive all of. OPTIONAL
+  #
+  # @return [JSON String] an array of data_sets that exist for the project and each ones properties
+  #
+  # @author Sean Cleveland
+  #
+  # @api public
+  def get_project_data_sets
+    @data_sets =""
+    parent.managed_repository do
+      if params[:type]
+        @data_sets = Voeis::DataSet.all(:type=>params[:type])
+      else
+        @data_sets = Voeis::DataSet.all
+      end
+    end
+    respond_to do |format|
+       format_response(@data_sets, format)
+    end
+  end
+  
+  # get_project_data_set_data
+  # API for fetching all of a data sets data from a project
+  #
+  #
+  # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/get_project_data_set_data&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_set_id=1
+  # 
+  # @param [Integer] :data_set_id
+  # @param [Boolean] :small_data if true this will return only local_date_time and the data_values. OPTIONAL
+  # @param [Integer] :variable_id if true this will return only data values that are associated with this variable. OPTIONAL
+  # 
+  # @return [JSON String] an array of data_sets that exist for the project and each ones properties
+  #
+  # @author Sean Cleveland
+  #
+  # @api public
+  def get_project_data_set_data
+    @data_set_data =""
+    @data_hash = Hash.new()
+    sql =""
+    parent.managed_repository do
+      @data_set_data = Voeis::DataSet.get(params[:data_set_id].to_i).data_values    
+      if params[:small_data]
+        if params[:variable_id]
+          sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE variable_id=#{params[:variable_id]} AND id IN ( #{@data_set_data.map{|k| k.id}.join(',')})"
+        else
+          sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE id IN ( #{@data_set_data.map{|k| k.id}.join(',')})"
+        end  
+        @data_hash[:data] = repository.adapter.select(sql)
+      else
+         @data_hash[:data] = @data_set_data
+      end
+      @data_hash[:data_set] = Voeis::DataSet.get(params[:data_set_id].to_i)
+    end
+    respond_to do |format|
+       format_response(@data_hash, format)
+    end
+  end
+  
+  private
  
      
      #'http://glassfish.msu.montana.edu/yogo/projects/Big%20Sky.json?api_key=Red-0bl_n0qxeOIwh4WQ&sitecode=UPGL-GLTNR24--MSU_UPGL-GLTNR24_MF_ESTBSWS&sensors[]=H2OCond_Avg&sensors[]=H2OTemp_Avg&sensors[]=AirTemp_Avg&sensors[]=AirTemp_SMP&hours=48&jsoncallback=?'
