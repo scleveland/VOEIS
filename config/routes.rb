@@ -106,8 +106,11 @@ Yogo::Application.routes.draw do
           post :create_project_sensor_type
           post :create_project_data_stream
           post :create_project_data_stream_column
+          post :create_project_data_set
           get :get_job_status
           get :get_project_jobs
+          get :get_project_data_set_data
+          get :get_project_data_sets
         end
       end
       resources :sensor_values do
