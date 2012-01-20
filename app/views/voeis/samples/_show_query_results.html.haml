@@ -1,4 +1,6 @@
 - dataId = tabId+'_data'
+
+
 %h3{:style=>"margin:5px 0;"}
   Query Results
 %strong Site: 
@@ -179,7 +181,22 @@
     function getProperDate(local_date_time, rowIndex){
       return local_date_time.slice(0,local_date_time.length-6);
     }
-    
+    function addSelectedToDataSet(){
+      //get the data values
+      dijit.byId('#{tabId}_loading_dialog').show();
+      var data_value_ids_string = ""
+      data_array = #{dataId}.val_grid.selection.getSelected();
+      for (i=0; i<data_array.length; i=i+1)
+      {
+        data_value_ids_string= data_value_ids_string + "&data_value_ids[]=" + data_array[i].id.toString();
+      }
+      //form has a hidden data_set_id
+      $.post('#{root_url}projects/#{project_uid}/apivs/add_data_to_project_data_set.json?data_set_id=' + $("#data_set").val() + data_value_ids_string,
+        function(data) {
+          $('.result').html(data);
+          dijit.byId('#{tabId}_loading_dialog').hide();
+        });
+    }
     //formatter: 'val_grid_formatter.dateTime',
     // grid formatters
     var val_grid_formatter = {};
@@ -250,8 +267,9 @@
        store: #{dataId}.val_store,
        grid_click: false,
        clientSort: true,
-       //rowSelector: '20px',
-       rowSelector: '0',
+       rowSelector: '20px',
+       indirectSelection: true,
+       //rowSelector: '0',
        structure: val_layout,
        style: 'width:95%;',
        plugins: {filter:true, exporter:true,
@@ -282,8 +300,10 @@
     document.createElement('div'));
     #{dataId}.val_grid.changePageSize(10);
 
-    // append the new grid to the div "gridContainer":
+    // append the new grid to the div " ":
     //dojo.byId("gridContainer").appendChild(val_grid.domNode);
+    
+    
     $('##{tabId}_search_results #gridContainer').append(#{dataId}.val_grid.domNode);
 
     // Call startup, in order to render the grid:
@@ -441,6 +461,10 @@
   -#%th{:field=>"data_value", :width=>"100px", :filterable=>true} Value
   %br
   #gridContainer{:style=>"width:900px;height:475px;"}
+  %label{:id => "d_set", :onclick=>"dijit.byId('new_data_set').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Data Set:
+  = select_tag("data_set", data_set_options.html_safe)
+  %button(dojoType="dijit.form.Button" name="add_data_button" onclick="addSelectedToDataSet();") 
+    Add Selected Data to Data Set
   %br
   %br
   

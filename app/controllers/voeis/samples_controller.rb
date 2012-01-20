@@ -147,6 +147,7 @@ class Voeis::SamplesController < Voeis::BaseController
   
   def query
     siteid = params[:site_id]
+    @project_uid= parent.id
     parent.managed_repository do
       @site = Voeis::Site.get(siteid) if !siteid.nil? && siteid.to_i>0
       
@@ -200,9 +201,16 @@ class Voeis::SamplesController < Voeis::BaseController
     @end_date = Date.civil(params[:range][:"end_date(1i)"].to_i,params[:range]    [:"end_date(2i)"].to_i,params[:range][:"end_date(3i)"].to_i)
     @start_date = @start_date.to_datetime
     @end_date = @end_date.to_datetime + 23.hour + 59.minute
-    
+    @project_uid = parent.id
     @column_array = Array.new
     @row_array = Array.new
+    @data_set = parent.managed_repository{Voeis::DataSet.all}
+    @data_set_opts_array = Array.new
+    @data_set.all(:order => [:name.asc]).each do |ds|
+      @data_set_opts_array << [ds.name.capitalize, ds.id.to_s]
+    end
+    @data_set_options = opts_for_select(@data_set_opts_array)
+    
     site = parent.managed_repository{Voeis::Site.get(params[:site])}
     @site_name =site.name
     @site = site
