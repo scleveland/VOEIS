@@ -1918,12 +1918,13 @@ class Voeis::ApivsController < Voeis::BaseController
      parent.managed_repository do
        if params[:name]
          if Voeis::DataSet.first(:name => params[:name]).nil?
-           if params[:type].nil?
+           if params[:type].empty?
              params[:type] = "default"
            end
            if params[:description].nil?
              params[:description] = ""
            end
+           debugger
            @data_set = Voeis::DataSet.create(:name=>params[:name], :type=>params[:type], :description=>params[:description])
          else
            @data_set = {"error" => "The name: #{params[:name]} already exists as data set."}
