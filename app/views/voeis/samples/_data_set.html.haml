@@ -1,0 +1,41 @@
+- content_for(:javascripts) do
+  :javascript
+    function createDataSet(){ 
+    $.post("#{root_url}projects/#{project_uid}/apivs/create_project_data_set.json?name=" + $("#name").val() + "&description=" + $("#description").val() + "&type="+ $("#type").val() +"&api_key=#{User.current.api_key}",
+    function(data) {
+      $('#data_set').append($("<option></option>").attr("value",data['id']).text($("#name").val())); 
+      $('#data_set').val(data['id']);
+      dijit.byId("new_data_set").hide();
+    }
+    );
+    }
+    dojo.require("dijit.Tooltip");
+
+#new_data_set{:dojoType=>"dijit.Dialog", :title=>"New Data Set"}
+  %h3 Create a new Data Set:
+  = form_for :data_set, :html=>{:dojoType=>"dijit.form.Form", :id=>"data_set"} do |f|
+    %label Name:
+    %input{:type=>"text", :name=>"name", :id=>"name", :dojoType=>"dijit.form.ValidationTextBox", :size=>30,  :style=>"width:30em", :required=>"true", :invalidMessage=>"A DataSet Name is required."}
+    =clear_break      
+    =clear_break 
+    %label Description:
+    %br
+    -#=f.text_area :description, :cols=> 30, :rows => 3
+    %input{:type=>"text", :name=>"description", :id=>"description", :size => 30, :style=>"width:30em",:dojoType=>"dijit.form.TextBox"}
+    =clear_break
+    =clear_break
+    %label Type:
+    %br
+    %input{:type=>"text", :name=>"type", :id=>"type", :size => 30, :style=>"width:30em",:dojoType=>"dijit.form.TextBox"}
+    =clear_break
+    =clear_break 
+    %br
+    %button{:id=> 'new_data_set_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createDataSet();"}
+      Create Data Set
+      %script{:type=>"dojo/method", :event=>"startup"}
+        var form = dijit.byId("data_set");
+        // set initial state
+        this.attr("disabled", !form.isValid());
+        this.connect(form, "onValidStateChange", function(state){
+        this.attr("disabled", !state);
+        });
