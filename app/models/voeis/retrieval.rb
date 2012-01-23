@@ -6,7 +6,7 @@ class Voeis::Retrieval
   property :id,                  Serial
   property :retrieve_date,        DateTime, :required => true
 
-  has 1, :deployment, :model => "Voeis::Deployment"
-
+  belongs_to :deployment, :model => "Voeis::Deployment", :required => false
+ 
   yogo_versioned
 end

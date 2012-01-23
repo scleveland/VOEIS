@@ -61,7 +61,7 @@ class Voeis::Site
   has n, :data_values,   :model => "Voeis::DataValue",   :through => Resource
   has n, :samples,       :model => "Voeis::Sample",      :through => Resource
   has n, :variables,     :model => "Voeis::Variable",    :through => Resource
-
+  has n, :deployments,   :model => "Voeis::Deployment",  :through => Resource
   belongs_to  :vertical_datum,    :model => "Voeis::VerticalDatumCV", :child_key=>"vertical_datum_id", :required=>false
   belongs_to  :local_projection,  :model => "Voeis::SpatialReference", :child_key=>"local_projection_id", :required=>false
   belongs_to :lat_long_datum, :model => "Voeis::SpatialReference", :child_key=>"lat_long_datum_id", :required=>false

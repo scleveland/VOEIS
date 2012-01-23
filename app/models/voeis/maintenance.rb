@@ -8,7 +8,7 @@ class Voeis::Maintenance
   property :type,                String, :required => true, :length => 512
   property :description,          Text
   
-  has 1, :instrument
+  belongs_to :instrument
 
   yogo_versioned
 end

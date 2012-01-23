@@ -6,9 +6,9 @@ class Voeis::Deployment
   property :id,                  Serial
   property :deploy_date,        DateTime, :required => true
 
-  has 1, :instrument
-  has 1, :site
-  has 1, :retieval, :required => false, :model => "Voeis::Retrieval"
+  belongs_to :instrument
+  belongs_to :site
+  has 1, :retrieval, :required => false, :model => "Voeis::Retrieval"
 
   yogo_versioned
 end
