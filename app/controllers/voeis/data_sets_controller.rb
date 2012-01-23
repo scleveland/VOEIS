@@ -10,6 +10,7 @@ class Voeis::DataSetsController < Voeis::BaseController
   def new
     @project = parent
     @data_sets = Voeis::DataSet.all
+    
   end
 
   def edit
@@ -33,6 +34,13 @@ class Voeis::DataSetsController < Voeis::BaseController
         end
       end
     end
+  end
+  
+  def show
+    @data_set = parent.managed_repository{Voeis::DataSet.get(params[:id].to_i)}
+    @project_uid = parent.id
+    @variables = Hash.new
+    @data_set.variables.map{|v| @variables = @variables.merge({v.id => v.variable_name})}
   end
 
   def add_data_set

@@ -15,6 +15,7 @@
   %h3 Create a new Data Set:
   = form_for :data_set, :html=>{:dojoType=>"dijit.form.Form", :id=>"data_set"} do |f|
     %label Name:
+    =clear_break    
     %input{:type=>"text", :name=>"name", :id=>"name", :dojoType=>"dijit.form.ValidationTextBox", :size=>30,  :style=>"width:30em", :required=>"true", :invalidMessage=>"A DataSet Name is required."}
     =clear_break      
     =clear_break 

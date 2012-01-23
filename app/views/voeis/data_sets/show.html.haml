@@ -1,0 +1,148 @@
+
+:javascript
+  dojo.require("dijit.dijit");
+  dojo.require("dijit.Dialog");
+  dojo.require("dijit.form.Form");
+  dojo.require("dijit.form.Button");
+  dojo.require("dojox.form.Uploader");
+  dojo.require("dojox.grid.EnhancedGrid");
+  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+  dojo.require("dojox.grid.enhanced.plugins.Filter");
+  dojo.require("dijit.layout.TabContainer");
+  dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+  dojo.require("dojox.grid.enhanced.plugins.Pagination");
+  dojo.require("dojo.data.ItemFileReadStore");
+  dojo.require("dojo.data.ItemFileWriteStore");
+  dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
+  var variables = #{@variables.to_json}
+  
+- dataSetGrid = "dataSet" + @data_set.id.to_s + "_grid"
+- dataSetStore ="dataSet" + @data_set.id.to_s + "_store"
+%h3{:style=>"margin:5px 0;"}
+  Data Set: #{@data_set.name}
+
+#dataSetGrid{:style=>"width:900px;height:475px;"}
+
+:javascript
+  var dataSet = {}
+  $.get("#{root_url}projects/#{@project_uid}/apivs/get_project_data_set_data.json?data_set_id=#{@data_set.id}",
+  function(data) {
+    dataSet.values= data["data"]
+    
+  }
+  );
+  
+  
+  function getProperDate(local_date_time, rowIndex){
+    return local_date_time.slice(0,local_date_time.length-6);
+  }
+  
+  //formatter: 'val_grid_formatter.dateTime',
+  // grid formatters
+  var val_grid_formatter = {};
+  val_grid_formatter.dateTime = function(value) {
+    if(value==null || value=='') return '-';
+    // Format DateTime string
+    var d = new Date(value);
+    //var fmt = d.getMonth()+'/'+d.getFullYear()
+    return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+  };
+  val_grid_formatter.selectItem = function(item) {
+    //var checked_img = '<img src="/images/notice.png" alt="SELCT" />';
+    var selected_img = '<img src="/images/1abu007.gif" alt="SELCT" />';
+    var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
+  
+    //if(#{dataSetGrid}.value_selected(item)) 
+    //  return selected_img;
+    return blank_img;
+  };
+  
+  val_grid_formatter.variable_name = function(value){
+    return variables[value]
+  }
+  
+  var val_layout = [
+  {
+     field: '_item',
+     name: '-',
+     formatter: val_grid_formatter.selectItem,
+     width: '24px'
+  },
+  {
+     field: 'id',
+     name: 'ID',
+     width: 'auto'
+  },
+  {
+     field: 'local_date_time',
+     name: 'Timestamp',
+     formatter: val_grid_formatter.dateTime,
+     width: '185px'
+  },
+  {
+     field: 'vertical_offset',
+     name: 'Vertical Offset',
+     width: 'auto'
+  },
+  {
+     field: 'data_value',
+     name: 'Value',
+     width: 'auto'
+  },
+  {
+     field: 'string_value',
+     name: 'Value(string format)',
+     width: 'auto'
+  },
+  {
+     field: 'quality_control_level',
+     name: 'QC Level',
+     width: 'auto'
+  },
+  {
+     field: 'variable_id',
+     name: 'Variable',
+     formatter: val_grid_formatter.variable_name,
+     width: 'auto'
+  },
+  {
+     field: 'published',
+     name: 'Published',
+     width: 'auto'
+  },
+  {
+     field: 'datatype',
+     name: 'DataType',
+     width: 'auto'
+  },
+  ];
+  
+  var data_json = {
+    identifier: 'id',
+    items: #{@data_set.data_values.to_json} };
+  var #{dataSetStore} = new dojo.data.ItemFileWriteStore({data: data_json });
+  // create a new grid:
+  #{dataSetGrid} = new dojox.grid.EnhancedGrid({
+     store: #{dataSetStore},
+     grid_click: true,
+     clientSort: true,
+     rowSelector: '20px',
+     indirectSelection: true,
+     structure: val_layout,
+     style: 'width:95%;',
+     plugins: {filter:true, exporter:true,
+       pagination:{
+         sizeSwitch: true,
+         position: "top",
+         itemTitle: "Data Points"
+     }},
+      onClick: function(ev) {
+        this.grid_click = ev;
+      },
+     },
+     document.createElement('div'));
+  #{dataSetGrid}.changePageSize(10);
+
+  // append the new grid to the div " ":
+  $('#dataSetGrid').append(#{dataSetGrid}.domNode);
+  #{dataSetGrid}.startup();
