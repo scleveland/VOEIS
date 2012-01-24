@@ -13,7 +13,7 @@
   dojo.require("dojo.data.ItemFileReadStore");
   dojo.require("dojo.data.ItemFileWriteStore");
   dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
-  var variables = #{@variables.to_json}
+  var units = #{@unit_names.to_json}
      
   var variable_json = {
     identifier: 'id',
@@ -35,6 +35,26 @@ Select Site:
 =clear_break
 Select Variables:
 #varGrid{:style=>"width:900px;height:300px;"}
+=clear_break
+=clear_break
+%div{:style=>"float: left;"}
+  %label{:for=>"date1"}
+    Start Date Selection:
+  %input{:type=>"text", :name=>"start_date", :id=>"start_date", :value=>"2005-12-30",
+      :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+%div{:style=>"float: left;"}
+  
+  %label{:for=>"date1"}
+    End Date Selection:
+  %input{:type=>"text", :name=>"end_date", :id=>"end_date", :value=>"2005-12-30",
+      :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
+
+=clear_break
+%p{:id=>"formatted"}
+=clear_break
+%p{:id=>"formatted2"}
+=clear_break
 %button(dojoType="dijit.form.Button" name="search_button" id="search_button" onclick="") 
   Perform Search
 
@@ -60,8 +80,8 @@ Select Variables:
     return blank_img;
   };
   
-  val_grid_formatter.variable_name = function(value){
-    return variables[value]
+  val_grid_formatter.unit_name = function(value){
+    return units[value]
   }
   var site_layout = [
   {
@@ -73,7 +93,7 @@ Select Variables:
   {
      field: 'id',
      name: 'ID',
-     width: 'auto'
+     width: '40px'
   },
   {
      field: 'name',
@@ -91,13 +111,19 @@ Select Variables:
   {
      field: 'id',
      name: 'ID',
-     width: 'auto'
+     width: '40px'
   },
   {
      field: 'variable_name',
      name: 'Name',
      width: 'auto'
-  }
+  },
+  {
+     field: 'variable_units_id',
+     name: 'Units',
+     formatter: val_grid_formatter.unit_name,
+     width: 'auto'
+  },
   ];
   
   
