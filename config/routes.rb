@@ -23,6 +23,7 @@ Yogo::Application.routes.draw do
     resources :memberships
     #Voeis Project Models scope
     scope :module => "voeis" do
+      resources :search
       resources :sites do
         collection do
           post :save_site
