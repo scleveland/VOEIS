@@ -461,10 +461,10 @@
   -#%th{:field=>"data_value", :width=>"100px", :filterable=>true} Value
   %br
   #gridContainer{:style=>"width:900px;height:475px;"}
-  -if User.current
+  -if current_user.projects.include?(Project.get(project_uid))
     %label{:id => "d_set", :onclick=>"dijit.byId('new_data_set').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Data Set:
     = select_tag("data_set", data_set_options.html_safe)
-    %button(dojoType="dijit.form.Button" name="add_data_button" onclick="addSelectedToDataSet();") 
+    %button(dojoType="dijit.form.Button" name="add_data_button" id="add_data_button" onclick="addSelectedToDataSet();") 
       Add Selected Data to Data Set
   %br
   %br

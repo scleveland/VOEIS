@@ -103,5 +103,5 @@
     return false;
     });
     });
--if User.current
-  = render(:partial => "data_set", :locals =>{:project_uid=>@project_uid})
+-if current_user.projects.include?(@project)
+  = render(:partial => "data_set", :locals =>{:project_uid=>@project.id})
