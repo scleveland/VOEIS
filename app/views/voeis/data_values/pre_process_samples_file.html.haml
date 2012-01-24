@@ -148,7 +148,7 @@ Form Progress:
               updateProgressBar();
               });
           -else #this is a variable column 
-            -this_var = Voeis::Variable.first(:variable_code=>ds_col.variables.first.variable_code)
+            -this_var = Voeis::Variable.get(ds_col.variables.first.id)
             :javascript
               $(document).ready(function() {
               $("#var_span#{col.to_s}").text("Variable: #{this_var.variable_name}");
@@ -488,7 +488,7 @@ Form Progress:
   variableDataStore = voeis.Server.DEFAULT.globalVariablesDataStore();
   var my_store = dojo.data.ItemFileReadStore({data: variable_json_store});
   
-  metatagDataStore = voeis.Server.DEFAULT.globalMetaTagDataStore();
+  metatagDataStore = ""//voeis.Server.DEFAULT.globalMetaTagDataStore();
   dojo.addOnLoad( function(){
   //variableStore2.fetch();
   //dijit.byId("display_grid1")._refresh();
