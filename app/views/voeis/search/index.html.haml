@@ -57,7 +57,7 @@ Select Variables:
     var selected_img = '<img src="/images/1abu007.gif" alt="SELCT" />';
     var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
   
-    //if(#{dataSetGrid}.value_selected(item)) 
+    //if(siteDataGrid.value_selected(item)) 
     //  return selected_img;
     return blank_img;
   };
@@ -110,7 +110,7 @@ Select Variables:
      clientSort: true,
      rowSelector: '20px',
      indirectSelection: true,
-     structure: val_layout,
+     structure: site_layout,
      style: 'width:95%;',
      plugins: {filter:true, exporter:true,
        pagination:{
@@ -136,7 +136,7 @@ Select Variables:
      clientSort: true,
      rowSelector: '20px',
      indirectSelection: true,
-     structure: val_layout,
+     structure: var_layout,
      style: 'width:95%;',
      plugins: {filter:true, exporter:true,
        pagination:{
@@ -152,5 +152,5 @@ Select Variables:
   siteDataGrid.changePageSize(10);
 
   // append the new grid to the div " ":
-  $('#siteGrid').append(siteDataGrid.domNode);
-  siteDataGrid.startup();
+  $('#varGrid').append(varDataGrid.domNode);
+  varDataGrid.startup();
