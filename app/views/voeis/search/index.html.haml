@@ -1,7 +1,3 @@
-Search
-
-
-
 :javascript
   dojo.require("dijit.dijit");
   dojo.require("dijit.Dialog");
@@ -33,6 +29,8 @@ Search
 
 Select Site:
 #siteGrid{:style=>"width:900px;height:300px;"}
+%button(dojoType="dijit.form.Button" name="search_button" id="update_variable_button" onclick="") 
+  Update Variables From Selected Sites
 =clear_break
 =clear_break
 Select Variables:
@@ -149,7 +147,7 @@ Select Variables:
       },
      },
      document.createElement('div'));
-  siteDataGrid.changePageSize(10);
+  varDataGrid.changePageSize(10);
 
   // append the new grid to the div " ":
   $('#varGrid').append(varDataGrid.domNode);
