@@ -268,11 +268,9 @@
        grid_click: false,
        clientSort: true,
        rowSelector: '20px',
-       indirectSelection: true,
-       //rowSelector: '0',
        structure: val_layout,
        style: 'width:95%;',
-       plugins: {filter:true, exporter:true,
+       plugins: {filter:true, exporter:true,indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"},
          pagination:{
            sizeSwitch: true,
            position: "top",
