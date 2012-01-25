@@ -29,12 +29,331 @@
       }
     );
   };
+  
+  //GLOBALS
+  var edit_data_value_content = '';
+  var data_value_edit;
+  
+  function tab_pre_dojo_parse() {
+    //PRE DOJO PARSE STUFF HERE
+    console.log('DATA-QUERY PRE-PARSE!');
+    var content = $('#edit_data_value_content');
+    edit_data_value_content = content.html();
+    console.log('CONTENT:',content);
+    content.empty();
+  };
+  
   $(window).ready(function(){
-    console.log('**LOADED**');
-    console.log('TABID: #{tabId}');
+    console.log('DATA-QUERY **LOADED**');
+    console.log('DATA-QUERY TABID: #{tabId}');
     update_site_vars();
+    
+    data_value_edit = new dijit.Dialog({
+      title: 'EDIT Data Value',
+      style: 'width:560px;',
+      item: 0,
+      saved_callback: 0,
+      populate: function(item,callback) {
+        var item = item || this.item;
+        if(!item) return;
+        var form = dijit.byId('data_value_edit_form');
+        var data_val = item.data_value.toString();
+        var var0 = $('##{tabId}_query #variable option').filter(':selected');
+        var0 = var0.text().split('(')[0]+' [Id:'+var0.val()+']';
+        console.log('VAR:',var0);
+        //$('#dv_var_name').text(item.variable_name.toString()+' [Id:'+item.id.toString()+']');
+        $('#dv_var_name').text(var0);
+        var d0 = new Date(item.date_time_utc.toString());
+        var d = new Date(d0.getTime()+((d0.getTimezoneOffset()/60-item.utc_offset)*3600000))
+        form.reset();
+        console.log('ITEM:',item);
+        console.log('data_value:',data_val);
+        //dijit.byId('DV_data_value').set('value', item['data_value'].toString());
+        dijit.byId('DV_data_value').set('value', data_val);
+        dijit.byId('DV_data_type').set('value', item['datatype'].toString());
+        dijit.byId('DV_string_value').set('value', item['string_value'].toString());
+        dijit.byId('DV_value_accuracy').set('value', item['value_accuracy'].toString());
+        dijit.byId('DV_replicate').set('value', item['replicate'].toString());
+        dijit.byId('DV_vertical_offset').set('value', item['vertical_offset'].toString());
+        dijit.byId('DV_end_vertical_offset').set('value', item['end_vertical_offset'].toString());
+        dijit.byId('DV_quality_control_level').set('value', item['quality_control_level'].toString());
+        if(item['published'][0]) dijit.byId('DV_published').set('checked', true);
+        dijit.byId('DV_local_date').set('value', item['local_date_time'].toString());
+        dijit.byId('DV_local_time').set('value', item['local_date_time'].toString());
+        dijit.byId('DV_utc_offset').set('value', item['utc_offset'].toString());
+        
+        //dijit.byId('DV_utc_date').set('value', item['date_time_utc'].toString());
+        //dijit.byId('DV_utc_time').set('value', item['date_time_utc'].toString());
+        $('#utc_datetime').text(d0.format('UTC:m/d/yyyy HH:MM:ss')+' UTC');
+        if(callback) this.saved_callback = callback;
+      },
+      pop: function(item,callback) {
+        this.item = item;
+        this.saved_callback = callback;
+        this.show();
+        this.populate(item);
+        var form = dijit.byId('data_value_edit_form');
+        var saveBtn = dijit.byId('data_value_edit_submit');
+        // set initial state
+        saveBtn.set("disabled", !form.isValid());
+      },
+      dateChanged: false,
+      dateChange: function(newVal) {
+        //if(this.dateChanged) return;
+        //this.dateChanged = true;
+        var item = this.item;
+        if(!item) return;
+        var utcval = dijit.byId('DV_utc_offset').get('value');
+        var dt = dijit.byId('DV_local_date').get('value').format('isoDate');
+        var tm = dijit.byId('DV_local_time').get('value').format('isoTime');
+        var tz = this.getTz(utcval);
+        console.log('DATE-CHANGE:',newVal);
+        console.log('DATE-CHANGE:',dt+'T'+tm+tz);
+        item['utc_offset'] = [parseFloat(utcval)];
+        item['local_date_time'] = [dt+'T'+tm+tz];
+        var d = new Date(dt+'T'+tm+tz);
+        item['date_time_utc'] = [d.format('UTC:'+dateFormat.masks.isoDateTime)];
+        $('#utc_datetime').text(d.format('UTC:m/d/yyyy HH:MM:ss')+' UTC');
+        this.item = item;
+        //this.dateChanged = false;
+      },
+      getTz: function(tzString) {
+        //###FORMAT utc offset value: -7.5 = "-07:30" // 3.75 = "+03:45"
+        var tzstr = tzString || dijit.byId('DV_utc_offset').get('value');
+        var tz0 = tzstr.toString().split('.');
+        var tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+Math.abs(tz0[0])).slice(-2)+':';
+        tz += tz0.length>1 ? (tz0[1]*6).toString().slice(0,2) : '00';
+        return tz;
+      },
+      getLocalDate: function(dateString) {
+        //###FORMAT local date string ISO
+        var dt = dijit.byId('DV_local_date').get('value').format('isoDate');
+        var tm = dijit.byId('DV_local_time').get('value').format('isoTime');
+        var tz = this.getTz();
+        item['utc_offset'] = [parseFloat(utcval)];
+        item['local_date_time'] = [dt+'T'+tm+tz];
+        var d = new Date(dt+'T'+tm+tz);
+        item['date_time_utc'] = [d.format('UTC:'+dateFormat.masks.isoDateTime)];
+      },
+      getUTCDate: function(dateString) {
+        //###FORMAT utc date string ISO
+        var utcval = dijit.byId('DV_utc_offset').get('value');
+        var dt = dijit.byId('DV_local_date').get('value').format('isoDate');
+        var tm = dijit.byId('DV_local_time').get('value').format('isoTime');
+        var tz = this.getTz(utcval);
+        item['utc_offset'] = [parseFloat(utcval)];
+        item['local_date_time'] = [dt+'T'+tm+tz];
+        var d = new Date(dt+'T'+tm+tz);
+        item['date_time_utc'] = [d.format('UTC:'+dateFormat.masks.isoDateTime)];
+      },
+      onShow: function() {
+        var form = dijit.byId('data_value_edit_form');
+        var saveBtn = dijit.byId('data_value_edit_submit');
+        console.log('FORM:',form);
+        console.log('BUTTON:',saveBtn);
+        // set initial state
+        saveBtn.set("disabled", !form.isValid());
+        var x = $('#dv_var_name').text();
+        $('#dv_var_name').text(x+' -- TEST!');
+      },
+      startup: function() {
+    		this.set('content', edit_data_value_content);
+    		this.parsedWidgets = dojo.parser.parse(this.domNode);
+        //this.set('content', edit_data_value_content);
+        console.log('PARSE:',this.parsedWidgets);
+        var form = dijit.byId('data_value_edit_form');
+        var saveBtn = dijit.byId('data_value_edit_submit');
+        console.log('START-FORM:',form);
+        console.log('START-SAVE:',saveBtn);
+        var dv_date = dijit.byId('DV_local_date');
+        var dv_time = dijit.byId('DV_local_time');
+        var dv_utc = dijit.byId('DV_utc_offset');
+        form.connectChildren();
+        dojo.connect(dv_date, 'onChange', function(val){data_value_edit.dateChange(val)});
+        dojo.connect(dv_time, 'onChange', function(val){data_value_edit.dateChange(val)});
+        dojo.connect(dv_utc, 'onChange', function(val){data_value_edit.dateChange(val)});
+        //###TEST
+        dojo.connect(dijit.byId('DV_data_value'), 'onChange', function(){
+          console.log('DataValue CHANGED:',dijit.byId('DV_data_value').get('value'));
+        });
+        //###ON-STATE-CHANGE
+        dojo.connect(form, "onValidStateChange", function(state){
+          //var saveBtn = dijit.byId('data_value_edit_submit');
+          console.log('STATE-CHANGE:',state);
+          //console.log('FORM:',form);
+          //console.log('BUTTON:',saveBtn);
+          saveBtn.attr("disabled", !state);
+        });
+        //###SAVE BUTTON
+        dojo.connect(saveBtn, "onClick", function(){
+          //var site = window[siteN+'ref'];
+          console.log('SAVE-BUTTON!');
+          var id = data_value_edit.item.id.toString();
+          var utcval = dijit.byId('DV_utc_offset').get('value');
+          var dt = dijit.byId('DV_local_date').get('value').format('isoDate');
+          var tm = dijit.byId('DV_local_time').get('value').format('isoTime');
+          var tz = data_value_edit.getTz(utcval);
+          //var diso = dt+'T'+tm+tz;
+          var data = {data_value: {
+            data_value: dijit.byId('DV_data_value').get('value'),
+            datatype: dijit.byId('DV_data_type').get('value'),
+            string_value: dijit.byId('DV_string_value').get('value'),
+            value_accuracy: dijit.byId('DV_value_accuracy').get('value'),
+            replicate: dijit.byId('DV_replicate').get('value'),
+            vertical_offset: dijit.byId('DV_vertical_offset').get('value'),
+            end_vertical_offset: dijit.byId('DV_end_vertical_offset').get('value'),
+            quality_control_level: dijit.byId('DV_quality_control_level').get('value'),
+            published: dijit.byId('DV_published').get('checked').toString(),
+            local_date_time: dt+'T'+tm+tz,
+            utc_offset: utcval,
+            date_time_utc: new Date(dt+'T'+tm+tz).format('UTC:'+dateFormat.masks.isoDateTime),
+             provenance_comment: dijit.byId('DV_provenance_comment').value}};
+          console.log('DV-POST:',data);
+          $.ajax({
+            type: 'PUT',
+            url: '/projects/#{@project.id}/data_values/'+id+'.json',
+            data: data,
+            dataType: 'json',
+            success: function(dat){
+              this.saved_callback(dat);
+            }
+          });
+        });
+      }
+    });
+    
+    //#####READY-STUFF
+    
   });
   
+  
+-#css:
+-#  #dv-form-table 
+
+#edit_data_value_content{:style=>"display:none;width:540px;"}
+  %form(id="data_value_edit_form" dojoType="dijit.form.Form" method="post" style="overflow:scroll;")
+    -#%script{:type=>"dojo/method", :event=>"onValidStateChange", :args=>"state"}
+    -#  :plain
+    -#    var saveBtn = dijit.byId('data_value_edit_submit');
+    -#    console.log('STATE-CHANGE:',state);
+    -#    saveBtn.attr("disabled", !state);
+    %table{:id=>"dv-form-table", :style=>"width:540px;"}
+      %tr
+        %td{:colspan=>"2"}
+          -#%span{:class=>"smfont"} 
+          -#  %strong SITE
+          -#%br
+          %h4{:style=>"margin:4px;"}
+            = '%s [Id:%s]'% [@site.name,@site.id]
+          -#%span{:class=>"smfont"} 
+          -#  %strong VARIABLE
+          -#%br
+          %h4{:id=>"dv_var_name", :style=>"margin:2px;"} xxx
+      %tr
+        %td
+          %label Data Value
+          %br
+          %input(name="data_value" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########.########'}" id="DV_data_value" required="true")
+            %span{:class=>'label'}
+        %td
+          %label Data Type
+          %br
+          %input(name="data_type" dojoType="dijit.form.ValidationTextBox" id="DV_data_type" required="true")
+      %tr
+        -#%td{:colspan=>"2"}
+        %td
+          %label String Representation
+          %br
+          %input(name="string_value" dojoType="dijit.form.ValidationTextBox" id="DV_string_value" required="true")
+          -#%input(name="string_value" dojoType="dijit.form.ValidationTextBox" id="DV_string_value" required="true"
+          -#      style="width:85%!important;")
+        %td
+          %label Value Accuracy
+          %br
+          %input(name="value_accuracy" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'######.######'}" id="DV_value_accuracy" required="false")
+      %tr
+        %td{:colspan=>"2"}
+          #dv_local_date{:style=>"float:left;margin-right:8px;"}
+            -#%a{:style=>"cursor:pointer;", :class=>"icon icon-notice", :href=>"javascript:", :onclick=>"$('#dv_local_time').hide();$('#dv_utc_time').show();return false;"}
+            -#  %strong Local Time [see UTC]
+            %label Date
+            %br
+            %input(name="local_date" dojoType="dijit.form.DateTextBox" id="DV_local_date" required="true" style="width:110px!important;")
+          #dv_local_time{:style=>"float:left;margin-right:8px;"}
+            %label Time
+            %br
+            %input(name="local_time" dojoType="dijit.form.TimeTextBox" id="DV_local_time" required="true" style="width:90px!important;")
+          #dv_utc_offset{:style=>"float:left;"}
+            %label UTC offset
+            %br
+            %input(name="utc_offset" dojoType="dijit.form.NumberTextBox" id="DV_utc_offset" 
+                  required="true" constraints="{pattern:'###.##'}" style="width:60px!important;")
+          #utc_datetime{:style=>"background:#ddd;padding:2px 5px;margin:16px 0 0 20px;float:left;"} utc
+          -#&nbsp;&nbsp;&nbsp;
+          -#C4DEF6  border:solid 1px #4885F7;
+          -##utc_datetime{:style=>"background:#ddd;padding:2px 5px;margin:16px 0 0 20px;float:left;"} utc
+          -#%br{:style=>'float:none; clear:both;'}
+      %tr
+        %td
+          %label Vertical Offset
+          %br
+          %input(name="vertical_offset" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########.######'}" id="DV_vertical_offset" required="false")
+        %td
+          %label End Vertical Offset
+          %br
+          %input(name="end_vertical_offset" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########.######'}" id="DV_end_vertical_offset" required="false")
+      %tr
+        %td
+          %label Replicate
+          %br
+          %input(name="replicate" dojoType="dijit.form.ValidationTextBox" id="DV_replicate" required="true")
+        %td
+          %label Q/C Level
+          %br
+          %input(name="quality_control_level" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'##########'}" 
+                id="DV_quality_control_level" style="width:70px!important;" required="true")
+          &nbsp;&nbsp;&nbsp;
+          &nbsp;&nbsp;&nbsp;
+          %input(name="published" dojoType="dijit.form.CheckBox" id="DV_published") 
+          Published
+      %tr
+        %td{:colspan=>"2"}
+          %label Provenance Comment
+          %br
+          %input(name="provenance_comment" dojoType="dijit.form.SimpleTextarea" id="DV_provenance_comment" rows="3" 
+                style="width:88%!important;line-height:16px!important;")
+  
+    %br{:style=>'float:none; clear:both;'}
+    
+    %button{:dojoType=>"dijit.form.Button", :id=>"data_value_edit_submit", :title=>'Create'} 
+      Save Data Value
+      -#%script{:type=>"dojo/method", :event=>"onClick"}
+      -#  :plain
+      -#    //var saveBtn = dijit.byId('data_value_edit_submit');
+      -#    var data = {data_value: {
+      -#      data_value = dijit.byId('DV_data_value').get('value'),
+      -#      datatype = dijit.byId('DV_data_type').get('value'),
+      -#      string_value = dijit.byId('DV_string_value').get('value'),
+      -#      value_accuracy = dijit.byId('DV_value_accuracy').get('value'),
+      -#      replicate = dijit.byId('DV_replicate').get('value'),
+      -#      vertical_offset = dijit.byId('DV_vertical_offset').get('value'),
+      -#      end_vertical_offset = dijit.byId('DV_end_vertical_offset').get('value'),
+      -#      quality_control_level = dijit.byId('DV_quality_control_level').get('value'),
+      -#      published = dijit.byId('DV_published').get('value'),
+      -#      local_date_time = dijit.byId('DV_local_date').get('value'),
+      -#      local_date_time = dijit.byId('DV_local_time').get('value'),
+      -#      utc_date_time = dijit.byId('DV_utc_date').get('value'),
+      -#      utc_date_time = dijit.byId('DV_utc_time').get('value'),
+      -#      provenance_comment = dijit.byId('DV_provenance_comment').value}};
+      -#    console.log('DV-POST:',data);
+      -#    $.post('/projects/#{@project.id}/data_values.json', data, function(dat) {
+      -#      //#####
+      -#      data_value_edit.saved_callback(dat);
+      -#    });
+    &nbsp;&nbsp;
+    %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"data_value_edit.hide();return false;"} Cancel
+    %br{:style=>'float:none; clear:both;'}
+
 
 - if site_id>0
   %h3{:style=>"margin-top:0;"}
