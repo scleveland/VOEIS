@@ -244,7 +244,8 @@
           -#  %strong SITE
           -#%br
           %h4{:style=>"margin:4px;"}
-            = '%s [Id:%s]'% [@site.name,@site.id]
+            -if !@site.nil?
+              = '%s [Id:%s]'% [@site.name,@site.id]
           -#%span{:class=>"smfont"} 
           -#  %strong VARIABLE
           -#%br
