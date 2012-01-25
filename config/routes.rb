@@ -145,7 +145,8 @@ Yogo::Application.routes.draw do
       end
       resources :data_values do
         collection do
-          get  :pre_process
+          get :versions
+          get :pre_process
           post  :pre_process_samples_file
           get  :pre_process_samples_file_upload
           post :store_samples_and_data_from_file
