@@ -35,6 +35,10 @@ class Voeis::DataValue
   #has n, :method,     :model => "Voeis::Method", :through => Resource
   
   
+  def versions_array
+    self.versions.to_a
+  end
+  
   def local_date_time
     # d = [:year, :mon, :day, :hour, :min, :sec].map{|q| @local_date_time.send(q)}
     # d << (utc_offset/24).to_f

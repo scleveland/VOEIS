@@ -5,11 +5,83 @@ class Voeis::DataValuesController < Voeis::BaseController
   # Properly override defaults to ensure proper controller behavior
   # @see Voeis::BaseController
   responders :rql
+  respond_to :html, :json
   defaults  :route_collection_name => 'data_values',
             :route_instance_name => 'data_value',
             :collection_name => 'data_values',
             :instance_name => 'data_value',
             :resource_class => Voeis::DataValue
+  
+  has_widgets do |root|
+    root << widget(:versions)
+  end
+  
+  @project = parent
+  
+  
+  #def new
+  #end
+  
+  #def index
+  #end
+  
+  #def show
+  #end
+  
+  # PUT /data_values/$ID$
+  def update
+    @project = parent
+    @project.managed_repository{
+      @data_value = Voeis::DataValue.get(params[:id].to_i)
+      datparams = params[:data_value]
+      
+      datparams.each{|prop,value| 
+        v = value.strip
+        datparams[prop] = nil if v=='NaN' || v=='null' }
+      ###
+      [:data_value,:utc_offset].each{|prop| 
+        datparams[prop] = datparams[prop].to_f }
+      [:value_accuracy,:vertical_offset,:end_vertical_offset].each{|prop| 
+        datparams[prop] = datparams[prop]=='' ? nil : datparams[prop].to_f }
+      datparams[:quality_control_level] = datparams[:quality_control_level].to_i
+      datparams[:published] = datparams[:published]=~(/(true|t|yes|y|1)$/i) ? true : false
+      
+      datparams.each do |key, value|
+        #@data_value[key] = value.blank? ? nil : value
+        @data_value[key] = value
+      end
+
+      logger.info '### DATPARAMS UPDATED ###'
+      logger.info datparams
+      logger.info '### DATA VALUE UPDATED ###'
+      logger.info @data_value.to_hash
+      
+      #logger.info '### READY TO SAVE VARIABLE ###'
+      #logger.info @variable.to_hash
+      debugger
+      
+      respond_to do |format|
+        if @data_value.save
+          format.html{
+            flash[:notice] = "DataValue was Updated successfully."
+            redirect_to project_url(@project)
+          }
+          format.json{
+            render :json => @data_value.as_json, :callback => params[:jsoncallback]
+          }
+        end
+      end
+
+    }
+    
+  end
+  
+  #def create
+  #end
+  
+  #def versions
+  #end
+  
   
   # Gather information necessary to store sample data
   #

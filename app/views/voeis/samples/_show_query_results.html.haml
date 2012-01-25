@@ -1,5 +1,5 @@
 - dataId = tabId+'_data'
-
+- edit_auth = true
 
 %h3{:style=>"margin:5px 0;"}
   Query Results
@@ -59,6 +59,22 @@
         position: absolute;
         cursor: pointer;
     }
+  
+  
+  -if edit_auth
+    :javascript
+      //### AUTH GLOBALS
+      var edit_auth = true;
+      var versions_url = '';
+      var data_del_url = '';
+  -else
+    :javascript
+      //### NO AUTH GLOBALS
+      var edit_auth = false;
+      var versions_url = '';
+      var data_del_url = '';
+  
+    
     
   :javascript
     dojo.require("dijit.dijit");
@@ -82,7 +98,7 @@
     dojo.require("dojo.data.ItemFileReadStore");
     dojo.require("dojo.data.ItemFileWriteStore");
     dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
-
+    
     console.log('RESULT -TABID: #{tabId}');
     var #{dataId} = {};
     #{dataId}.value_data = #{data_vals.to_json};
@@ -199,22 +215,66 @@
     }
     //formatter: 'val_grid_formatter.dateTime',
     // grid formatters
-    var val_grid_formatter = {};
-    val_grid_formatter.dateTime = function(value) {
-      if(value==null || value=='') return '-';
-      // Format DateTime string
-      var d = new Date(value);
-      //var fmt = d.getMonth()+'/'+d.getFullYear()
-      return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
-    };
-    val_grid_formatter.selectItem = function(item) {
-      //var checked_img = '<img src="/images/notice.png" alt="SELCT" />';
-      var selected_img = '<img src="/images/1abu007.gif" alt="SELCT" />';
-      var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
+    var val_grid_formatter = {
+      dateTime: function(value) {
+        if(value==null || value=='') return '-';
+        // Format DateTime string
+        console.log('DATE:',value);
+        var d = new Date(value);
+        //var fmt = d.getMonth()+'/'+d.getFullYear()
+        return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+      },
+      dataDateTime: function(item) {
+        if(item==null || item=='') return '-';
+        // FORMAT LocalDateTime string for DataValue item
+        //###FORMAT utc offset value: -7.5 = "-07:30" // 3.75 = "+03:45"
+        var tzstr = item.utc_offset.toString();
+        var tz0 = tzstr.split('.');
+        var tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+Math.abs(tz0[0])).slice(-2)+':';
+        tz += tz0.length>1 ? (tz0[1]*6).toString().slice(0,2) : '00';
+        var d0 = new Date(item.date_time_utc.toString());
+        var d = new Date(d0.format("UTC:yyyy-mm-dd'T'HH:MM:ss"+tz));
+        console.log('GRID-DATE:',item.date_time_utc.toString(),item.local_date_time.toString(),item.utc_offset.toString());
+        return d.format("yyyy-mm-dd HH:MM:ss "+tz);
+      },
+      trueFalse: function(value) {
+        var checked_img = '<img src="/images/true.png" />';
+        var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
+        if(value) return checked_img;
+        return blank_img;
+      },
+      selectItem: function(item) {
+        //var checked_img = '<img src="/images/notice.png" alt="SELCT" />';
+        var selected_img = '<img src="/images/1abu007.gif" alt="SELCT" />';
+        var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
       
-      if(#{dataId}.value_selected(item)) 
-        return selected_img;
-      return blank_img;
+        if(#{dataId}.value_selected(item)) 
+          return selected_img;
+        return blank_img;
+      },
+      vertical_offset: function(item) {
+        if(item==null || item=='') return '-';
+        if(item.vertical_offset[0]==null) return '-';
+        var vo_val = item.vertical_offset.toString();
+        if(item.end_vertical_offset[0]!=null && item.end_vertical_offset[0]!=0)
+          vo_val += ' &ndash; '+item.end_vertical_offset.toString();
+        return vo_val;
+      },
+      controls: function(item) {
+        if(item==null || item=='') return '-';
+        //return 'TESTING-- #';
+        var id = item.id[0];
+        //var idx = item.idx[0];
+        var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" />';
+        var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" />';
+        //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
+        //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
+        var hist_link = '<a href="'+versions_url+'/versions/?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;">'+hist_icon+'</a>\n';
+        var delete_link = '<a href="javascript:" onclick="return false;">'+delete_icon+'</a>\n';
+        var spaces = '&nbsp;';
+        //if(item.used[0]) return spaces+hist_link;
+        return spaces+hist_link+spaces+delete_link;
+      }
     };
 
     var val_layout = [{
@@ -224,15 +284,22 @@
        width: '24px'
     },
     {
-       field: 'local_date_time',
+       //field: 'local_date_time',
+       field: '_item',
        name: 'Timestamp',
-       formatter: val_grid_formatter.dateTime,
+       formatter: val_grid_formatter.dataDateTime,
        width: '185px'
     },
+    //{
+    //   field: 'vertical_offset',
+    //   name: 'Vertical Offset',
+    //   width: 'auto'
+    //},
     {
-       field: 'vertical_offset',
+       field: '_item',
        name: 'Vertical Offset',
-       width: 'auto'
+       formatter: val_grid_formatter.vertical_offset,
+       width: '11%'
     },
     {
        field: 'data_value',
@@ -241,24 +308,31 @@
     },
     {
        field: 'string_value',
-       name: 'Value(string format)',
-       width: 'auto'
-    },
-    {
-       field: 'quality_control_level',
-       name: 'QC Level',
-       width: 'auto'
-    },
-    {
-       field: 'published',
-       name: 'Published',
+       name: 'Value (string)',
        width: 'auto'
     },
     {
        field: 'datatype',
        name: 'DataType',
-       width: 'auto'
+       width: '10%'
     },
+    {
+       field: 'quality_control_level',
+       name: 'QC Lvl',
+       width: '6%'
+    },
+    {
+       field: 'published',
+       name: 'Pub',
+       formatter: val_grid_formatter.trueFalse,
+       width: '6%'
+    },
+    {
+       field: '_item',
+       name: 'DO',
+       formatter: val_grid_formatter.controls,
+       width: '8%'
+    }
     ];
 
     // create a new grid:
@@ -266,6 +340,7 @@
     #{dataId}.val_grid = new dojox.grid.EnhancedGrid({
        store: #{dataId}.val_store,
        grid_click: false,
+       grid_select: false,
        clientSort: true,
        rowSelector: '20px',
        structure: val_layout,
@@ -276,20 +351,41 @@
            position: "top",
            itemTitle: "Data Points"
        }},
-       onClick: function(ev) {
-         this.grid_click = ev;
-       },
        onSelected: function(idx) {
-         var item = this.getItem(idx);
+         //this.grid_click = ev;
+         this.grid_select = this.getItem(idx);
+         var this_col = this.focus.cell.index;
+         var col1 = this.layout.cells[1];
+         this.focus.setFocusCell(col1,idx);
+         if(this_col==this.layout.cellCount-1 || this_col==0){
+           this.selection.clear();
+           this.grid_select = false;
+           return;
+         };
+         var item = this.grid_select;
          console.log('SELECT:',item);
          var point = #{dataId}.data[item._0];
          console.log('SELECT-PT:',point);
-         if(!this.grid_click) return;
+         this.selection.clear();
+       },
+       onClick: function(ev) {
+         var item = this.grid_select;
+         console.log('GRID-CLICK:',this.grid_select);
+         if(!this.grid_select) return;
          //EDIT datavalue
-         console.log('GRID CLICK:',item);
-         console.log('CLICK EV:',this.grid_click);
-         
-         this.grid_click = false;
+         console.log('GRID ITEM:',item);
+         data_value_edit.pop(item, function(data) {
+           //### Update Graph
+           data['selected'] = item.selected;
+           #{dataId}.data[item._0] = [point[0],data.data_value]
+           //### Update Grid
+           //#####STORE SAVE
+           
+           //### Refresh
+           //#{dataId}.val_grid.update();
+           //#{dataId}.plot.update();
+         });
+         this.grid_select = false;
        },
        onFetchError: function(err) {
          console.log('GRID FETCH ERROR:',err);
@@ -306,6 +402,7 @@
 
     // Call startup, in order to render the grid:
     #{dataId}.val_grid.startup();
+    #{dataId}.val_grid.grid_click = false;
     
     // Setup tooltip removal on tab switch
     //var tabs = dijit.byId('tab_browser');
@@ -314,7 +411,7 @@
     //    $("#tooltip").remove();
     //});    
     
-    #{dataId}.plot = $.plot($("##{tabId}_search_results #placeholder"), [#{dataId}.data],{
+    #{dataId}.plot = $.plot($("##{tabId}_search_results #plotContainer"), [#{dataId}.data],{
            series: {
                color : "blue",
                lines: { show: true },
@@ -328,11 +425,11 @@
     });
 
     // add zoom out button 
-    $('<div class="zobutton" style="right:20px;top:20px">-</div>').appendTo($("#placeholder")).click(function (e) {
+    $('<div class="zobutton" style="right:20px;top:20px">-</div>').appendTo($("##{tabId}_search_results #plotContainer")).click(function (e) {
        e.preventDefault();
        #{dataId}.plot.zoomOut();
     });
-    $('<div class="zibutton" style="right:20px;top:43px">+</div>').appendTo($("#placeholder")).click(function (e) {
+    $('<div class="zibutton" style="right:20px;top:43px">+</div>').appendTo($("##{tabId}_search_results #plotContainer")).click(function (e) {
        e.preventDefault();
        #{dataId}.plot.zoom();
     });
@@ -371,7 +468,7 @@
      //NOTE-- the time string for #x is in UTC format and currently is in GMT time
      #{dataId}.previousPoint = null;
      
-     $("##{tabId}_search_results #placeholder").bind("plothover", function (event, pos, item) {
+     $("##{tabId}_search_results #plotContainer").bind("plothover", function (event, pos, item) {
          var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
          var dDate = new Date();
          dDate.setTime(mEpoch);
@@ -400,7 +497,7 @@
      
      // PLOTCLICK event to scroll to point on datagrid
      
-     $("##{tabId}_search_results #placeholder").bind("plotclick", function (event, pos, item) {
+     $("##{tabId}_search_results #plotContainer").bind("plotclick", function (event, pos, item) {
          if(item) {
            //###SCROLL TO TOP of GRID
            //window.scrollTo(0,0);
@@ -448,7 +545,7 @@
     =clear_break
   -#simplechart{:style=>"width: 250px; height: 150px;"}
   -#chartDiv{:style=>"width: 250px; height: 150px;"}
-  #placeholder{:style=>"width:600px;height:300px;"}
+  #plotContainer{:style=>"width:600px;height:300px;float:left;"}
   -#=render_widget :flot_graph, :display, :variable=>variable, :data => graph_data
   -##value_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pvalues", :data=>"values_json"}
   -#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{filter:true}",  :store=>"value_store", :clientSort=>"true", :style=>"width: 700px; height: 400px;", :jsId=>"ValueDisplayGrid", :id=>"ValueDisplayGrid", :title=>"Sites"}
@@ -457,6 +554,8 @@
   -#%th{:field=>"local_date_time", :width=>"190px", :filterable=>true} Timestamp
   -#%th{:field=>"vertical_offset", :width=>"130px", :filterable=>true} Vertical Offset
   -#%th{:field=>"data_value", :width=>"100px", :filterable=>true} Value
+  #buttonContainer{:style=>"width:200px;height:100px;border:solid 1px red;margin:180px 0 0 20px;float:left;"}
+  %br{:style=>'float:none; clear:both;'}
   %br
   #gridContainer{:style=>"width:900px;height:475px;"}
   -if current_user.projects.include?(Project.get(project_uid))

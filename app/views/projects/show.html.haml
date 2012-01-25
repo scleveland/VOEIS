@@ -35,6 +35,8 @@
     dojo.require("dijit.Dialog");
     dojo.require("dijit.form.Form");
     dojo.require("dijit.form.TextBox");
+    dojo.require("dijit.form.DateTextBox");
+    dojo.require("dijit.form.TimeTextBox");
     dojo.require("dijit.form.Button");
     dojo.require("dijit.form.ValidationTextBox");
     dojo.require("dijit.form.SimpleTextarea"); 
@@ -1132,6 +1134,7 @@
       var projDataHref = "/projects/#{@project.id}/samples/query";
       if(parseInt(siteId)) projDataHref += '?site_id='+siteId
       var projDataLoad = function(varId,varName) {
+        data_value_edit.startup();
       };
       openProjTab(tabs, projDataHref, projDataId, tabTitle, projDataLoad);
       //##
@@ -1225,11 +1228,15 @@
           title: tabTitle,
           style: "margine-top:0;padding-top:0;",
           closable: true,
+          parseOnLoad: false,
         	executeScripts: true,
       	  ioArgs: { headers: {"Accept": "text/html"} },
           store: voeis.Server.DEFAULT,
           onDownloadEnd: function(){
-            console.log('tab-load-done-NOW: ');
+            console.log('tab-load-done-NOW!');
+            if(window.tab_pre_dojo_parse) tab_pre_dojo_parse();
+            console.log('NOW parse dijits');
+            dojo.parser.parse(this.domNode);
             console.log('TEST-'+TEST);
             tabLoad();
           },
