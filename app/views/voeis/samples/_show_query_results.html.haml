@@ -265,24 +265,29 @@
         //return 'TESTING-- #';
         var id = item.id[0];
         //var idx = item.idx[0];
-        var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" />';
-        var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" />';
+        var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" style="margin:0;padding:0;height:16px;" />';
+        var edit_icon = '<img src="/images/icons/edit.png" alt="history icon" title="EDIT" style="margin:0;padding:0;height:16px;" />';
+        var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" style="margin:0;padding:0;height:16px;" />';
         //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
         //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
-        var hist_link = '<a href="'+versions_url+'/versions/?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;">'+hist_icon+'</a>\n';
-        var delete_link = '<a href="javascript:" onclick="return false;">'+delete_icon+'</a>\n';
+        var hist_link = '<a href="'+versions_url+'/versions/?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
+        var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit();return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
+        var delete_link = '<a href="javascript:" onclick="return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
         var spaces = '&nbsp;';
         //if(item.used[0]) return spaces+hist_link;
-        return spaces+hist_link+spaces+delete_link;
+        //return spaces+hist_link+spaces+delete_link;
+        return spaces+edit_link+spaces+hist_link+spaces+delete_link;
+        //return spaces+hist_link+spaces+edit_link+spaces+delete_link;
       }
     };
 
-    var val_layout = [{
-       field: '_item',
-       name: '-',
-       formatter: val_grid_formatter.selectItem,
-       width: '24px'
-    },
+    var val_layout = [
+    //{
+    //   field: '_item',
+    //   name: '-',
+    //   formatter: val_grid_formatter.selectItem,
+    //   width: '24px'
+    //},
     {
        //field: 'local_date_time',
        field: '_item',
@@ -331,16 +336,15 @@
        field: '_item',
        name: 'DO',
        formatter: val_grid_formatter.controls,
-       width: '8%'
+       width: '12%'
     }
     ];
 
     // create a new grid:
-    var val_grid_click = false;
     #{dataId}.val_grid = new dojox.grid.EnhancedGrid({
        store: #{dataId}.val_store,
-       grid_click: false,
-       grid_select: false,
+       select_click: false,
+       select_item: false,
        clientSort: true,
        rowSelector: '20px',
        indirectSelection: true,
@@ -348,32 +352,39 @@
        structure: val_layout,
        style: 'width:95%;',
        plugins: {filter:true, exporter:true,
+         //indirectSelection,
          pagination:{
            sizeSwitch: true,
            position: "top",
            itemTitle: "Data Points"
        }},
+       
        onSelected: function(idx) {
-         //this.grid_click = ev;
-         this.grid_select = this.getItem(idx);
-         var this_col = this.focus.cell.index;
+         this.select_item = this.getItem(idx);
+         this.select_col = this.focus.cell.index;
          var col1 = this.layout.cells[1];
          this.focus.setFocusCell(col1,idx);
-         if(this_col==this.layout.cellCount-1 || this_col==0){
-           this.selection.clear();
-           this.grid_select = false;
+         if(this.select_col==this.layout.cellCount-1){
+           this.selection.deselect(this.select_item);
+           //this.select_click = false;
            return;
          };
-         var item = this.grid_select;
-         console.log('SELECT:',item);
-         var point = #{dataId}.data[item._0];
-         console.log('SELECT-PT:',point);
-         this.selection.clear();
+         //var item = this.grid_select;
+         //console.log('SELECT:',item);
+         //var point = #{dataId}.data[item._0];
+         //console.log('SELECT-PT:',point);
+         //this.selection.deselect(this.select_item);
        },
        onClick: function(ev) {
-         var item = this.grid_select;
-         console.log('GRID-CLICK:',this.grid_select);
-         if(!this.grid_select) return;
+         this.select_click = ev;
+         console.log('GRID-CLICK:',ev);
+       },
+       popEdit: function() {
+         var item = this.select_item;
+         if(!this.select_item){
+           console.log('NO ITEM!');
+           return;
+         };
          //EDIT datavalue
          console.log('GRID ITEM:',item);
          data_value_edit.pop(item, function(data) {
@@ -387,7 +398,6 @@
            //#{dataId}.val_grid.update();
            //#{dataId}.plot.update();
          });
-         this.grid_select = false;
        },
        onFetchError: function(err) {
          console.log('GRID FETCH ERROR:',err);
@@ -404,7 +414,6 @@
 
     // Call startup, in order to render the grid:
     #{dataId}.val_grid.startup();
-    #{dataId}.val_grid.grid_click = false;
     
     // Setup tooltip removal on tab switch
     //var tabs = dijit.byId('tab_browser');
@@ -511,10 +520,11 @@
            var val_grid = #{dataId}.val_grid;
            var store = #{dataId}.val_store;
            
-           val_grid.selection.deselectAll();
-           val_grid.scrollTo(0);
-           val_grid.scrollToRow(idx);
-           val_grid.selection.addToSelection(val_item);
+           //#val_grid.selection.deselectAll();
+           //val_grid.scrollTo(0);
+           //val_grid.scrollToRow(idx);
+           //#val_grid.selection.addToSelection(val_item);
+           //val_grid.selection.toggleSelect(val_item);
            
            //value_selection_clear(#{dataId});
            //#{dataId}.value_selection[idx] = 1;
@@ -531,7 +541,11 @@
      $('body #main_container').animate({scrollTop:220}, 'slow');//chrome, safari
      //$('##{tabId}_search_results').animate({scrollTop:200}, 'slow');
 
-  %h3{:style=>"margin:0 0 10px 0;width:56%;float:left;"}
+  :css
+    #gridContainer img { margin:0; }
+    #gridContainer a { margin:0; }
+  
+  %h3{:style=>"margin:0 0 10px 0;width:500px;float:left;"}
     ="#{variable}|#{units}"
   -if !row_array.empty?
     -form_tag({:html=>{:style=>'float:left;'}, :controller=>'samples', :action=>'export'}) do 
