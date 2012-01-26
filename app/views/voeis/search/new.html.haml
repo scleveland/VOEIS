@@ -68,8 +68,6 @@ Select Variables:
   function BuildQuery(){
     var site_array = siteDataGrid.selection.getSelected();
     var var_array = varDataGrid.selection.getSelected();
-    site_ids_string= "";
-    var_ids_string= "";
     site_ids = [];
     var_ids = [];
     for (s in site_array){
@@ -79,18 +77,9 @@ Select Variables:
       var_ids.push(var_array[v].id.toString())
     }
     url = "#{root_url}projects/#{parent.id}/search?site_ids=" + site_ids.join(',');
-    url = url+"&var_ids=" + var_ids.join(',');
-    url = url + "&start_date=" +dijit.byId("start_date").value.format('yyyy-mm-dd')
-    url = url + "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
-    for (i=0; i<site_array.length; i=i+1)
-    {
-      site_ids_string= site_ids_string + "&site_ids[]=" + site_array[i].id.toString();
-    }
-    
-    for (i=0; i<var_array.length; i=i+1)
-    {
-      var_ids_string= var_ids_string + "&var_ids[]=" + var_array[i].id.toString();
-    }
+    url += "&var_ids=" + var_ids.join(',');
+    url += "&start_date=" +dijit.byId("start_date").value.format('yyyy-mm-dd')
+    url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
     $("#query_string").html(url);
     dijit.byId("search_button").attr("disabled", false);
   }
