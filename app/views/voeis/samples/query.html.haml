@@ -212,7 +212,7 @@
           console.log('DV-POST:',data);
           $.ajax({
             type: 'PUT',
-            url: '/projects/#{@project.id}/data_values/'+id+'.json',
+            url: '/projects/#{@project.id}/data_values/'+id+'.json?api_key=#{current_user.api_key}',
             data: data,
             dataType: 'json',
             success: function(dat){

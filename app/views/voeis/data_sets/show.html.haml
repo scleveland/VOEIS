@@ -15,6 +15,7 @@
   dojo.require("dojo.data.ItemFileWriteStore");
   dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
   var variables = #{@variables.to_json}
+
   
 - dataSetGrid = "dataSet" + @data_set.id.to_s + "_grid"
 - dataSetStore ="dataSet" + @data_set.id.to_s + "_store"
@@ -22,10 +23,38 @@
   Data Set: #{@data_set.name}
 
 #dataSetGrid{:style=>"width:900px;height:475px;"}
+%button(dojoType="dijit.form.Button" name="remove_data_button" id="remove_data_button" onclick="RemoveSelectedFromDataSet();") 
+  Remove Selected Data from Data Set
 
 :javascript
   var dataSet = {}
-  $.get("#{root_url}projects/#{@project_uid}/apivs/get_project_data_set_data.json?data_set_id=#{@data_set.id}",
+  
+  function RemoveSelectedFromDataSet(){
+    //get the data values
+    var data_value_ids_string = ""
+    data_array = #{dataSetGrid}.selection.getSelected();
+    for (i=0; i<data_array.length; i=i+1)
+    {
+      data_value_ids_string= data_value_ids_string + "&data_value_ids[]=" + data_array[i].id.toString();
+    }
+    //form has a hidden data_set_id
+    $.post('#{root_url}projects/#{@project.id}/apivs/remove_data_from_project_data_set.json?data_set_id=#{@data_set.id}' + data_value_ids_string,
+      function(data) {
+        $('.result').html(data);
+      });
+      if(data_array.length){
+                  // Iterate through the list of selected items.
+                  // The current item is available in the variable
+                  // "selectedItem" within the following function:
+                  dojo.forEach(data_array, function(selectedItem){
+                      if(selectedItem !== null){
+                          // Delete the item from the data store:
+                          #{dataSetStore}.deleteItem(selectedItem);
+                      } // end if
+                  }); // end forEach
+              } // end if
+      dijit.byId(#{dataSetGrid}).selection.clear();
+  } $.get("#{root_url}projects/#{@project_uid}/apivs/get_project_data_set_data.json?data_set_id=#{@data_set.id}",
   function(data) {
     dataSet.values= data["data"]
     
@@ -126,15 +155,15 @@
      store: #{dataSetStore},
      grid_click: true,
      clientSort: true,
+     selectMode: "extended",
      rowSelector: '20px',
-     indirectSelection: true,
      structure: val_layout,
      style: 'width:95%;',
-     plugins: {filter:true, exporter:true,
+     plugins: {filter:true, indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"},
        pagination:{
          sizeSwitch: true,
          position: "top",
-         itemTitle: "Data Points"
+         itemTitle: "Data Points",
      }},
       onClick: function(ev) {
         this.grid_click = ev;

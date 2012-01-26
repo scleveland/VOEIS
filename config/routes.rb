@@ -109,6 +109,7 @@ Yogo::Application.routes.draw do
           post :create_project_data_stream_column
           post :create_project_data_set
           post :add_data_to_project_data_set
+          post :remove_data_from_project_data_set
           get :get_job_status
           get :get_project_jobs
           get :get_project_data_set_data
