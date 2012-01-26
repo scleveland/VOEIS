@@ -2008,7 +2008,7 @@ class Voeis::ApivsController < Voeis::BaseController
    # API for adding data values to an existing data set within a project
    #
    #
-   # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/add_data_to__project_data_set.json&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_set_id=1&data_set_ids[]=21&data_set_ids[]=13
+   # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/add_data_to__project_data_set.json&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_set_id=1&data_value_ids[]=21&data_value_ids[]=13
    # 
    # @param [Integer] :data_set_id
    # @param [Array] :data_value_ids - this is an array of the data value ids to add to the data set.
@@ -2042,7 +2042,45 @@ class Voeis::ApivsController < Voeis::BaseController
         format_response(@data_hash, format)
      end
    end
-  
+   
+   # remove_data_from_project_data_set
+    # API for removing data values from an existing data set within a project
+    #
+    #
+    # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/remove_data_to__project_data_set.json&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_set_id=1&data_value_ids[]=21&data_value_ids[]=13
+    # 
+    # @param [Integer] :data_set_id
+    # @param [Array] :data_value_ids - this is an array of the data value ids to remove from the data set.
+    # @param [Boolean] :small_data if true this will return only local_date_time and the data_values. OPTIONAL
+    # 
+    # @return [JSON Object] an array of data_values that exist for the data_set
+    #
+    # @author Sean Cleveland
+    #
+    # @api public
+    def add_data_from_project_data_set
+      @data_set_data =""
+      @data_hash = Hash.new()
+      sql =""
+      parent.managed_repository do
+        if data_set = Voeis::DataSet.get(params[:data_set_id].to_i)
+          data_set.remove_data_values(params[:data_value_ids])
+          @data_set_data = data_set.data_values    
+          if params[:small_data]
+            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE id IN ( #{@data_set_data.map{|k| k.id}.join(',')})"
+            @data_hash[:data] = repository.adapter.select(sql)
+          else
+             @data_hash[:data] = @data_set_data
+          end
+          @data_hash[:data_set] = Voeis::DataSet.get(params[:data_set_id].to_i)
+        else
+          @data_hash = {"error" => "The id: #{params[:data_set_id]} does not exist as data set."}
+        end
+      end
+      respond_to do |format|
+         format_response(@data_hash, format)
+      end
+    end
   private
  
      
