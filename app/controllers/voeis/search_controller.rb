@@ -27,15 +27,26 @@ class Voeis::SearchController < Voeis::BaseController
     end
 
     results = {}
+    presults = {}
     @variables=[]
     # result[timestamp] = {var_id=>val,var_id=>val,var_id=>val}
     data.each do |d|
       results[d.local_date_time] ||= {}
       results[d.local_date_time][d.variable_id] = d.data_value
+      presults[d.local_date_time.to_i] ||= {}
+      presults[d.local_date_time.to_i]["var_#{d.variable_id}"] = d.data_value
       @variables << d.variable unless @variables.include?(d.variable)
     end
-    
+    null_variables={}
+    @variables.each do |v|
+      null_variables["var_#{v.id}"] = -9999
+    end
+    @parallel_results=[]
+    presults.each do |k,pr| 
+      @parallel_results << {:timestamp => k}.merge(null_variables.merge(pr))
+    end
     @data = results.map{|k,v| {:timestamp => k}.merge(v) }
+   # @parallel_results = presults.map{|k,v| {:timestamp => k}.merge(v) }
     @data = @data.sort{|a,b| a[:timestamp] <=> b[:timestamp] }
     
     # @variables = parent.managed_repository {
