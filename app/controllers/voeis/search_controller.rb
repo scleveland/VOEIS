@@ -23,14 +23,16 @@ class Voeis::SearchController < Voeis::BaseController
                             :site_id => site_ids,
                             :local_date_time.gte => start_date,
                             :local_date_time.lte => end_date)
-      @variables  = data.variables
+     # @variables  = data.variables(:unique=>true)
     end
 
     results = {}
+    @variables=[]
     # result[timestamp] = {var_id=>val,var_id=>val,var_id=>val}
     data.each do |d|
       results[d.local_date_time] ||= {}
       results[d.local_date_time][d.variable_id] = d.data_value
+      @variables << d.variable unless @variables.include?(d.variable)
     end
     
     @data = results.map{|k,v| {:timestamp => k}.merge(v) }
