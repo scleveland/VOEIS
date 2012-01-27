@@ -1,1 +1,71 @@
-= params["site_ids"]
+%h1 Search Results
+
+%h3 Summary
+%ul
+  %li Number of DataValues: #{@data.length}
+  %li Number of Variables: #{@variables.length}
+  
+=@data.inspect
+
+#searchGrid{:style=>"width:100%;height:100%;"}
+
+:javascript
+  dojo.require("dijit.dijit");
+  dojo.require("dijit.form.Button");
+  dojo.require("dojox.grid.EnhancedGrid");
+  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+  dojo.require("dojox.grid.enhanced.plugins.Filter");
+  dojo.require("dijit.layout.TabContainer");
+  dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+  dojo.require("dojox.grid.enhanced.plugins.Pagination");
+  dojo.require("dojo.data.ItemFileReadStore");
+  var units = #{@unit_names.to_json}
+     
+  var data_json = {
+    identifier: 'timestamp',
+    items: #{@data.to_json} };
+  var data_store = new dojo.data.ItemFileReadStore({data: data_json });
+
+  var val_grid_formatter = {};
+  val_grid_formatter.dateTime = function(value) {
+    if(value==null || value=='') return '-';
+    var d = new Date(value);
+    return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+  };
+
+  var data_layout = [
+    {
+       field: 'timestamp',
+       name: 'TimeStamp',
+       formatter: val_grid_formatter.dateTime,
+       width: 'auto'
+    },
+    #{@variables.map{|v| '{field:"%s", name: "%s", width:"auto"}' % [v.id, v.variable_name] }.join(',')}
+  ];
+
+  // create a new site grid:
+  searchGrid = new dojox.grid.EnhancedGrid({
+     store: data_store,
+     clientSort: true,
+     rowSelector: '20px',
+     structure: data_layout,
+     style: 'width:95%;',
+     plugins: {filter:true, indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"},
+       pagination:{
+         sizeSwitch: true,
+         position: "top",
+         itemTitle: "Data Points"
+     }},
+      onClick: function(ev) {
+        this.grid_click = ev;
+      },
+     },
+     document.createElement('div'));
+  searchGrid.changePageSize(10);
+
+  // append the new grid to the div " ":
+  $('#searchGrid').append(searchGrid.domNode);
+  searchGrid.startup();
+
+
+
