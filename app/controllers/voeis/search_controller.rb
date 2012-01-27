@@ -1,7 +1,7 @@
 class Voeis::SearchController < Voeis::BaseController
   # Properly override defaults to ensure proper controller behavior
   # @see Voeis::BaseController
-  
+
   def new
     @sites = parent.managed_repository{Voeis::Site.all}
     @variables = parent.managed_repository{Voeis::Variable.all}
@@ -16,14 +16,17 @@ class Voeis::SearchController < Voeis::BaseController
     start_date   = params[:start_date]
     end_date     = params[:end_date]
     
-    data = parent.managed_repository {
-      Voeis::DataValue.all(:variable_id => variable_ids, 
+    data = ""
+    @variables = ""
+    parent.managed_repository do
+      data =Voeis::DataValue.all(:variable_id => variable_ids, 
                             :site_id => site_ids,
                             :local_date_time.gte => start_date,
                             :local_date_time.lte => end_date)
-    }
+      @variables  = data.variables
+    end
 
-    results = []
+    results = {}
     # result[timestamp] = {var_id=>val,var_id=>val,var_id=>val}
     data.each do |d|
       results[d.local_date_time] ||= {}
@@ -33,9 +36,9 @@ class Voeis::SearchController < Voeis::BaseController
     @data = results.map{|k,v| {:timestamp => k}.merge(v) }
     @data = @data.sort{|a,b| a[:timestamp] <=> b[:timestamp] }
     
-    @variables = parent.managed_repository {
-      Voeis::Variable.all(:id => variable_ids)
-    }
+    # @variables = parent.managed_repository {
+    #   Voeis::Variable.all(:id => variable_ids)
+    # }
   end
 
 end
