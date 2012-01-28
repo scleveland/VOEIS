@@ -12,7 +12,7 @@
     -#  = stylesheet_link_tag 'compiled/ie.css', :media => 'screen, projection'
 
     
-    = javascript_include_tag(:defaults, 'jquery-snippet.js', "dojo_old/dojo.js", "voeislayer.js", "jquery.flot.min.js", "date.format.js")
+    = javascript_include_tag(:defaults, 'jquery-snippet.js', "dojo_old/dojo.js", "voeislayer.js", "jquery.flot.min.js", "date.format.js", "protovis.min.js")
     -#= javascript_include_tag('rails.js', 'jquery.1.7.1.min.js', 'jquery-snippet.js', "dojo_old/dojo.js", "voeislayer.js", "jquery.flot.min.js")
     = csrf_meta_tag
 
@@ -79,8 +79,7 @@
     :css
       body, html { width:100%; height:100%; margin:0; padding:0; overflow:hidden; }
       #border_container { width:100%; height:100% }
-      
-      #main_container { margin:10px 0 10px 20px }
+      #main_container 
       
       .datahub-icon-25 { 
         background-image: url('/images/datahub_icon_25.png');
@@ -259,8 +258,9 @@
                 
               
       
-      #main_container{:dojoType=>"dijit.layout.ContentPane", :region=>"center", :gutters=>"false", :style=>"padding:0; background-color:light-grey"}
-        = content_for?(:content) ? yield(:content) : yield
+      #main_container{:dojoType=>"dijit.layout.ContentPane", :region=>"center", :gutters=>"false", :style=>"padding:0; "}
+        #main_sub
+          = content_for?(:content) ? yield(:content) : yield
 
       #bottom.claro{:dojoType => "dijit.layout.ContentPane", :region => "bottom", :gutters => "false", :style => "padding:0"}
         #footer{:style=>"padding-top:6px; border-top: 1px #6F97CB solid;"}

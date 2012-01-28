@@ -1,0 +1,189 @@
+:javascript
+  dojo.require("dijit.dijit");
+  dojo.require("dijit.form.Button");
+  dojo.require("dojox.grid.EnhancedGrid");
+  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+  dojo.require("dojox.grid.enhanced.plugins.Filter");
+  dojo.require("dijit.layout.TabContainer");
+  dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+  dojo.require("dojo.data.ItemFileWriteStore");
+  dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
+  var units = #{@unit_names.to_json}
+     
+  var variable_json = {
+    identifier: 'id',
+    items: #{@variables.to_json} };
+  var var_store = new dojo.data.ItemFileWriteStore({data: variable_json });
+  var site_json = {
+    identifier: 'id',
+    items: #{@sites.to_json} };
+  var site_store = new dojo.data.ItemFileWriteStore({data: site_json }); 
+  
+%h3{:style=>"margin:5px 0;"}
+  Project Search:
+
+Select Site:
+#siteGrid{:style=>"width:900px;height:300px;"}
+%button(dojoType="dijit.form.Button" name="search_button" id="update_variable_button" onclick="") 
+  Update Variables From Selected Sites
+=clear_break
+=clear_break
+Select Variables:
+#varGrid{:style=>"width:900px;height:300px;"}
+=clear_break
+=clear_break
+%div{:style=>"float: left;"}
+  %label{:for=>"date1"}
+    Start Date Selection:
+  %input{:type=>"text", :name=>"start_date", :id=>"start_date", :value=>"2005-12-30",
+      :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+%div{:style=>"float: left;"}
+  
+  %label{:for=>"date1"}
+    End Date Selection:
+  %input{:type=>"text", :name=>"end_date", :id=>"end_date", :value=>"2005-12-30",
+      :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
+
+=clear_break
+%p{:id=>"formatted"}
+=clear_break
+%p{:id=>"formatted2"}
+=clear_break
+%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button" onclick="BuildQuery();") 
+  Build Query
+#query_string{:style=>"width:900px;height:50px;"}
+=clear_break
+%button(dojoType="dijit.form.Button" name="search_button" id="search_button" onclick="doSearch();" ) 
+  Perform Search
+:javascript
+  dojo.addOnLoad(function(){
+    dijit.byId("search_button").set("disabled",true);
+  });
+  function BuildQuery(){
+    var site_array = siteDataGrid.selection.getSelected();
+    var var_array = varDataGrid.selection.getSelected();
+    site_ids = [];
+    var_ids = [];
+    for (s in site_array){
+      site_ids.push(site_array[s].id.toString())
+    }
+    for (v in var_array){
+      var_ids.push(var_array[v].id.toString())
+    }
+    url = "#{root_url}projects/#{parent.id}/search?site_ids=" + site_ids.join(',');
+    url += "&var_ids=" + var_ids.join(',');
+    url += "&start_date=" +dijit.byId("start_date").value.format('yyyy-mm-dd')
+    url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
+    $("#query_string").html(url);
+    dijit.byId("search_button").attr("disabled", false);
+  }
+  
+  function doSearch(){
+    window.location=$("#query_string").html();
+  }
+  //formatter: 'val_grid_formatter.dateTime',
+  // grid formatters
+  var val_grid_formatter = {};
+  val_grid_formatter.dateTime = function(value) {
+    if(value==null || value=='') return '-';
+    // Format DateTime string
+    var d = new Date(value);
+    //var fmt = d.getMonth()+'/'+d.getFullYear()
+    return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+  };
+  val_grid_formatter.selectItem = function(item) {
+    //var checked_img = '<img src="/images/notice.png" alt="SELCT" />';
+    //var selected_img = '<img src="/images/1abu007.gif" alt="SELCT" />';
+    var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
+  
+    //if(siteDataGrid.value_selected(item)) 
+    //  return selected_img;
+    return blank_img;
+  };
+  
+  val_grid_formatter.unit_name = function(value){
+    return units[value]
+  }
+  var site_layout = [
+  {
+     field: '_item',
+     name: '-',
+     formatter: val_grid_formatter.selectItem,
+     width: '24px'
+  },
+  {
+     field: 'id',
+     name: 'ID',
+     width: '40px'
+  },
+  {
+     field: 'name',
+     name: 'Name',
+     width: 'auto'
+  }
+  ];
+  var var_layout = [
+  {
+     field: '_item',
+     name: '-',
+     formatter: val_grid_formatter.selectItem,
+     width: '24px'
+  },
+  {
+     field: 'id',
+     name: 'ID',
+     width: '40px'
+  },
+  {
+     field: 'variable_name',
+     name: 'Name',
+     width: 'auto'
+  },
+  {
+     field: 'variable_units_id',
+     name: 'Units',
+     formatter: val_grid_formatter.unit_name,
+     width: 'auto'
+  },
+  ];
+  
+  
+  // create a new site grid:
+  siteDataGrid = new dojox.grid.EnhancedGrid({
+     store: site_store,
+     clientSort: true,
+     rowSelector: '20px',
+     structure: site_layout,
+     style: 'width:95%;',
+     plugins: {filter:true, exporter:true,indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"},
+      },
+      onClick: function(ev) {
+        this.grid_click = ev;
+      },
+     },
+     document.createElement('div'));
+
+  // append the new grid to the div " ":
+  $('#siteGrid').append(siteDataGrid.domNode);
+  siteDataGrid.startup();
+  
+  //create a new variable grid
+  varDataGrid = new dojox.grid.EnhancedGrid({
+     store: var_store,
+     grid_click: true,
+     clientSort: true,
+     rowSelector: '20px',
+     structure: var_layout,
+     style: 'width:95%;',
+     plugins: {filter:true, exporter:true,indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"},
+      },
+      onClick: function(ev) {
+        this.grid_click = ev;
+      },
+     },
+     document.createElement('div'));
+
+  // append the new grid to the div " ":
+  $('#varGrid').append(varDataGrid.domNode);
+  varDataGrid.startup();
