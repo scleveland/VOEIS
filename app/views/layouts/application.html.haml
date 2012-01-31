@@ -259,8 +259,7 @@
               
       
       #main_container{:dojoType=>"dijit.layout.ContentPane", :region=>"center", :gutters=>"false", :style=>"padding:0; "}
-        #main_sub
-          = content_for?(:content) ? yield(:content) : yield
+        = content_for?(:content) ? yield(:content) : yield
 
       #bottom.claro{:dojoType => "dijit.layout.ContentPane", :region => "bottom", :gutters => "false", :style => "padding:0"}
         #footer{:style=>"padding-top:6px; border-top: 1px #6F97CB solid;"}
