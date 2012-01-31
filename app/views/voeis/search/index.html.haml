@@ -1,60 +1,9 @@
 %h1 Search Results
-#searchGrid{:style=>"width:auto;height:500px;"}
-
-:javascript
-  dojo.require("dijit.dijit");
-  dojo.require("dijit.form.Button");
-  dojo.require("dojox.grid.EnhancedGrid");
-  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
-  dojo.require("dojox.grid.enhanced.plugins.Filter");
-  dojo.require("dijit.layout.TabContainer");
-  dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
-  dojo.require("dojo.data.ItemFileWriteStore");
-  var units = #{@unit_names.to_json}
-
-  var data_json = {
-    identifier: 'timestamp',
-    items: #{@data.to_json} };
-  var data_store = new dojo.data.ItemFileWriteStore({data: data_json });
-  var val_grid_formatter = {};
-  val_grid_formatter.dateTime = function(value) {
-    if(value==null || value=='') return '-';
-    var d = new Date(value);
-    return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
-  };
-
-  var data_layout = [
-    {
-       field: 'timestamp',
-       name: 'TimeStamp',
-       formatter: val_grid_formatter.dateTime,
-       width: '100px'
-    },
-    #{@variables.map{|v| '{field:"%s", name: "%s", width:"100px"}' % [v.id, v.variable_name] }.join(',')}
-  ];
-
-  // create a new site grid:
-  searchGrid = new dojox.grid.EnhancedGrid({
-     store: data_store,
-     clientSort: true,
-     rowSelector: '20px',
-     structure: data_layout,
-     style: 'width:95%;',
-     plugins: {filter:true, indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"}},
-      onClick: function(ev) {
-        this.grid_click = ev;
-      },
-     },
-     document.createElement('div'));
-  // append the new grid to the div " ":
-  $('#searchGrid').append(searchGrid.domNode);
-  searchGrid.startup();
-
-
 #center  
   #fig
     :plain
       <script type="text/javascript+protovis">
+      $(window).ready(function(){ 
       var cars = #{@parallel_results.to_json}
 
       var units = {
@@ -65,8 +14,8 @@
       var dims = pv.keys(units);
 
       /* Sizing and scales. */
-      var w = 1200,
-          h = 600,
+      var w = 1000,
+          h = 350,
           fudge = 0.5,
           x = pv.Scale.ordinal(dims).splitFlush(0, w),
           y = pv.dict(dims, function(t) pv.Scale.linear(
@@ -188,13 +137,13 @@
           .text(function(d) filter[d.dim].max.toFixed(0) + units[d.dim].unit);
 
       vis.render();
-
+      });
           </script>
           <style type="text/css">
 
           #fig {
             width: 1200px;
-            height: 600px;
+            height: 400px;
             position: relative;
             margin: auto;
           }
@@ -211,4 +160,55 @@
             font-size: medium;
           }
        </style>
+
+#searchGrid{:style=>"width:auto;height:500px;"}
+
+:javascript
+  dojo.require("dijit.dijit");
+  dojo.require("dijit.form.Button");
+  dojo.require("dojox.grid.EnhancedGrid");
+  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+  dojo.require("dojox.grid.enhanced.plugins.Filter");
+  dojo.require("dijit.layout.TabContainer");
+  dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+  dojo.require("dojo.data.ItemFileWriteStore");
+  var units = #{@unit_names.to_json}
+
+  var data_json = {
+    identifier: 'timestamp',
+    items: #{@data.to_json} };
+  var data_store = new dojo.data.ItemFileWriteStore({data: data_json });
+  var val_grid_formatter = {};
+  val_grid_formatter.dateTime = function(value) {
+    if(value==null || value=='') return '-';
+    var d = new Date(value);
+    return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+  };
+
+  var data_layout = [
+    {
+       field: 'timestamp',
+       name: 'TimeStamp',
+       formatter: val_grid_formatter.dateTime,
+       width: '100px'
+    },
+    #{@variables.map{|v| '{field:"%s", name: "%s", width:"100px"}' % [v.id, v.variable_name] }.join(',')}
+  ];
+
+  // create a new site grid:
+  searchGrid = new dojox.grid.EnhancedGrid({
+     store: data_store,
+     clientSort: true,
+     rowSelector: '20px',
+     structure: data_layout,
+     style: 'width:95%;',
+     plugins: {filter:true, indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"}},
+      onClick: function(ev) {
+        this.grid_click = ev;
+      },
+     },
+     document.createElement('div'));
+  // append the new grid to the div " ":
+  $('#searchGrid').append(searchGrid.domNode);
+  searchGrid.startup();
 
