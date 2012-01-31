@@ -1,5 +1,5 @@
 - dataId = tabId+'_data'
-- edit_auth = true
+- edit_auth = current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project)
 
 %h3{:style=>"margin:5px 0;"}
   Query Results
@@ -65,13 +65,13 @@
     :javascript
       //### AUTH GLOBALS
       var edit_auth = true;
-      var versions_url = '';
+      var versions_url = '/projects/#{@project.id}/data_values';
       var data_del_url = '';
   -else
     :javascript
       //### NO AUTH GLOBALS
       var edit_auth = false;
-      var versions_url = '';
+      var versions_url = '/projects/#{@project.id}/data_values';
       var data_del_url = '';
   
     
@@ -106,11 +106,10 @@
       #{dataId}.value_data[i]['selected'] = 0;
     #{dataId}.data = #{graph_data.as_json};
     
-    console.log('1RESULT -DATAID(#{dataId}):',#{dataId});
-    
+    //console.log('1RESULT -DATAID(#{dataId}):',#{dataId});
     //#{dataId}.values_json = {identifier: 'id', items: #{dataId}.value_data };
     
-    console.log('2RESULT -DATAID(#{dataId}):',#{dataId});
+    //console.log('2RESULT -DATAID(#{dataId}):',#{dataId});
     
     //#{dataId}.val_store = new dojo.data.ItemFileReadStore({data: {identifier: 'id', items: #{dataId}.value_data }});
     #{dataId}.val_store = new dojo.data.ItemFileWriteStore({data: {identifier: 'id', items: #{dataId}.value_data }});
@@ -124,7 +123,7 @@
         }
     }));
     ***/
-    console.log('3RESULT -DATAID(#{dataId}):',#{dataId});
+    //console.log('3RESULT -DATAID(#{dataId}):',#{dataId});
     
     //create select array / clear array
     /***
@@ -232,9 +231,10 @@
         var tz0 = tzstr.split('.');
         var tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+Math.abs(tz0[0])).slice(-2)+':';
         tz += tz0.length>1 ? (tz0[1]*6).toString().slice(0,2) : '00';
-        var d0 = new Date(item.date_time_utc.toString());
-        var d = new Date(d0.format("UTC:yyyy-mm-dd'T'HH:MM:ss"+tz));
-        console.log('GRID-DATE:',item.date_time_utc.toString(),item.local_date_time.toString(),item.utc_offset.toString());
+        //var d0 = new Date(item.date_time_utc.toString());
+        //var d = new Date(d0.format("UTC:yyyy-mm-dd'T'HH:MM:ss"+tz));
+        var d = new Date(item.local_date_time.toString());
+        //console.log('GRID-DATE:',item.date_time_utc.toString(),item.local_date_time.toString(),item.utc_offset.toString());
         return d.format("yyyy-mm-dd HH:MM:ss "+tz);
       },
       trueFalse: function(value) {
@@ -253,25 +253,28 @@
         return blank_img;
       },
       vertical_offset: function(item) {
+        var fixed = 3;    //decimal places accuracy
         if(item==null || item=='') return '-';
         if(item.vertical_offset[0]==null) return '-';
-        var vo_val = item.vertical_offset.toString();
-        if(item.end_vertical_offset[0]!=null && item.end_vertical_offset[0]!=0)
-          vo_val += ' &ndash; '+item.end_vertical_offset.toString();
+        var vo_val = item.vertical_offset[0].toFixed(fixed);
+        //if(item.end_vertical_offset[0]!=null && item.end_vertical_offset[0]!=0)
+        if(item.end_vertical_offset[0]!=null)
+          vo_val += ' &ndash; '+item.end_vertical_offset[0].toFixed(fixed);
         return vo_val;
       },
       controls: function(item) {
         if(item==null || item=='') return '-';
         //return 'TESTING-- #';
         var id = item.id[0];
-        //var idx = item.idx[0];
+        var idx = item._0;
+        console.log('GRID ITEM:',item);
         var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" style="margin:0;padding:0;height:16px;" />';
         var edit_icon = '<img src="/images/icons/edit.png" alt="history icon" title="EDIT" style="margin:0;padding:0;height:16px;" />';
         var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" style="margin:0;padding:0;height:16px;" />';
         //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
         //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
-        var hist_link = '<a href="'+versions_url+'/versions/?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
-        var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit();return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
+        var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
+        var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit('+idx+');return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
         var delete_link = '<a href="javascript:" onclick="return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
         var spaces = '&nbsp;';
         //if(item.used[0]) return spaces+hist_link;
@@ -295,17 +298,6 @@
        formatter: val_grid_formatter.dataDateTime,
        width: '185px'
     },
-    //{
-    //   field: 'vertical_offset',
-    //   name: 'Vertical Offset',
-    //   width: 'auto'
-    //},
-    {
-       field: '_item',
-       name: 'Vertical Offset',
-       formatter: val_grid_formatter.vertical_offset,
-       width: '11%'
-    },
     {
        field: 'data_value',
        name: 'Value',
@@ -320,6 +312,17 @@
        field: 'datatype',
        name: 'DataType',
        width: '10%'
+    },
+    //{
+    //   field: 'vertical_offset',
+    //   name: 'Vertical Offset',
+    //   width: 'auto'
+    //},
+    {
+       field: '_item',
+       name: 'Vertical Offset',
+       formatter: val_grid_formatter.vertical_offset,
+       width: '15%'
     },
     {
        field: 'quality_control_level',
@@ -336,7 +339,7 @@
        field: '_item',
        name: 'DO',
        formatter: val_grid_formatter.controls,
-       width: '12%'
+       width: '10%'
     }
     ];
 
@@ -350,7 +353,13 @@
        structure: val_layout,
        style: 'width:95%;',
        plugins: {filter:true, exporter:true,
-         indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"},
+         indirectSelection:{
+           headerSelector:true, 
+           rowSelector:'multi',
+           cell:false,
+           col:false,
+           width:"40px", 
+           styles:"text-align: center;"},
          pagination:{
            sizeSwitch: true,
            position: "top",
@@ -360,11 +369,10 @@
        onSelected: function(idx) {
          this.select_item = this.getItem(idx);
          this.select_col = this.focus.cell.index;
-         var col1 = this.layout.cells[1];
-         this.focus.setFocusCell(col1,idx);
+         //var col1 = this.layout.cells[1];
+         //this.focus.setFocusCell(col1,idx);
          if(this.select_col==this.layout.cellCount-1){
            this.selection.deselect(this.select_item);
-           //this.select_click = false;
            return;
          };
          //var item = this.grid_select;
@@ -373,27 +381,39 @@
          //console.log('SELECT-PT:',point);
          //this.selection.deselect(this.select_item);
        },
+       onDeselected: function(idx) {
+         this.select_item = this.getItem(idx);
+         this.select_col = this.focus.cell.index;
+         //var col1 = this.layout.cells[1];
+         //this.focus.setFocusCell(col1,idx);
+         if(this.select_col==this.layout.cellCount-1){
+           this.selection.addToSelection(this.select_item);
+           return;
+         };
+       },
        onClick: function(ev) {
          this.select_click = ev;
-         console.log('GRID-CLICK:',ev);
+         //console.log('GRID-CLICK:',ev);
        },
-       popEdit: function() {
-         var item = this.select_item;
-         if(!this.select_item){
+       popEdit: function(idx) {
+         //var item = this.getItem(idx);
+         var item = #{dataId}.value_data[idx];
+         var point = #{dataId}.data[idx];
+         if(!item){
            console.log('NO ITEM!');
            return;
          };
          //EDIT datavalue
-         console.log('GRID ITEM:',item);
+         console.log('EDIT ITEM:',item);
          data_value_edit.pop(item, function(data) {
            //### Update Graph
-           data['selected'] = item.selected;
+           //data['selected'] = item.selected;
            #{dataId}.data[item._0] = [point[0],data.data_value]
            //### Update Grid
            //#####STORE SAVE
-           
+           datastore.update(data,#{dataId}.val_store);
            //### Refresh
-           //#{dataId}.val_grid.update();
+           #{dataId}.val_grid.update();
            //#{dataId}.plot.update();
          });
        },
@@ -519,10 +539,11 @@
            var store = #{dataId}.val_store;
            
            //#val_grid.selection.deselectAll();
-           //val_grid.scrollTo(0);
-           //val_grid.scrollToRow(idx);
+           val_grid.scrollTo(0);
+           val_grid.scrollToRow(idx);
            //#val_grid.selection.addToSelection(val_item);
-           //val_grid.selection.toggleSelect(val_item);
+           val_grid.selection.toggleSelect(val_item);
+           console.log('PLOT-CLICK:',event,pos,item,val_item);
            
            //value_selection_clear(#{dataId});
            //#{dataId}.value_selection[idx] = 1;

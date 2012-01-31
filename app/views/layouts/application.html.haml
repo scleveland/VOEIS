@@ -256,9 +256,9 @@
                 = link_to("Forgot My Password", reset_password_users_path)
         = yield :toolbar
                 
-      #main_container       
-        #main_sub{:dojoType=>"dijit.layout.ContentPane", :region=>"center", :gutters=>"false", :style=>"padding:0;"}
-          = content_for?(:content) ? yield(:content) : yield
+      
+      #main_container{:dojoType=>"dijit.layout.ContentPane", :region=>"center", :gutters=>"false", :style=>"padding:0; "}
+        = content_for?(:content) ? yield(:content) : yield
 
 
       #bottom.claro{:dojoType => "dijit.layout.ContentPane", :region => "bottom", :gutters => "false", :style => "padding:0"}

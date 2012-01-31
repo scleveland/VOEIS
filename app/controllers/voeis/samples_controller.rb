@@ -211,8 +211,8 @@ class Voeis::SamplesController < Voeis::BaseController
     end
     @data_set_options = opts_for_select(@data_set_opts_array)
     
-    site = parent.managed_repository{Voeis::Site.get(params[:site])}
-    @site_name =site.name
+    site = parent.managed_repository{Voeis::Site.get(params[:site_select])}
+    @site_name = site.name
     @site = site
     if params[:variable] != "None"
       
@@ -254,7 +254,7 @@ class Voeis::SamplesController < Voeis::BaseController
         end #end stamp
 
       else #we want only one variable
-        variable = parent.managed_repository{Voeis::Variable.get(params[:variable])}
+        variable = parent.managed_repository{Voeis::Variable.get(params[:variable_select])}
         @var_name = variable.variable_name
         @variable = variable
         @units = Voeis::Unit.get(variable.variable_units_id).units_name
