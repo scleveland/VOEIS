@@ -97,11 +97,13 @@
                                 @data_value.local_date_time.strftime("%Y-%m-%d %H:%M:%S"),
                                 @data_value.data_value.to_s]
 
+
 %strong
   SHOW DATA VALUE VERSIONS
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/datavalue/history/update', [#{@variable.id},#{@site.id}]);")
+= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
+//= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/datavalue/history/update', [#{@variable.id},#{@site.id}]);")
 %br
 
 
@@ -115,6 +117,4 @@
                                         :properties=>@ver_properties,
                                         :restore_callback=>"item_restore",
                                         :user=>current_user
-
-
 

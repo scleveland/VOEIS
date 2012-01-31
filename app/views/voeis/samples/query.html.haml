@@ -7,7 +7,7 @@
 -# tabId = @project.id.to_s+'-site'+site_id.to_s+'-data'
 - tabId = 'site'+site_id.to_s+'_data'
 -#- edit_auth = true
-- edit_auth = current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project)
+- edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project))
 
 
 -#- content_for(:javascripts) do
@@ -542,5 +542,5 @@
     return false;
     });
     });
--if current_user.projects.include?(@project)
+-if !current_user.nil? && current_user.projects.include?(@project)
   = render(:partial => "data_set", :locals =>{:project_uid=>@project.id})
