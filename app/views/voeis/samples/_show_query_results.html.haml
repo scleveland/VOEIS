@@ -1,5 +1,5 @@
 - dataId = tabId+'_data'
-- edit_auth = current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project)
+- edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project))
 
 %h3{:style=>"margin:5px 0;"}
   Query Results
@@ -264,6 +264,7 @@
       },
       controls: function(item) {
         if(item==null || item=='') return '-';
+        if(!edit_auth) return '-must login-'
         //return 'TESTING-- #';
         var id = item.id[0];
         var idx = item._0;
@@ -275,7 +276,7 @@
         //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
         var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
         var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit('+idx+');return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
-        var delete_link = '<a href="javascript:" onclick="return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
+        var delete_link = '<a href="javascript:" onclick="dv_item_delete('+idx+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
         var spaces = '&nbsp;';
         //if(item.used[0]) return spaces+hist_link;
         //return spaces+hist_link+spaces+delete_link;
@@ -342,6 +343,7 @@
        width: '10%'
     }
     ];
+    if(!edit_auth) val_layout.pop();
 
     // create a new grid:
     #{dataId}.val_grid = new dojox.grid.EnhancedGrid({
@@ -351,7 +353,7 @@
        clientSort: true,
        rowSelector: '0',
        structure: val_layout,
-       style: 'width:95%;',
+       //style: 'width:100%;',
        plugins: {filter:true, exporter:true,
          indirectSelection:{
            headerSelector:true, 
@@ -371,7 +373,9 @@
          this.select_col = this.focus.cell.index;
          //var col1 = this.layout.cells[1];
          //this.focus.setFocusCell(col1,idx);
-         if(this.select_col==this.layout.cellCount-1){
+         //###this.selection.deselect(this.select_item);
+         //if(this.select_col==this.layout.cellCount-1){
+         if(!this.select_col==0){
            this.selection.deselect(this.select_item);
            return;
          };
@@ -386,7 +390,9 @@
          this.select_col = this.focus.cell.index;
          //var col1 = this.layout.cells[1];
          //this.focus.setFocusCell(col1,idx);
-         if(this.select_col==this.layout.cellCount-1){
+         //###this.selection.addToSelection(this.select_item);
+         //if(this.select_col==this.layout.cellCount-1){
+         if(!this.select_col==0){
            this.selection.addToSelection(this.select_item);
            return;
          };
@@ -427,6 +433,43 @@
     // append the new grid to the div " ":
     //dojo.byId("gridContainer").appendChild(val_grid.domNode);
     
+    //GRID CONTROL FUNCTIONS
+    function dv_item_restore(item,callback){
+      console.log('DV ROLLBACK:',item);
+      var data = {data_value: item};
+      var id = item.id;
+      $.ajax({
+        type: 'PUT',
+        url: '/projects/#{@project.id}/data_values/'+id+'.json?api_key=#{current_user.api_key}',
+        data: data,
+        dataType: 'json',
+        success: function(dat){
+          callback(dat);
+        }
+      });
+    };
+    function dv_grid_refresh(data){
+      datastore.update(data,#{dataId}.val_store);
+      //### Refresh
+      #{dataId}.val_grid.update();
+      //#{dataId}.plot.update();
+    };
+    function dv_item_delete(idx){
+      var item = #{dataId}.val_grid.getItem(idx);
+      confirmDialog('Confirm Rollback &mdash;',
+        'ARE YOU SURE?\n<br/>DELETE DATA VALUE: \n<br/>'+item.data_value,
+        function(yes){
+          console.log('CONFIRM:',yes);
+          if(!yes) return;
+          //ITEM SAVE CALLBACK
+          datastore.update(item,#{dataId}.val_store);
+          //### Refresh
+          #{dataId}.val_grid.update();
+          //#{dataId}.plot.update();
+        }, 
+        { buttonOk:'YES', buttonCancel:'Cancel' });
+    };
+    
     
     $('##{tabId}_search_results #gridContainer').append(#{dataId}.val_grid.domNode);
 
@@ -446,8 +489,11 @@
                lines: { show: true },
                points: { show: true }
               },
-
-           grid:  { hoverable: true, clickable: true },
+           grid:  { 
+             backgroundColor: '#fcfcfc',
+             hoverable: true, 
+             clickable: true 
+           },
            xaxis: { mode: "time" },
            pan:   { interactive: true },
            zoom: {interative: true}
@@ -525,7 +571,6 @@
      });
      
      // PLOTCLICK event to scroll to point on datagrid
-     
      $("##{tabId}_search_results #plotContainer").bind("plotclick", function (event, pos, item) {
          if(item) {
            //###SCROLL TO TOP of GRID
@@ -589,12 +634,13 @@
   -#%th{:field=>"local_date_time", :width=>"190px", :filterable=>true} Timestamp
   -#%th{:field=>"vertical_offset", :width=>"130px", :filterable=>true} Vertical Offset
   -#%th{:field=>"data_value", :width=>"100px", :filterable=>true} Value
-  #buttonContainer{:style=>"width:200px;height:100px;border:solid 1px red;margin:180px 0 0 20px;float:left;"}
+  #buttonContainer{:style=>"width:200px;height:100px;margin:180px 0 0 20px;float:left;"}
   %br{:style=>'float:none; clear:both;'}
   %br
-  #gridContainer{:style=>"width:900px;height:475px;"}
-  -if current_user.projects.include?(Project.get(project_uid))
-    %label{:id => "d_set", :onclick=>"dijit.byId('new_data_set').show();", :class => "icon icon-add", :onmouseover =>"this.style.cursor='hand'"}Data Set:
+  -# 33e 3A7594 3889AA
+  #gridContainer{:style=>"width:850px;height:420px;border:solid 1px #3A7594;"}
+  -if !current_user.nil? && current_user.projects.include?(Project.get(project_uid))
+    %label{:id=>"d_set", :onclick=>"dijit.byId('new_data_set').show();", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}Data Set:
     = select_tag("data_set", data_set_options.html_safe)
     %button(dojoType="dijit.form.Button" name="add_data_button" id="add_data_button" onclick="addSelectedToDataSet();") 
       Add Selected Data to Data Set

@@ -11,6 +11,9 @@
     dojo.require("dijit.layout.TabContainer");
     dojo.require("voeis.ui.SitePane");
     dojo.require("voeis.ui.ProjectSitesGrid");
+    //dojo.require("yogo.maps.google");    
+  
+    //yogo.maps.google.load();
     
     projectsDataStore = voeis.Server.DEFAULT.projectsDataStore();
     
@@ -133,7 +136,9 @@
           onDownloadEnd: function(){
             console.log('load-done-NOW: ');
             console.log('TEST-'+TEST);
-            graphInit(varId,varName);
+            console.log('VAR DOWNLOAD!');
+            initPage();
+            //graphInit(varId,varName);
           },
           href: "/projects/"+projectId+"/variables/"+varId+".html?&site_id="+siteId});
         tabs.addChild(varPane);
@@ -211,7 +216,7 @@
     });
 
     dojo.subscribe("voeis/project/variable/tab", function(projectId, varId, varName, siteId) {
-      console.log(arguments);
+      console.log('OPEN VAR:',arguments);
       var tab_browser = dijit.byId('right_tabs');
       openVarTab(tab_browser, projectId, varId, varName, siteId);
     });

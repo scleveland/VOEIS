@@ -22,7 +22,7 @@
 
 
 -########################
-- edit_auth = current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project)
+- edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project))
 -#- site_id = @site.nil? ? 0 : @site.id
 -# tabId = @project.id.to_s+'-site'+site_id.to_s+'-data'
 -#- tabId = 'site'+site_id.to_s+'_data'
@@ -1623,7 +1623,6 @@
       //tabs.tabStrip = false;
       var projVarLoad = function(varId,varName) {
         initPage();
-        //if(parseInt(varId)) graphInit(varId,varName);
         
       };
       openProjTab(tabs, projVarHref, projVarId, tabTitle, projVarLoad);
@@ -1683,7 +1682,7 @@
           title: tabTitle,
           style: "margine-top:0;padding-top:0;",
           closable: true,
-          parseOnLoad: false,
+          //parseOnLoad: false,
         	executeScripts: true,
       	  ioArgs: { headers: {"Accept": "text/html"} },
           store: voeis.Server.DEFAULT,
@@ -1691,7 +1690,7 @@
             console.log('tab-load-done-NOW!');
             if(window.tab_pre_dojo_parse) tab_pre_dojo_parse();
             console.log('NOW parse dijits');
-            dojo.parser.parse(this.domNode);
+            //dojo.parser.parse(this.domNode);
             console.log('TEST-'+TEST);
             tabLoad();
           },
@@ -1706,6 +1705,7 @@
       tabs.selectChild(pane);
     };
 
+    /*** NOT USED!?
     var openSitesGridTab = function(tabs, projectId) {
       var sitesGrid = new dojox.grid.EnhancedGrid({
         title: projectId,
@@ -1720,6 +1720,7 @@
       tabs.addChild(sitesGrid);
       tabs.selectChild(sitesGrid);
     };
+    ***/
 
     //#############
 

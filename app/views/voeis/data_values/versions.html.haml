@@ -1,5 +1,6 @@
 -# DATA VALUE VERSIONS PANE
 :javascript
+  dojoConfig = { parseOnLoad: false };
   dojo.require("dojox.grid.EnhancedGrid");
   dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
   dojo.require("dojox.grid.enhanced.plugins.Filter");
@@ -13,7 +14,8 @@
     if(window.name=='HISTORY') {
       $('#top').css('display','none');
       $('#bottom').css('display','none');
-      $('#main_container').css('top','10px');
+      $('#main_container').css('top','0');
+      $('#main_container').css('padding-top','10px');
       $('#main_container').css('height','100%');
       
     };
@@ -28,20 +30,22 @@
   };
   
   // SAVE CALLBACKs for ITEM ROLLBACK
-  function cv_item_restore(item) {
+  function item_restore(item) {
+    console.log('ROLLBACK:',item);
     if(window.name=='HISTORY') {
-      var goto = window.opener.cv_item_restore0;
+      var goto = window.opener.dv_item_restore;
+      var refresh = window.opener.dv_grid_refresh;
       window.close();
-      goto(item, window.location.reload);
+      goto(item, refresh);
       //window.opener.cv_item_restore0(item, window.location.reload);
     } else {
-      cv_item_restore0(item);
+      dv_item_restore(item);
       window.location.reload();
     };
   };
   
   // SAVE CALLBACK for ITEM ROLLBACK
-  function item_restore(item) {
+  function item_restore00(item) {
     console.log('ROLLBACK:',item);
     var var_id = item.id;
     var varPane = window['site'+item.id+'ref'];
@@ -97,11 +101,13 @@
                                 @data_value.local_date_time.strftime("%Y-%m-%d %H:%M:%S"),
                                 @data_value.data_value.to_s]
 
+
 %strong
   SHOW DATA VALUE VERSIONS
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/datavalue/history/update', [#{@variable.id},#{@site.id}]);")
+= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
+//= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/datavalue/history/update', [#{@variable.id},#{@site.id}]);")
 %br
 
 
@@ -115,6 +121,4 @@
                                         :properties=>@ver_properties,
                                         :restore_callback=>"item_restore",
                                         :user=>current_user
-
-
 

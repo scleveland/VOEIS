@@ -122,7 +122,7 @@ class Voeis::DataValuesController < Voeis::BaseController
       temp[:published_string] = ver.published ? "YES" : "NO"
       temp[:vertical_offset_range] = "-none-"
       temp[:vertical_offset_range] = ver.vertical_offset.to_s if !@data_value.vertical_offset.nil?
-      temp[:vertical_offset_range] += "&ndash;"+ver.end_vertical_offset.to_s if !ver.end_vertical_offset.nil?
+      temp[:vertical_offset_range] += " - "+ver.end_vertical_offset.to_s if !ver.end_vertical_offset.nil?
       temp[:datetime_string] = ver.local_date_time.strftime("%Y-%m-%d %H:%M:%S ")
       tz0 = ver.utc_offset.to_s.split('.')
       tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+tz0[0].to_i.abs.to_s)[-2,2]+':'

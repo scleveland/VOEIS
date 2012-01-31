@@ -7,7 +7,7 @@
 -# tabId = @project.id.to_s+'-site'+site_id.to_s+'-data'
 - tabId = 'site'+site_id.to_s+'_data'
 -#- edit_auth = true
-- edit_auth = current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project)
+- edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project))
 
 
 -#- content_for(:javascripts) do
@@ -62,6 +62,53 @@
       edit_data_value_content = content.html();
       console.log('CONTENT:',content);
       content.empty();
+    };
+
+    // NICE Dijit ConfirmDialog
+    function confirmDialog(title, body, callbackFn, options) {
+      var theDialog = new dijit.Dialog({
+        id: 'confirmDialog',
+        title: title,
+        draggable: false,
+        style: 'width:220px;',
+        onHide: function() {
+          theDialog.destroyRecursive();
+        }
+      });
+      for(var prop in options) theDialog.attr(prop,options[prop]);
+      
+      var callback = function(yes) {
+        theDialog.hide();
+        theDialog.destroyRecursive(false);
+        callbackFn(yes);
+      };
+      
+      var message = dojo.create("p", {
+        style: {
+          marginTop: "5px"
+        },
+        innerHTML: body
+      });
+      var btnsDiv = dojo.create("div", {
+        style: {
+          textAlign: "center"
+        }
+      });
+      var okBtn = new dijit.form.Button({label: theDialog.buttonOk, 
+        id: "confirmDialogOKButton", 
+        style: "margin:5px 10px;",
+        onClick: function(){ callback(true) } });
+      var cancelBtn = new dijit.form.Button({label: theDialog.buttonCancel, 
+        id: "confirmDialogCancelButton", 
+        style: "margin:5px 10px;",
+        onClick: function(){ callback(false) } });
+      
+      theDialog.containerNode.appendChild(message);
+      theDialog.containerNode.appendChild(btnsDiv);
+      btnsDiv.appendChild(okBtn.domNode);
+      btnsDiv.appendChild(cancelBtn.domNode);
+
+      theDialog.show();
     };
   
     // DOJO STORE FUNCTIONS
@@ -542,5 +589,5 @@
     return false;
     });
     });
--if current_user.projects.include?(@project)
+-if !current_user.nil? && current_user.projects.include?(@project)
   = render(:partial => "data_set", :locals =>{:project_uid=>@project.id})
