@@ -1682,7 +1682,7 @@
           title: tabTitle,
           style: "margine-top:0;padding-top:0;",
           closable: true,
-          parseOnLoad: false,
+          //parseOnLoad: false,
         	executeScripts: true,
       	  ioArgs: { headers: {"Accept": "text/html"} },
           store: voeis.Server.DEFAULT,
@@ -1690,7 +1690,7 @@
             console.log('tab-load-done-NOW!');
             if(window.tab_pre_dojo_parse) tab_pre_dojo_parse();
             console.log('NOW parse dijits');
-            dojo.parser.parse(this.domNode);
+            //dojo.parser.parse(this.domNode);
             console.log('TEST-'+TEST);
             tabLoad();
           },
@@ -1705,6 +1705,7 @@
       tabs.selectChild(pane);
     };
 
+    /*** NOT USED!?
     var openSitesGridTab = function(tabs, projectId) {
       var sitesGrid = new dojox.grid.EnhancedGrid({
         title: projectId,
@@ -1719,6 +1720,7 @@
       tabs.addChild(sitesGrid);
       tabs.selectChild(sitesGrid);
     };
+    ***/
 
     //#############
 

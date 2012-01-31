@@ -276,7 +276,7 @@
         //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
         var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
         var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit('+idx+');return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
-        var delete_link = '<a href="javascript:" onclick="return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
+        var delete_link = '<a href="javascript:" onclick="dv_item_delete('+idx+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
         var spaces = '&nbsp;';
         //if(item.used[0]) return spaces+hist_link;
         //return spaces+hist_link+spaces+delete_link;
@@ -432,6 +432,43 @@
 
     // append the new grid to the div " ":
     //dojo.byId("gridContainer").appendChild(val_grid.domNode);
+    
+    //GRID CONTROL FUNCTIONS
+    function dv_item_restore(item,callback){
+      console.log('DV ROLLBACK:',item);
+      var data = {data_value: item};
+      var id = item.id;
+      $.ajax({
+        type: 'PUT',
+        url: '/projects/#{@project.id}/data_values/'+id+'.json?api_key=#{current_user.api_key}',
+        data: data,
+        dataType: 'json',
+        success: function(dat){
+          callback(dat);
+        }
+      });
+    };
+    function dv_grid_refresh(data){
+      datastore.update(data,#{dataId}.val_store);
+      //### Refresh
+      #{dataId}.val_grid.update();
+      //#{dataId}.plot.update();
+    };
+    function dv_item_delete(idx){
+      var item = #{dataId}.val_grid.getItem(idx);
+      confirmDialog('Confirm Rollback &mdash;',
+        'ARE YOU SURE?\n<br/>DELETE DATA VALUE: \n<br/>'+item.data_value,
+        function(yes){
+          console.log('CONFIRM:',yes);
+          if(!yes) return;
+          //ITEM SAVE CALLBACK
+          datastore.update(item,#{dataId}.val_store);
+          //### Refresh
+          #{dataId}.val_grid.update();
+          //#{dataId}.plot.update();
+        }, 
+        { buttonOk:'YES', buttonCancel:'Cancel' });
+    };
     
     
     $('##{tabId}_search_results #gridContainer').append(#{dataId}.val_grid.domNode);
