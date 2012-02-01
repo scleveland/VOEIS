@@ -1,168 +1,175 @@
 %h1 Search Results
-#center  
-  #fig
-    :plain
-      <script type="text/javascript+protovis">
-      $(window).ready(function(){ 
-      var cars = #{@parallel_results.to_json}
+-if @parallel_results.count < 500
+  #center  
+    #fig
+      :plain
+        <script type="text/javascript+protovis">
+        $(window).ready(function(){ 
+        var cars = #{@parallel_results.to_json}
 
-      var units = {
-        timestamp: {name: "DateTime", unit: "Unix seconds"},
-        #{@variables.map{|v| 'var_%s: {name:"%s", unit: "%s"}' % [v.id, v.variable_name, ""] }.join(",")}
-      }
+        var units = {
+          timestamp: {name: "DateTime", unit: ""},
+          #{@variables.map{|v| 'var_%s: {name:"%s", unit: "%s"}' % [v.id, v.variable_name, ""] }.join(",")}
+        }
 
-      var dims = pv.keys(units);
+        var dims = pv.keys(units);
 
-      /* Sizing and scales. */
-      var w = 1000,
-          h = 350,
-          fudge = 0.5,
-          x = pv.Scale.ordinal(dims).splitFlush(0, w),
-          y = pv.dict(dims, function(t) pv.Scale.linear(
-              cars.filter(function(d) !isNaN(d[t])),
-              function(d) Math.floor(d[t])-fudge,
-              function(d) Math.ceil(d[t]) +fudge
-              ).range(0, h)),
-          c = pv.dict(dims, function(t) pv.Scale.linear(
-              cars.filter(function(d) !isNaN(d[t])),
-              function(d) Math.floor(d[t])-fudge,
-              function(d) Math.ceil(d[t]) +fudge
-              ).range("steelblue", "brown"));
+        /* Sizing and scales. */
+        var w = 1000,
+            h = 350,
+            fudge = 0.5,
+            x = pv.Scale.ordinal(dims).splitFlush(0, w),
+            y = pv.dict(dims, function(t) pv.Scale.linear(
+                cars.filter(function(d) !isNaN(d[t])),
+                function(d) Math.floor(d[t])-fudge,
+                function(d) Math.ceil(d[t]) +fudge
+                ).range(0, h)),
+            c = pv.dict(dims, function(t) pv.Scale.linear(
+                cars.filter(function(d) !isNaN(d[t])),
+                function(d) Math.floor(d[t])-fudge,
+                function(d) Math.ceil(d[t]) +fudge
+                ).range("steelblue", "brown"));
 
-      /* Interaction state. */
-      var filter = pv.dict(dims, function(t) {
-          return {min: y[t].domain()[0], max: y[t].domain()[1]};
-        }), active = "timestamp";
+        /* Interaction state. */
+        var filter = pv.dict(dims, function(t) {
+            return {min: y[t].domain()[0], max: y[t].domain()[1]};
+          }), active = "timestamp";
 
-      /* The root panel. */
-      var vis = new pv.Panel()
-          .width(w)
-          .height(h)
-          .left(30)
-          .right(30)
-          .top(30)
-          .bottom(20);
+        /* The root panel. */
+        var vis = new pv.Panel()
+            .width(w)
+            .height(h)
+            .left(30)
+            .right(30)
+            .top(30)
+            .bottom(20);
 
-      // The parallel coordinates display.
-      vis.add(pv.Panel)
-          .data(cars)
-          .visible(function(d) dims.every(function(t)
-              (d[t] >= filter[t].min) && (d[t] <= filter[t].max)))
-        .add(pv.Line)
-          .data(dims)
-          .left(function(t, d) x(t))
-          .bottom(function(t, d) y[t](d[t]))
-          .strokeStyle("#ddd")
-          .lineWidth(1)
-          .antialias(false);
+        // The parallel coordinates display.
+        vis.add(pv.Panel)
+            .data(cars)
+            .visible(function(d) dims.every(function(t)
+                (d[t] >= filter[t].min) && (d[t] <= filter[t].max)))
+          .add(pv.Line)
+            .data(dims)
+            .left(function(t, d) x(t))
+            .bottom(function(t, d) y[t](d[t]))
+            .strokeStyle("#ddd")
+            .lineWidth(1)
+            .antialias(false);
 
-      // Rule per dimension.
-      rule = vis.add(pv.Rule)
-          .data(dims)
-          .left(x);
+        // Rule per dimension.
+        rule = vis.add(pv.Rule)
+            .data(dims)
+            .left(x);
 
-      // Dimension label
-      rule.anchor("top").add(pv.Label)
-          .top(-12)
-          .font("bold 10px sans-serif")
-          .text(function(d) units[d].name);
+        // Dimension label
+        rule.anchor("top").add(pv.Label)
+            .top(-12)
+            .font("bold 9px sans-serif")
+            .text(function(d) units[d].name);
 
-      // The parallel coordinates display.
-      var change = vis.add(pv.Panel);
+        // The parallel coordinates display.
+        var change = vis.add(pv.Panel);
 
-      var line = change.add(pv.Panel)
-          .data(cars)
-          .visible(function(d) dims.every(function(t)
-              (d[t] >= filter[t].min) && (d[t] <= filter[t].max)))
-        .add(pv.Line)
-          .data(dims)
-          .left(function(t, d) x(t))
-          .bottom(function(t, d) y[t](d[t]))
-          .strokeStyle(function(t, d) c[active](d[active]))
-          .lineWidth(1);
+        var line = change.add(pv.Panel)
+            .data(cars)
+            .visible(function(d) dims.every(function(t)
+                (d[t] >= filter[t].min) && (d[t] <= filter[t].max)))
+          .add(pv.Line)
+            .data(dims)
+            .left(function(t, d) x(t))
+            .bottom(function(t, d) y[t](d[t]))
+            .strokeStyle(function(t, d) c[active](d[active]))
+            .lineWidth(1);
 
-      // Updater for slider and resizer.
-      function update(d) {
-        var t = d.dim;
-        filter[t].min = Math.max(y[t].domain()[0], y[t].invert(h - d.y - d.dy));
-        filter[t].max = Math.min(y[t].domain()[1], y[t].invert(h - d.y));
-        active = t;
-        change.render();
-        return false;
-      }
-
-      // Updater for slider and resizer.
-      function selectAll(d) {
-        if (d.dy < 3) {
+        // Updater for slider and resizer.
+        function update(d) {
           var t = d.dim;
-          filter[t].min = Math.max(y[t].domain()[0], y[t].invert(0));
-          filter[t].max = Math.min(y[t].domain()[1], y[t].invert(h));
-          d.y = 0; d.dy = h;
+          filter[t].min = Math.max(y[t].domain()[0], y[t].invert(h - d.y - d.dy));
+          filter[t].max = Math.min(y[t].domain()[1], y[t].invert(h - d.y));
           active = t;
           change.render();
+          return false;
         }
-        return false;
-      }
 
-      /* Handle select and drag */
-      var handle = change.add(pv.Panel)
-          .data(dims.map(function(dim) { return {y:0, dy:h, dim:dim}; }))
-          .left(function(t) x(t.dim) - 30)
-          .width(60)
-          .fillStyle("rgba(0,0,0,.001)")
-          .cursor("crosshair")
-          .event("mousedown", pv.Behavior.select())
-          .event("select", update)
-          .event("selectend", selectAll)
-        .add(pv.Bar)
-          .left(25)
-          .top(function(d) d.y)
-          .width(10)
-          .height(function(d) d.dy)
-          .fillStyle(function(t) t.dim == active
-              ? c[t.dim]((filter[t.dim].max + filter[t.dim].min) / 2)
-              : "hsla(0,0,50%,.5)")
-          .strokeStyle("white")
-          .cursor("move")
-          .event("mousedown", pv.Behavior.drag())
-          .event("dragstart", update)
-          .event("drag", update);
-
-      handle.anchor("bottom").add(pv.Label)
-          .textBaseline("top")
-          .text(function(d) filter[d.dim].min.toFixed(0) + units[d.dim].unit);
-
-      handle.anchor("top").add(pv.Label)
-          .textBaseline("bottom")
-          .text(function(d) filter[d.dim].max.toFixed(0) + units[d.dim].unit);
-
-      vis.render();
-      });
-          </script>
-          <style type="text/css">
-
-          #fig {
-            width: 1200px;
-            height: 400px;
-            position: relative;
-            margin: auto;
+        // Updater for slider and resizer.
+        function selectAll(d) {
+          if (d.dy < 3) {
+            var t = d.dim;
+            filter[t].min = Math.max(y[t].domain()[0], y[t].invert(0));
+            filter[t].max = Math.min(y[t].domain()[1], y[t].invert(h));
+            d.y = 0; d.dy = h;
+            active = t;
+            change.render();
           }
+          return false;
+        }
 
-          #title {
-            position: absolute;
-            top: 70px;
-            left: 200px;
-            padding: 10px;
-            background: white;
-          }
+        /* Handle select and drag */
+        var handle = change.add(pv.Panel)
+            .data(dims.map(function(dim) { return {y:0, dy:h, dim:dim}; }))
+            .left(function(t) x(t.dim) - 30)
+            .width(60)
+            .fillStyle("rgba(0,0,0,.001)")
+            .cursor("crosshair")
+            .event("mousedown", pv.Behavior.select())
+            .event("select", update)
+            .event("selectend", selectAll)
+          .add(pv.Bar)
+            .left(25)
+            .top(function(d) d.y)
+            .width(10)
+            .height(function(d) d.dy)
+            .fillStyle(function(t) t.dim == active
+                ? c[t.dim]((filter[t.dim].max + filter[t.dim].min) / 2)
+                : "hsla(0,0,50%,.5)")
+            .strokeStyle("white")
+            .cursor("move")
+            .event("mousedown", pv.Behavior.drag())
+            .event("dragstart", update)
+            .event("drag", update);
 
-          large {
-            font-size: medium;
-          }
-       </style>
+        handle.anchor("bottom").add(pv.Label)
+            .textBaseline("top")
+            .text(function(d) filter[d.dim].min.toFixed(0) + units[d.dim].unit);
+
+        handle.anchor("top").add(pv.Label)
+            .textBaseline("bottom")
+            .text(function(d) filter[d.dim].max.toFixed(0) + units[d.dim].unit);
+
+        vis.render();
+        });
+            </script>
+            <style type="text/css">
+
+            #fig {
+              width: 1200px;
+              height: 400px;
+              position: relative;
+              margin: auto;
+            }
+
+            #title {
+              position: absolute;
+              top: 70px;
+              left: 200px;
+              padding: 10px;
+              background: white;
+            }
+
+            large {
+              font-size: medium;
+            }
+         </style>
 
 #searchGrid{:style=>"width:auto;height:500px;"}
-
+%button{:dojoType=>"dijit.form.Button",:onclick=>"exportAll()"}
+  Export all to CSV</button>
+%button{:dojoType=>"dijit.form.Button",:onclick=>"exportSelected()"}
+  Export Selected Rows to CSV
+=form_tag 'search/export' do 
+  =hidden_field_tag('data')
+%textarea{:id=>"output"}
 :javascript
   dojo.require("dijit.dijit");
   dojo.require("dijit.form.Button");
@@ -171,6 +178,7 @@
   dojo.require("dojox.grid.enhanced.plugins.Filter");
   dojo.require("dijit.layout.TabContainer");
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+  dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
   dojo.require("dojo.data.ItemFileWriteStore");
   var units = #{@unit_names.to_json}
 
@@ -192,9 +200,29 @@
        formatter: val_grid_formatter.dateTime,
        width: '100px'
     },
-    #{@variables.map{|v| '{field:"%s", name: "%s", width:"100px"}' % [v.id, v.variable_name] }.join(',')}
+    #{@variables.map{|v| '{field:"%s", name: "%s (%s)", width:"100px"}' % [v.id, v.variable_name.gsub(",","-"),@unit_names[v.variable_units_id] ]}.join(',')}
   ];
 
+  function exportAll(){
+      //csv_string=""
+      //for (s in data_layout){
+      //  csv_string = csv_string + '"'+data_layout[s][:name]+'",'
+      //}
+      //csv_string = csv_string.substring(0, str.length - 1);
+      //csv_string = csv_string + "\n"
+      searchGrid.exportGrid("csv", function(str){
+          dojo.byId("data").value = str;
+          document.forms[0].submit()
+      });
+  };
+  
+  function exportSelected(){
+      searchGrid.exportSelected("csv",function(str){
+          dojo.byId("data").value = str;
+          document.forms[0].submit()
+      });
+  };
+  
   // create a new site grid:
   searchGrid = new dojox.grid.EnhancedGrid({
      store: data_store,
@@ -202,7 +230,7 @@
      rowSelector: '20px',
      structure: data_layout,
      style: 'width:95%;',
-     plugins: {filter:true, indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"}},
+     plugins: {filter:true, exporter: true, indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"}},
       onClick: function(ev) {
         this.grid_click = ev;
       },

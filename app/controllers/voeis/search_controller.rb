@@ -8,6 +8,9 @@ class Voeis::SearchController < Voeis::BaseController
     @units = Voeis::Unit.all
     @unit_names = Hash.new
     @units.map{|u| @unit_names = @unit_names.merge({u.id => u.units_name})}
+    @start_date = parent.managed_repository{Voeis::SiteDataCatalog.first(:order=>[:starting_timestamp])}
+    @end_date = parent.managed_repository{Voeis::SiteDataCatalog.last(:order=>[:ending_timestamp], :ending_timestamp.not => nil)}
+    debugger
   end
   
   def index
@@ -15,7 +18,9 @@ class Voeis::SearchController < Voeis::BaseController
     variable_ids = params[:var_ids].split(',')
     start_date   = params[:start_date]
     end_date     = params[:end_date]
-    
+    @units = Voeis::Unit.all
+    @unit_names = Hash.new
+    @units.map{|u| @unit_names = @unit_names.merge({u.id => u.units_abbreviation})}
     data = ""
     @variables = ""
     parent.managed_repository do
@@ -33,8 +38,8 @@ class Voeis::SearchController < Voeis::BaseController
     data.each do |d|
       results[d.local_date_time] ||= {}
       results[d.local_date_time][d.variable_id] = d.data_value
-      presults[d.local_date_time.to_i] ||= {}
-      presults[d.local_date_time.to_i]["var_#{d.variable_id}"] = d.data_value
+      presults[d.local_date_time.strftime("%Y%m%d%H%M").to_i] ||= {}
+      presults[d.local_date_time.strftime("%Y%m%d%H%M").to_i]["var_#{d.variable_id}"] = d.data_value
       @variables << d.variable unless @variables.include?(d.variable)
     end
     null_variables={}
@@ -52,6 +57,14 @@ class Voeis::SearchController < Voeis::BaseController
     # @variables = parent.managed_repository {
     #   Voeis::Variable.all(:id => variable_ids)
     # }
+  end
+  
+  #export the results of search/browse to a csv file
+  def export
+    filename ="voeis_data.csv"
+    send_data(params[:data],
+      :type => 'text/csv; charset=utf-8; header=present',
+      :filename => filename)
   end
 
 end
