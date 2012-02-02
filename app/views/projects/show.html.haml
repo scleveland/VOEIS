@@ -214,9 +214,30 @@
     
     // DOJO STORE FUNCTIONS
     var datastore = {
+      // CONSTANTS
       date_format: 'yyyy-mm-dd HH:MM:ss', // format for create/update dates
+      store_default: psites,  // default store if not in call
+      // CONVERT DATASTORE ITEM TO PLAIN ITEM
+      item: function(item) {
+        for(prop in item)
+          item[prop] = this.value(item[prop]);
+        return item;
+      },
+      // CONVERT DATASTORE VALUE TO PLAIN VALUE
+      value: function(val) {
+        if(typeof val=='object' && val.hasOwnProperty(0))
+          return val[0];
+        return val;
+      },
+      // SET IDX IF THE STORE HAS IT??!
+      set_idx: function(item, item_store) {
+        var store = item_store || this.store_default;
+        if(store._arrayOfAllItems[0].hasOwnProperty('idx')) 
+          item['idx'] =  store._arrayOfAllItems.length;
+      },
       // DOJO STORE RAW FETCH
-      get_raw: function(id, store) {
+      get_raw: function(id, item_store) {
+        var store = item_store || this.store_default;
         var myitem = {};
         store.fetch({query: {id: parseInt(id.toString())},
           onItem: function(item) {
@@ -230,17 +251,14 @@
         return myitem;
       },
       // DOJO STORE FETCH (no array wrapping)
-      get: function(id, store) {
-        var myitem = {};
+      get: function(id, item_store) {
+        var store = item_store || this.store_default;
         var item = this.get_raw(id, store);
-        for(prop in item) {
-          if(item[prop]==null) myitem[prop] = null;
-          else myitem[prop] = item[prop][0];
-        };
-        return myitem;
+        return this.item(item);
       },
-      // CREATE RESULT IN DOJO STORE
-      new: function(item, store) {
+      // CREATE NEW ITEM IN DOJO STORE
+      new: function(item, item_store) {
+        var store = item_store || this.store_default;
         if(store._arrayOfAllItems[0].hasOwnProperty('idx')) 
           item['idx'] =  store._arrayOfAllItems.length;
         //item['used'] = false;
@@ -260,27 +278,20 @@
             onError: function(error) { console.log('STORE SAVE ERROR:',error) }
           });
       },
-      // UPDATE DOJO STORE FROM RESULT
-      update: function(new_item, store) {
+      // UPDATE DOJO STORE FROM NEW_ITEM (MUST HAVE ID)
+      update: function(new_item, item_store) {
+        var store = item_store || this.store_default;
         d = new Date();
         new_item['updated_at'] = d.format(this.date_format);
         //item['updated_at'] = dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ssZ"});
-        var item_value;
         store.fetch({query: {id: parseInt(new_item.id.toString())},
           //onComplete: function(items,request) 
           onItem: function(item) {
             //### UPDATE ATTRIBUTES
-            //if(items.length>0) 
             for(prop in new_item)
               if(item.hasOwnProperty(prop) && prop!='id')
-                if(new_item[prop]==null) store.setValue(items[0], prop, null);
-                else { try {
-                  item_value = new_item[prop][0];
-                } catch(e) {
-                  item_value = new_item[prop];
-                }
-                store.setValue(item, prop, item_value);
-                };
+                if(new_item[prop]==null) store.setValue(item, prop, null);
+                else store.setValue(item, prop, datastore.value(new_item[prop]));
           },
           onError: function(error,request) {
             console.log('ITEM UPDATE ERROR:',error);
@@ -293,12 +304,13 @@
           });
       },
       // DELETE ITEM IN DOJO STORE
-      delete: function(item, store) {
+      delete: function(item, item_store) {
+        var store = item_store || this.store_default;
         try {
           store.deleteItem(item);
         }
         catch (e) { 
-          console.log('STORE ERROR:',e);
+          console.log('STORE ERROR:',e.message);
         };
         if(store.isDirty())
           store.save({
@@ -314,7 +326,7 @@
       //    return site_data[i];
       //siteId = ''+siteId;
       console.log('GET-SITE-ID: '+siteId);
-      var site = datastore.get(siteId, psites);
+      var site = datastore.get(siteId);
       return site;
       ///////
       /***
@@ -349,7 +361,7 @@
       };
       var grid = dijit.byId('project_sites');
       grid.selection.clear();
-      pmap_refresh();
+      //pmap_refresh();
     }
     
     function pmap_new(siteId) {
