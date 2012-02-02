@@ -42,7 +42,7 @@ class Voeis::DataValuesController < Voeis::BaseController
       [:data_value,:utc_offset].each{|prop| 
         datparams[prop] = datparams[prop].to_f }
       [:value_accuracy,:vertical_offset,:end_vertical_offset].each{|prop| 
-        datparams[prop] = datparams[prop]=='' ? nil : datparams[prop].to_f }
+        datparams[prop] = datparams[prop].blank? ? nil : datparams[prop].to_f }
       datparams[:quality_control_level] = datparams[:quality_control_level].to_i
       datparams[:published] = datparams[:published]=~(/(true|t|yes|y|1)$/i) ? true : false
       
@@ -79,8 +79,84 @@ class Voeis::DataValuesController < Voeis::BaseController
   #def create
   #end
   
-  #def versions
-  #end
+  def versions
+    @project = parent
+    @data_value = @project.managed_repository{Voeis::DataValue.get(params[:id].to_i)}
+    
+    @versions = @project.managed_repository{@data_value.versions_array}
+    @site = @project.managed_repository{Voeis::Site.get(@data_value.site_id.to_i)}
+    @variable = @project.managed_repository{Voeis::Variable.get(@data_value.variable_id.to_i)}
+    
+    @data_refs = []
+    temp = {}
+    temp[:site] = "-none-"
+    temp[:variable] = '-none-'
+    #if !@site.nil?
+    #  temp[:site] = "%s [Id:%s]"% @site.to_hash.values_at(:name,:id)
+    #end
+    #if !@variable.nil?
+    #  temp[:variable] = "%s [Id:%s]"% @variable.to_hash.values_at(:variable_name,:id)
+    #end
+    temp[:published_string] = @data_value.published ? "YES" : "NO"
+    temp[:vertical_offset_range] = "-none-"
+    temp[:vertical_offset_range] = @data_value.vertical_offset.to_s if !@data_value.vertical_offset.nil?
+    temp[:vertical_offset_range] += " - "+@data_value.end_vertical_offset.to_s if !@data_value.end_vertical_offset.nil?
+    #temp[:datetime_string] = "-none-"
+    temp[:datetime_string] = @data_value.local_date_time.strftime("%Y-%m-%d %H:%M:%S ")
+    tz0 = @data_value.utc_offset.to_s.split('.')
+    tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+tz0[0].to_i.abs.to_s)[-2,2]+':'
+    tz += tz0.count>1 ? ('0'+((('.'+tz0[1]).to_f*100).to_i*0.6).to_i.to_s)[-2,2] : '00'
+    
+    temp[:datetime_string] += tz+@data_value.date_time_utc.strftime(" [%Y-%m-%d %H:%M:%S UTC]")
+    @data_refs << temp
+    @versions.each{|ver| 
+      temp = {}
+      temp[:site] = "-none-"
+      temp[:variable] = '-none-'
+      #if !Voeis::Site.get(@data_value.site_id).nil?
+      #  temp[:site] = "%s [Id:%s]"% Voeis::Site.get(@data_value.site_id).to_hash.values_at(:name,:id)
+      #end
+      #if !Voeis::Variable.get(@data_value.variable_id).nil?
+      #  temp[:variable] = "%s [Id:%s]"% Voeis::Variable.get(@data_value.variable_id).to_hash.values_at(:variable_name,:id)
+      #end
+      temp[:published_string] = ver.published ? "YES" : "NO"
+      temp[:vertical_offset_range] = "-none-"
+      temp[:vertical_offset_range] = ver.vertical_offset.to_s if !@data_value.vertical_offset.nil?
+      temp[:vertical_offset_range] += " - "+ver.end_vertical_offset.to_s if !ver.end_vertical_offset.nil?
+      temp[:datetime_string] = ver.local_date_time.strftime("%Y-%m-%d %H:%M:%S ")
+      tz0 = ver.utc_offset.to_s.split('.')
+      tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+tz0[0].to_i.abs.to_s)[-2,2]+':'
+      tz += tz0.count>1 ? ('0'+((('.'+tz0[1]).to_f*100).to_i*0.6).to_i.to_s)[-2,2] : '00'
+      temp[:datetime_string] += tz+ver.date_time_utc.strftime(" [%Y-%m-%d %H:%M:%S UTC]")
+      @data_refs << temp
+    }
+
+    @ver_properties = [
+#      {:label=>"Version", :name=>"version"},
+#      {:label=>"Value ID", :name=>"id"},
+#      {:label=>"Site", :name=>"site"},
+#      {:label=>"Variable", :name=>"variable"},
+      {:label=>"Date/Time", :name=>"datetime_string", :contains=>["local_date_time","date_time_utc","utc_offset"]},
+      {:label=>"Data Value", :name=>"data_value"},
+      {:label=>"String Value", :name=>"string_value"},
+      {:label=>"Data Type", :name=>"datatype"},
+      {:label=>"Value Accuracy", :name=>"value_accuracy"},
+#      {:label=>"Date/Time", :name=>"datetime_local"},
+#      {:label=>"UTC offset", :name=>"utc_offset"},
+#      {:label=>"UTC Date/Time", :name=>"datetime_utc"},
+      {:label=>"Vertical Offset", :name=>"vertical_offset_range", :contains=>["vertical_offset","end_vertical_offset"]},
+#      {:label=>"Vertical Offset", :name=>"vertical_offset"},
+#      {:label=>"End Vertical Offset", :name=>"end_vertical_offset"},
+      {:label=>"Replicate", :name=>"replicate"},
+      {:label=>"Q/C level", :name=>"quality_control_level"},
+      {:label=>"Published", :name=>"published_string", :contains=>["published"]},
+      {:label=>"File Name", :name=>"filename"}
+#      {:label=>"Updated By", :name=>"updated_by_name"},
+#      {:label=>"Update Comment", :name=>"updated_comment"},
+#      {:label=>"Provenance Comment", :name=>"provenance_comment"}
+      ]
+    ###
+  end
   
   
   # Gather information necessary to store sample data

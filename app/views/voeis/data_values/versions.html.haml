@@ -1,5 +1,6 @@
 -# DATA VALUE VERSIONS PANE
 :javascript
+  dojoConfig = { parseOnLoad: false };
   dojo.require("dojox.grid.EnhancedGrid");
   dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
   dojo.require("dojox.grid.enhanced.plugins.Filter");
@@ -7,8 +8,44 @@
   dojo.require("dijit.layout.TabContainer");
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
   
-  // SAVE CALLBACK for ITEM ROLLBACK
+  // ON LOAD
+  $(window).ready(function(){ 
+    //##### 
+    if(window.name=='HISTORY') {
+      $('#top').css('display','none');
+      $('#bottom').css('display','none');
+      $('#main_container').css('top','0');
+      $('#main_container').css('padding-top','10px');
+      $('#main_container').css('height','100%');
+      
+    };
+  });
+  
+  // GO BACK or if no history- CLOSE WINDOW
+  function back_or_close() {
+    if(window.name=='HISTORY')
+      window.close();
+    else
+      window.history.back();
+  };
+  
+  // SAVE CALLBACKs for ITEM ROLLBACK
   function item_restore(item) {
+    console.log('ROLLBACK:',item);
+    if(window.name=='HISTORY') {
+      var goto = window.opener.dv_item_restore;
+      var refresh = window.opener.dv_grid_refresh;
+      window.close();
+      goto(item, refresh);
+      //window.opener.cv_item_restore0(item, window.location.reload);
+    } else {
+      dv_item_restore(item);
+      window.location.reload();
+    };
+  };
+  
+  // SAVE CALLBACK for ITEM ROLLBACK
+  function item_restore00(item) {
     console.log('ROLLBACK:',item);
     var var_id = item.id;
     var varPane = window['site'+item.id+'ref'];
@@ -59,13 +96,18 @@
 %h3{:style=>"margin-top:0;"}
   %span.small{:style=>"font-size:14px;"}
     HISTORY: 
-  = 'site-%s/%s [%s]'%[@site.id,@variable.variable_name,@data_value.,@data_value.string_value]
+  = 'site-%s / %s [%s / %s]'% [@site.id,
+                                @variable.variable_name,
+                                @data_value.local_date_time.strftime("%Y-%m-%d %H:%M:%S"),
+                                @data_value.data_value.to_s]
+
 
 %strong
   SHOW DATA VALUE VERSIONS
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/datavalue/history/update', [#{@variable.id},#{@site.id}]);")
+= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
+//= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/datavalue/history/update', [#{@variable.id},#{@site.id}]);")
 %br
 
 
@@ -75,10 +117,8 @@
                                         :versions=>@versions,
                                         :unique_id=>"%s_datavalue%s"%[projId,@data_value.id],
                                         :unique_jsid=>"%s_datavalue%s"%[projId.tr('-','$'),@data_value.id],
-                                        :item_refs=>@var_refs,
+                                        :item_refs=>@data_refs,
                                         :properties=>@ver_properties,
                                         :restore_callback=>"item_restore",
                                         :user=>current_user
-
-
 

@@ -1,4 +1,6 @@
 :javascript
+  dojoConfig = { parseOnLoad: false };
+  console.log('JAVASCRIPT:LOADING!');
   dojo.require("dojox.grid.EnhancedGrid");
   dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
   dojo.require("dojox.grid.enhanced.plugins.Filter");
@@ -19,6 +21,53 @@
     data: versions_json_#{@unique_jsid}
   });
   
+  // NICE Dijit ConfirmDialog
+  function confirmDialog(title, body, callbackFn, options) {
+    var theDialog = new dijit.Dialog({
+      id: 'confirmDialog',
+      title: title,
+      draggable: false,
+      style: 'width:220px;',
+      onHide: function() {
+        theDialog.destroyRecursive();
+      }
+    });
+    for(var prop in options) theDialog.attr(prop,options[prop]);
+    
+    var callback = function(yes) {
+      theDialog.hide();
+      theDialog.destroyRecursive(false);
+      callbackFn(yes);
+    };
+    
+    var message = dojo.create("p", {
+      style: {
+        marginTop: "5px"
+      },
+      innerHTML: body
+    });
+    var btnsDiv = dojo.create("div", {
+      style: {
+        textAlign: "center"
+      }
+    });
+    var okBtn = new dijit.form.Button({label: theDialog.buttonOk, 
+      id: "confirmDialogOKButton", 
+      style: "margin:5px 10px;",
+      onClick: function(){ callback(true) } });
+    var cancelBtn = new dijit.form.Button({label: theDialog.buttonCancel, 
+      id: "confirmDialogCancelButton", 
+      style: "margin:5px 10px;",
+      onClick: function(){ callback(false) } });
+    
+    theDialog.containerNode.appendChild(message);
+    theDialog.containerNode.appendChild(btnsDiv);
+    btnsDiv.appendChild(okBtn.domNode);
+    btnsDiv.appendChild(cancelBtn.domNode);
+
+    theDialog.show();
+  };
+
   //### RETURN TO VERSIONS TAB
   function versionsTab(){
       var tabs = dijit.byId('history-tabs-#{@unique_id}');
@@ -30,7 +79,7 @@
   function restoreVer(ver_item){
       var item = ver_item;
       //if(!window.confirm('ARE YOU SURE?\nROLLBACK VERSION '+item.version)) return;
-      console.log('ROLLBACK?',item);
+      console.log('RAW-ROLLBACK?',item);
       confirmDialog('Confirm Rollback &mdash;',
         'ARE YOU SURE?\n<br/>ROLLBACK VERSION '+item.version,
         function(yes){
@@ -55,6 +104,16 @@
         }, 
         { buttonOk:'YES', buttonCancel:'Cancel' });
   };
+  
+  $(window).ready(function(){ 
+    console.log('DONE LOADING!!');
+    if(window.pmap_init) pmap_init();
+    //HAVE SITES?
+    if(site_data.length==0) {
+      add_sample_menu.set('disabled',true);
+      add_logger_menu.set('disabled',true);
+    };
+  });
   
 
 
@@ -114,11 +173,12 @@
         - reset_cycle
         - @ver_properties.each do |prop|
           %tr{:class=>cycle('row1','row0')}
+            - prop_dirty = (version[:dirty]&[prop[:name]]+(prop[:contains].nil? ? []:prop[:contains])).empty?
             %td{:style=>"text-align:right;width:25%;"}
-              %strong{:style=>"#{version[:dirty].include?(prop[:name])?'color:#B22800':''}"}
+              %strong{:style=>"#{prop_dirty ? '' : 'color:#B22800'}"}
                 #{prop[:label]}
             %td
-              #{version[prop[:name].to_sym]}
+              &=version[prop[:name].to_sym]
         %tr{:class=>cycle('row1','row0')}
           %td{:style=>"text-align:right;width:25%;"}
             %strong

@@ -83,6 +83,7 @@
   -#      = link_to("Edit Site", edit_project_site_path(@project,resource.id), :dojoType => "yogo.ui.MenuLink")
 
 
+-#- not_browse = (request.fullpath =~ /\/projects\/?$/).nil?
 - siteId = @site.nil? ? "site0" : "site"+@site.id.to_s
 - varId = siteId+'_var'+@variable[:id].to_s
 
@@ -103,11 +104,13 @@
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     -if @auth && @site
-      = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('##{varId}_show').hide();$('##{varId}_edit').show();")
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{@site.id}]);")
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
+      %span{:id=>"#{varId}_buttons"}
+        = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('##{varId}_show').hide();$('##{varId}_edit').show();")
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{@site.id}]);")
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    
+    
     -#= link_to('DATA', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
     -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     -#= link_to('SAMPLES', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
@@ -554,16 +557,30 @@
               Save Variable
               %script{:type=>"dojo/method", :event=>"startup"}
                 :plain
+                  var browse = false;
                   var form = #{varId}_edit_form;
                   var variable = #{@variable.to_json};
                   var var_id = parseInt(variable.id);
                   var site_id = parseInt(#{@site.nil? ? 0 : @site.id});
-                  var this_pane_id = '#{@project.id}-site'+site_id+'-var'+var_id;
-                  var this_pane = dojo.byId(this_pane_id);
-                  if(this_pane) this_pane = dijit.byNode(this_pane);
+                  var this_pane_id = '#{@project.id}-var'+var_id;
+                  var this_pane = dijit.byId(this_pane_id);
+                  if(this_pane) {
+                    browse = true
+                    var button_div = $('##{varId}_buttons');
+                    button_div.hide();
+                  } else {
+                    this_pane_id = '#{@project.id}-site'+site_id+'-var'+var_id;
+                    this_pane = dojo.byId(this_pane_id);
+                    if(this_pane) this_pane = dijit.byNode(this_pane);
+                  };
+                  
                   console.log('INIT-FORM:',form);
                   console.log('FOR VAR:',variable);
-                  console.log('THIS_PANE:',this_pane);
+                  console.log('PANE ID:',this_pane_id);
+                  console.log('THIS PANE:',this_pane);
+                  console.log('siteId=#{siteId}');
+                  console.log('varId=#{varId}');
+                  console.log('@var_id=#{@var_id}');
                   //if(parseInt(#{@var_id})) graphInit(variable.id,variable.name,#{varId}_gdata);
                   //else $('##{varId}-provenance-row').hide();
                   function cancel_edit(varID) {
@@ -592,12 +609,13 @@
                     };
                   };
                   this_pane.connect(this_pane, "onShow", function(state){
-                    if(parseInt(#{@var_id})) graphInit(site_id,variable.id,variable.name,#{varId}_gdata);
+                    //if(parseInt(#{@var_id})) 
+                    graphInit(site_id,variable.id,variable.name,#{varId}_gdata);
                   });
                   var form0 = form.domNode;
                   //var pane = dijit.byNode(dojo.byId('site00'));
                   //eval('var pane = site00ref');
-                  var site_pane = window['#{siteId}ref']
+                  //var site_pane = window['#{siteId}ref']
                   //var site = site_pane.site;
                   console.log('GO VAR_UPDATE:',this_pane);
                   //INITIALIZE: submit button
@@ -678,8 +696,10 @@
                           first: 'NA',
                           last: 'NA'};
                         site_var_data[site_id-1].append(var_data);
-                        site_pane.siteUpdate();
-                        #{varId}_cancel_edit();
+                        var site_pane = window['#{siteId}ref'];
+                        if(site_pane) site_pane.siteUpdate();
+                        //#{varId}_cancel_edit();
+                        cancel_edit('#{varId}');
                       },
                       dataType: 'json'
                     });
