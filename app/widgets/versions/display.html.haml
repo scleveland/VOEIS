@@ -86,7 +86,7 @@
           console.log('CONFIRM:',yes);
           if(!yes) return;
           item['provenance_comment'] = 'ROLLBACK VERSION '+item.version
-          console.log('VER:',item);
+          //console.log('VER:',item);
           //STRIP UNWANTED STUFF??
           delete item.version;
           //delete item.dirty;
@@ -107,12 +107,7 @@
   
   $(window).ready(function(){ 
     console.log('DONE LOADING!!');
-    if(window.pmap_init) pmap_init();
-    //HAVE SITES?
-    if(site_data.length==0) {
-      add_sample_menu.set('disabled',true);
-      add_logger_menu.set('disabled',true);
-    };
+    
   });
   
 
@@ -166,7 +161,7 @@
               %button{:dojoType=>"dijit.form.Button", :onclick=>"versionsTab();return false;"}
                 BACK TO VERSIONS
               &nbsp;&nbsp;
-              %button{:dojoType=>"dijit.form.Button", :onclick=>"restoreVer(#{version.reject{|k| @xtra.include?(k)}.to_json});return false;"}
+              %button{:dojoType=>"dijit.form.Button", :onclick=>"restoreVer(#{(version.reject{|k| @xtra.include?(k)}.merge({:id=>@item[:id]})).to_json});return false;"}
                 ROLLBACK VERSION
               -#%a{:href=>"javascript:", :onclick=>"versionsTab();return false;"}
               -#  [RETRUN TO VERSIONS TAB]

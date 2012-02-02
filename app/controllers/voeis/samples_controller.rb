@@ -147,6 +147,9 @@ class Voeis::SamplesController < Voeis::BaseController
   
   def query
     siteid = params[:site_id]
+    varid = params[:var_id]
+    dt_start = params[:start_date]
+    dt_end = params[:end_date]
     @project_uid= parent.id
     parent.managed_repository do
       @site = Voeis::Site.get(siteid) if !siteid.nil? && siteid.to_i>0
@@ -168,25 +171,28 @@ class Voeis::SamplesController < Voeis::BaseController
       end
 
       @sites = Voeis::Site.all
-        variable_opt_array = Array.new
+        @variable_opt_array = Array.new
         if !@sites.empty?
           if !@sites.all(:order => [:name.asc]).first.variables.empty?
             #variable_opt_array << ["All", "All"]
             @sites.all(:order => [:name.asc]).first.variables.each do |var|
               data_catalog = Voeis::SiteDataCatalog.first(:site_id => @sites.all(:order => [:name.asc]).first.id, :variable_id => var.id)
               if !data_catalog.starting_timestamp.nil?
-                variable_opt_array << [var.variable_name+":"+var.data_type + "(" + data_catalog.starting_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + " - " + data_catalog.ending_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + ')', var.id.to_s]
+                @variable_opt_array << [var.variable_name+":"+var.data_type + "(" + data_catalog.starting_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + " - " + data_catalog.ending_timestamp.to_date.to_formatted_s(:long).gsub('00:00','') + ')', var.id.to_s]
               else
-                variable_opt_array << [var.variable_name+":"+var.data_type, var.id.to_s]
+                @variable_opt_array << [var.variable_name+":"+var.data_type, var.id.to_s]
               end
             end
           else
-            variable_opt_array << ["None", "None"]
+            @variable_opt_array << ["None", "None"]
           end
         end
-        @variable_opts = opts_for_select(variable_opt_array)
+        @variable_opts = opts_for_select(@variable_opt_array, selected=varid)
       #end
     end
+    logger.info "######### @variable_opts"
+    logger.info @variable_opt_array
+    
     @site_opts_array = Array.new
     @sites.all(:order => [:name.asc]).each do |site|
       @site_opts_array << [site.name.capitalize+" | "+site.code, site.id.to_s]
