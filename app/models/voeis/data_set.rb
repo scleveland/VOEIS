@@ -54,8 +54,48 @@ class Voeis::DataSet
     self.data_values
   end
   
+  
+  def remove_data_values(data_value_ids)
+    int_data_value_ids = data_value_ids.map{|k| k.to_i}
+    data_sql = Array.new
+    sql=""
+    data_sql = (int_data_value_ids).map{|data_value_id| "(#{self.id},#{data_value_id})"}
+    sql=  "DELETE FROM \"voeis_data_set_data_values\" WHERE (\"data_set_id\",\"data_value_id\") IN ("
+    puts sql << data_sql.join(',')
+    sql = sql +")"
+    repository.adapter.execute(sql)
+    self.update_count
+    self.data_values
+  end
+  
   def add_user(user)
     User.first_or_create(user.attributes)
     
+  end
+  
+  def protovis_csv
+    csv_string = "local_date_time, data_value, variable_id, site_id\n"
+    self.data_values.each do |dv|
+      temp_array = Array.new()
+      temp_array<< dv.local_date_time.to_i.to_s 
+      temp_array<< dv.data_value.to_s 
+      temp_array<< dv.variable_id.to_s 
+      temp_array<< dv.site_id.to_s 
+      csv_string = csv_string + temp_array.join(',') + '\n'
+    end
+    csv_string
+  end
+  
+  def protovis_json
+    json_array = Array.new()
+    self.data_values.each do |dv|
+      temp_hash = Hash.new()
+      temp_hash[:local_date_time] = dv.local_date_time.to_i
+      temp_hash[:data_value] = dv.data_value
+      temp_hash[:variable_id] = dv.variable_id
+      temp_hash[:site_id] = dv.site_id
+      json_array << temp_hash
+    end
+    json_array.to_json
   end
 end
