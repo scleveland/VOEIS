@@ -23,7 +23,9 @@
 -# = pagination_links(@query, params[:page], 10)  
 
 -if row_array.empty?
-  Sorry.  There is no Data for your search.
+  %strong
+    %em
+      Sorry.  There is no Data for your search.
 
   :javascript
     console.log('FAILURR RESULT TABID: #{tabId}');
@@ -268,7 +270,7 @@
         //return 'TESTING-- #';
         var id = item.id[0];
         var idx = item._0;
-        console.log('GRID ITEM:',item);
+        //console.log('GRID ITEM:',item);
         var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" style="margin:0;padding:0;height:16px;" />';
         var edit_icon = '<img src="/images/icons/edit.png" alt="history icon" title="EDIT" style="margin:0;padding:0;height:16px;" />';
         var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" style="margin:0;padding:0;height:16px;" />';
@@ -281,7 +283,6 @@
         //if(item.used[0]) return spaces+hist_link;
         //return spaces+hist_link+spaces+delete_link;
         return spaces+edit_link+spaces+hist_link+spaces+delete_link;
-        //return spaces+hist_link+spaces+edit_link+spaces+delete_link;
       }
     };
 
@@ -350,6 +351,7 @@
        store: #{dataId}.val_store,
        select_click: false,
        select_item: false,
+       deselect_item: false,
        clientSort: true,
        rowSelector: '0',
        structure: val_layout,
@@ -375,10 +377,10 @@
          //this.focus.setFocusCell(col1,idx);
          //###this.selection.deselect(this.select_item);
          //if(this.select_col==this.layout.cellCount-1){
-         if(!this.select_col==0){
-           this.selection.deselect(this.select_item);
-           return;
-         };
+         //if(!this.select_col==0){
+         //  this.selection.deselect(this.select_item);
+         //  return;
+         //};
          //var item = this.grid_select;
          //console.log('SELECT:',item);
          //var point = #{dataId}.data[item._0];
@@ -386,20 +388,34 @@
          //this.selection.deselect(this.select_item);
        },
        onDeselected: function(idx) {
-         this.select_item = this.getItem(idx);
+         this.deselect_item = this.getItem(idx);
          this.select_col = this.focus.cell.index;
          //var col1 = this.layout.cells[1];
          //this.focus.setFocusCell(col1,idx);
          //###this.selection.addToSelection(this.select_item);
          //if(this.select_col==this.layout.cellCount-1){
-         if(!this.select_col==0){
-           this.selection.addToSelection(this.select_item);
-           return;
-         };
+         //if(!this.select_col==0){
+         //  this.selection.addToSelection(this.select_item);
+         //  return;
+         //};
        },
        onClick: function(ev) {
          this.select_click = ev;
          //console.log('GRID-CLICK:',ev);
+         if(this.select_item){
+           if(this.select_col!=0){
+             this.selection.deselect(this.select_item);
+             return;
+           };
+           this.select_item = false;
+         };
+         if(this.deselect_item){
+           if(this.select_col!=0){
+             this.selection.addToSelection(this.select_item);
+             return;
+           };
+           this.deselect_item = false;
+         };
        },
        popEdit: function(idx) {
          //var item = this.getItem(idx);
@@ -436,8 +452,16 @@
     //GRID CONTROL FUNCTIONS
     function dv_item_restore(item,callback){
       console.log('DV ROLLBACK:',item);
-      var data = {data_value: item};
       var id = item.id;
+      var data = {data_value: item};
+      delete data.data_value.id;
+      delete data.data_value.datetime_string;
+      delete data.data_value.vertical_offset_range;
+      delete data.data_value.published_string;
+      delete data.data_value.site;
+      delete data.data_value.variable;
+      delete data.data_value.site_id;
+      delete data.data_value.variable_id;
       $.ajax({
         type: 'PUT',
         url: '/projects/#{@project.id}/data_values/'+id+'.json?api_key=#{current_user.api_key}',
@@ -456,16 +480,31 @@
     };
     function dv_item_delete(idx){
       var item = #{dataId}.val_grid.getItem(idx);
+      var id = item.id;
       confirmDialog('Confirm Rollback &mdash;',
         'ARE YOU SURE?\n<br/>DELETE DATA VALUE: \n<br/>'+item.data_value,
         function(yes){
           console.log('CONFIRM:',yes);
           if(!yes) return;
-          //ITEM SAVE CALLBACK
-          datastore.update(item,#{dataId}.val_store);
-          //### Refresh
-          #{dataId}.val_grid.update();
-          //#{dataId}.plot.update();
+          //DataValue DELETE
+          $.ajax({
+            type: 'DELETE',
+            url: '/projects/#{@project.id}/data_values/'+id+'?api_key=#{current_user.api_key}',
+            data: {},
+            dataType: 'json',
+            success: function(result){
+              var errs = result.errors;
+              if(errs && errs.length) {
+                console.log('FAILED ERRORS:\n'+errs.join('/n'));
+              } else {
+                //NOW UPDATE STORE
+                datastore.update(item,#{dataId}.val_store);
+                //### Refresh
+                #{dataId}.val_grid.update();
+                //#{dataId}.plot.update();
+              };
+            }
+          });
         }, 
         { buttonOk:'YES', buttonCancel:'Cancel' });
     };
@@ -638,7 +677,7 @@
   %br{:style=>'float:none; clear:both;'}
   %br
   -# 33e 3A7594 3889AA
-  #gridContainer{:style=>"width:850px;height:420px;border:solid 1px #3A7594;"}
+  #gridContainer{:style=>"width:850px;height:400px;border:solid 1px #3A7594;"}
   -if !current_user.nil? && current_user.projects.include?(Project.get(project_uid))
     %label{:id=>"d_set", :onclick=>"dijit.byId('new_data_set').show();", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}Data Set:
     = select_tag("data_set", data_set_options.html_safe)

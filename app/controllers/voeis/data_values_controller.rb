@@ -35,16 +35,21 @@ class Voeis::DataValuesController < Voeis::BaseController
       @data_value = Voeis::DataValue.get(params[:id].to_i)
       datparams = params[:data_value]
       
-      datparams.each{|prop,value| 
+      datparams.each do |prop,value| 
         v = value.strip
-        datparams[prop] = nil if v=='NaN' || v=='null' }
+        datparams[prop] = nil if v=='NaN' || v=='null'
+      end
       ###
       [:data_value,:utc_offset].each{|prop| 
         datparams[prop] = datparams[prop].to_f }
       [:value_accuracy,:vertical_offset,:end_vertical_offset].each{|prop| 
         datparams[prop] = datparams[prop].blank? ? nil : datparams[prop].to_f }
       datparams[:quality_control_level] = datparams[:quality_control_level].to_i
-      datparams[:published] = datparams[:published]=~(/(true|t|yes|y|1)$/i) ? true : false
+      [:published,:observes_daylight_savings].each{|prop| 
+        datparams[prop] = datparams[prop]=~(/(true|t|yes|y|1)$/i) ? true : false }
+
+      logger.info '### DATPARAMS ###'
+      logger.info datparams
       
       datparams.each do |key, value|
         #@data_value[key] = value.blank? ? nil : value
