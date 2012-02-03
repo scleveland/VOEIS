@@ -472,7 +472,7 @@
       delete data.data_value.variable_id;
       $.ajax({
         type: 'PUT',
-        url: '/projects/#{@project.id}/data_values/'+id+'.json?api_key=#{current_user.api_key}',
+        url: '/projects/#{@project.id}/data_values/'+id+'.json?api_key=#{current_user.nil? ? '' : current_user.api_key}',
         data: data,
         dataType: 'json',
         success: function(dat){
@@ -497,7 +497,7 @@
           //DataValue DELETE
           $.ajax({
             type: 'DELETE',
-            url: '/projects/#{@project.id}/data_values/'+id+'?api_key=#{current_user.api_key}',
+            url: '/projects/#{@project.id}/data_values/'+id+'?api_key=#{current_user.nil? ? '' : current_user.api_key}',
             data: {},
             dataType: 'json',
             success: function(result){
