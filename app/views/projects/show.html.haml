@@ -1609,6 +1609,19 @@
       //##
     };
 
+    var openDataHistoryTab = function(tabs, projectId, dataId, dataVal, varId, varName, siteId) {
+      var tabTitle = 'History: Site-'+siteId+': '+varName+' ('+dataVal+')';
+      var projVarHistHref = "/projects/#{@project.id}/data_values/versions?id="dataId;
+      // "/projects/#{@project.id}/variables/versions?id="+varId+"&site_id="+siteId;
+      var projVarHistId = '#{@project.id}-site'+siteId+'-var'+varId+'-history';
+      //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
+      //projectSitePath(this.projectId, this.siteId)
+      var projVarHistLoad = function(siteId,varName) {
+      };
+      openProjTab(tabs, projVarHistHref, projVarHistId, tabTitle, projVarHistLoad);
+      //##
+    };
+
     var openSampsTab = function(tabs, projectId, varId, varName, siteId) {
       var tabTitle = 'Samples: Site-'+siteId;
       var projVarId = '#{@project.id}-site'+siteId+'-var'+varId;
@@ -1815,6 +1828,13 @@
       var projectId = "#{@project.id}";
       var tabs = dijit.byId('tab_browser');
       openDataQueryTab(tabs, projectId, siteId);
+    });
+    
+    dojo.subscribe("voeis/project/data/history", function(dataId,dataVal,varId,varName,siteId) {
+      console.log('DATA-HISTORY',arguments);
+      var projectId = "#{@project.id}";
+      var tabs = dijit.byId('tab_browser');
+      openDataHistoryTab(tabs, projectId, dataId, dataVal, varId, varName, siteId);
     });
 
     dojo.subscribe("voeis/project/samples", function(siteId) {

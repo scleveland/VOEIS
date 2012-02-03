@@ -214,7 +214,7 @@
               %div{:dojoType => "dijit.Menu"}
                 -#= link_to("Browse", campaigns_path, :dojoType => "yogo.ui.MenuLink")
                 -#= link_to("Browse Data Streams", query_project_data_streams_path(@project), :dojoType => "yogo.ui.MenuLink")
-                = link_to("Browse/Simple Search Data", query_project_samples_path(@project), :dojoType => "yogo.ui.MenuLink") 
+                -#= link_to("Browse/Simple Search Data", query_project_samples_path(@project), :dojoType => "yogo.ui.MenuLink") 
                 = link_to("Job Queue", project_jobs_path(@project), :dojoType => "yogo.ui.MenuLink")
                 -if !current_user.nil?
                   -#= link_to("Search", campaigns_path, :dojoType => "yogo.ui.MenuLink")
