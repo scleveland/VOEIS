@@ -183,8 +183,10 @@ class Voeis::SamplesController < Voeis::BaseController
                 @variable_opt_array << [var.variable_name+":"+var.data_type, var.id.to_s]
               end
             end
+            @variable_count = @variable_opt_array.count
           else
             @variable_opt_array << ["None", "None"]
+            @variable_count = 0
           end
         end
         @variable_opts = opts_for_select(@variable_opt_array, selected=varid)
