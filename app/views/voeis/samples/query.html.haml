@@ -39,15 +39,21 @@
   $(window).ready(function(){
     console.log('DATA-QUERY **LOADED**');
     console.log('DATA-QUERY TABID: #{tabId}');
-    if(#{site_id}==0) update_site_vars();
+    //if(#{site_id}==0) 
+    update_site_vars();
   
-    //if(window['data_value_edit_setup'])
-    data_value_edit_setup();
+    //if(!window.data_value_edit){
+    //  (function(){
+    //    data_value_edit_setup();
+    //    
+    //  })();
+    //};
     
   });
   
   
--if site_id==0 && edit_auth
+-#if site_id==0 && edit_auth
+-if false && edit_auth
   :javascript
   
     //EDIT DATA VALUE GLOBALS
@@ -128,7 +134,7 @@
           return val[0];
         return val;
       },
-      // SET IDX IF THE STORE HAS IT
+      // SET IDX IF THE STORE HAS IT??!
       set_idx: function(item, item_store) {
         var store = item_store || this.store_default;
         if(store._arrayOfAllItems[0].hasOwnProperty('idx')) 
@@ -219,7 +225,9 @@
     };
     
     // INIT VALUE EDIT FORM
+    delete window.data_value_edit_setup;
     function data_value_edit_setup() {
+      if(window.data_value_edit) return;
       data_value_edit = new dijit.Dialog({
         title: 'EDIT Data Value',
         style: 'width:560px;',
@@ -554,7 +562,7 @@
     = clear_break
   Variable
   :plain
-    (<span id="vars_count">#{@variable_opt_array.count-1}</span>):
+    (<span id="vars_count">#{@variable_count}</span>):
   = select_tag("variable_select", @variable_opts.html_safe)
   = clear_break
   = clear_break
