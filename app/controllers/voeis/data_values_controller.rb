@@ -40,6 +40,7 @@ class Voeis::DataValuesController < Voeis::BaseController
         datparams[prop] = nil if v=='NaN' || v=='null'
       end
       ###
+      #datparams[:local_date_time] = Date
       [:data_value,:utc_offset].each{|prop| 
         datparams[prop] = datparams[prop].to_f }
       [:value_accuracy,:vertical_offset,:end_vertical_offset].each{|prop| 

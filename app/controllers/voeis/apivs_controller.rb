@@ -1665,6 +1665,28 @@ class Voeis::ApivsController < Voeis::BaseController
      end
    end
    
+   
+   # get_project_site_variables
+    # API for creating a new variable within in a project
+    # 
+    # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_site_variables.json?site_ids[]=1&site_ids[]=5&site_ids[]=7
+    #
+    # @param [Integer] site_ids the array of IDs of the project site - this is required
+    #  
+    # @author Sean Cleveland
+    #
+    # @api public
+    def get_project_site_variables
+      @variables =""
+      parent.managed_repository do
+        sites = Voeis::Site.all(:id=>params[:site_ids])
+        @variables = sites.variables
+      end
+      respond_to do |format|
+        format_response(@variables, format)
+      end
+    end
+   
   # import_voeis_variable_to_project
   # API for getting a variable within in the VOEIS system into the current project
   #
@@ -2058,7 +2080,7 @@ class Voeis::ApivsController < Voeis::BaseController
     # @author Sean Cleveland
     #
     # @api public
-    def add_data_from_project_data_set
+    def remove_data_from_project_data_set
       @data_set_data =""
       @data_hash = Hash.new()
       sql =""

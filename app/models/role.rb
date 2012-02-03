@@ -56,7 +56,6 @@ class Role
       Voeis::SpeciationCV,
       Voeis::ValueTypeCV,
       Voeis::VariableNameCV,
-      Voeis::Equipment,
       Voeis::DataSet,
       Voeis::Job,
       Voeis::Visit,

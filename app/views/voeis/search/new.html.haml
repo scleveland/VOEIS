@@ -24,7 +24,7 @@
 
 Select Site:
 #siteGrid{:style=>"width:900px;height:300px;"}
-%button(dojoType="dijit.form.Button" name="search_button" id="update_variable_button" onclick="") 
+%button(dojoType="dijit.form.Button" name="search_button" id="update_variable_button" onclick="updateVariables();") 
   Update Variables From Selected Sites
 =clear_break
 =clear_break
@@ -35,14 +35,14 @@ Select Variables:
 %div{:style=>"float: left;"}
   %label{:for=>"date1"}
     Start Date Selection:
-  %input{:type=>"text", :name=>"start_date", :id=>"start_date", :value=>"2005-12-30",
+  %input{:type=>"text", :name=>"start_date", :id=>"start_date", :value=>"#{@start_date.starting_timestamp.strftime("%Y-%m-%d")}",
       :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
 %div{:style=>"float: left;"}
   
   %label{:for=>"date1"}
     End Date Selection:
-  %input{:type=>"text", :name=>"end_date", :id=>"end_date", :value=>"2005-12-30",
+  %input{:type=>"text", :name=>"end_date", :id=>"end_date", :value=>"#{@end_date.ending_timestamp.strftime("%Y-%m-%d")}",
       :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
 
 =clear_break
@@ -54,12 +54,32 @@ Select Variables:
   Build Query
 #query_string{:style=>"width:900px;height:50px;"}
 =clear_break
-%button(dojoType="dijit.form.Button" name="search_button" id="search_button" onclick="doSearch();" ) 
+%button(dojoType="dijit.form.Button" name="search_button" id="search_button" disabled=true onclick="doSearch();" ) 
   Perform Search
 :javascript
   dojo.addOnLoad(function(){
-    dijit.byId("search_button").set("disabled",true);
+    //dijit.byId("search_button").set("disabled",true);
   });
+  
+  function updateVariables(){
+    site_var_array = siteDataGrid.selection.getSelected();
+    site_ids = [];
+    for (s in site_var_array){
+      site_ids.push(site_var_array[s].id.toString())
+    }
+    base_url="#{root_url}projects/#{parent.id}/apivs/get_project_site_variables.json?";
+    site_url = base_url + "site_ids[]="+ site_ids.join('&site_ids[]=');
+    $.get(site_url,
+      function(data) {
+        var variable_json = {
+          identifier: 'id',
+          items: data};
+        new_var_store = new dojo.data.ItemFileWriteStore({data: variable_json }); 
+        varDataGrid.setStore(new_var_store)
+      }
+    );
+  }
+  
   function BuildQuery(){
     var site_array = siteDataGrid.selection.getSelected();
     var var_array = varDataGrid.selection.getSelected();
@@ -80,7 +100,9 @@ Select Variables:
   }
   
   function doSearch(){
-    window.location=$("#query_string").html();
+    //window.location=$("#query_string").html();
+    window.open($("#query_string").html(), "Search Results");
+    //dojo.publish('voeis/project/search/results', [$("#query_string").html()])
   }
   //formatter: 'val_grid_formatter.dateTime',
   // grid formatters
@@ -144,6 +166,26 @@ Select Variables:
      field: 'variable_units_id',
      name: 'Units',
      formatter: val_grid_formatter.unit_name,
+     width: 'auto'
+  },
+  {
+     field: 'general_category',
+     name: 'Category',
+     width: 'auto'
+  },
+  {
+     field: 'sample_medium',
+     name: 'Medium',
+     width: 'auto'
+  },
+  {
+     field: 'value_type',
+     name: 'Value Type',
+     width: 'auto'
+  },
+  {
+     field: 'data_type',
+     name: 'Data Type',
      width: 'auto'
   },
   ];

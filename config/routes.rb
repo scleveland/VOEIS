@@ -23,7 +23,11 @@ Yogo::Application.routes.draw do
     resources :memberships
     #Voeis Project Models scope
     scope :module => "voeis" do
-      resources :search
+      resources :search do
+        collection do
+          post :export
+        end
+      end
       resources :sites do
         collection do
           post :save_site
@@ -61,7 +65,11 @@ Yogo::Application.routes.draw do
         end
       end
       resources :meta_tags
-      resources :data_sets
+      resources :data_sets do
+        collection do
+          get :proto
+        end
+      end
       resources :spatial_offsets
       resources :labs
       resources :units
@@ -83,6 +91,7 @@ Yogo::Application.routes.draw do
           get :get_project_variable
           get :get_voeis_variables
           get :get_dojo_voeis_variables
+          get :get_project_site_variables
           get :get_project_sample
           get :get_project_samples
           get :get_project_sample_measurements

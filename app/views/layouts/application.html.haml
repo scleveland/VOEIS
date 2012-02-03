@@ -79,7 +79,7 @@
     :css
       body, html { width:100%; height:100%; margin:0; padding:0; overflow:hidden; }
       #border_container { width:100%; height:100% }
-      #main_container 
+      #main_container
       
       .datahub-icon-25 { 
         background-image: url('/images/datahub_icon_25.png');
@@ -207,14 +207,19 @@
                 -#- if @project.managed_repository { Voeis::DataStream.all.count } > 0
                 -#  -#= link_to("Add Data", add_project_data_streams_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
 
-          - if !@sites.nil? && @sites.count > 0
+          - if !@project.sites.nil? && @project.sites.count > 0
             #dataButton{:dojoType => "dijit.form.DropDownButton"}
               %span{:style => "font-weight:bold"}
                 Project Data
               %div{:dojoType => "dijit.Menu"}
                 -#= link_to("Browse", campaigns_path, :dojoType => "yogo.ui.MenuLink")
                 -#= link_to("Browse Data Streams", query_project_data_streams_path(@project), :dojoType => "yogo.ui.MenuLink")
+
                 -#= link_to("Browse/Simple Search Data", query_project_samples_path(@project), :dojoType => "yogo.ui.MenuLink") 
+                = link_to("Simple QA/QC", query_project_samples_path(@project), :dojoType => "yogo.ui.MenuLink") 
+                -#= link_to("Search Data",new_project_search_path(@project), :dojoType => "yogo.ui.MenuLink") 
+                = link_to("Search Data", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/search'); return false;")
+
                 = link_to("Job Queue", project_jobs_path(@project), :dojoType => "yogo.ui.MenuLink")
                 -if !current_user.nil?
                   -#= link_to("Search", campaigns_path, :dojoType => "yogo.ui.MenuLink")
@@ -259,6 +264,7 @@
       
       #main_container{:dojoType=>"dijit.layout.ContentPane", :region=>"center", :gutters=>"false", :style=>"padding:0; "}
         = content_for?(:content) ? yield(:content) : yield
+
 
       #bottom.claro{:dojoType => "dijit.layout.ContentPane", :region => "bottom", :gutters => "false", :style => "padding:0"}
         #footer{:style=>"padding-top:6px; border-top: 1px #6F97CB solid;"}
