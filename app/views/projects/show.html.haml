@@ -212,6 +212,7 @@
     }
     
     
+    //#####################
     // DOJO STORE FUNCTIONS
     var datastore = {
       // CONSTANTS
@@ -219,9 +220,10 @@
       store_default: psites,  // default store if not in call
       // CONVERT DATASTORE ITEM TO PLAIN ITEM
       item: function(item) {
+        var myitem = {};
         for(prop in item)
-          item[prop] = this.value(item[prop]);
-        return item;
+          myitem[prop] = this.value(item[prop]);
+        return myitem;
       },
       // CONVERT DATASTORE VALUE TO PLAIN VALUE
       value: function(val) {
