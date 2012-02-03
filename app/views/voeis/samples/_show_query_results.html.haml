@@ -276,8 +276,7 @@
         var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" style="margin:0;padding:0;height:16px;" />';
         //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
         //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
-        //var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
-        var hist_link = '<a href="javascript:" onclick="dojo.publish('voeis/project/data/history', ["+item.id+",'"+item.data_value+"',"+item.variable_id+",'#{variable}',"+item.site_id+"]);return false;">'+hist_icon+'</a>\n';
+        var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
         var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit('+idx+');return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
         var delete_link = '<a href="javascript:" onclick="dv_item_delete('+idx+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
         var spaces = '&nbsp;';
@@ -410,22 +409,21 @@
          this.select_click = ev;
          //console.log('GRID-CLICK:',ev);
          //var select_col = this.select_focus.cell.index;
-         if(this.select_focus.cell!=null) {
-           if(this.select_item){
-             if(this.select_focus.cell.index!=0){
-               this.selection.deselect(this.select_item);
-               return;
-             };
-             this.select_item = false;
+         if(this.select_focus.cell==null) return;
+         if(this.select_item){
+           if(this.select_focus.cell.index!=0){
+             this.selection.deselect(this.select_item);
+             return;
            };
-           if(this.deselect_item){
-             if(this.select_focus.cell.index!=0){
-               this.selection.addToSelection(this.deselect_item);
-               return;
-             };
-           };
+           this.select_item = false;
          };
-         this.deselect_item = false;
+         if(this.deselect_item){
+           if(this.select_focus.cell.index!=0){
+             this.selection.addToSelection(this.select_item);
+             return;
+           };
+           this.deselect_item = false;
+         };
        },
        popEdit: function(idx) {
          //var item = this.getItem(idx);
