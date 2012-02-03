@@ -38,11 +38,22 @@ class Voeis::DataSetsController < Voeis::BaseController
   
   def show
     @data_set = parent.managed_repository{Voeis::DataSet.get(params[:id].to_i)}
+    data_values = parent.managed_repository{Voeis::DataSet.get(params[:id].to_i).data_values}
     @project_uid = parent.id
     @variables = Hash.new
     @data_set.variables.map{|v| @variables = @variables.merge({v.id => v.variable_name})}
+    
   end
 
+  def proto
+    @data_set = parent.managed_repository{Voeis::DataSet.get(7)}#params[:id].to_i)}
+    data_values = parent.managed_repository{Voeis::DataSet.get(7)}#params[:id].to_i).data_values}
+    @project_uid = parent.id
+    @variables = Hash.new
+    @data_set.variables.map{|v| @variables = @variables.merge({v.id => v.variable_name})}
+    
+  end
+  
   def add_data_set
     @data_sets = Voeis::DataSet.all
   end

@@ -54,11 +54,11 @@ Select Variables:
   Build Query
 #query_string{:style=>"width:900px;height:50px;"}
 =clear_break
-%button(dojoType="dijit.form.Button" name="search_button" id="search_button" onclick="doSearch();" ) 
+%button(dojoType="dijit.form.Button" name="search_button" id="search_button" disabled=true onclick="doSearch();" ) 
   Perform Search
 :javascript
   dojo.addOnLoad(function(){
-    dijit.byId("search_button").set("disabled",true);
+    //dijit.byId("search_button").set("disabled",true);
   });
   
   function updateVariables(){
@@ -100,7 +100,9 @@ Select Variables:
   }
   
   function doSearch(){
-    window.location=$("#query_string").html();
+    //window.location=$("#query_string").html();
+    window.open($("#query_string").html(), "Search Results");
+    //dojo.publish('voeis/project/search/results', [$("#query_string").html()])
   }
   //formatter: 'val_grid_formatter.dateTime',
   // grid formatters

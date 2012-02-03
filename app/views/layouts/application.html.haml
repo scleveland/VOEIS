@@ -207,7 +207,7 @@
                 -#- if @project.managed_repository { Voeis::DataStream.all.count } > 0
                 -#  -#= link_to("Add Data", add_project_data_streams_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
 
-          - if !@sites.nil? && @sites.count > 0
+          - if !@project.sites.nil? && @project.sites.count > 0
             #dataButton{:dojoType => "dijit.form.DropDownButton"}
               %span{:style => "font-weight:bold"}
                 Project Data
@@ -215,7 +215,8 @@
                 -#= link_to("Browse", campaigns_path, :dojoType => "yogo.ui.MenuLink")
                 -#= link_to("Browse Data Streams", query_project_data_streams_path(@project), :dojoType => "yogo.ui.MenuLink")
                 = link_to("Simple QA/QC", query_project_samples_path(@project), :dojoType => "yogo.ui.MenuLink") 
-                = link_to("Search Data",new_project_search_path(@project), :dojoType => "yogo.ui.MenuLink") 
+                -#= link_to("Search Data",new_project_search_path(@project), :dojoType => "yogo.ui.MenuLink") 
+                = link_to("Search Data", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/search'); return false;")
                 = link_to("Job Queue", project_jobs_path(@project), :dojoType => "yogo.ui.MenuLink")
                 -if !current_user.nil?
                   -#= link_to("Search", campaigns_path, :dojoType => "yogo.ui.MenuLink")

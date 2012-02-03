@@ -1609,6 +1609,28 @@
       //##
     };
 
+    var openSearchTab = function(tabs, projectId) {
+      var tabTitle = 'Data Search:';
+      var projDataId = '#{@project.id}-search';
+      var projDataHref = "#{new_project_search_path(@project)}";
+      var projDataLoad = function(varId,varName) {
+
+      };
+      openProjTab(tabs, projDataHref, projDataId, tabTitle, projDataLoad);
+      //##
+    };
+    
+    var openSearchResultTab = function(tabs, projectId, searchURL) {
+      var tabTitle = 'Search Result: ' + new Date().format("HH:MM");
+      var projDataId = '#{@project.id}-search--results--'+ new Date().getTime();
+      var projDataHref = searchURL;
+      var projDataLoad = function(varId,varName) {
+          plot_parallel_coordinates()
+      };
+      openProjTab(tabs, projDataHref, projDataId, tabTitle, projDataLoad);
+      //##
+    };
+    
     var openSampsTab = function(tabs, projectId, varId, varName, siteId) {
       var tabTitle = 'Samples: Site-'+siteId;
       var projVarId = '#{@project.id}-site'+siteId+'-var'+varId;
@@ -1816,7 +1838,8 @@
       var tabs = dijit.byId('tab_browser');
       openDataQueryTab(tabs, projectId, siteId);
     });
-
+    
+  
     dojo.subscribe("voeis/project/samples", function(siteId) {
       console.log('SAMPLES',arguments);
       var projectId = "#{@project.id}";
@@ -1880,5 +1903,20 @@
       tabs.addChild(grid);
       tabs.selectChild(grid);
     });
+    
+    dojo.subscribe("voeis/project/search", function() {
+      console.log('DATA-QUERY',arguments);
+      var projectId = "#{@project.id}";
+      var tabs = dijit.byId('tab_browser');
+      openSearchTab(tabs, projectId);
+    });
+    
+    dojo.subscribe("voeis/project/search/results", function(searchURL) {
+      console.log('DATA-QUERY',arguments);
+      var projectId = "#{@project.id}";
+      var tabs = dijit.byId('tab_browser');
+      openSearchResultTab(tabs, projectId, searchURL);
+    });
+    
   })();
 

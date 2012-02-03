@@ -1,10 +1,10 @@
+
 %h1 Search Results
 -if @parallel_results.count < 500
   #center  
     #fig
       :plain
         <script type="text/javascript+protovis">
-        $(window).ready(function(){ 
         var cars = #{@parallel_results.to_json}
 
         var units = {
@@ -138,38 +138,37 @@
             .text(function(d) filter[d.dim].max.toFixed(0) + units[d.dim].unit);
 
         vis.render();
-        });
-            </script>
-            <style type="text/css">
+        </script>
+        <style type="text/css">
 
-            #fig {
-              width: 1200px;
-              height: 400px;
-              position: relative;
-              margin: auto;
-            }
+        #fig {
+          width: 1200px;
+          height: 400px;
+          position: relative;
+          margin: auto;
+        }
 
-            #title {
-              position: absolute;
-              top: 70px;
-              left: 200px;
-              padding: 10px;
-              background: white;
-            }
+        #title {
+          position: absolute;
+          top: 70px;
+          left: 200px;
+          padding: 10px;
+          background: white;
+        }
 
-            large {
-              font-size: medium;
-            }
-         </style>
+        large {
+          font-size: medium;
+        }
+        </style>
 
 #searchGrid{:style=>"width:auto;height:500px;"}
 %button{:dojoType=>"dijit.form.Button",:onclick=>"exportAll()"}
   Export all to CSV</button>
-%button{:dojoType=>"dijit.form.Button",:onclick=>"exportSelected()"}
-  Export Selected Rows to CSV
+-#%button{:dojoType=>"dijit.form.Button",:onclick=>"exportSelected()"}
+-#Export Selected Rows to CSV
 =form_tag 'search/export' do 
   =hidden_field_tag('data')
-%textarea{:id=>"output"}
+-#%textarea{:id=>"output"}
 :javascript
   dojo.require("dijit.dijit");
   dojo.require("dijit.form.Button");
