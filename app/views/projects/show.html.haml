@@ -1611,7 +1611,7 @@
 
     var openDataHistoryTab = function(tabs, projectId, dataId, dataVal, varId, varName, siteId) {
       var tabTitle = 'History: Site-'+siteId+': '+varName+' ('+dataVal+')';
-      var projVarHistHref = "/projects/#{@project.id}/data_values/versions?id="dataId;
+      var projVarHistHref = "/projects/#{@project.id}/data_values/versions?id="+dataId;
       // "/projects/#{@project.id}/variables/versions?id="+varId+"&site_id="+siteId;
       var projVarHistId = '#{@project.id}-site'+siteId+'-var'+varId+'-history';
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
