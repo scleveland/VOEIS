@@ -520,69 +520,6 @@
     // append the new grid to the div " ":
     //dojo.byId("gridContainer").appendChild(val_grid.domNode);
     
-<<<<<<< HEAD
-=======
-    //GRID CONTROL FUNCTIONS
-    function dv_item_restore(item,callback){
-      console.log('DV ROLLBACK:',item);
-      var id = item.id;
-      var data = {data_value: item};
-      delete data.data_value.id;
-      delete data.data_value.datetime_string;
-      delete data.data_value.vertical_offset_range;
-      delete data.data_value.published_string;
-      delete data.data_value.site;
-      delete data.data_value.variable;
-      delete data.data_value.site_id;
-      delete data.data_value.variable_id;
-      $.ajax({
-        type: 'PUT',
-        url: '/projects/#{@project.id}/data_values/'+id+'.json?api_key=#{current_user.nil? ? '' : current_user.api_key}',
-        data: data,
-        dataType: 'json',
-        success: function(dat){
-          callback(dat);
-        }
-      });
-    };
-    function dv_grid_refresh(data){
-      datastore.update(data,#{dataId}.val_store);
-      //### Refresh
-      #{dataId}.val_grid.update();
-      //#{dataId}.plot.update();
-    };
-    function dv_item_delete(idx){
-      var item = #{dataId}.val_grid.getItem(idx);
-      var id = item.id;
-      confirmDialog('Confirm Rollback &mdash;',
-        'ARE YOU SURE?\n<br/>DELETE DATA VALUE: \n<br/>'+item.data_value,
-        function(yes){
-          console.log('CONFIRM:',yes);
-          if(!yes) return;
-          //DataValue DELETE
-          $.ajax({
-            type: 'DELETE',
-            url: '/projects/#{@project.id}/data_values/'+id+'?api_key=#{current_user.nil? ? '' : current_user.api_key}',
-            data: {},
-            dataType: 'json',
-            success: function(result){
-              var errs = result.errors;
-              if(errs && errs.length) {
-                console.log('FAILED ERRORS:\n'+errs.join('/n'));
-              } else {
-                //NOW UPDATE STORE
-                datastore.update(item,#{dataId}.val_store);
-                //### Refresh
-                #{dataId}.val_grid.update();
-                //#{dataId}.plot.update();
-              };
-            }
-          });
-        }, 
-        { buttonOk:'YES', buttonCancel:'Cancel' });
-    };
-    
->>>>>>> master
     
     $('##{tabId}_search_results #gridContainer').append(#{dataId}.val_grid.domNode);
 
