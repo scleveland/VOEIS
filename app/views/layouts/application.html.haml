@@ -206,7 +206,7 @@
                 -#  -#= link_to("Add Field Data", new_field_measurement_project_sensor_values_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
                 -#- if @project.managed_repository { Voeis::DataStream.all.count } > 0
                 -#  -#= link_to("Add Data", add_project_data_streams_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
-          - if !request.url.include?("projects/new")
+          - if !request.url.include?("projects/new ")
             - if !@project.sites.nil? && @project.sites.count > 0
               #dataButton{:dojoType => "dijit.form.DropDownButton"}
                 %span{:style => "font-weight:bold"}
