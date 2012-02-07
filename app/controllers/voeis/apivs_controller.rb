@@ -579,7 +579,16 @@ class Voeis::ApivsController < Voeis::BaseController
       end
   end
   
-  
+  def get_project_data_stream_data
+    @data_values =""
+    parent.managed_repository do
+      data_stream = Voeis::DataStream.get(params[:data_stream_id])
+      @data_values=data_stream.data_values
+    end
+    respond_to do |format|
+     format_response(@data_values, format)
+    end
+  end
   # http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_sensor_type.json?
    # "name=mytest_sensor&min=0&max=0&differece=0&data_stream_column_id=92&variable_id=20&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7"
   
@@ -2015,6 +2024,89 @@ class Voeis::ApivsController < Voeis::BaseController
       respond_to do |format|
          format_response(@data_hash, format)
       end
+    end
+    
+    ###### Simulations stuff####
+    # 
+    # curl -F datafile=@summaryAF.csv -F site_id=1 -F sim_col=1 http://localhost:3000/projects/168b2812-51a4-11e1-ad78-c82a14fffebf/apivs/upload_simulation.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
+    def upload_simulation
+      parent.managed_repository do
+        first_row = Array.new
+        flash_error = Hash.new
+        @msg = "There was a problem parsing this file."
+        name = Time.now.to_s + params[:datafile].original_filename 
+        directory = "temp_data"
+        @new_file = File.join(directory,name)
+        File.open(@new_file, "wb"){ |f| f.write(params['datafile'].read)}
+        site = Voeis::Site.get(params[:site_id].to_i)
+        unless data_stream = Voeis::DataStream.first(:name => params[:datafile].original_filename) 
+          #create a datatemplate
+          data_stream = Voeis::DataStream.create(:name => params[:datafile].original_filename, :filename => params[:datafile].original_filename, :type=>"Simulation")
+          data_stream.sites << site
+          data_stream.save
+          #csv = CSV.open(@new_file, "r")
+          csv = CSV.read(@new_file)
+          row = csv[0]
+          debugger
+          units_id =341#unknown
+          counter = 0
+          row.each do |v|
+            var =""
+            repository("default") do
+              var = Voeis::Variable.first_or_create(:variable_name=>v, :variable_code => "#{v}_code",:variable_units_id =>  units_id)
+            end
+            if counter+1 == params[:sim_col].to_i
+              data_stream_column = Voeis::DataStreamColumn.create(
+                                         :column_number => counter,
+                                         :name => "SampleID",
+                                         :type =>"SampleID",
+                                         :unit => "NA",
+                                         :original_var => "NA")
+            else
+              data_stream_column = Voeis::DataStreamColumn.create(
+                                    :column_number => counter,
+                                    :name =>         var.variable_code,
+                                    :original_var => var.variable_name,
+                                    :unit =>         "NA",
+                                    :type =>         "NA")           
+
+              if Voeis::Variable.get(var.id).nil?
+                 variable = Voeis::Variable.new
+                 variable.attributes = var.attributes
+                 variable.save!
+               else
+                variable = Voeis::Variable.get(var.id)
+               end
+               site.variables << variable
+               site.save
+               data_stream_column.variables << variable
+            end
+            data_stream_column.data_streams << data_stream
+            data_stream_column.save
+            counter +=1
+          end
+        end
+        flash_error = flash_error.merge(Voeis::DataValue.parse_sim_csv(@new_file, data_stream.id, params[:site_id], 2,nil,nil,user.id))        
+       respond_to do |format|
+          if params.has_key?(:api_key)
+            format.json
+          end
+          if flash_error[:error].nil?
+            if flash_error[:success].nil?
+              flash_error[:success] = "File was parsed succesfully."
+            end
+            data_stream.sites.first.update_site_data_catalog
+            #flash_error = flash_error.merge({:last_record => data_stream_template.data_stream_columns.sensor_types.sensor_values.last(:order =>[:id.asc]).as_json}) 
+          end
+          format.json do
+            render :json => flash_error.to_json, :callback => params[:jsoncallback]
+          end
+          format.xml do
+            render :xml => flash_error.to_xml
+          end
+        end
+      end
+     
     end
   private
  
