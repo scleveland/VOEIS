@@ -53,7 +53,8 @@
   
   
 -#if site_id==0 && edit_auth
--if false && edit_auth
+-#if false && edit_auth
+-if false
   :javascript
   
     //EDIT DATA VALUE GLOBALS
@@ -362,7 +363,8 @@
             console.log('DataValue CHANGED:',dijit.byId('DV_data_value').get('value'));
           });
           //###ON-STATE-CHANGE
-          dojo.connect(form, "onValidStateChange", function(state){
+          //dojo.connect(form, "onValidStateChange", function(state){
+          form.watch('state', function(state){
             //var saveBtn = dijit.byId('data_value_edit_submit');
             console.log('STATE-CHANGE:',state);
             //console.log('FORM:',form);

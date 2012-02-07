@@ -1,4 +1,8 @@
 -# DATA VALUE VERSIONS PANE
+
+- tabId = 'site'+@site.id.to_s+'_data'
+- dataId = tabId+'_data'
+
 :javascript
   dojoConfig = { parseOnLoad: false };
   dojo.require("dojox.grid.EnhancedGrid");
@@ -47,7 +51,8 @@
   function dv_item_restore(item){
     console.log('DV ROLLBACK:',item);
     var id = item.id;
-    var data = {data_value: item};
+    var data = {};
+    data = {data_value: item};
     delete data.data_value.id;
     delete data.data_value.datetime_string;
     delete data.data_value.vertical_offset_range;
@@ -62,7 +67,7 @@
       data: data,
       dataType: 'json',
       success: function(dat){
-        datastore.update(data,#{dataId}.val_store);
+        datastore.update(item,#{dataId}.val_store);
         //### Refresh
         #{dataId}.val_grid.update();
         //#{dataId}.plot.update();
@@ -132,8 +137,8 @@
   SHOW DATA VALUE VERSIONS
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
-//= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/datavalue/history/update', [#{@variable.id},#{@site.id}]);")
+//= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
+= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/data/history/update', [#{@data_value.id}]);")
 %br
 
 

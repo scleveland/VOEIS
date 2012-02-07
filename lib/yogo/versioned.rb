@@ -22,7 +22,8 @@ module Yogo
       
       # Register before save hooks
       before(:save) do
-        dirty_props = self.dirty_attributes.keys.map{|k| k.name.to_s }-['id','updated_at','provenance_comment','deleted_at']
+        ### ADDED: date_time_utc --ALWAYS DIRTY!
+        dirty_props = self.dirty_attributes.keys.map{|k| k.name.to_s }-['id','updated_at','provenance_comment','deleted_at','date_time_utc']
         dirty_props = dirty_props.map{|p| 
           #p = p[0..-4] if (p[-3..-1]=='_id' && !@@id_exceptions.include?(p))
           (p[-3..-1]=='_id' && !::ID_EXCEPTIONS.include?(p)) ? p[0..-4] : p

@@ -44,7 +44,10 @@ class Voeis::DataValue
     # d << (utc_offset/24).to_f
     # #puts d
     # DateTime.new(*d) 
-    @local_date_time.to_datetime.change(:offset => "#{utc_offset}:00")
+    tz0 = utc_offset.to_s.split('.')
+    tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+tz0[0].to_i.abs.to_s)[-2,2]+':'
+    tz += tz0.count>1 ? ('0'+((('.'+tz0[1]).to_f*100).to_i*0.6).to_i.to_s)[-2,2] : '00'
+    @local_date_time.to_datetime.change(:offset => tz)  ### "#{utc_offset}:00")
   end
   
   def date_time_utc

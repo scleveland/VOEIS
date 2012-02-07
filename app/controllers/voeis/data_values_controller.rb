@@ -28,6 +28,27 @@ class Voeis::DataValuesController < Voeis::BaseController
   #def show
   #end
   
+  # DELETE /data_values/$ID$
+  def destroy
+    @project = parent
+    @project.managed_repository{
+      data_value = Voeis::DataValue.get(params[:id].to_i)
+      data_value.destroy
+      
+      respond_to do |format|
+        if data_value.destroy
+          format.html{
+            flash[:notice] = "DataValue was successfully Deleted."
+            redirect_to project_url(@project)
+          }
+          format.json{
+            render :json => {}.as_json, :callback => params[:jsoncallback]
+          }
+        end
+      end
+    }
+  end
+  
   # PUT /data_values/$ID$
   def update
     @project = parent
@@ -35,12 +56,18 @@ class Voeis::DataValuesController < Voeis::BaseController
       @data_value = Voeis::DataValue.get(params[:id].to_i)
       datparams = params[:data_value]
       
+      logger.info '### DATPARAMS ###'
+      logger.info datparams
+      logger.info '### DATA VALUE ###'
+      logger.info @data_value.to_hash
+      
       datparams.each do |prop,value| 
         v = value.strip
         datparams[prop] = nil if v=='NaN' || v=='null'
       end
       ###
-      #datparams[:local_date_time] = Date
+      datparams[:local_date_time] = DateTime.parse(datparams[:local_date_time])
+      datparams[:date_time_utc] = DateTime.parse(datparams[:date_time_utc])
       [:data_value,:utc_offset].each{|prop| 
         datparams[prop] = datparams[prop].to_f }
       [:value_accuracy,:vertical_offset,:end_vertical_offset].each{|prop| 
@@ -49,9 +76,6 @@ class Voeis::DataValuesController < Voeis::BaseController
       [:published,:observes_daylight_savings].each{|prop| 
         datparams[prop] = datparams[prop]=~(/(true|t|yes|y|1)$/i) ? true : false }
 
-      logger.info '### DATPARAMS ###'
-      logger.info datparams
-      
       datparams.each do |key, value|
         #@data_value[key] = value.blank? ? nil : value
         @data_value[key] = value
@@ -86,6 +110,7 @@ class Voeis::DataValuesController < Voeis::BaseController
   #end
   
   def versions
+    #@tabId = params[:tab_id]
     @project = parent
     @data_value = @project.managed_repository{Voeis::DataValue.get(params[:id].to_i)}
     

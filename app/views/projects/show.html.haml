@@ -699,7 +699,7 @@
           item['utc_offset'] = [parseFloat(utcval)];
           item['local_date_time'] = [dt+'T'+tm+tz];
           var d = new Date(dt+'T'+tm+tz);
-          item['date_time_utc'] = [d.format('UTC:'+dateFormat.masks.isoDateTime)];
+          item['date_time_utc'] = [d.format('UTC:'+dateFormat.masks.isoDateTime)+'+00:00'];
         },
         getUTCDate: function(dateString) {
           //###FORMAT utc date string ISO
@@ -710,7 +710,7 @@
           item['utc_offset'] = [parseFloat(utcval)];
           item['local_date_time'] = [dt+'T'+tm+tz];
           var d = new Date(dt+'T'+tm+tz);
-          item['date_time_utc'] = [d.format('UTC:'+dateFormat.masks.isoDateTime)];
+          item['date_time_utc'] = [d.format('UTC:'+dateFormat.masks.isoDateTime)+'+00:00'];
         },
         onShow: function() {
           var form = dijit.byId('data_value_edit_form');
@@ -738,16 +738,11 @@
           dojo.connect(dv_date, 'onChange', function(val){data_value_edit.dateChange(val)});
           dojo.connect(dv_time, 'onChange', function(val){data_value_edit.dateChange(val)});
           dojo.connect(dv_utc, 'onChange', function(val){data_value_edit.dateChange(val)});
-          //###TEST
-          dojo.connect(dijit.byId('DV_data_value'), 'onChange', function(){
-            console.log('DataValue CHANGED:',dijit.byId('DV_data_value').get('value'));
-          });
           //###ON-STATE-CHANGE
-          dojo.connect(form, "onValidStateChange", function(state){
-            //var saveBtn = dijit.byId('data_value_edit_submit');
+          //dojo.connect(form, "onValidStateChange", function(state){
+          form.watch('state', function(){
+            var state = form.isValid();
             console.log('STATE-CHANGE:',state);
-            //console.log('FORM:',form);
-            //console.log('BUTTON:',saveBtn);
             saveBtn.attr("disabled", !state);
           });
           //###SAVE BUTTON
@@ -772,7 +767,7 @@
               published: dijit.byId('DV_published').get('checked').toString(),
               local_date_time: dt+'T'+tm+tz,
               utc_offset: utcval,
-              date_time_utc: new Date(dt+'T'+tm+tz).format('UTC:'+dateFormat.masks.isoDateTime),
+              date_time_utc: new Date(dt+'T'+tm+tz).format('UTC:'+dateFormat.masks.isoDateTime)+'+00:00',
               provenance_comment: dijit.byId('DV_provenance_comment').value}};
             console.log('DV-POST:',data);
             $.ajax({
@@ -1610,10 +1605,10 @@
     };
 
     var openDataHistoryTab = function(tabs, projectId, dataId, dataVal, varId, varName, siteId) {
-      var tabTitle = 'History: Site-'+siteId+': '+varName+' ('+dataVal+')';
+      var tabTitle = 'History: Site-'+siteId+' / '+varName+' ('+dataVal+')';
       var projVarHistHref = "/projects/#{@project.id}/data_values/versions?id="+dataId;
       // "/projects/#{@project.id}/variables/versions?id="+varId+"&site_id="+siteId;
-      var projVarHistId = '#{@project.id}-site'+siteId+'-var'+varId+'-history';
+      var projVarHistId = '#{@project.id}--datavalue'+dataId+'-history';
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
       var projVarHistLoad = function(siteId,varName) {
@@ -1853,10 +1848,20 @@
     });
     
     dojo.subscribe("voeis/project/data/history", function(dataId,dataVal,varId,varName,siteId) {
-      console.log('DATA-HISTORY',arguments);
+      console.log('DATA-VALUE HISTORY',arguments);
       var projectId = "#{@project.id}";
       var tabs = dijit.byId('tab_browser');
       openDataHistoryTab(tabs, projectId, dataId, dataVal, varId, varName, siteId);
+    });
+
+    dojo.subscribe("voeis/project/data/history/update", function(dataId) {
+      console.log('DATA-VALUE HISTORY UPDATE:',arguments);
+      var projDataHistId = '#{@project.id}--datavalue'+dataId+'-history';
+      var histPane = dojo.byId(projDataHistId);
+      if(histPane) {
+        histPane = dijit.byNode(histPane);
+        histPane.refresh();
+      };
     });
 
     dojo.subscribe("voeis/project/samples", function(siteId) {
