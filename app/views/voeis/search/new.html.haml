@@ -51,15 +51,9 @@ Select Variables:
 %p{:id=>"formatted2"}
 =clear_break
 %button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button" onclick="BuildQuery();") 
-  Build Query
-#query_string{:style=>"width:900px;height:50px;"}
-=clear_break
-%button(dojoType="dijit.form.Button" name="search_button" id="search_button" disabled=true onclick="doSearch();" ) 
   Perform Search
+#query_string
 :javascript
-  dojo.addOnLoad(function(){
-    //dijit.byId("search_button").set("disabled",true);
-  });
   
   function updateVariables(){
     site_var_array = siteDataGrid.selection.getSelected();
@@ -96,7 +90,7 @@ Select Variables:
     url += "&start_date=" +dijit.byId("start_date").value.format('yyyy-mm-dd')
     url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
     $("#query_string").html(url);
-    dijit.byId("search_button").attr("disabled", false);
+    doSearch();
   }
   
   function doSearch(){

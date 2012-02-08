@@ -36,7 +36,7 @@ class Voeis::SearchController < Voeis::BaseController
                             :local_date_time.lte => end_date)
      # @variables  = data.variables(:unique=>true)
     end
-
+    @dv_count = data.count
     results = {}
     presults = {}
     @variables=[]

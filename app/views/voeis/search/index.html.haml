@@ -1,6 +1,10 @@
 
 %h1 Search Results
+
+%p
+  Search URL: #{request.url}
 -if @parallel_results.count < 500
+  %h2 Parallel Coordinate Graph of Results:
   #center  
     #fig
       :plain
@@ -160,7 +164,7 @@
           font-size: medium;
         }
         </style>
-
+%h2 Grid Results- showing #{@data.count} rows and #{@dv_count} data values.
 #searchGrid{:style=>"width:auto;height:500px;"}
 %button{:dojoType=>"dijit.form.Button",:onclick=>"exportAll()"}
   Export all to CSV</button>
