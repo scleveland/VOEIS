@@ -240,7 +240,12 @@
                   -#= link_to("Browse Data Streams", query_project_data_streams_path(@project), :dojoType => "yogo.ui.MenuLink")
                   -#= link_to("Simple QA/QC", query_project_samples_path(@project), :dojoType => "yogo.ui.MenuLink") 
                   -#= link_to("Search Data",new_project_search_path(@project), :dojoType => "yogo.ui.MenuLink") 
-                  = link_to("Search Data", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/search'); return false;")
+                  
+                  - if !@edit_auth.nil? && @edit_auth
+                    = link_to("Data Query QA/QC", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
+                  - else
+                    = link_to("Data Query", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
+                  = link_to("Data Search", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/search'); return false;")
                   = link_to("Job Queue", project_jobs_path(@project), :dojoType => "yogo.ui.MenuLink")
                   -if !current_user.nil?
                     -#= link_to("Search", campaigns_path, :dojoType => "yogo.ui.MenuLink")

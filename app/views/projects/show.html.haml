@@ -1593,7 +1593,8 @@
     };
 
     var openDataQueryTab = function(tabs, projectId, siteId) {
-      var tabTitle = 'Data Search: Site-'+siteId;
+      if(parseInt(siteId)) var tabTitle = 'Data Query: Site-'+siteId;
+      else var tabTitle = 'Data Query &ndash;';
       var projDataId = '#{@project.id}-site'+siteId+'-data';
       var projDataHref = "/projects/#{@project.id}/samples/query";
       if(parseInt(siteId)) projDataHref += '?site_id='+siteId
@@ -1618,7 +1619,7 @@
     };
 
     var openSearchTab = function(tabs, projectId) {
-      var tabTitle = 'Data Search:';
+      var tabTitle = 'Data Search &ndash;';
       var projDataId = '#{@project.id}-search';
       var projDataHref = "#{new_project_search_path(@project)}";
       var projDataLoad = function(varId,varName) {
@@ -1630,7 +1631,7 @@
     
     var openSearchResultTab = function(tabs, projectId, searchURL) {
       var tabTitle = 'Search Result: ' + new Date().format("HH:MM");
-      var projDataId = '#{@project.id}-search--results--'+ new Date().getTime();
+      var projDataId = '#{@project.id}--search--results--'+ new Date().getTime();
       var projDataHref = searchURL;
       var projDataLoad = function(varId,varName) {
           plot_parallel_coordinates()

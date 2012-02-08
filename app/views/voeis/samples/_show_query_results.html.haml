@@ -99,9 +99,9 @@
         #{dataId}.val_grid.update();
         //#{dataId}.plot.update();
       };
-      function dv_item_delete(idx){
-        var item = #{dataId}.val_grid.getItem(idx);
-        var id = item.id;
+      function dv_item_delete(id){
+        //var item = #{dataId}.val_grid.getItem(idx);
+        var item = datastore.get_raw(id,#{dataId}.val_store);
         confirmDialog('Confirm Rollback &mdash;',
           'ARE YOU SURE?\n<br/>DELETE DATA VALUE: \n<br/>'+item.data_value,
           function(yes){
@@ -339,9 +339,9 @@
         //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
         //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
         //var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
-        var hist_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/data/history\', ['+item.id+',\''+item.data_value+'\','+item.variable_id+',\'#{variable}\','+item.site_id+']);return false;">'+hist_icon+'</a>\n';
-        var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit('+idx+');return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
-        var delete_link = '<a href="javascript:" onclick="dv_item_delete('+idx+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
+        var hist_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/data/history\', ['+id+',\''+item.data_value.toString()+'\','+item.variable_id.toString()+',\'#{variable}\','+item.site_id+']);return false;">'+hist_icon+'</a>\n';
+        var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit('+id+');return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
+        var delete_link = '<a href="javascript:" onclick="dv_item_delete('+id+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
         var spaces = '&nbsp;';
         //if(item.used[0]) return spaces+hist_link;
         //return spaces+hist_link+spaces+delete_link;
@@ -488,10 +488,11 @@
            this.deselect_item = false;
          };
        },
-       popEdit: function(idx) {
+       popEdit: function(id) {
          //var item = this.getItem(idx);
-         var item = #{dataId}.value_data[idx];
-         var point = #{dataId}.data[idx];
+         //var item = #{dataId}.value_data[idx];
+         var item = datastore.get_raw(id,#{dataId}.val_store);
+         var point = #{dataId}.data[item._0];
          if(!item){
            console.log('NO ITEM!');
            return;
