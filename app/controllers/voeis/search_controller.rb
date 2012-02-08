@@ -8,8 +8,14 @@ class Voeis::SearchController < Voeis::BaseController
     @units = Voeis::Unit.all
     @unit_names = Hash.new
     @units.map{|u| @unit_names = @unit_names.merge({u.id => u.units_name})}
-    @start_date = parent.managed_repository{Voeis::SiteDataCatalog.first(:order=>[:starting_timestamp])}
-    @end_date = parent.managed_repository{Voeis::SiteDataCatalog.last(:order=>[:ending_timestamp], :ending_timestamp.not => nil)}
+    if parent.managed_repository{Voeis::SiteDataCatalog.count} > 0
+      @start_date = parent.managed_repository{Voeis::SiteDataCatalog.first(:order=>[:starting_timestamp])}
+      @end_date = parent.managed_repository{Voeis::SiteDataCatalog.last(:order=>[:ending_timestamp], :ending_timestamp.not => nil)}
+    else
+      @start_date= parent.managed_repository{Voeis::SiteDataCatalog.new(:starting_timestamp=>DateTime.now)}
+      @end_date=parent.managed_repository{Voeis::SiteDataCatalog.new(:ending_timestamp=>DateTime.now)}
+    end
+    
     debugger
   end
   
@@ -43,8 +49,12 @@ class Voeis::SearchController < Voeis::BaseController
       @variables << d.variable unless @variables.include?(d.variable)
     end
     null_variables={}
-    @variables.each do |v|
-      null_variables["var_#{v.id}"] = -9999
+    if !@variables.empty?
+      @variables.each do |v|
+        if !v.nil?
+          null_variables["var_#{v.id}"] = -9999
+        end
+      end
     end
     @parallel_results=[]
     presults.each do |k,pr| 
