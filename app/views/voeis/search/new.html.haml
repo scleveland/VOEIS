@@ -35,14 +35,14 @@ Select Variables:
 %div{:style=>"float: left;"}
   %label{:for=>"date1"}
     Start Date Selection:
-  %input{:type=>"text", :name=>"start_date", :id=>"start_date", :value=>"#{@start_date.starting_timestamp.strftime("%Y-%m-%d")}",
+  %input{:type=>"text", :name=>"start_date", :id=>"start_date", :value=>"#{@start_date.nil? ? Time.now.strftime("%Y-%m-%d") : @start_date.starting_timestamp.nil? ? Time.now.strftime("%Y-%m-%d") : @start_date.starting_timestamp.strftime("%Y-%m-%d")}",
       :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
 %div{:style=>"float: left;"}
   
   %label{:for=>"date1"}
     End Date Selection:
-  %input{:type=>"text", :name=>"end_date", :id=>"end_date", :value=>"#{@end_date.ending_timestamp.strftime("%Y-%m-%d")}",
+  %input{:type=>"text", :name=>"end_date", :id=>"end_date", :value=>"#{@end_date.nil? ? Time.now.strftime("%Y-%m-%d") : @end_date.ending_timestamp.nil? ? Time.now.strftime("%Y-%m-%d")  : @end_date.ending_timestamp.strftime("%Y-%m-%d")}",
       :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
 
 =clear_break
