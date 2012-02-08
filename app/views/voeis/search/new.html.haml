@@ -20,12 +20,12 @@
   var site_store = new dojo.data.ItemFileWriteStore({data: site_json }); 
   
 %h3{:style=>"margin:5px 0;"}
-  Project Search:
+  Data Search
 
 Select Site:
-#siteGrid{:style=>"width:900px;height:300px;"}
+#siteGrid{:style=>"width:900px;height:200px;"}
 %button(dojoType="dijit.form.Button" name="search_button" id="update_variable_button" onclick="updateVariables();") 
-  Update Variables From Selected Sites
+  Filter Variables From Selected Sites
 =clear_break
 =clear_break
 Select Variables:
@@ -195,7 +195,7 @@ Select Variables:
   siteDataGrid = new dojox.grid.EnhancedGrid({
      store: site_store,
      clientSort: true,
-     rowSelector: '20px',
+     rowSelector: '0',
      structure: site_layout,
      style: 'width:95%;',
      plugins: {filter:true, exporter:true,indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"},
@@ -215,7 +215,7 @@ Select Variables:
      store: var_store,
      grid_click: true,
      clientSort: true,
-     rowSelector: '20px',
+     rowSelector: '0',
      structure: var_layout,
      style: 'width:95%;',
      plugins: {filter:true, exporter:true,indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"},

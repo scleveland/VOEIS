@@ -1,4 +1,8 @@
 -# DATA VALUE VERSIONS PANE
+
+- tabId = 'site'+@site.id.to_s+'_data'
+- dataId = tabId+'_data'
+
 :javascript
   dojoConfig = { parseOnLoad: false };
   dojo.require("dojox.grid.EnhancedGrid");
@@ -42,6 +46,33 @@
       dv_item_restore(item);
       window.location.reload();
     };
+  };
+  //GRID CONTROL FUNCTIONS
+  function dv_item_restore(item){
+    console.log('DV ROLLBACK:',item);
+    var id = item.id;
+    var data = {};
+    data = {data_value: item};
+    delete data.data_value.id;
+    delete data.data_value.datetime_string;
+    delete data.data_value.vertical_offset_range;
+    delete data.data_value.published_string;
+    delete data.data_value.site;
+    delete data.data_value.variable;
+    delete data.data_value.site_id;
+    delete data.data_value.variable_id;
+    $.ajax({
+      type: 'PUT',
+      url: '/projects/#{@project.id}/data_values/'+id+'.json?api_key=#{current_user.api_key}',
+      data: data,
+      dataType: 'json',
+      success: function(dat){
+        datastore.update(item,#{dataId}.val_store);
+        //### Refresh
+        #{dataId}.val_grid.update();
+        //#{dataId}.plot.update();
+      }
+    });
   };
   
   // SAVE CALLBACK for ITEM ROLLBACK
@@ -106,8 +137,8 @@
   SHOW DATA VALUE VERSIONS
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
-//= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/datavalue/history/update', [#{@variable.id},#{@site.id}]);")
+//= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
+= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/data/history/update', [#{@data_value.id}]);")
 %br
 
 
@@ -119,6 +150,6 @@
                                         :unique_jsid=>"%s_datavalue%s"%[projId.tr('-','$'),@data_value.id],
                                         :item_refs=>@data_refs,
                                         :properties=>@ver_properties,
-                                        :restore_callback=>"item_restore",
+                                        :restore_callback=>"dv_item_restore",
                                         :user=>current_user
 

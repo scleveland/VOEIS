@@ -69,6 +69,68 @@
       var edit_auth = true;
       var versions_url = '/projects/#{@project.id}/data_values';
       var data_del_url = '';
+      
+      //GRID CONTROL FUNCTIONS
+      function dv_item_restore(item,callback){
+        console.log('DV ROLLBACK:',item);
+        var id = item.id;
+        var data = {data_value: item};
+        delete data.data_value.id;
+        delete data.data_value.datetime_string;
+        delete data.data_value.vertical_offset_range;
+        delete data.data_value.published_string;
+        delete data.data_value.site;
+        delete data.data_value.variable;
+        delete data.data_value.site_id;
+        delete data.data_value.variable_id;
+        $.ajax({
+          type: 'PUT',
+          url: '/projects/#{@project.id}/data_values/'+id+'.json?api_key=#{current_user.api_key}',
+          data: data,
+          dataType: 'json',
+          success: function(dat){
+            callback(dat);
+          }
+        });
+      };
+      function dv_grid_refresh(data){
+        datastore.update(data,#{dataId}.val_store);
+        //### Refresh
+        #{dataId}.val_grid.update();
+        //#{dataId}.plot.update();
+      };
+      function dv_item_delete(id){
+        //var item = #{dataId}.val_grid.getItem(idx);
+        var item = datastore.get_raw(id,#{dataId}.val_store);
+        confirmDialog('Confirm Rollback &mdash;',
+          'ARE YOU SURE?\n<br/>DELETE DATA VALUE: \n<br/>'+item.data_value,
+          function(yes){
+            console.log('CONFIRM:',yes);
+            if(!yes) return;
+            //DataValue DELETE
+            $.ajax({
+              type: 'DELETE',
+              url: '/projects/#{@project.id}/data_values/'+id+'?api_key=#{current_user.api_key}',
+              data: {},
+              dataType: 'json',
+              success: function(result){
+                var errs = result.errors;
+                if(errs && errs.length) {
+                  console.log('FAILED ERRORS:\n'+errs.join('/n'));
+                } else {
+                  //NOW UPDATE STORE
+                  console.log('UPDATE GRID:',item,result)
+                  datastore.delete(item,#{dataId}.val_store);
+                  //### Refresh
+                  #{dataId}.val_grid.update();
+                  //#{dataId}.plot.update();
+                };
+              }
+            });
+          }, 
+          { buttonOk:'YES', buttonCancel:'Cancel' });
+      };
+
   -else
     :javascript
       //### NO AUTH GLOBALS
@@ -276,9 +338,10 @@
         var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" style="margin:0;padding:0;height:16px;" />';
         //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
         //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
-        var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
-        var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit('+idx+');return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
-        var delete_link = '<a href="javascript:" onclick="dv_item_delete('+idx+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
+        //var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
+        var hist_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/data/history\', ['+id+',\''+item.data_value.toString()+'\','+item.variable_id.toString()+',\'#{variable}\','+item.site_id+']);return false;">'+hist_icon+'</a>\n';
+        var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit('+id+');return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
+        var delete_link = '<a href="javascript:" onclick="dv_item_delete('+id+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
         var spaces = '&nbsp;';
         //if(item.used[0]) return spaces+hist_link;
         //return spaces+hist_link+spaces+delete_link;
@@ -425,10 +488,11 @@
            this.deselect_item = false;
          };
        },
-       popEdit: function(idx) {
+       popEdit: function(id) {
          //var item = this.getItem(idx);
-         var item = #{dataId}.value_data[idx];
-         var point = #{dataId}.data[idx];
+         //var item = #{dataId}.value_data[idx];
+         var item = datastore.get_raw(id,#{dataId}.val_store);
+         var point = #{dataId}.data[item._0];
          if(!item){
            console.log('NO ITEM!');
            return;
@@ -456,66 +520,6 @@
 
     // append the new grid to the div " ":
     //dojo.byId("gridContainer").appendChild(val_grid.domNode);
-    
-    //GRID CONTROL FUNCTIONS
-    function dv_item_restore(item,callback){
-      console.log('DV ROLLBACK:',item);
-      var id = item.id;
-      var data = {data_value: item};
-      delete data.data_value.id;
-      delete data.data_value.datetime_string;
-      delete data.data_value.vertical_offset_range;
-      delete data.data_value.published_string;
-      delete data.data_value.site;
-      delete data.data_value.variable;
-      delete data.data_value.site_id;
-      delete data.data_value.variable_id;
-      $.ajax({
-        type: 'PUT',
-        url: '/projects/#{@project.id}/data_values/'+id+'.json?api_key=#{current_user.nil? ? '' : current_user.api_key}',
-        data: data,
-        dataType: 'json',
-        success: function(dat){
-          callback(dat);
-        }
-      });
-    };
-    function dv_grid_refresh(data){
-      datastore.update(data,#{dataId}.val_store);
-      //### Refresh
-      #{dataId}.val_grid.update();
-      //#{dataId}.plot.update();
-    };
-    function dv_item_delete(idx){
-      var item = #{dataId}.val_grid.getItem(idx);
-      var id = item.id;
-      confirmDialog('Confirm Rollback &mdash;',
-        'ARE YOU SURE?\n<br/>DELETE DATA VALUE: \n<br/>'+item.data_value,
-        function(yes){
-          console.log('CONFIRM:',yes);
-          if(!yes) return;
-          //DataValue DELETE
-          $.ajax({
-            type: 'DELETE',
-            url: '/projects/#{@project.id}/data_values/'+id+'?api_key=#{current_user.nil? ? '' : current_user.api_key}',
-            data: {},
-            dataType: 'json',
-            success: function(result){
-              var errs = result.errors;
-              if(errs && errs.length) {
-                console.log('FAILED ERRORS:\n'+errs.join('/n'));
-              } else {
-                //NOW UPDATE STORE
-                datastore.update(item,#{dataId}.val_store);
-                //### Refresh
-                #{dataId}.val_grid.update();
-                //#{dataId}.plot.update();
-              };
-            }
-          });
-        }, 
-        { buttonOk:'YES', buttonCancel:'Cancel' });
-    };
     
     
     $('##{tabId}_search_results #gridContainer').append(#{dataId}.val_grid.domNode);
