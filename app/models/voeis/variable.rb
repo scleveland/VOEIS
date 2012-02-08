@@ -163,7 +163,7 @@ class Voeis::Variable
     # results = repository.adapter.select(sql)
     # if results.length != 0
     #   sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time DESC LIMIT 10"
-      dresults = Voeis::DataValue.all(:site_id => site.id, :variable_id => self.id, :order => [:local_date_time.desc], :limit => 10)
+      dresults = Voeis::DataValue.all(:site_id => site.id, :variable_id => self.id, :order => [:local_date_time.desc], :limit => 24)
       #dresults = repository.adapter.select(sql)
       dresults.map{|dv| [dv[:local_date_time].to_datetime.to_i*1000, dv[:data_value]]}
     #end
@@ -176,7 +176,7 @@ class Voeis::Variable
     # if results.length != 0
     #   sql = "SELECT * FROM voeis_data_values WHERE id IN #{results.to_s.gsub('[','(').gsub(']',')')} ORDER BY local_date_time DESC LIMIT 10"
     #   dresults = repository.adapter.select(sql)
-    dresults = Voeis::DataValue.all(:site_id => site.id, :variable_id => self.id, :order => [:local_date_time.desc], :limit => 10)
+    dresults = Voeis::DataValue.all(:site_id => site.id, :variable_id => self.id, :order => [:local_date_time.desc], :limit => 24)
       dresults.map{|dv| [dv[:local_date_time].to_datetime, dv[:data_value]]}
       #(self.data_values & site.data_values).all(:order=>[:local_date_time], :limit=>10).map{|dv| [dv.local_date_time.to_datetime, dv.data_value] }
     #end
