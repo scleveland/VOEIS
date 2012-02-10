@@ -50,8 +50,11 @@ Select Variables:
 =clear_break
 %p{:id=>"formatted2"}
 =clear_break
-%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button" onclick="BuildQuery();") 
+%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button" onclick="doSearch();") 
   Perform Search
+%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button2" onclick="doSearch2();") 
+  TESTING: Search
+
 #query_string
 :javascript
   
@@ -90,13 +93,19 @@ Select Variables:
     url += "&start_date=" +dijit.byId("start_date").value.format('yyyy-mm-dd')
     url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
     $("#query_string").html(url);
-    doSearch();
   }
   
   function doSearch(){
+    BuildQuery();
     //window.location=$("#query_string").html();
     window.open($("#query_string").html(), "Search Results");
     //dojo.publish('voeis/project/search/results', [$("#query_string").html()])
+  }
+  function doSearch2(){
+    BuildQuery();
+    //window.location=$("#query_string").html();
+    //window.open($("#query_string").html(), "Search Results");
+    dojo.publish('voeis/project/search/results', [$("#query_string").html()])
   }
   //formatter: 'val_grid_formatter.dateTime',
   // grid formatters

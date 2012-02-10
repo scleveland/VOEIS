@@ -1634,7 +1634,7 @@
       var projDataId = '#{@project.id}--search--results--'+ new Date().getTime();
       var projDataHref = searchURL;
       var projDataLoad = function(varId,varName) {
-          plot_parallel_coordinates()
+          drawGraph();
       };
       openProjTab(tabs, projDataHref, projDataId, tabTitle, projDataLoad);
       //##
