@@ -723,7 +723,16 @@ module Odhelper
     end
   end
   
-  
+  def change_variable_no_data_value(project)
+    project.managed_repository do
+      sql ="ALTER TABLE voeis_variables ALTER COLUMN no_data_value TYPE varchar(512)"
+      repository.adapter.execute(sql)
+    end
+  end
+  def change_variable_no_data_value_global
+    sql ="ALTER TABLE voeis_variables ALTER COLUMN no_data_value TYPE varchar(512)"
+    repository.adapter.execute(sql)
+  end
   def set_variable_quality_control(project)
     puts project.name
     project.managed_repository do
