@@ -29,8 +29,10 @@ class Voeis::VariablesController < Voeis::BaseController
         if !params[:site_id].nil?
           @site =  Voeis::Site.get(params[:site_id].to_i)
           @site_variable_stats = Voeis::SiteDataCatalog.all(:variable_id=>params[:id].to_i, :site_id=>params[:site_id].to_i)
-          @graph_data = @variable.last_ten_values_graph(@site)
-          @data = @variable.last_ten_values(@site)
+          #@graph_data = @variable.last_ten_values_graph(@site)
+          #@data = @variable.last_ten_values(@site)
+          @graph_data = @variable.last_days_values_graph(@site)
+          @data = @variable.last_days_values(@site)
         end
       }
       @variable_ref = {}
@@ -199,7 +201,6 @@ class Voeis::VariablesController < Voeis::BaseController
   
   # POST /variables
   def create
-
     @variable = Voeis::Variable.new(params[:variable])
     if @variable.variable_code.nil? || @variable_code =="undefined"
       @variable.variable_code = @variable.id.to_s+@variable.variable_name+@variable.speciation+Voeis::Unit.get(@variable.variable_units_id).units_name
