@@ -259,13 +259,14 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   # @api public
   def upload_data 
+    flash_error = Hash.new
     parent.managed_repository do
       unless params[:site_id].nil?
         site = Voeis::Site.get(params[:site_id].to_i)  
         unless site.nil?
           unless params[:data_template_id].nil?
             first_row = Array.new
-            flash_error = Hash.new
+            
           debugger
             @msg = "There was a problem parsing this file."
             name = Time.now.to_s + params[:datafile].original_filename 
