@@ -137,7 +137,9 @@
       theDialog.show();
     };
     
+    //#####################
     // GLOBALS & STORES
+    var projectSearchCount = 0;
     var projectsDataStore = voeis.Server.DEFAULT.projectsDataStore();
     var projectStore = dojo.store.JsonRest({target: "#{root_url}projects.json?"});
     //var Sitestore = voeis.Server.DEFAULT.projectSitesDataStore('#{@project.id}');
@@ -1445,9 +1447,9 @@
 = clear_break
 
 -#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width:905px;height:540px;margin-top:0;padding-top:0;"}
-#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width:905px;height:540px;margin-top:0;padding-top:0;", :prop=>"parseOnLoad:true"}
-  #overview{:dojoType=>"dijit.layout.ContentPane", :title=>"Project", :style=>"margin:0;padding:0;", :selected=>true}
-    .show-map{:style=>"float:left;width:700px;height:500px;margin:0;padding:0;", :id=>@project.id}
+#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width:905px;height:480px;margin-top:0;padding-top:0;", :prop=>"parseOnLoad:true"}
+  #overview{:dojoType=>"dijit.layout.ContentPane", :title=>"Project", :style=>"margin:0;padding:0;float:left;", :selected=>true}
+    .show-map{:style=>"float:left;width:700px;height:100%;margin:0;padding:0;", :id=>@project.id}
     -#.show-map{:style=>"float:left;width:700px;height:500px;margin:0;padding:0;", :id=>@project.id}
     -#= render(:partial => 'overview_map', :locals => { :project => @project,
     -#                                                  :sites => @sites,
@@ -1457,7 +1459,7 @@
               :jsId=>"OverviewGrid", 
               :store=>"psites", 
               :autoWidth=>"false",
-              :style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
+              :style=>"width:200px;height:440px;float:left;margin:0;padding:0;cursor:pointer;"}
         -#:style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
         %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
           :plain
@@ -1599,9 +1601,32 @@
       var projDataHref = "/projects/#{@project.id}/samples/query";
       if(parseInt(siteId)) projDataHref += '?site_id='+siteId
       var projDataLoad = function(varId,varName) {
-        data_value_edit.startup();
+        console.log('QUERY-LOADED!!');
+        //data_value_edit.startup();
       };
       openProjTab(tabs, projDataHref, projDataId, tabTitle, projDataLoad);
+      //##
+    };
+
+    var openDataQueryResultsTab = function(tabs, projectId, siteId, qstring) {
+      if(parseInt(siteId)) {
+        var count = ++window['site'+siteId+'ref'].queryCount;
+        count = ('0000'+count).slice(-3);
+        var tabTitle = 'Query Results: Site-'+siteId+' ['+count+']';
+        //var tabId = '#{@project.id}-site'+siteId+'-query-'+count;
+        var tabId = 'site'+siteId+'_dataquery_'+count;
+      } else {
+        var count = ++projectSearchCount;
+        count = ('0000'+count).slice(-3);
+        var tabTitle = 'Data Query Results: '+count;
+        //var tabId = '#{@project.id}-dataquery'+count;
+        var tabId = 'site0_dataquery'+count;
+      };
+      var tabHref = "/projects/#{@project.id}/samples/search?tab_id="+tabId+"&"+qstring;
+      var tabLoaded = function(varId,varName) {
+        
+      };
+      openProjTab(tabs, tabHref, tabId, tabTitle, tabLoaded);
       //##
     };
 
@@ -1622,21 +1647,25 @@
       var tabTitle = 'Data Search &ndash;';
       var projDataId = '#{@project.id}-search';
       var projDataHref = "#{new_project_search_path(@project)}";
-      var projDataLoad = function(varId,varName) {
-
+      var projSearchLoad = function(varId,varName) {
+        
       };
-      openProjTab(tabs, projDataHref, projDataId, tabTitle, projDataLoad);
+      openProjTab(tabs, projDataHref, projDataId, tabTitle, projSearchLoad);
       //##
     };
     
     var openSearchResultTab = function(tabs, projectId, searchURL) {
-      var tabTitle = 'Search Result: ' + new Date().format("HH:MM");
-      var projDataId = '#{@project.id}--search--results--'+ new Date().getTime();
+      var count = ++projectSearchCount;
+      count = ('0000'+count).slice(-3);
+      //var tabTitle = 'Search Result: ' + new Date().format("HH:MM");
+      var tabTitle = 'Search Results: '+count;
+      //var projDataId = '#{@project.id}--search--results--'+ new Date().getTime();
+      var projDataId = '#{@project.id}--search-results--'+count;
       var projDataHref = searchURL;
-      var projDataLoad = function(varId,varName) {
+      var projSearchResultsLoad = function(varId,varName) {
           drawGraph();
       };
-      openProjTab(tabs, projDataHref, projDataId, tabTitle, projDataLoad);
+      openProjTab(tabs, projDataHref, projDataId, tabTitle, projSearchResultsLoad);
       //##
     };
     
@@ -1846,6 +1875,13 @@
       var projectId = "#{@project.id}";
       var tabs = dijit.byId('tab_browser');
       openDataQueryTab(tabs, projectId, siteId);
+    });
+    
+    dojo.subscribe("voeis/project/dataquery/results", function(siteId,qstring) {
+      console.log('DATA-QUERY-RESULTS',arguments);
+      var projectId = "#{@project.id}";
+      var tabs = dijit.byId('tab_browser');
+      openDataQueryResultsTab(tabs, projectId, siteId, qstring);
     });
     
     dojo.subscribe("voeis/project/data/history", function(dataId,dataVal,varId,varName,siteId) {

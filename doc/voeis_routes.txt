@@ -12,6 +12,7 @@
                                             project_membership GET    /projects/:project_id/memberships/:id(.:format)                                        {:action=>"show", :controller=>"memberships"}
                                                                PUT    /projects/:project_id/memberships/:id(.:format)                                        {:action=>"update", :controller=>"memberships"}
                                                                DELETE /projects/:project_id/memberships/:id(.:format)                                        {:action=>"destroy", :controller=>"memberships"}
+                                   export_project_search_index POST   /projects/:project_id/search/export(.:format)                                          {:action=>"export", :controller=>"voeis/search"}
                                           project_search_index GET    /projects/:project_id/search(.:format)                                                 {:action=>"index", :controller=>"voeis/search"}
                                                                POST   /projects/:project_id/search(.:format)                                                 {:action=>"create", :controller=>"voeis/search"}
                                             new_project_search GET    /projects/:project_id/search/new(.:format)                                             {:action=>"new", :controller=>"voeis/search"}
@@ -77,6 +78,7 @@
                                               project_meta_tag GET    /projects/:project_id/meta_tags/:id(.:format)                                          {:action=>"show", :controller=>"voeis/meta_tags"}
                                                                PUT    /projects/:project_id/meta_tags/:id(.:format)                                          {:action=>"update", :controller=>"voeis/meta_tags"}
                                                                DELETE /projects/:project_id/meta_tags/:id(.:format)                                          {:action=>"destroy", :controller=>"voeis/meta_tags"}
+                                       proto_project_data_sets GET    /projects/:project_id/data_sets/proto(.:format)                                        {:action=>"proto", :controller=>"voeis/data_sets"}
                                              project_data_sets GET    /projects/:project_id/data_sets(.:format)                                              {:action=>"index", :controller=>"voeis/data_sets"}
                                                                POST   /projects/:project_id/data_sets(.:format)                                              {:action=>"create", :controller=>"voeis/data_sets"}
                                           new_project_data_set GET    /projects/:project_id/data_sets/new(.:format)                                          {:action=>"new", :controller=>"voeis/data_sets"}
@@ -121,6 +123,7 @@
                             get_project_variable_project_apivs GET    /projects/:project_id/apivs/get_project_variable(.:format)                             {:action=>"get_project_variable", :controller=>"voeis/apivs"}
                              get_voeis_variables_project_apivs GET    /projects/:project_id/apivs/get_voeis_variables(.:format)                              {:action=>"get_voeis_variables", :controller=>"voeis/apivs"}
                         get_dojo_voeis_variables_project_apivs GET    /projects/:project_id/apivs/get_dojo_voeis_variables(.:format)                         {:action=>"get_dojo_voeis_variables", :controller=>"voeis/apivs"}
+                      get_project_site_variables_project_apivs GET    /projects/:project_id/apivs/get_project_site_variables(.:format)                       {:action=>"get_project_site_variables", :controller=>"voeis/apivs"}
                               get_project_sample_project_apivs GET    /projects/:project_id/apivs/get_project_sample(.:format)                               {:action=>"get_project_sample", :controller=>"voeis/apivs"}
                              get_project_samples_project_apivs GET    /projects/:project_id/apivs/get_project_samples(.:format)                              {:action=>"get_project_samples", :controller=>"voeis/apivs"}
                  get_project_sample_measurements_project_apivs GET    /projects/:project_id/apivs/get_project_sample_measurements(.:format)                  {:action=>"get_project_sample_measurements", :controller=>"voeis/apivs"}
@@ -148,6 +151,8 @@ get_project_site_sample_values_count_by_variable_project_apivs GET    /projects/
                          create_project_data_set_project_apivs POST   /projects/:project_id/apivs/create_project_data_set(.:format)                          {:action=>"create_project_data_set", :controller=>"voeis/apivs"}
                     add_data_to_project_data_set_project_apivs POST   /projects/:project_id/apivs/add_data_to_project_data_set(.:format)                     {:action=>"add_data_to_project_data_set", :controller=>"voeis/apivs"}
                remove_data_from_project_data_set_project_apivs POST   /projects/:project_id/apivs/remove_data_from_project_data_set(.:format)                {:action=>"remove_data_from_project_data_set", :controller=>"voeis/apivs"}
+                               upload_simulation_project_apivs POST   /projects/:project_id/apivs/upload_simulation(.:format)                                {:action=>"upload_simulation", :controller=>"voeis/apivs"}
+                    get_project_data_stream_data_project_apivs GET    /projects/:project_id/apivs/get_project_data_stream_data(.:format)                     {:action=>"get_project_data_stream_data", :controller=>"voeis/apivs"}
                                   get_job_status_project_apivs GET    /projects/:project_id/apivs/get_job_status(.:format)                                   {:action=>"get_job_status", :controller=>"voeis/apivs"}
                                 get_project_jobs_project_apivs GET    /projects/:project_id/apivs/get_project_jobs(.:format)                                 {:action=>"get_project_jobs", :controller=>"voeis/apivs"}
                        get_project_data_set_data_project_apivs GET    /projects/:project_id/apivs/get_project_data_set_data(.:format)                        {:action=>"get_project_data_set_data", :controller=>"voeis/apivs"}
@@ -192,7 +197,8 @@ get_project_site_sample_values_count_by_variable_project_apivs GET    /projects/
                                          query_project_samples GET    /projects/:project_id/samples/query(.:format)                                          {:action=>"query", :controller=>"voeis/samples"}
                          site_sample_variables_project_samples GET    /projects/:project_id/samples/site_sample_variables(.:format)                          {:action=>"site_sample_variables", :controller=>"voeis/samples"}
                                         export_project_samples POST   /projects/:project_id/samples/export(.:format)                                         {:action=>"export", :controller=>"voeis/samples"}
-                                        search_project_samples POST   /projects/:project_id/samples/search(.:format)                                         {:action=>"search", :controller=>"voeis/samples"}
+                                        search_project_samples GET    /projects/:project_id/samples/search(.:format)                                         {:action=>"search", :controller=>"voeis/samples"}
+                                                               POST   /projects/:project_id/samples/search(.:format)                                         {:action=>"search", :controller=>"voeis/samples"}
                                                project_samples GET    /projects/:project_id/samples(.:format)                                                {:action=>"index", :controller=>"voeis/samples"}
                                                                POST   /projects/:project_id/samples(.:format)                                                {:action=>"create", :controller=>"voeis/samples"}
                                             new_project_sample GET    /projects/:project_id/samples/new(.:format)                                            {:action=>"new", :controller=>"voeis/samples"}

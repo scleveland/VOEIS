@@ -35,6 +35,20 @@
   };
 
   function data_value_edit_setup() {};
+    
+  function submit_query() {
+    //dijit.byId('#{tabId}_loading_dialog').show();
+    var qstring = [];
+    var form = dojo.byId('#{tabId}_query');
+    if(!form) return;
+    for(var i=0; i<form.elements.length; i++) {
+      var fld = form.elements[i];
+      if(fld.value && fld.name && fld.type!='submit' && fld.type!='button') 
+        qstring.push(fld.name+'='+fld.value);
+    };
+    qstring = qstring.join('&');
+    dojo.publish('voeis/project/dataquery/results', [#{site_id}, qstring]);
+  }
 
   $(window).ready(function(){
     console.log('DATA-QUERY **LOADED**');
@@ -411,6 +425,7 @@
       });
     
     };
+
   
   :css
     #data_value_edit_formxxx [id^=DV] { width:35% !important; }
@@ -554,7 +569,7 @@
     Data Query:
 = form_for(:query, @query, :url => { :action=>'search'}, :remote=>true, :html=>{:id=>tabId+'_query'}) do |f|
   -#%input{:type=>"hidden", :name=>"tab_id", :value=>"#{tabId}"}
-  =hidden_field_tag('tab_id', tabId)
+  -#=hidden_field_tag('tab_id', tabId)
   - if site_id>0
     =hidden_field_tag('site_select', site_id.to_s)
   - else
@@ -569,16 +584,23 @@
   = clear_break
   = clear_break
   Dates After: 
-  = date_select('range', 'start_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
+  -#= date_select('range', 'start_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
+  -#%input(name="start_date" dojoType="dijit.form.DateTextBox" id="start_date00" value="#{@start_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
+  %input(name="start_date" dojoType="dijit.form.DateTextBox" id="start_date00" value="#{@start_date}" style="width:200px!important;")
+  &nbsp;&nbsp;&nbsp;
   Dates Before: 
-  = date_select('range', 'end_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
+  -#= date_select('range', 'end_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
+  -#%input(name="end_date" dojoType="dijit.form.DateTextBox" id="end_date00" value="#{@end_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
+  %input(name="end_date" dojoType="dijit.form.DateTextBox" id="end_date00" value="#{@end_date}" style="width:200px!important;")
   = clear_break
   = clear_break
 
   -#  (<span id="vars_count">#{@variable_opts_array.count}</span>):
   -#= f.submit('Search', :onclick => "dijit.byId('loading_dialog').show();")
   -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
-  %button(dojoType="dijit.form.Button" type="submit" name="submit_form" value="Search" onclick="dijit.byId('#{tabId}_loading_dialog').show();") 
+  -#%button(dojoType="dijit.form.Button" type="submit" name="submit_form" value="Search" onclick="dijit.byId('#{tabId}_loading_dialog').show();") 
+  -#  Search
+  %button(dojoType="dijit.form.Button" type="submit" name="submit_form" value="Search" onclick="submit_query();return false;")
     Search
   
   &nbsp;&nbsp;

@@ -1,0 +1,743 @@
+- dataId = @tabId+'_data'
+- edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project))
+
+-#%h3{:style=>"margin:5px 0;"}
+%h3{:style=>"margin-top:0;"}
+  = @site_name+':'
+  Query Results
+  (#{@tabId[-3,3]})
+
+%strong
+  QUERY DATES:
+  -if !@start_date.nil?
+    -if @start_date > @end_date
+      ERROR - start date should not come after end date
+    -else
+      = @start_date.to_date.to_formatted_s(:long).gsub('00:00','')
+      &ndash;
+      = @end_date.to_date.to_formatted_s(:long).gsub('00:00','')
+  -else
+    ERROR - invalid date entry
+
+=clear_break
+-# #pagination-links
+-# = pagination_links(@query, params[:page], 10)  
+
+-if @row_array.empty?
+  %strong
+    VARIABLE:
+    = "#{@var_name} | #{@units}"
+    %br
+    %br
+    %em
+      Sorry.  There is no Data for your search.
+
+  :javascript
+    console.log('FAILURR RESULT TABID: #{@tabId}');
+    console.log('FAILURR RESULT DATAID: #{dataId}');
+    var #{dataId} = {};
+    #{dataId}.value_data = #{@data_vals.to_json};
+    #{dataId}.data = #{@graph_data.as_json};
+    console.log('DATAID object:',#{dataId});
+
+-else
+  = javascript_include_tag(:defaults, "jquery.flot.min.js", "jquery.flot.selection.min.js","jquery.flot.navigate.min.js")
+  
+  
+  :css
+    div.zobutton {
+        font-size: smaller;
+        color: #999;
+        background-color: #eee;
+        padding: 4px;
+    }
+     .zobutton {
+        position: absolute;
+        cursor: pointer;
+    }
+
+    div.zibutton {
+        font-size: smaller;
+        color: #999;
+        background-color: #eee;
+        padding: 2px;
+    }
+     .zibutton {
+        position: absolute;
+        cursor: pointer;
+    }
+  
+  
+  -if edit_auth
+    :javascript
+      //### AUTH GLOBALS
+      var edit_auth = true;
+      var versions_url = '/projects/#{@project.id}/data_values';
+      var data_del_url = '';
+      
+      //GRID CONTROL FUNCTIONS
+      function dv_item_restore(item,callback){
+        console.log('DV ROLLBACK:',item);
+        var id = item.id;
+        var data = {data_value: item};
+        delete data.data_value.id;
+        delete data.data_value.datetime_string;
+        delete data.data_value.vertical_offset_range;
+        delete data.data_value.published_string;
+        delete data.data_value.site;
+        delete data.data_value.variable;
+        delete data.data_value.site_id;
+        delete data.data_value.variable_id;
+        $.ajax({
+          type: 'PUT',
+          url: '/projects/#{@project.id}/data_values/'+id+'.json?api_key=#{current_user.api_key}',
+          data: data,
+          dataType: 'json',
+          success: function(dat){
+            callback(dat);
+          }
+        });
+      };
+      function dv_grid_refresh(data){
+        datastore.update(data,#{dataId}.val_store);
+        //### Refresh
+        #{dataId}.val_grid.update();
+        //#{dataId}.plot.update();
+      };
+      function dv_item_delete(id){
+        //var item = #{dataId}.val_grid.getItem(idx);
+        var item = datastore.get_raw(id,#{dataId}.val_store);
+        confirmDialog('Confirm Rollback &mdash;',
+          'ARE YOU SURE?\n<br/>DELETE DATA VALUE: \n<br/>'+item.data_value,
+          function(yes){
+            console.log('CONFIRM:',yes);
+            if(!yes) return;
+            //DataValue DELETE
+            $.ajax({
+              type: 'DELETE',
+              url: '/projects/#{@project.id}/data_values/'+id+'?api_key=#{current_user.api_key}',
+              data: {},
+              dataType: 'json',
+              success: function(result){
+                var errs = result.errors;
+                if(errs && errs.length) {
+                  console.log('FAILED ERRORS:\n'+errs.join('/n'));
+                } else {
+                  //NOW UPDATE STORE
+                  console.log('UPDATE GRID:',item,result)
+                  datastore.delete(item,#{dataId}.val_store);
+                  //### Refresh
+                  #{dataId}.val_grid.update();
+                  //#{dataId}.plot.update();
+                };
+              }
+            });
+          }, 
+          { buttonOk:'YES', buttonCancel:'Cancel' });
+      };
+
+  -else
+    :javascript
+      //### NO AUTH GLOBALS
+      var edit_auth = false;
+      var versions_url = '/projects/#{@project.id}/data_values';
+      var data_del_url = '';
+  
+    
+    
+  :javascript
+    dojo.require("dijit.dijit");
+    dojo.require("dijit.Dialog");
+    dojo.require("dijit.form.Form");
+    dojo.require("dijit.form.Button");
+    dojo.require("dojox.form.Uploader");
+    dojo.require("dojox.grid.EnhancedGrid");
+    dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+    dojo.require("dojox.grid.enhanced.plugins.Filter");
+    dojo.require("dijit.layout.TabContainer");
+    dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+    dojo.require("dojox.grid.enhanced.plugins.Pagination");
+    //dojo.require("dojox.charting.Chart2D");
+    //dojo.require("dojox.charting.DataChart");
+    //dojo.require("dojox.charting.StoreSeries");
+    //dojo.require("dojox.charting.DataSeries");
+    //dojo.require("dojo.store.Observable");
+    //dojo.require("dojo.store.Memory");
+    //dojo.require("dojox.charting.themes.Claro");
+    dojo.require("dojo.data.ItemFileReadStore");
+    dojo.require("dojo.data.ItemFileWriteStore");
+    dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
+    
+    console.log('RESULT -TABID: #{@tabId}');
+    var #{dataId} = {};
+    #{dataId}.value_data = #{@data_vals.to_json};
+    for(var i=0;i<#{dataId}.value_data.length;i++) 
+      #{dataId}.value_data[i]['selected'] = 0;
+    #{dataId}.data = #{@graph_data.as_json};
+    
+    //console.log('1RESULT -DATAID(#{dataId}):',#{dataId});
+    //#{dataId}.values_json = {identifier: 'id', items: #{dataId}.value_data };
+    
+    //console.log('2RESULT -DATAID(#{dataId}):',#{dataId});
+    
+    //#{dataId}.val_store = new dojo.data.ItemFileReadStore({data: {identifier: 'id', items: #{dataId}.value_data }});
+    #{dataId}.val_store = new dojo.data.ItemFileWriteStore({data: {identifier: 'id', items: #{dataId}.value_data }});
+    
+    /***
+    #{dataId}.dvalue_store = dojo.store.Observable(new dojo.store.Memory({
+        data: {
+            identifier: "id",
+            label: "data values",
+            items: #{dataId}.value_data
+        }
+    }));
+    ***/
+    //console.log('3RESULT -DATAID(#{dataId}):',#{dataId});
+    
+    //create select array / clear array
+    /***
+    #{dataId}.value_selection = [];
+    function value_selection_clear(data_vals) {
+      data_vals.value_selection = [];
+      for(var i=0;i<data_vals.value_data.length;i++)
+        data_vals.value_selection[i] = 0;
+    };
+    value_selection_clear(#{dataId});
+    ***/
+    #{dataId}.clear_value_selection = function() {
+      var store = #{dataId}.val_store;
+      var len = #{dataId}.value_data.length;
+      for(var i=0;i<len;i++) {
+        var item0 = #{dataId}.value_data[i];
+        store.setValue(item0,'selected',0);
+      };
+      store.save({
+        onError: function() {
+          console.log('SAVE FAILED: clear_value_selection');
+        }
+      });
+    }; 
+    #{dataId}.select_value = function(item,value) {
+      var store = #{dataId}.val_store;
+      store.setValue(item,'selected',value);
+    }; 
+    #{dataId}.value_selected = function(item) {
+      var store = #{dataId}.val_store;
+      var val = store.getValue(item,'selected',0);
+      if(typeof val=='boolean' && val) return true;
+      if(typeof val!='boolean' && parseInt(val)) return true;
+      return false;
+    }; 
+    
+    //var chart1 = new dojox.charting.Chart2D("simplechart");
+    function trans1(store, item){
+      // let's create our object
+      var o = {
+        x: store.getValue(item, "local_date_time"),
+        y: store.getValue(item, "data_value")
+      };
+      return o;
+    }
+    
+    //chart1.addPlot("default", {type: "Lines"});
+    //chart1.addAxis("x");
+    //chart1.addAxis("y", {vertical: true});
+    //var series = new dojox.charting.DataSeries(value_store, { query: {id:"*"}}, trans1);
+    //chart1.addSeries(value_data, {query: {id: "*"}}, trans1(value_data, ));
+    //chart1.addSeries("DataValues", new dojox.charting.StoreSeries(dvalue_store, { query: { id: "*" } }, "local_date_time", "data_value"));
+    //chart1.addSeries("Series 1", series);
+    //chart1.render();
+
+    //chart = new dojox.charting.DataChart("chartDiv" ,{type:dojox.charting.plot2d.Scatter,xaxis:{labelFunc:"seriesLabels"}});
+    //chart.setStore(value_store, {symbol:"*"}, "data_value");  //  <-- single value property
+    // set the layout structure:
+    
+    function exportAll() {
+        dijit.byId("val_grid").exportGrid("csv", function(str) {
+            dojo.byId("output").value = str;
+        });
+    };
+    function exportSelected() {
+        var str = dijit.byId("val_grid").exportSelected("csv");
+        dojo.byId("output").value = str;
+    };
+    
+    function getProperDate(local_date_time, rowIndex){
+      return local_date_time.slice(0,local_date_time.length-6);
+    }
+    function addSelectedToDataSet(){
+      //get the data values
+      dijit.byId('#{@tabId}_loading_dialog').show();
+      var data_value_ids_string = ""
+      data_array = #{dataId}.val_grid.selection.getSelected();
+      for (i=0; i<data_array.length; i=i+1)
+      {
+        data_value_ids_string= data_value_ids_string + "&data_value_ids[]=" + data_array[i].id.toString();
+      }
+      //form has a hidden data_set_id
+      $.post('#{root_url}projects/#{@project_uid}/apivs/add_data_to_project_data_set.json?data_set_id=' + $("#data_set").val() + data_value_ids_string,
+        function(data) {
+          $('.result').html(data);
+          dijit.byId('#{@tabId}_loading_dialog').hide();
+        });
+    }
+    //formatter: 'val_grid_formatter.dateTime',
+    // grid formatters
+    var val_grid_formatter = {
+      dateTime: function(value) {
+        if(value==null || value=='') return '-';
+        // Format DateTime string
+        console.log('DATE:',value);
+        var d = new Date(value);
+        //var fmt = d.getMonth()+'/'+d.getFullYear()
+        return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+      },
+      dataDateTime: function(item) {
+        if(item==null || item=='') return '-';
+        // FORMAT LocalDateTime string for DataValue item
+        //###FORMAT utc offset value: -7.5 = "-07:30" // 3.75 = "+03:45"
+        var tzstr = item.utc_offset.toString();
+        var tz0 = tzstr.split('.');
+        var tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+Math.abs(tz0[0])).slice(-2)+':';
+        tz += tz0.length>1 ? (tz0[1]*6).toString().slice(0,2) : '00';
+        //var d0 = new Date(item.date_time_utc.toString());
+        //var d = new Date(d0.format("UTC:yyyy-mm-dd'T'HH:MM:ss"+tz));
+        var d = new Date(item.local_date_time.toString());
+        //console.log('GRID-DATE:',item.date_time_utc.toString(),item.local_date_time.toString(),item.utc_offset.toString());
+        return d.format("yyyy-mm-dd HH:MM:ss "+tz);
+      },
+      trueFalse: function(value) {
+        var checked_img = '<img src="/images/true.png" />';
+        var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
+        if(value) return checked_img;
+        return blank_img;
+      },
+      selectItem: function(item) {
+        //var checked_img = '<img src="/images/notice.png" alt="SELCT" />';
+        var selected_img = '<img src="/images/1abu007.gif" alt="SELCT" />';
+        var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
+      
+        if(#{dataId}.value_selected(item)) 
+          return selected_img;
+        return blank_img;
+      },
+      vertical_offset: function(item) {
+        var fixed = 3;    //decimal places accuracy
+        if(item==null || item=='') return '-';
+        if(item.vertical_offset[0]==null) return '-';
+        var vo_val = item.vertical_offset[0].toFixed(fixed);
+        //if(item.end_vertical_offset[0]!=null && item.end_vertical_offset[0]!=0)
+        if(item.end_vertical_offset[0]!=null)
+          vo_val += ' &ndash; '+item.end_vertical_offset[0].toFixed(fixed);
+        return vo_val;
+      },
+      controls: function(item) {
+        if(item==null || item=='') return '-';
+        if(!edit_auth) return '-must login-'
+        //return 'TESTING-- #';
+        var id = item.id[0];
+        var idx = item._0;
+        //console.log('GRID ITEM:',item);
+        var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" style="margin:0;padding:0;height:16px;" />';
+        var edit_icon = '<img src="/images/icons/edit.png" alt="history icon" title="EDIT" style="margin:0;padding:0;height:16px;" />';
+        var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" style="margin:0;padding:0;height:16px;" />';
+        //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
+        //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
+        //var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
+        var hist_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/data/history\', ['+id+',\''+item.data_value.toString()+'\','+item.variable_id.toString()+',\'#{@var_name}\','+item.site_id+']);return false;">'+hist_icon+'</a>\n';
+        var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit('+id+');return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
+        var delete_link = '<a href="javascript:" onclick="dv_item_delete('+id+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
+        var spaces = '&nbsp;';
+        //if(item.used[0]) return spaces+hist_link;
+        //return spaces+hist_link+spaces+delete_link;
+        return spaces+edit_link+spaces+hist_link+spaces+delete_link;
+      }
+    };
+
+    var val_layout = [
+    //{
+    //   field: '_item',
+    //   name: '-',
+    //   formatter: val_grid_formatter.selectItem,
+    //   width: '24px'
+    //},
+    {
+       //field: 'local_date_time',
+       field: '_item',
+       name: 'Timestamp',
+       formatter: val_grid_formatter.dataDateTime,
+       width: '185px'
+    },
+    {
+       field: 'data_value',
+       name: 'Value',
+       width: 'auto'
+    },
+    {
+       field: 'string_value',
+       name: 'Value (string)',
+       width: 'auto'
+    },
+    {
+       field: 'datatype',
+       name: 'DataType',
+       width: '10%'
+    },
+    //{
+    //   field: 'vertical_offset',
+    //   name: 'Vertical Offset',
+    //   width: 'auto'
+    //},
+    {
+       field: '_item',
+       name: 'Vertical Offset',
+       formatter: val_grid_formatter.vertical_offset,
+    //   width: '15%'
+       width: 'auto'
+    },
+    {
+       field: 'quality_control_level',
+       name: 'QC Lvl',
+       width: '6%'
+    },
+    {
+       field: 'published',
+       name: 'Pub',
+       formatter: val_grid_formatter.trueFalse,
+       width: '5%'
+    },
+    {
+       field: '_item',
+       name: 'DO',
+       formatter: val_grid_formatter.controls,
+       width: '10%'
+    }
+    ];
+    if(!edit_auth) val_layout.pop();
+
+    // create a new grid:
+    #{dataId}.val_grid = new dojox.grid.EnhancedGrid({
+       store: #{dataId}.val_store,
+       select_click: false,
+       select_item: false,
+       deselect_item: false,
+       clientSort: true,
+       rowSelector: '0',
+       structure: val_layout,
+       //style: 'width:100%;',
+       plugins: {filter:true, exporter:true,
+         indirectSelection:{
+           headerSelector:true, 
+           rowSelector:'multi',
+           cell:false,
+           col:false,
+           width:"40px", 
+           styles:"text-align: center;"},
+         pagination:{
+           sizeSwitch: true,
+           position: "top",
+           itemTitle: "Data Points"
+       }},
+       
+       onSelected: function(idx) {
+         this.select_item = this.getItem(idx);
+         this.deselect_item = false;
+         this.select_focus = this.focus;
+         console.log('SELECT:',this.select_item);
+         //this.select_col = this.focus.cell.index;
+         //var col1 = this.layout.cells[1];
+         //this.focus.setFocusCell(col1,idx);
+         //###this.selection.deselect(this.select_item);
+         //if(this.select_col==this.layout.cellCount-1){
+         //if(!this.select_col==0){
+         //  this.selection.deselect(this.select_item);
+         //  return;
+         //};
+         //var item = this.grid_select;
+         //console.log('SELECT:',item);
+         //var point = #{dataId}.data[item._0];
+         //console.log('SELECT-PT:',point);
+         //this.selection.deselect(this.select_item);
+       },
+       onDeselected: function(idx) {
+         this.deselect_item = this.getItem(idx);
+         this.select_item = false;
+         this.select_focus = this.focus;
+         console.log('DESELECT:',this.deselect_item);
+         //var col1 = this.layout.cells[1];
+         //this.focus.setFocusCell(col1,idx);
+         //###this.selection.addToSelection(this.select_item);
+         //if(this.select_col==this.layout.cellCount-1){
+         //if(!this.select_col==0){
+         //  this.selection.addToSelection(this.select_item);
+         //  return;
+         //};
+       },
+       onClick: function(ev) {
+         this.select_click = ev;
+         //console.log('GRID-CLICK:',ev);
+         //var select_col = this.select_focus.cell.index;
+         if(this.select_focus.cell==null) return;
+         if(this.select_item){
+           if(this.select_focus.cell.index!=0){
+             this.selection.deselect(this.select_item);
+             return;
+           };
+           this.select_item = false;
+         };
+         if(this.deselect_item){
+           if(this.select_focus.cell.index!=0){
+             this.selection.addToSelection(this.select_item);
+             return;
+           };
+           this.deselect_item = false;
+         };
+       },
+       popEdit: function(id) {
+         //var item = this.getItem(idx);
+         //var item = #{dataId}.value_data[idx];
+         var item = datastore.get_raw(id,#{dataId}.val_store);
+         var point = #{dataId}.data[item._0];
+         if(!item){
+           console.log('NO ITEM!');
+           return;
+         };
+         //EDIT datavalue
+         console.log('EDIT ITEM:',item);
+         data_value_edit.pop(item, function(data) {
+           //### Update Graph
+           //data['selected'] = item.selected;
+           #{dataId}.data[item._0] = [point[0],data.data_value]
+           //### Update Grid
+           //#####STORE SAVE
+           datastore.update(data,#{dataId}.val_store);
+           //### Refresh
+           #{dataId}.val_grid.update();
+           //#{dataId}.plot.update();
+         });
+       },
+       onFetchError: function(err) {
+         console.log('GRID FETCH ERROR:',err);
+       }
+    },
+    document.createElement('div'));
+    #{dataId}.val_grid.changePageSize(10);
+
+    // append the new grid to the div " ":
+    //dojo.byId("gridContainer").appendChild(val_grid.domNode);
+    
+    
+    $('##{@tabId}_search_results #gridContainer').append(#{dataId}.val_grid.domNode);
+
+    // Call startup, in order to render the grid:
+    #{dataId}.val_grid.startup();
+    
+    // Setup tooltip removal on tab switch
+    //var tabs = dijit.byId('tab_browser');
+    //tabs.watch("selectedChild", function(name, oval, nval){
+    //    console.log("changed TABs from: ", oval, " to ", nval);
+    //    $("#tooltip").remove();
+    //});    
+    
+    #{dataId}.plot = $.plot($("##{@tabId}_search_results #plotContainer"), [#{dataId}.data],{
+           series: {
+               color : "blue",
+               lines: { show: true },
+               points: { show: true }
+              },
+           grid:  { 
+             backgroundColor: '#fcfcfc',
+             hoverable: true, 
+             clickable: true 
+           },
+           xaxis: { mode: "time" },
+           pan:   { interactive: true },
+           zoom: {interative: true}
+    });
+
+    // add zoom out button 
+    $('<div class="zobutton" style="right:20px;top:20px">-</div>').appendTo($("##{@tabId}_search_results #plotContainer")).click(function (e) {
+       e.preventDefault();
+       #{dataId}.plot.zoomOut();
+    });
+    $('<div class="zibutton" style="right:20px;top:43px">+</div>').appendTo($("##{@tabId}_search_results #plotContainer")).click(function (e) {
+       e.preventDefault();
+       #{dataId}.plot.zoom();
+    });
+
+    //Function ShowToolTip and previousPoint allow the hover function to display
+     //a message for each data point on the graph when the cursor hoversover
+     
+     //I would only mess with the css if you really need to otherwise this
+     //shouldn't need any modification
+     function showTooltip(x, y, contents) {
+       //delete tooltip_timeout;
+       //var tooltip_timeout = setTimeout(function() {
+       //  $("#tooltip").remove();
+       //  delete tooltip_timeout;
+       //},4000);
+       $('<div id="tooltip">' + contents + '</div>').css( {
+           position: 'absolute',
+           display: 'none',
+           'z-index': 1000,
+           top: y + 5,
+           left: x + 5,
+           border: '1px solid #fdd',
+           padding: '2px',
+           'background-color': '#fee',
+           opacity: 0.80
+       }).appendTo("body").fadeIn(200);
+     };
+
+     //remove tooltip on mouseout
+     //$("##{@tabId}_search_results #placeholder").bind("onmouseout", function (event) {
+     //  $("#tooltip").remove();
+     //};
+
+
+     //Most of this should remain the same
+     //NOTE-- the time string for #x is in UTC format and currently is in GMT time
+     #{dataId}.previousPoint = null;
+     
+     $("##{@tabId}_search_results #plotContainer").bind("plothover", function (event, pos, item) {
+         var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+         var dDate = new Date();
+         dDate.setTime(mEpoch);
+         $("#x").text(dDate.toLocaleString());
+         $("#y").text(pos.y);
+
+         if (item) {
+             if (#{dataId}.previousPoint != item.datapoint) {
+                 #{dataId}.previousPoint = item.datapoint;
+                 $("#tooltip").remove();
+                 var x = item.datapoint[0].toFixed(2),
+                     y = item.datapoint[1].toFixed(2);
+                     var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+                     dDate = new Date();
+                     dDate.setTime(mEpoch);
+                 showTooltip(item.pageX, item.pageY,
+                   //*****You will need to change the sensor name here to the appropriate one selected above
+                            //dDate.toLocaleString() + " = " + y + " " + "#{@variable}|#{@units}" );
+                            val_grid_formatter.dateTime(dDate) + " = " + y + " " + "#{@var_name}|#{@units}" );
+             }
+         } else {
+             $("#tooltip").remove();
+             #{dataId}.previousPoint = null;            
+         }
+     });
+     
+     // PLOTCLICK event to scroll to point on datagrid
+     $("##{@tabId}_search_results #plotContainer").bind("plotclick", function (event, pos, item) {
+         if(item) {
+           //###SCROLL TO TOP of GRID
+           //window.scrollTo(0,0);
+           //$('html #main_container').animate({scrollTop:580}, 'slow');//IE, FF
+           //$('body #main_container').animate({scrollTop:580}, 'slow');//chrome, safari
+           var idx = item.dataIndex;
+           var val_item = #{dataId}.value_data[idx];
+           //var val_grid = dijit.byNode($('##{@tabId}_search_results #gridContainer div')[0]);
+           var val_grid = #{dataId}.val_grid;
+           var store = #{dataId}.val_store;
+           
+           //#val_grid.selection.deselectAll();
+           val_grid.scrollTo(0);
+           val_grid.scrollToRow(idx);
+           //#val_grid.selection.addToSelection(val_item);
+           val_grid.selection.toggleSelect(val_item);
+           console.log('PLOT-CLICK:',event,pos,item,val_item);
+           
+           //value_selection_clear(#{dataId});
+           //#{dataId}.value_selection[idx] = 1;
+           #{dataId}.clear_value_selection();
+           #{dataId}.select_value(val_item,1);
+           
+           val_grid.update();
+         };
+     });
+     
+     //###SCROLL TO SEARCH DIV
+     //window.scrollTo(0,0);
+     //$('html #main_container').animate({scrollTop:220}, 'slow');//IE, FF
+     //$('body #main_container').animate({scrollTop:220}, 'slow');//chrome, safari
+     //$('##{@tabId}_search_results').animate({scrollTop:200}, 'slow');
+
+
+     //ON-LOAD READY
+     $(window).ready(function(){
+       console.log('QUERY-RESULTS **LOADED**');
+       //console.log('DATA-QUERY TABID: #{@tabId}');
+       var count = window['site#{@site.id.to_s}ref'].queryCount;
+       count = ('0000'+count).slice(-3);
+       $('##{@tabId}_query_count').text(count);
+
+     });
+
+  :css
+    #gridContainer img { margin:0; }
+    #gridContainer a { margin:0; }
+  
+  %div{:id=>"#{@tabId}_search_results"}
+    %br
+    %h3{:style=>"margin:0 0 10px 0;width:500px;float:left;"}
+      = "#{@var_name} | #{@units}"
+    -if !@row_array.empty?
+      -form_tag({:html=>{:style=>'float:left;'}, :controller=>'samples', :action=>'export'}) do 
+        =hidden_field_tag('column_array', @column_array.to_json)
+        =hidden_field_tag('row_array', @row_array.to_json)
+        =hidden_field_tag('site_name', @site_name)
+        =hidden_field_tag('site', @site.to_json)
+        =hidden_field_tag('variable', @variable.to_json)
+        =hidden_field_tag('start_date', @start_date)
+        =hidden_field_tag('data_vals', @data_vals.to_json)
+        =hidden_field_tag('end_date', @end_date)
+        =submit_tag("Export Results")
+      =clear_break
+    -#simplechart{:style=>"width: 250px; height: 150px;"}
+    -#chartDiv{:style=>"width: 250px; height: 150px;"}
+    #plotContainer{:style=>"width:600px;height:300px;float:left;"}
+    -#=render_widget :flot_graph, :display, :variable=>variable, :data => graph_data
+    -##value_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pvalues", :data=>"values_json"}
+    -#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{filter:true}",  :store=>"value_store", :clientSort=>"true", :style=>"width: 700px; height: 400px;", :jsId=>"ValueDisplayGrid", :id=>"ValueDisplayGrid", :title=>"Sites"}
+    -#%thead
+    -#%tr
+    -#%th{:field=>"local_date_time", :width=>"190px", :filterable=>true} Timestamp
+    -#%th{:field=>"vertical_offset", :width=>"130px", :filterable=>true} Vertical Offset
+    -#%th{:field=>"data_value", :width=>"100px", :filterable=>true} Value
+    #buttonContainer{:style=>"width:200px;height:100px;margin:180px 0 0 20px;float:left;"}
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    -# 33e 3A7594 3889AA
+    #gridContainer{:style=>"width:850px;height:430px;border:solid 1px #3A7594;"}
+    -if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
+      %label{:id=>"d_set", :onclick=>"dijit.byId('new_data_set').show();", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}Data Set:
+      = select_tag("data_set", @data_set_options.html_safe)
+      %button(dojoType="dijit.form.Button" name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
+        Add Selected Data to Data Set
+    %br
+    %br
+    -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
+
+    -# %button{:onclick=>"exportAll()"}
+    -#   Export all to CSV
+    -# %button{:onclick=>"exportSelected()"}
+    -#   Export Selected Rows to CSV
+    -# %br
+    -# %textarea{:id=>"output"}
+
+    -# -i=0
+    -# %table
+    -#   %tr
+    -#     -column_array.each do |col|
+    -#       %th
+    -#         =col[0]
+    -#   -row_array.each do |row|
+    -#     -i=1-i
+    -#     %tr{:class=>"row#{i}"}
+    -#       -row.each do |col|
+    -#         %td{:class =>"search-results"}
+    -#           =col
+
+:javascript
+  dojo.addOnLoad(function() {
+    
+  });
