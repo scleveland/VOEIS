@@ -24,7 +24,9 @@
     font-size: medium;
   }
 
-%h1 Search Results
+-#%h1 Search Results
+%h3{:style=>"margin-top:0;"}
+  Search Results
 
 %p
   Search URL: #{request.url}
@@ -35,10 +37,11 @@
       GRAPH HERE!
       
 
-%h2 Grid Results- showing #{@data.count} rows and #{@dv_count} data values.
-#searchGrid{:style=>"width:auto;height:500px;"}
-%button{:dojoType=>"dijit.form.Button",:onclick=>"exportAll()"}
+%h3 Grid Results- showing #{@data.count} rows and #{@dv_count} data values.
+#searchGrid{:style=>"width:auto;height:500px;margin-bottom:6px;"}
+%button{:dojoType=>"dijit.form.Button",:onclick=>"exportAll()", :style=>"margin-bottom:20px;padding:0;"}
   Export all to CSV</button>
+%br
 -#%button{:dojoType=>"dijit.form.Button",:onclick=>"exportSelected()"}
 -#Export Selected Rows to CSV
 =form_tag 'search/export' do 
