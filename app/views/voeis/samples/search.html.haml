@@ -710,10 +710,9 @@
     #gridContainer{:style=>"width:850px;height:430px;border:solid 1px #3A7594;"}
     -if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
       %p{:style=>"margin:7px 0;"}
-        -#%a{:href=>"javascript:", :onclick=>""}
-        
-        %label{:id=>"d_set", :onclick=>"dijit.byId('new_data_set').show();", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
-          Data Set:
+        %a{:href=>"javascript:", :onclick=>"dijit.byId('new_data_set').show();return false;"}
+          %label{:id=>"d_set", :onclick=>"dijit.byId('new_data_set').show();", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
+            Data Set:
         = select_tag("data_set", @data_set_options.html_safe)
         %button(dojoType="dijit.form.Button" name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
           Add Selected Data to Data Set
@@ -744,3 +743,6 @@
   dojo.addOnLoad(function() {
     
   });
+
+-if !current_user.nil? && current_user.projects.include?(@project)
+  = render(:partial => "data_set", :locals =>{:project_uid=>@project.id})
