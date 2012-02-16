@@ -321,6 +321,37 @@
             onComplete: function() { console.log('STORE ITEM DELETED!') },
             onError: function(error) { console.log('STORE DELETE ERROR:',error) }
           });
+      },
+      formats: {
+        dateTime: function(value) {
+          if(value==null || value=='') return '-';
+          // Format DateTime string
+          console.log('DATE:',value);
+          var d = new Date(value);
+          //var fmt = d.getMonth()+'/'+d.getFullYear()
+          return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+          //return d.format("yyyy-mm-dd HH:MM:ss "+tz);
+        },
+        dataDateTime: function(item) {
+          if(item==null || item=='') return '-';
+          // FORMAT LocalDateTime string for DataValue item
+          //###FORMAT utc offset value: -7.5 = "-07:30" // 3.75 = "+03:45"
+          var tzstr = item.utc_offset.toString();
+          var tz0 = tzstr.split('.');
+          var tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+Math.abs(tz0[0])).slice(-2)+':';
+          tz += tz0.length>1 ? (tz0[1]*6).toString().slice(0,2) : '00';
+          //var d0 = new Date(item.date_time_utc.toString());
+          //var d = new Date(d0.format("UTC:yyyy-mm-dd'T'HH:MM:ss"+tz));
+          var d = new Date(item.local_date_time.toString());
+          //console.log('GRID-DATE:',item.date_time_utc.toString(),item.local_date_time.toString(),item.utc_offset.toString());
+          return d.format("yyyy-mm-dd HH:MM:ss "+tz);
+        },
+        trueFalse: function(value) {
+          var checked_img = '<img src="/images/true.png" />';
+          var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
+          if(value) return checked_img;
+          return blank_img;
+        }
       }
     };
     
@@ -1645,12 +1676,11 @@
 
     var openSearchTab = function(tabs, projectId) {
       var tabTitle = 'Data Search &ndash;';
-      var projDataId = '#{@project.id}-search';
-      var projDataHref = "#{new_project_search_path(@project)}";
-      var projSearchLoad = function(varId,varName) {
-        
+      var tabId = '#{@project.id}-search';
+      var tabHref = "#{new_project_search_path(@project)}";
+      var tabLoaded = function(varId,varName) {
       };
-      openProjTab(tabs, projDataHref, projDataId, tabTitle, projSearchLoad);
+      openProjTab(tabs, tabHref, tabId, tabTitle, tabLoaded);
       //##
     };
     
@@ -1658,14 +1688,15 @@
       var count = ++projectSearchCount;
       count = ('0000'+count).slice(-3);
       //var tabTitle = 'Search Result: ' + new Date().format("HH:MM");
-      var tabTitle = 'Search Results: '+count;
-      //var projDataId = '#{@project.id}--search--results--'+ new Date().getTime();
-      var projDataId = '#{@project.id}--search-results--'+count;
-      var projDataHref = searchURL;
-      var projSearchResultsLoad = function(varId,varName) {
+      var tabTitle = 'Search Results  ['+count+']';
+      //var tabId = '#{@project.id}--search--results--'+ new Date().getTime();
+      //var tabId = '#{@project.id}--search-results--'+count;
+      var tabId = 'search_results_'+count;
+      var tabHref = searchURL+'&tab_id='+tabId;
+      var tabLoaded = function(varId,varName) {
           drawGraph();
       };
-      openProjTab(tabs, projDataHref, projDataId, tabTitle, projSearchResultsLoad);
+      openProjTab(tabs, tabHref, tabId, tabTitle, tabLoaded);
       //##
     };
     

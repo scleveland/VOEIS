@@ -5,7 +5,7 @@
 %h3{:style=>"margin-top:0;"}
   = @site_name+':'
   Query Results
-  (#{@tabId[-3,3]})
+  [#{@tabId[-3,3]}]
 
 %strong
   QUERY DATES:
@@ -709,11 +709,14 @@
     -# 33e 3A7594 3889AA
     #gridContainer{:style=>"width:850px;height:430px;border:solid 1px #3A7594;"}
     -if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
-      %label{:id=>"d_set", :onclick=>"dijit.byId('new_data_set').show();", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}Data Set:
-      = select_tag("data_set", @data_set_options.html_safe)
-      %button(dojoType="dijit.form.Button" name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
-        Add Selected Data to Data Set
-    %br
+      %p{:style=>"margin:7px 0;"}
+        -#%a{:href=>"javascript:", :onclick=>""}
+        
+        %label{:id=>"d_set", :onclick=>"dijit.byId('new_data_set').show();", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
+          Data Set:
+        = select_tag("data_set", @data_set_options.html_safe)
+        %button(dojoType="dijit.form.Button" name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
+          Add Selected Data to Data Set
     %br
     -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
 

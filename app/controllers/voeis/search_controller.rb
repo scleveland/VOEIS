@@ -20,10 +20,13 @@ class Voeis::SearchController < Voeis::BaseController
   end
   
   def index
+    @tabId = params[:tab_id]
     site_ids    = params[:site_ids].split(',')
     variable_ids = params[:var_ids].split(',')
     start_date   = params[:start_date]
     end_date     = params[:end_date]
+    @start_date = Date.parse(start_date)
+    @end_date = Date.parse(end_date)
     @units = Voeis::Unit.all
     @unit_names = Hash.new
     @units.map{|u| @unit_names = @unit_names.merge({u.id => u.units_abbreviation})}
