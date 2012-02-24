@@ -168,6 +168,7 @@
     dojo.require("dojo.data.ItemFileWriteStore");
     dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
     
+    
     console.log('RESULT -TABID: #{@tabId}');
     var #{dataId} = {};
     #{dataId}.value_data = #{@data_vals.to_json};
@@ -287,7 +288,7 @@
       dateTime: function(value) {
         if(value==null || value=='') return '-';
         // Format DateTime string
-        console.log('DATE:',value);
+        //console.log('DATE:',value);
         var d = new Date(value);
         //var fmt = d.getMonth()+'/'+d.getFullYear()
         return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
@@ -416,19 +417,22 @@
     if(!edit_auth) val_layout.pop();
 
     // create a new grid:
+    //#{dataId}.val_grid = new dijit_ext.Egrid({
     #{dataId}.val_grid = new dojox.grid.EnhancedGrid({
        store: #{dataId}.val_store,
-       select_click: false,
-       select_item: false,
-       deselect_item: false,
        clientSort: true,
        rowSelector: '0',
+       rowsPerPage: 10,
+       selectionMode:'extended',
        structure: val_layout,
        //style: 'width:100%;',
+       //TURN-OFF clickSelectEvent
+       rowSelect: false,
        plugins: {filter:true, exporter:true,
          indirectSelection:{
            headerSelector:true, 
            rowSelector:'multi',
+           selectionMode:'extended',
            cell:false,
            col:false,
            width:"40px", 
@@ -439,7 +443,7 @@
            itemTitle: "Data Points"
        }},
        
-       onSelected: function(idx) {
+       xonSelected: function(idx) {
          this.select_item = this.getItem(idx);
          this.deselect_item = false;
          this.select_focus = this.focus;
@@ -459,7 +463,7 @@
          //console.log('SELECT-PT:',point);
          //this.selection.deselect(this.select_item);
        },
-       onDeselected: function(idx) {
+       xonDeselected: function(idx) {
          this.deselect_item = this.getItem(idx);
          this.select_item = false;
          this.select_focus = this.focus;
@@ -473,10 +477,11 @@
          //  return;
          //};
        },
-       onClick: function(ev) {
+       xonClick: function(ev) {
          this.select_click = ev;
-         //console.log('GRID-CLICK:',ev);
+         console.log('GRID-CLICK:',ev);
          //var select_col = this.select_focus.cell.index;
+         return;
          if(this.select_focus.cell==null) return;
          if(this.select_item){
            if(this.select_focus.cell.index!=0){
@@ -594,17 +599,124 @@
      //  $("#tooltip").remove();
      //};
 
-
      //Most of this should remain the same
      //NOTE-- the time string for #x is in UTC format and currently is in GMT time
      #{dataId}.previousPoint = null;
+     #{dataId}.plotClick = [];
+     #{dataId}.plotHover = [];
+     #{dataId}.hoverDelay = 0;
+     
+     //DOM hover event
+     //$('tab_browser').hover( function(e){
+     //$('body').mouseover( function(e){
+     $('xbody').hover( function(e){
+       //console.log('DOM-HOVER:',e);
+       if(#{dataId}.plotHover.length==0) {
+         $("#tooltip").remove();
+         return;
+       };
+       var event = #{dataId}.plotHover[0];
+       var pos = #{dataId}.plotHover[1];
+       var item = #{dataId}.plotHover[2];
+       if(!item) {
+         //$("#tooltip").remove();
+         return;
+       };
+       console.log('DOM-PLOT-HOVER =',#{dataId}.plotHover,e);
+       showPlotTooltip(event,pos,item);
+       //$("#tooltip").remove();
+       
+       //CLEAR EVENT
+       #{dataId}.plotHover = [];
+     });
+     
+     //DOM click event
+     $('body').click( function(e){
+       //console.log('DOM-CLICK:',e);
+       if(#{dataId}.plotClick.length==0) return;
+       var event = #{dataId}.plotClick[0];
+       var pos = #{dataId}.plotClick[1];
+       var item = #{dataId}.plotClick[2];
+       //SELECT ROW IN GRID
+       if(item) {
+         //###SCROLL TO TOP of GRID
+         //window.scrollTo(0,0);
+         //$('html #main_container').animate({scrollTop:580}, 'slow');//IE, FF
+         //$('body #main_container').animate({scrollTop:580}, 'slow');//chrome, safari
+         var idx = item.dataIndex;
+         var val_item = #{dataId}.value_data[idx];
+         //var val_grid = dijit.byNode($('##{@tabId}_search_results #gridContainer div')[0]);
+         var val_grid = #{dataId}.val_grid;
+         var store = #{dataId}.val_store;
+         
+         //#val_grid.selection.deselectAll();
+         val_grid.scrollTo(0);
+         val_grid.scrollToRow(idx);
+         //#val_grid.selection.addToSelection(val_item);
+         val_grid.selection.toggleSelect(val_item);
+         console.log('PLOT-CLICK:',event,pos,item,val_item);
+         
+         //value_selection_clear(#{dataId});
+         //#{dataId}.value_selection[idx] = 1;
+         #{dataId}.clear_value_selection();
+         #{dataId}.select_value(val_item,1);
+         
+         val_grid.update();
+       };
+       
+       //CLEAR EVENT
+       #{dataId}.plotClick = [];
+     });
+     
      
      $("##{@tabId}_search_results #plotContainer").bind("plothover", function (event, pos, item) {
-         var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
-         var dDate = new Date();
-         dDate.setTime(mEpoch);
-         $("#x").text(dDate.toLocaleString());
-         $("#y").text(pos.y);
+       //
+       //showPlotTooltip(event,pos,item);
+       #{dataId}.plotHover = [event,pos,item];
+       showPlotTooltip(event,pos,item);
+       //console.log('PLOT-HOVER =',#{dataId}.plotHover);
+       return;
+       
+       //$("#tooltip").remove();
+       //window.clearTimeout(hoverDelay);
+       
+       //if(#{dataId}.hoverDelay) return;
+       //
+       //var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+       //var dDate = new Date();
+       //dDate.setTime(mEpoch);
+       //$("#x").text(dDate.toLocaleString());
+       //$("#y").text(pos.y);
+       
+       /****
+       if (item) {
+         if (#{dataId}.previousPoint != item.datapoint) {
+           #{dataId}.previousPoint = item.datapoint;
+           $("#tooltip").remove();
+           var x = item.datapoint[0].toFixed(2),
+               y = item.datapoint[1].toFixed(2);
+           var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+           dDate = new Date();
+           dDate.setTime(mEpoch);
+           var msg = val_grid_formatter.dateTime(dDate) + " = " + y + "  #{@var_name}|#{@units}";
+           #{dataId}.hoverDelay = window.setTimeout(function(){
+             showTooltip(item.pageX, item.pageY, msg);
+             #{dataId}.hoverDelay = 0;
+           },1);
+         };
+       } else {
+         $("#tooltip").remove();
+         #{dataId}.previousPoint = null;            
+       };
+       ****/
+     });
+     
+     function showPlotTooltip(event,pos,item) {
+         //var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+         //var dDate = new Date();
+         //dDate.setTime(mEpoch);
+         //$("#x").text(dDate.toLocaleString());
+         //$("#y").text(pos.y);
 
          if (item) {
              if (#{dataId}.previousPoint != item.datapoint) {
@@ -612,9 +724,9 @@
                  $("#tooltip").remove();
                  var x = item.datapoint[0].toFixed(2),
                      y = item.datapoint[1].toFixed(2);
-                     var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
-                     dDate = new Date();
-                     dDate.setTime(mEpoch);
+                 var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+                 dDate = new Date();
+                 dDate.setTime(mEpoch);
                  showTooltip(item.pageX, item.pageY,
                    //*****You will need to change the sensor name here to the appropriate one selected above
                             //dDate.toLocaleString() + " = " + y + " " + "#{@variable}|#{@units}" );
@@ -624,35 +736,14 @@
              $("#tooltip").remove();
              #{dataId}.previousPoint = null;            
          }
-     });
+     };
      
      // PLOTCLICK event to scroll to point on datagrid
      $("##{@tabId}_search_results #plotContainer").bind("plotclick", function (event, pos, item) {
-         if(item) {
-           //###SCROLL TO TOP of GRID
-           //window.scrollTo(0,0);
-           //$('html #main_container').animate({scrollTop:580}, 'slow');//IE, FF
-           //$('body #main_container').animate({scrollTop:580}, 'slow');//chrome, safari
-           var idx = item.dataIndex;
-           var val_item = #{dataId}.value_data[idx];
-           //var val_grid = dijit.byNode($('##{@tabId}_search_results #gridContainer div')[0]);
-           var val_grid = #{dataId}.val_grid;
-           var store = #{dataId}.val_store;
-           
-           //#val_grid.selection.deselectAll();
-           val_grid.scrollTo(0);
-           val_grid.scrollToRow(idx);
-           //#val_grid.selection.addToSelection(val_item);
-           val_grid.selection.toggleSelect(val_item);
-           console.log('PLOT-CLICK:',event,pos,item,val_item);
-           
-           //value_selection_clear(#{dataId});
-           //#{dataId}.value_selection[idx] = 1;
-           #{dataId}.clear_value_selection();
-           #{dataId}.select_value(val_item,1);
-           
-           val_grid.update();
-         };
+         //
+         #{dataId}.plotClick = [event,pos,item];
+         return;
+         
      });
      
      //###SCROLL TO SEARCH DIV
@@ -666,9 +757,6 @@
      $(window).ready(function(){
        console.log('QUERY-RESULTS **LOADED**');
        //console.log('DATA-QUERY TABID: #{@tabId}');
-       var count = window['site#{@site.id.to_s}ref'].queryCount;
-       count = ('0000'+count).slice(-3);
-       $('##{@tabId}_query_count').text(count);
 
      });
 
@@ -710,10 +798,10 @@
     #gridContainer{:style=>"width:850px;height:430px;border:solid 1px #3A7594;"}
     -if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
       %p{:style=>"margin:7px 0;"}
-        %a{:href=>"javascript:", :onclick=>"dijit.byId('new_data_set').show();return false;"}
-          %label{:id=>"d_set", :onclick=>"dijit.byId('new_data_set').show();", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
+        %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
+          %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
             Data Set:
-        = select_tag("data_set", @data_set_options.html_safe)
+        = select_tag("#{@tabId}_data_set_select", @data_set_options.html_safe)
         %button(dojoType="dijit.form.Button" name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
           Add Selected Data to Data Set
     %br
@@ -739,10 +827,10 @@
     -#         %td{:class =>"search-results"}
     -#           =col
 
+-if !current_user.nil? && current_user.projects.include?(@project)
+  = render(:partial => "data_set", :locals =>{:project_uid=>@project.id, :tab_id=>@tabId})
+
 :javascript
   dojo.addOnLoad(function() {
     
   });
-
--if !current_user.nil? && current_user.projects.include?(@project)
-  = render(:partial => "data_set", :locals =>{:project_uid=>@project.id})
