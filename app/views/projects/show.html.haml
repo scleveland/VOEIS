@@ -62,6 +62,21 @@
     dojo.require("voeis.Server");
     dojo.require("voeis.ui.SitePane2");
     
+    //###############################
+    //MONKEY-PATCH EnhancedGrid
+    //provide rowSelect to override clickSelectEvent
+    (function(){
+      // NEW PROPERTY: rowSelect (clickSelectEvent?)
+      dojox.grid.EnhancedGrid.prototype.rowSelect = true;
+      var oldSelect_clickSelectEvent = dojox.grid.Selection.prototype.clickSelectEvent;
+      
+      //OVERRIDE clickSelectEvent to DISABLE Row-Select if rowSelect=false
+      dojox.grid.Selection.prototype.clickSelectEvent = function(){
+        if(this.grid.rowSelect) oldSelect_clickSelectEvent.apply(this,arguments);
+      };
+    })();
+    
+    // ###############################
     // CREATE ValidationTextarea
     dojo.provide("dijit_ext.ValidationTextarea"); 
     dojo.declare( 
@@ -90,6 +105,7 @@
       }
     });
 
+    // ###############################
     // NICE Dijit ConfirmDialog
     function confirmDialog(title, body, callbackFn, options) {
       var theDialog = new dijit.Dialog({
@@ -214,7 +230,7 @@
     }
     
     
-    //#####################
+    // ###############################
     // DOJO STORE FUNCTIONS
     var datastore = {
       // CONSTANTS
@@ -1798,6 +1814,16 @@
             //dojo.parser.parse(this.domNode);
             console.log('TEST-'+TEST);
             tabLoad();
+          },
+          onClose: function(){
+            console.log('tab-close:',tabId);
+            var this_pane = dojo.byId(tabId);
+            if(this_pane) this_pane = dijit.byNode(this_pane);
+            tabs.removeChild(this_pane);
+            this_pane.onClose();
+            this_pane.destroyRecursive();
+            //### tab close callback
+            //tabClose();
           },
           href: tabHref});
         tabs.addChild(tabPane);

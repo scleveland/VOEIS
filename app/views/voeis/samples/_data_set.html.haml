@@ -31,7 +31,7 @@
     =clear_break
     =clear_break 
     %br
-    %button{:id=> 'new_data_set_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createDataSet();"}
+    %button{:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"createDataSet();"}
       Create Data Set
       %script{:type=>"dojo/method", :event=>"startup"}
         var form = dijit.byId("data_set");

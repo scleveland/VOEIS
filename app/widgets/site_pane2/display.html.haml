@@ -227,12 +227,12 @@
     Dates After: 
     -#= date_select('range', 'start_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
     -#%input(name="start_date" dojoType="dijit.form.DateTextBox" id="start_date00" value="#{@start_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
-    %input(name="start_date" dojoType="dijit.form.DateTextBox" id="start_date000" value="$$$site-data-start$$$" style="width:200px!important;")
+    %input(name="start_date" dojoType="dijit.form.DateTextBox" value="$$$site-data-start$$$" style="width:200px!important;")
     &nbsp;&nbsp;&nbsp;
     Dates Before: 
     -#= date_select('range', 'end_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
     -#%input(name="end_date" dojoType="dijit.form.DateTextBox" id="end_date00" value="#{@end_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
-    %input(name="end_date" dojoType="dijit.form.DateTextBox" id="end_date000" value="$$$site-data-end$$$" style="width:200px!important;")
+    %input(name="end_date" dojoType="dijit.form.DateTextBox" value="$$$site-data-end$$$" style="width:200px!important;")
     %br{:style=>'float:none; clear:both;'}
     %br
     %br
