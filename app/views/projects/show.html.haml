@@ -215,6 +215,29 @@
     
     
     //#####################
+    // FLOT-PLOT FUNCTIONS
+    var plotutils = {
+      // CONSTANTS
+      date_format: 'yyyy-mm-dd HH:MM:ss', // format for create/update dates
+      plot_default: 0,  // default plot-graph if not in call
+      // SET DEFAULT PLOT-GRAPH
+      setPlot: function(plot) {
+        if(!plot) return;
+        this.plot_default = plot;
+      },
+      // HIGHLIGHT RANGE OF GRAPH POINTS
+      highlightRange: function(start,end,series,plot) {
+        var myplot = plot | this.plot_default;
+        if(!myplot) return;
+        if(end<start) return;
+        var ser = series | 0;
+        for(var i=start;i<=end;i++){
+          myplot.highlight(ser,i);
+        };
+      }
+    }
+    
+    //#####################
     // DOJO STORE FUNCTIONS
     var datastore = {
       // CONSTANTS
