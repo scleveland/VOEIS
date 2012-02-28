@@ -124,11 +124,11 @@
       };
 
   -else
-  :javascript
-    //### NO AUTH GLOBALS
-    var edit_auth = false;
-    var versions_url = '/projects/#{@project.id}/data_values';
-    var data_del_url = '';
+    :javascript
+      //### NO AUTH GLOBALS
+      var edit_auth = false;
+      var versions_url = '/projects/#{@project.id}/data_values';
+      var data_del_url = '';
   
   
   %div{:id=>"#{@tabId}_search_results"}
@@ -142,116 +142,72 @@
         -show_dates += @end_date.to_date.to_formatted_s(:long).gsub('00:00','')
     -else
       -show_dates = "ERROR - invalid date entry"
-  
-    %div{:id=>"#{@tabId}_plot_view", :style=>""}
-      %strong
-        QUERY DATES: #{show_dates}
-
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        - tabId = 'site00_data'
-        -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
-        = link_to('VIEW TABLE', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#query-site00').hide();$('#show-site00').show();return false;") 
-
-        -if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          %p{:style=>"margin:7px 0;"}
-            %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
-              %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
-                Data Set:
-            = select_tag("#{@tabId}_data_set_select", @data_set_options.html_safe)
-            %button(dojoType="dijit.form.Button" name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
-              Add Selected Data to Data Set
-
-      =clear_break
-      -# #pagination-links
-      -# = pagination_links(@query, params[:page], 10)  
-      %br
+    
+    %strong
+      QUERY DATES:
+      -if !@start_date.nil?
+        -if @start_date > @end_date
+          ERROR - start date should not come after end date
+        -else
+          = @start_date.to_date.to_formatted_s(:long).gsub('00:00','')
+          &ndash;
+          = @end_date.to_date.to_formatted_s(:long).gsub('00:00','')
+          (#{@graph_data.length} Points)
+      -else
+        ERROR - invalid date entry
       
-      %h3{:style=>"margin:0 0 10px 0;width:500px;float:left;"}
-        = "#{@var_name} | #{@units}"
-      -if !@row_array.empty?
-        -form_tag({:html=>{:style=>'float:left;'}, :controller=>'samples', :action=>'export'}) do 
-          =hidden_field_tag('column_array', @column_array.to_json)
-          =hidden_field_tag('row_array', @row_array.to_json)
-          =hidden_field_tag('site_name', @site_name)
-          =hidden_field_tag('site', @site.to_json)
-          =hidden_field_tag('variable', @variable.to_json)
-          =hidden_field_tag('start_date', @start_date)
-          =hidden_field_tag('data_vals', @data_vals.to_json)
-          =hidden_field_tag('end_date', @end_date)
-          =submit_tag("Export Results")
-        =clear_break
-      -#simplechart{:style=>"width: 250px; height: 150px;"}
-      -#chartDiv{:style=>"width: 250px; height: 150px;"}
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
+    = link_to('VIEW TABLE', 'javascript:', :class=>'icon icon-cancel', :html=>{:id=>'#{@tabId}_toggle_view_id'}, :onclick=>"#{dataId}.toggle_views();return false;") 
+    
+    -if !@row_array.empty?
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      -form_tag({:html=>{:style=>'', :id=>"#{@tabId}_export_form"}, :controller=>'samples', :action=>'export'}) do 
+        =hidden_field_tag('column_array', @column_array.to_json)
+        =hidden_field_tag('row_array', @row_array.to_json)
+        =hidden_field_tag('site_name', @site_name)
+        =hidden_field_tag('site', @site.to_json)
+        =hidden_field_tag('variable', @variable.to_json)
+        =hidden_field_tag('start_date', @start_date)
+        =hidden_field_tag('data_vals', @data_vals.to_json)
+        =hidden_field_tag('end_date', @end_date)
+        -#=submit_tag("Export Results")
+        = link_to('EXPORT RESULTS', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('##{dataId}_export_form')[0].submit();return false;") 
+    
+    =clear_break
+    -#simplechart{:style=>"width: 250px; height: 150px;"}
+    -#chartDiv{:style=>"width: 250px; height: 150px;"}
+    %h3{:style=>"margin:0 0 10px 0;width:500px;float:left;"}
+      = "#{@var_name} | #{@units}"
+
+      -if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        -#%p{:style=>"margin:7px 0;"}
+        -#  %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
+        -#    %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
+        -#      Data Set:
+        %button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
+          Add Selected Data &gt;&gt;
+        = select_tag("#{@tabId}_data_set_select", @data_set_options.html_safe)
+    
+    =clear_break
+    -# #pagination-links
+    -# = pagination_links(@query, params[:page], 10)  
+    %br
+    
+    %div{:id=>"#{@tabId}_plot_view", :style=>""}
+      
       #plotContainer{:style=>"width:600px;height:300px;float:left;"}
-      -#=render_widget :flot_graph, :display, :variable=>variable, :data => graph_data
-      -##value_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pvalues", :data=>"values_json"}
-      -#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{filter:true}",  :store=>"value_store", :clientSort=>"true", :style=>"width: 700px; height: 400px;", :jsId=>"ValueDisplayGrid", :id=>"ValueDisplayGrid", :title=>"Sites"}
-      -#%thead
-      -#%tr
-      -#%th{:field=>"local_date_time", :width=>"190px", :filterable=>true} Timestamp
-      -#%th{:field=>"vertical_offset", :width=>"130px", :filterable=>true} Vertical Offset
-      -#%th{:field=>"data_value", :width=>"100px", :filterable=>true} Value
       #buttonContainer{:style=>"width:200px;height:100px;margin:180px 0 0 20px;float:left;"}
       %br{:style=>'float:none; clear:both;'}
       %br
       -# 33e 3A7594 3889AA
       
     %div{:id=>"#{@tabId}_grid_view", :style=>""}
-      %strong
-        QUERY DATES: #{show_dates}
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
-        = link_to('VIEW GRAPH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#query-site00').hide();$('#show-site00').show();return false;") 
-
-        -if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          %p{:style=>"margin:7px 0;"}
-            %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
-              %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
-                Data Set:
-            = select_tag("#{@tabId}_data_set_select", @data_set_options.html_safe)
-            %button(dojoType="dijit.form.Button" name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
-              Add Selected Data to Data Set
-
-      =clear_break
-      -# #pagination-links
-      -# = pagination_links(@query, params[:page], 10)  
-      %br
       
       #gridContainer{:style=>"width:850px;height:430px;border:solid 1px #3A7594;"}
-      -if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
-        %p{:style=>"margin:7px 0;"}
-          %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
-            %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
-              Data Set:
-          = select_tag("#{@tabId}_data_set_select", @data_set_options.html_safe)
-          %button(dojoType="dijit.form.Button" name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
-            Add Selected Data to Data Set
       %br
       -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
-
-      -# %button{:onclick=>"exportAll()"}
-      -#   Export all to CSV
-      -# %button{:onclick=>"exportSelected()"}
-      -#   Export Selected Rows to CSV
-      -# %br
-      -# %textarea{:id=>"output"}
-
-      -# -i=0
-      -# %table
-      -#   %tr
-      -#     -column_array.each do |col|
-      -#       %th
-      -#         =col[0]
-      -#   -row_array.each do |row|
-      -#     -i=1-i
-      -#     %tr{:class=>"row#{i}"}
-      -#       -row.each do |col|
-      -#         %td{:class =>"search-results"}
-      -#           =col
   
     
     
@@ -280,6 +236,7 @@
     
     
     console.log('RESULT -TABID: #{@tabId}');
+    
     var #{dataId} = {};
     #{dataId}.value_data = #{@data_vals.to_json};
     for(var i=0;i<#{dataId}.value_data.length;i++) 
@@ -304,6 +261,19 @@
     }));
     ***/
     //console.log('3RESULT -DATAID(#{dataId}):',#{dataId});
+    
+    //*** SWITCH VIEWS: PLOT/GRID
+    #{dataId}.toggle_views = function() {
+      if($('##{@tabId}_toggle_view_id').text()=='VIEW TABLE') {
+        $('##{@tabId}_toggle_view_id').text('VIEW GRAPH');
+        $('##{@tabId}_plot_view').hide();
+        $('##{@tabId}_grid_view').show();
+      } else {
+        $('##{@tabId}_toggle_view_id').text('VIEW TABLE');
+        $('##{@tabId}_grid_view').hide();
+        $('##{@tabId}_plot_view').show();
+      };
+    };
     
     //var chart1 = new dojox.charting.Chart2D("simplechart");
     function trans1(store, item){

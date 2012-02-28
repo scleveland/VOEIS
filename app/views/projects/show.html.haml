@@ -1822,6 +1822,10 @@
             console.log('TEST-'+TEST);
             tabLoad();
           },
+          onClose: function(){
+            console.log('tab-close:---WORKING');
+            //if(window.tab_pre_dojo_parse) tab_pre_dojo_parse();
+          },
           href: tabHref});
         tabs.addChild(tabPane);
       };
