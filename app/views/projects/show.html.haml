@@ -241,12 +241,34 @@
         if(!plot) return;
         this.plot_default = plot;
       },
+      // RETURN LIMITS FROM ARRAY OF ITEMS (grid.selection)
+      selectionLimits: function(items,plot) {
+        var myplot = plot || this.plot_default;
+        if(!items) return;
+        var pdata = myplot.getData();
+        var selx = items.map(function(item){return pdata[item._0][0]});
+        var first = Math.min.apply(Math, selx);
+        var last = Math.max.apply(Math, selx);
+        var first_item = items[selx.indexOf(first)];
+        var last_item = items[selx.indexOf(last)];
+        return {0:first_item,1:last_item,values:[first,last]};
+      },
+      // HIGHLIGHT SELECTION ARRAY (grid.selection)
+      highlightItems: function(items,series,plot) {
+        var myplot = plot || this.plot_default;
+        if(!myplot) return;
+        var pdata = myplot.getData();
+        var ser = series || 0;
+        for(var i=0;i<items.length;i++){
+          myplot.highlight(ser,items[i]._0);
+        };
+      },
       // HIGHLIGHT RANGE OF GRAPH POINTS
       highlightRange: function(start,end,series,plot) {
-        var myplot = plot | this.plot_default;
+        var myplot = plot || this.plot_default;
         if(!myplot) return;
         if(end<start) return;
-        var ser = series | 0;
+        var ser = series || 0;
         for(var i=start;i<=end;i++){
           myplot.highlight(ser,i);
         };
