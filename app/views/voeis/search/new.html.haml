@@ -19,40 +19,50 @@
     items: #{@sites.to_json} };
   var site_store = new dojo.data.ItemFileWriteStore({data: site_json }); 
   
-%h3{:style=>"margin:5px 0;"}
-  Data Search
+-#%h3{:style=>"margin:5px 0;"}
+%h3{:style=>"margin:0 0 10px 0;"}
+  Data Search &mdash; Mulitple Sites &amp; Variables
 
-Select Site:
+%strong Select Sites:
 #siteGrid{:style=>"width:900px;height:200px;"}
 %button(dojoType="dijit.form.Button" name="search_button" id="update_variable_button" onclick="updateVariables();") 
   Filter Variables From Selected Sites
 =clear_break
 =clear_break
-Select Variables:
+%strong Select Variables:
 #varGrid{:style=>"width:900px;height:300px;"}
 =clear_break
 =clear_break
+%p
+  %strong
+    Data available for:
+  -if @start_date.nil? && @end_date.nil?
+    &mdash;
+  -else
+    = @start_date.starting_timestamp.strftime("%m/%d/%Y")
+    &ndash;
+    = @end_date.ending_timestamp.strftime("%m/%d/%Y")
+
 %div{:style=>"float: left;"}
   %label{:for=>"date1"}
     Start Date Selection:
-  %input{:type=>"text", :name=>"start_date", :id=>"start_date", :value=>"#{@start_date.nil? ? Time.now.strftime("%Y-%m-%d") : @start_date.starting_timestamp.nil? ? Time.now.strftime("%Y-%m-%d") : @start_date.starting_timestamp.strftime("%Y-%m-%d")}",
+  %input{:type=>"text", :name=>"start_date", :id=>"start_date", :value=>"#{@end_date.nil? ? Time.now.strftime("%Y-%m-%d") : @end_date.ending_timestamp.nil? ? Time.now.strftime("%Y-%m-%d") : (@end_date.ending_timestamp-1.day).strftime("%Y-%m-%d")}",
       :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
 %div{:style=>"float: left;"}
-  
   %label{:for=>"date1"}
     End Date Selection:
   %input{:type=>"text", :name=>"end_date", :id=>"end_date", :value=>"#{@end_date.nil? ? Time.now.strftime("%Y-%m-%d") : @end_date.ending_timestamp.nil? ? Time.now.strftime("%Y-%m-%d")  : @end_date.ending_timestamp.strftime("%Y-%m-%d")}",
       :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
 
 =clear_break
-%p{:id=>"formatted"}
-=clear_break
-%p{:id=>"formatted2"}
-=clear_break
+-#%p{:id=>"formatted"}
+-#=clear_break
+-#%p{:id=>"formatted2"}
+-#=clear_break
 -#%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button" onclick="doSearch();") 
 -#  Perform Search
-%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button2" onclick="doSearch2();") 
+%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button2" onclick="doSearch2();" style="margin:10px 0;")
   Perform Search
 
 #query_string
@@ -232,3 +242,6 @@ Select Variables:
   // append the new grid to the div " ":
   $('#varGrid').append(varDataGrid.domNode);
   varDataGrid.startup();
+
+%br
+%br

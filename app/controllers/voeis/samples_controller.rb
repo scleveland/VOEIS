@@ -166,11 +166,15 @@ class Voeis::SamplesController < Voeis::BaseController
       #sensor_start_year = Voeis::SensorValue.first(:order => [:timestamp.asc])
       #sensor_end_year = Voeis::SensorValue.last(:order => [:timestamp.asc])
       if @start_year.nil? || @end_year.nil?
-        @start_year = Time.now.year
-        @end_year = Time.now.year
+        @start_date = DateTime.now.strftime('%Y-%m-%d')
+        @end_date = DateTime.now.strftime('%Y-%m-%d')
+        @start_year = DateTime.now.year
+        @end_year = DateTime.now.year
       else
-        @start_year = @start_year.starting_timestamp.to_time.year
-        @end_year = @end_year.ending_timestamp.to_time.year
+        @start_date = @start_year.starting_timestamp.strftime('%Y-%m-%d')
+        @end_date = @end_year.ending_timestamp.strftime('%Y-%m-%d')
+        @start_year = @start_year.starting_timestamp.to_date.year
+        @end_year = @end_year.ending_timestamp.to_date.year
       end
 
       @sites = Voeis::Site.all
@@ -208,8 +212,10 @@ class Voeis::SamplesController < Voeis::BaseController
   
   def search
     @tabId = params[:tab_id]
-    @start_date =  Date.civil(params[:range][:"start_date(1i)"].to_i,params[:range]      [:"start_date(2i)"].to_i,params[:range][:"start_date(3i)"].to_i)
-    @end_date = Date.civil(params[:range][:"end_date(1i)"].to_i,params[:range]    [:"end_date(2i)"].to_i,params[:range][:"end_date(3i)"].to_i)
+    #@start_date =  Date.civil(params[:range][:"start_date(1i)"].to_i,params[:range]      [:"start_date(2i)"].to_i,params[:range][:"start_date(3i)"].to_i)
+    #@end_date = Date.civil(params[:range][:"end_date(1i)"].to_i,params[:range]    [:"end_date(2i)"].to_i,params[:range][:"end_date(3i)"].to_i)
+    @start_date =  Date.parse(params[:start_date])
+    @end_date = Date.parse(params[:end_date])
     @start_date = @start_date.to_datetime
     @end_date = @end_date.to_datetime + 23.hour + 59.minute
     @project_uid = parent.id
@@ -308,12 +314,14 @@ class Voeis::SamplesController < Voeis::BaseController
            :filename => filename)
       else
         respond_to do |format|
-          format.js 
+          format.js if format.json
+          format.html if format.html
         end#end format
       end#end if export
     else
       @var_name = "None"
     end #end if !site.empty?
+    #render 'search.html.haml'
   end #end def
   
   def opts_for_select(opt_array, selected = nil)

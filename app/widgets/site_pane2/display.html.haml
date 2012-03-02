@@ -101,9 +101,11 @@
     = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   -if @edit_auth
-    = link_to('DATA QUERY QA/QC', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
+    -#= link_to('DATA QUERY QA/QC', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
+    = link_to('DATA QUERY QA/QC', 'javascript:', :class=>'icon icon-proj', :onclick=>"$('#show-site00').hide();$('#query-site00').show();return false;")
   -else
-    = link_to('DATA QUERY', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
+    -#= link_to('DATA QUERY', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
+    = link_to('DATA QUERY', 'javascript:', :class=>'icon icon-proj', :onclick=>"$('#show-site00').hide();$('#query-site00').show();return false;")
 
   -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   -#= link_to('SAMPLES', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
@@ -192,6 +194,66 @@
   -#    console.log('TEST BUTTON: CLICK!!');
   -#    alert('TEST BUTTON: CLICK!!');
     
+
+#query-site00{:style=>"margin-top:0;padding-top:0;display:none;"}
+
+  %strong QUERY SITE
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  - tabId = 'site00_data'
+  -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
+  = link_to('BACK TO SITE', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#query-site00').hide();$('#show-site00').show();return false;") 
+  %br
+  %br
+  %br
+  
+  -#= form_for(:query, @query, :url => {:controller=>'samples', :action=>'search'}, :remote=>true, :html=>{:id=>tabId+'_query'}) do |f|
+  %form(accept-charset="UTF-8" class="new_voeis_site" data-remote="true" id="site00_query" dojoType="dijit.form.Form")
+    -#%input{:type=>"hidden", :name=>"tab_id", :value=>"#{tabId}"}
+    -#=hidden_field_tag('tab_id', tabId)
+    =hidden_field_tag('site_select', "$$$id$$$")
+    Variable
+    ($$$site-variable-count$$$):
+    
+    :plain
+      <select id="variable_select" name="variable_select" style="width:450px;">
+        $$$site-variable-select$$$
+      </select>
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    %br
+    
+    Dates After: 
+    -#= date_select('range', 'start_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
+    -#%input(name="start_date" dojoType="dijit.form.DateTextBox" id="start_date00" value="#{@start_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
+    %input(name="start_date" dojoType="dijit.form.DateTextBox" value="$$$site-data-start$$$" style="width:200px!important;")
+    &nbsp;&nbsp;&nbsp;
+    Dates Before: 
+    -#= date_select('range', 'end_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
+    -#%input(name="end_date" dojoType="dijit.form.DateTextBox" id="end_date00" value="#{@end_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
+    %input(name="end_date" dojoType="dijit.form.DateTextBox" value="$$$site-data-end$$$" style="width:200px!important;")
+    %br{:style=>'float:none; clear:both;'}
+    %br
+    %br
+
+    -#  (<span id="vars_count">#{@variable_opts_array.count}</span>):
+    -#= f.submit('Search', :onclick => "dijit.byId('loading_dialog').show();")
+    -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
+    %button(dojoType="dijit.form.Button" type="submit" name="submit_form" value="Search" onclick="site00ref.submitDataQuery();return false;")
+      Search
+
+    &nbsp;&nbsp;
+    %button(dojoType="dijit.form.Button" name="cancel" value="Cancel" onclick="window.location=#{project_path(@project)}") 
+      Cancel
+      %script{:type=>"dojo/method", :event=>"onClick"}
+        :plain
+          $('#query-site00').hide();
+          $('#show-site00').show();
+
+  %br{:style=>'float:none; clear:both;'}
+  %br
+  
 
 -if @auth
   -##edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>'EDIT', :style=>"margin-top:0;padding-top:0;display:none;"}

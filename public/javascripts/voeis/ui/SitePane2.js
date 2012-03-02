@@ -17,6 +17,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	cleanContent: true,
 	parsedWidgets: [],
 	local: {},
+	queryCount: 0,
 	
 	protoDivId: 'site_pane_proto',
 	style: "margin-top:0;padding-top:0;",
@@ -141,6 +142,27 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		var json_samps = dojo.toJson(this.site_samps).replace(/"/g, '&quot;');
 		sitePaneContent = sitePaneContent.replace(/\$\$\$site-samps\$\$\$/, json_samps);
 		//console.log(json_samps);
+		
+		//DATA QUERY FORM STUFF
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-variable-count\$\$\$/, this.site_var_stats.length.toString());
+		data = '';
+		var dates1 = [], dates2 = [];
+		for(var i=0;i<this.site_var_stats.length;i++) {
+			data += '<option value="'+this.site_var_stats[i].varid+'">';
+			data += this.site_var_stats[i].varname+': '+this.site_var_stats[i].varunits;
+			if(parseInt(this.site_var_stats[i].count)) {
+				data += '  ['+this.site_var_stats[i].first+'&ndash;'+this.site_var_stats[i].last+']';
+				dates1.push(new Date(this.site_var_stats[i].first));
+				dates2.push(new Date(this.site_var_stats[i].last));
+			};
+			data += '</option>\n';
+		};
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-variable-select\$\$\$/, data);
+		siteDate1 = (dates1.length) ? new Date(Math.min.apply(null,dates1)).format('isoDate') : '';
+		siteDate2 = (dates2.length) ? new Date(Math.max.apply(null,dates2)).format('isoDate') : '';
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-data-start\$\$\$/, siteDate1);
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-data-end\$\$\$/, siteDate2);
+		
 
 		//sitePaneContent = sitePaneContent.replace(/dojotype_dialog/g, 'dojoType="dijit.Dialog"');
 
@@ -376,6 +398,19 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		var ttl = title || $('#'+contentDiv).attr('title') || 'unamed DIALOG';
 		this.dialog.attr('title', ttl);
 		this.dialog.show();
+	},
+	
+	submitDataQuery: function() {
+    var qstring = [];
+    var form = dojo.byId(this.id+'_query');
+    if(!form) return;
+    for(var i=0; i<form.elements.length; i++) {
+      var fld = form.elements[i];
+      if(fld.value && fld.name && fld.type!='submit' && fld.type!='button') 
+        qstring.push(fld.name+'='+fld.value);
+    };
+    qstring = qstring.join('&');
+    dojo.publish('voeis/project/dataquery/results', [this.site.id, qstring]);
 	},
 	
 	purgeContent: function() {

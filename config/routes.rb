@@ -141,6 +141,7 @@ Yogo::Application.routes.draw do
           get   :query
           get   :site_sample_variables
           post  :export
+          get   :search
           post  :search
         end
       end

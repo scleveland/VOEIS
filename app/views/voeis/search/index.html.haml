@@ -5,9 +5,7 @@
   });
 
 :css
-  #graph {
-    width: 1200px;
-    height: 400px;
+  ##{@tabId}_graph {
     position: relative;
     margin: auto;
   }
@@ -24,21 +22,41 @@
     font-size: medium;
   }
 
-%h1 Search Results
+-#%h1 Search Results
+%h3{:style=>"margin-top:0;"}
+  Search Results
+  [#{@tabId[-3,3]}]
+  
+%strong
+  SEARCH DATES:
+  -if !@start_date.nil?
+    -if @start_date > @end_date
+      ERROR - start date should not come after end date
+    -else
+      = @start_date.to_date.to_formatted_s(:long).gsub('00:00','')
+      &ndash;
+      = @end_date.to_date.to_formatted_s(:long).gsub('00:00','')
+  -else
+    ERROR - invalid date entry
 
 %p
-  Search URL: #{request.url}
--if @parallel_results.count < 500
+  %strong SEARCH URL:
+  #{request.url}
+
+-if @parallel_results.count > 500
+  %strong
+    %em TOO MANY RESULTS TO DISPLAY
+-else
   %h2 Parallel Coordinate Graph of Results:
   #center  
-    #graph{:style=>"width:95%"}
+    %div{:id=>"#{@tabId}_graph", :style=>"width:90%;height:400px;"}
       GRAPH HERE!
       
-
-%h2 Grid Results- showing #{@data.count} rows and #{@dv_count} data values.
-#searchGrid{:style=>"width:auto;height:500px;"}
-%button{:dojoType=>"dijit.form.Button",:onclick=>"exportAll()"}
-  Export all to CSV</button>
+%h3 Grid Results- showing #{@data.count} rows and #{@dv_count} data values.
+%div{:id=>"#{@tabId}_grid", :style=>"width:auto;height:500px;margin-bottom:6px;"}
+%button{:dojoType=>"dijit.form.Button",:onclick=>"exportAll()", :style=>"margin-bottom:20px;padding:0;"}
+  Export all to CSV
+%br
 -#%button{:dojoType=>"dijit.form.Button",:onclick=>"exportSelected()"}
 -#Export Selected Rows to CSV
 =form_tag 'search/export' do 
@@ -54,24 +72,28 @@
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
   dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
   dojo.require("dojo.data.ItemFileWriteStore");
-  var units = #{@unit_names.to_json}
+  
+  console.log('SEARCH-RESULT TAB-ID: #{@tabId}');
+  var #{@tabId}_data = {};
+  #{@tabId}_data.units = #{@unit_names.to_json}
 
-  var data_json = {
+  #{@tabId}_data.data_json = {
     identifier: 'timestamp',
     items: #{@data.to_json} };
-  var data_store = new dojo.data.ItemFileWriteStore({data: data_json });
-  var val_grid_formatter = {};
-  val_grid_formatter.dateTime = function(value) {
+  #{@tabId}_data.data_store = new dojo.data.ItemFileWriteStore({data: #{@tabId}_data.data_json });
+  var search_grid_formatter = {};
+  search_grid_formatter.dateTime = function(value) {
     if(value==null || value=='') return '-';
     var d = new Date(value);
     return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
   };
 
-  var data_layout = [
+  #{@tabId}_data.data_layout = [
     {
        field: 'timestamp',
        name: 'TimeStamp',
-       formatter: val_grid_formatter.dateTime,
+       formatter: search_grid_formatter.dateTime,
+       //formatter: datastore.formats.dateTime,
        width: '100px'
     },
     #{@variables.map{|v| '{field:"%s", name: "%s (%s)", width:"100px"}' % [v.id, v.variable_name.gsub(",","-"),@unit_names[v.variable_units_id] ]}.join(',')}
@@ -84,25 +106,25 @@
       //}
       //csv_string = csv_string.substring(0, str.length - 1);
       //csv_string = csv_string + "\n"
-      searchGrid.exportGrid("csv", function(str){
+      #{@tabId}_data.searchGrid.exportGrid("csv", function(str){
           dojo.byId("data").value = str;
           document.forms[0].submit()
       });
   };
   
   function exportSelected(){
-      searchGrid.exportSelected("csv",function(str){
+      #{@tabId}_data.searchGrid.exportSelected("csv",function(str){
           dojo.byId("data").value = str;
           document.forms[0].submit()
       });
   };
   
   // create a new site grid:
-  searchGrid = new dojox.grid.EnhancedGrid({
-     store: data_store,
+  #{@tabId}_data.searchGrid = new dojox.grid.EnhancedGrid({
+     store: #{@tabId}_data.data_store,
      clientSort: true,
      rowSelector: '20px',
-     structure: data_layout,
+     structure: #{@tabId}_data.data_layout,
      style: 'width:95%;',
      plugins: {filter:true, exporter: true, indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"}},
       onClick: function(ev) {
@@ -111,12 +133,13 @@
      },
      document.createElement('div'));
   // append the new grid to the div " ":
-  $('#searchGrid').append(searchGrid.domNode);
-  searchGrid.startup();
+  $('##{@tabId}_grid').append(#{@tabId}_data.searchGrid.domNode);
+  #{@tabId}_data.searchGrid.startup();
   
   //######################
   // CREATE PARALLEL GRAPH
   function drawGraph() {
+    console.log('DRAWING GRAPH');
     var cars = #{@parallel_results.to_json}
 
     var units = {
@@ -128,7 +151,7 @@
 
     /* Sizing and scales. */
     var wold = 1000,
-        w = parseInt($('#graph').css('width')),
+        w = parseInt($('##{@tabId}_graph').css('width')),
         h = 350,
         fudge = 0.5,
         x = pv.Scale.ordinal(dims).splitFlush(0, w),
@@ -149,7 +172,7 @@
       }), active = "timestamp";
 
     /* The root panel. */
-    var vis = new pv.Panel().canvas('graph')
+    var vis = new pv.Panel().canvas('#{@tabId}_graph')
         .width(w)
         .height(h)
         .left(30)
