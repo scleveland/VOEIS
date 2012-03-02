@@ -146,6 +146,9 @@ class Voeis::SamplesController < Voeis::BaseController
   end
   
   def query
+    #q = repository.adapter.send(:select_statement,VOEISMODELQUERY.query)
+    #sql = q[0].gsub!("?").each_with_index{|v,i| "\"#{q[1][i]}\"" }
+    
     siteid = params[:site_id]
     varid = params[:var_id]
     dt_start = params[:start_date]
