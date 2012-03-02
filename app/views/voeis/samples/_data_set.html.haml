@@ -1,11 +1,13 @@
 -# content_for(:javascripts) do
 :javascript
   function #{tab_id}_createDataSet(){ 
-    $.post("#{root_url}projects/#{project_uid}/apivs/create_project_data_set.json?name=" + $("#name").val() + "&description=" + $("#description").val() + "&type="+ $("#type").val() +"&api_key=#{User.current.api_key}",
+    var els = dojo.byId("#{tab_id}_data_set").elements;
+    var qstr = "name="+els.name.value+"&description="+els.description.value+"&type="+els.type.value+"&api_key=#{User.current.api_key}";
+    $.post("#{root_url}projects/#{project_uid}/apivs/create_project_data_set.json?"+qstr,
     function(data) {
-      $('##{tab_id}_data_set_select').append($("<option></option>").attr("value",data['id']).text($("#name").val())); 
+      $('##{tab_id}_data_set_select').append($("<option></option>").attr("value",data['id']).text(els.name.value)); 
       $('##{tab_id}_data_set_select').val(data['id']);
-      dijit.byId("new_data_set").hide();
+      dijit.byId("#{tab_id}_new_data_set").hide();
     });
   }
   dojo.require("dijit.Tooltip");

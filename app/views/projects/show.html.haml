@@ -244,8 +244,8 @@
       // RETURN LIMITS FROM ARRAY OF ITEMS (grid.selection)
       selectionLimits: function(items,plot) {
         var myplot = plot || this.plot_default;
-        if(!items) return;
-        var pdata = myplot.getData();
+        if(!items || !myplot) return;
+        var pdata = myplot.getData()[0].data;
         var selx = items.map(function(item){return pdata[item._0][0]});
         var first = Math.min.apply(Math, selx);
         var last = Math.max.apply(Math, selx);
@@ -256,9 +256,9 @@
       // HIGHLIGHT SELECTION ARRAY (grid.selection)
       highlightItems: function(items,series,plot) {
         var myplot = plot || this.plot_default;
-        if(!myplot) return;
-        var pdata = myplot.getData();
+        if(!items || !myplot) return;
         var ser = series || 0;
+        var pdata = myplot.getData()[ser].data;
         for(var i=0;i<items.length;i++){
           myplot.highlight(ser,items[i]._0);
         };
@@ -927,6 +927,9 @@
   -#        %div{:dojoType=>"dijit.Menu", :id=>"dataSubMenu"}
   -#          = render_cell(:data_menu, :display, :current_user => current_user)
 
+
+#loading_dialog{:dojoType=>"dijit.Dialog", :disableCloseButton=>true, :title=>"Loading..."}
+  #search-div-loader
 
 #overview_dialog{:dojoType=>"dijit.Dialog", :disableCloseButton=>true, :title=>"Project Overview", :style=>"width:640px;"}
   - if @project.description && @project.description.length > 0
@@ -1716,6 +1719,7 @@
       };
       var tabHref = "/projects/#{@project.id}/samples/search?tab_id="+tabId+"&"+qstring;
       var tabLoaded = function(varId,varName) {
+        initPage();
         
       };
       openProjTab(tabs, tabHref, tabId, tabTitle, tabLoaded);
@@ -1755,7 +1759,7 @@
       var tabId = 'search_results_'+count;
       var tabHref = searchURL+'&tab_id='+tabId;
       var tabLoaded = function(varId,varName) {
-          drawGraph();
+        drawGraph();
       };
       openProjTab(tabs, tabHref, tabId, tabTitle, tabLoaded);
       //##

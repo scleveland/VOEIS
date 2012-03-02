@@ -133,15 +133,6 @@
   
   %div{:id=>"#{@tabId}_search_results"}
   
-    -if !@start_date.nil?
-      -if @start_date > @end_date
-        ERROR - start date should not come after end date
-      -else
-        = @start_date.to_date.to_formatted_s(:long).gsub('00:00','')+" &ndash; "
-        = @end_date.to_date.to_formatted_s(:long).gsub('00:00','')
-    -else
-      ERROR - invalid date entry
-    
     -form_tag(:controller=>'samples', :action=>'export') do 
       
       %strong
@@ -178,7 +169,8 @@
     =clear_break
     -#simplechart{:style=>"width: 250px; height: 150px;"}
     -#chartDiv{:style=>"width: 250px; height: 150px;"}
-    %h3{:style=>"margin:0 0 10px 0;float:left;"}
+    
+    %h3{:style=>"margin:0;float:left;"}
       = "#{@var_name} | #{@units}"
 
       -if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
@@ -197,16 +189,14 @@
     -# = pagination_links(@query, params[:page], 10)  
     %br
     
-    %div{:id=>"#{@tabId}_plot_view", :style=>""}
+    %div{:id=>"#{@tabId}_plot_view"}
       
-      #plotContainer{:style=>"width:600px;height:300px;float:left;"}
-      #buttonContainer{:style=>"width:200px;height:100px;margin:180px 0 0 20px;float:left;"}
-      %br{:style=>'float:none; clear:both;'}
+      #plotContainer{:style=>"width:800px;height:310px;"}
       %br
       
-    %div{:id=>"#{@tabId}_grid_view", :style=>""}
+    %div{:id=>"#{@tabId}_grid_view"}
       
-      #gridContainer{:style=>"width:850px;height:430px;border:solid 1px #3A7594;display:none;"}
+      #gridContainer{:style=>"width:850px;height:310px;border:solid 1px #3A7594;"}
       %br
       -# 33e 3A7594 3889AA
       -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
@@ -262,6 +252,7 @@
         }
     }));
     ***/
+    
     //console.log('3RESULT -DATAID(#{dataId}):',#{dataId});
     
     //*** SWITCH VIEWS: PLOT/GRID
@@ -270,6 +261,8 @@
         $('##{@tabId}_toggle_view_id').text('VIEW GRAPH');
         $('##{@tabId}_plot_view').hide();
         $('##{@tabId}_grid_view').show();
+        #{dataId}.val_grid.render();
+        
       } else {
         $('##{@tabId}_toggle_view_id').text('VIEW TABLE');
         $('##{@tabId}_grid_view').hide();
@@ -314,8 +307,10 @@
       return local_date_time.slice(0,local_date_time.length-6);
     }
     function addSelectedToDataSet(){
+      //abort if NO DataSet selected
+      if((parseInt($('##{@tabId}_data_set_select').val())||0)==0) return;
       //get the data values
-      dijit.byId('#{@tabId}_loading_dialog').show();
+      dijit.byId('loading_dialog').show();
       var data_value_ids_string = ""
       data_array = #{dataId}.val_grid.selection.getSelected();
       for (i=0; i<data_array.length; i=i+1)
@@ -326,7 +321,7 @@
       $.post('#{root_url}projects/#{@project_uid}/apivs/add_data_to_project_data_set.json?data_set_id=' + $("#data_set").val() + data_value_ids_string,
         function(data) {
           $('.result').html(data);
-          dijit.byId('#{@tabId}_loading_dialog').hide();
+          dijit.byId('loading_dialog').hide();
         });
     }
     //formatter: 'val_grid_formatter.dateTime',
@@ -488,49 +483,19 @@
          //  sizeSwitch: true,
          //  position: "top",
          //  itemTitle: "Data Points"
-       }},
+       },
        
        onSelected: function(idx) {
-         console.log('SELECT:',this.select_item);
+         console.log('SELECT:',idx);
          var val_plot = #{dataId}.plot;
+         val_plot.unhighlight();
          plotutils.highlightItems(this.selection.getSelected(),0,val_plot);
-         
-         //this.select_item = this.getItem(idx);
-         //this.deselect_item = false;
-         //this.select_focus = this.focus;
-         
-         //this.select_col = this.focus.cell.index;
-         //var col1 = this.layout.cells[1];
-         //this.focus.setFocusCell(col1,idx);
-         //###this.selection.deselect(this.select_item);
-         //if(this.select_col==this.layout.cellCount-1){
-         //if(!this.select_col==0){
-         //  this.selection.deselect(this.select_item);
-         //  return;
-         //};
-         //var item = this.grid_select;
-         //console.log('SELECT:',item);
-         //var point = #{dataId}.data[item._0];
-         //console.log('SELECT-PT:',point);
-         //this.selection.deselect(this.select_item);
        },
        onDeselected: function(idx) {
-         console.log('DESELECT:',this.deselect_item);
+         console.log('DESELECT:',idx);
          var val_plot = #{dataId}.plot;
+         val_plot.unhighlight();
          plotutils.highlightItems(this.selection.getSelected(),0,val_plot);
-         
-         //this.deselect_item = this.getItem(idx);
-         //this.select_item = false;
-         //this.select_focus = this.focus;
-         
-         //var col1 = this.layout.cells[1];
-         //this.focus.setFocusCell(col1,idx);
-         //###this.selection.addToSelection(this.select_item);
-         //if(this.select_col==this.layout.cellCount-1){
-         //if(!this.select_col==0){
-         //  this.selection.addToSelection(this.select_item);
-         //  return;
-         //};
        },
        xonClick: function(ev) {
          this.select_click = ev;
@@ -590,6 +555,11 @@
 
     // Call startup, in order to render the grid:
     #{dataId}.val_grid.startup();
+    // Hide grid div initially (after rendering)
+    setTimeout(function(){
+      $('##{@tabId}_grid_view').hide();
+      
+    },200);
     
     // Setup tooltip removal on tab switch
     //var tabs = dijit.byId('tab_browser');
@@ -709,6 +679,7 @@
            //var first = Math.min.apply(Math, selx);
            //var last = Math.max.apply(Math, selx);
            var limits = plotutils.selectionLimits(sel,val_plot)
+           console.log('LIMITS:',limits);
            if(item.datapoint[0]<limits.values[0]) {
              val_grid.selection.selectRange(val_item._0, limits[1]._0);
            } else {
@@ -720,24 +691,24 @@
            };
            plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
            val_grid.scrollTo(0);
-           val_grid.scrollToRow(limits[0]._0);
+           var toend = limits[1]._0 - 4;
+           if(toend<0) toend = 0;
+           val_grid.scrollToRow(toend);
          } else {
+           //NORMAL-CLICK: Select/Deselect Point
            //###SCROLL TO TOP of GRID
            //window.scrollTo(0,0);
            //$('html #main_container').animate({scrollTop:580}, 'slow');//IE, FF
            //$('body #main_container').animate({scrollTop:580}, 'slow');//chrome, safari
            
-           val_plot.highlight(0,idx);
+           if(val_grid.selection.isSelected(idx)) val_plot.unhighlight(0,idx);
+           else val_plot.highlight(0,idx);
            //val_grid.selection.deselectAll();
            val_grid.scrollTo(0);
            val_grid.scrollToRow(idx);
-           val_grid.selection.addToSelection(val_item);
-           //val_grid.selection.toggleSelect(val_item);
+           //val_grid.selection.addToSelection(val_item);
+           val_grid.selection.toggleSelect(val_item);
          };
-         //value_selection_clear(#{dataId});
-         //#{dataId}.value_selection[idx] = 1;
-         //#{dataId}.clear_value_selection();
-         //#{dataId}.select_value(val_item,1);
          
          val_grid.update();
        };
@@ -831,16 +802,30 @@
      //$('##{@tabId}_search_results').animate({scrollTop:200}, 'slow');
 
 
+     //ON-TAB-LOAD!
+     function initPage() {
+       console.log('initPage: NOW');
+       console.log('DATA-QUERY TABID: #{@tabId}');
+       console.log('DATA-SET-SELECT:',$("##{@tabId}_data_set_select")[0]);
+       
+       $("##{@tabId}_data_set_select").change(function(e){
+         console.log('CHANGE!');
+         if(this.value!='NEW') return;
+         //OPEN DIALOG
+         $("##{@tabId}_data_set_select").val('-');
+         dijit.byNode($('##{@tabId}_new_data_set')[0]).show();
+         
+       });
+
+       console.log('initPage: DONE');
+     };
+     
+     
      //ON-LOAD READY
      $(window).ready(function(){
        console.log('QUERY-RESULTS **LOADED**');
-       //console.log('DATA-QUERY TABID: #{@tabId}');
        
-       $("##{@tabId}_data_set_select").change(function(e){
-         if(this.value!='NEW') return;
-         //OPEN DIALOG
-         
-       });
+       initPage();
 
      });
 
@@ -850,5 +835,6 @@
 
 :javascript
   dojo.addOnLoad(function() {
+    initPage();
     
   });
