@@ -237,7 +237,7 @@ class Voeis::SamplesController < Voeis::BaseController
       @graph_data = Array.new
       @data_structs = ""  
       parent.managed_repository do 
-        q = repository.adapter.send(:select_statement, Voeis::DataValue.all(:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date, :order=>[:local_date_time.asc],:fields=>[:id,:data_value,:local_date_time,:string_value,:datatype, :vertical_offset,:quality_control_level, :published, :date_time_utc, :site_id,:variable_id,:utc_offset,:end_vertical_offset]).query)
+        q = repository.adapter.send(:select_statement, Voeis::DataValue.all(:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date, :order=>[:local_date_time.asc],:fields=>[:id,:data_value,:local_date_time,:string_value,:datatype, :vertical_offset,:quality_control_level, :published, :date_time_utc, :site_id,:variable_id,:utc_offset,:end_vertical_offset, :value_accuracy,:replicate]).query)
         sql = q[0].gsub!("?").each_with_index{|v,i| "\'#{q[1][i]}\'" }
         @data_structs = repository.adapter.select(sql)
       end
