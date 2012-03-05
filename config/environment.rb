@@ -28,6 +28,14 @@ class Array
     self.map{|k| k.to_hash}.to_json
   end
 end
+
+module DataMapper
+  def self.raw_select(dm_query)
+    statement, bind_vars = repository.adapter.send(:select_statement, dm_query.query)
+    sql = repository.adapter.send(:open_connection).create_command(statement).send(:escape_sql, bind_vars)
+    repository.adapter.select(sql)
+  end
+end
 # Initialize the rails application
 Yogo::Application.initialize!
 

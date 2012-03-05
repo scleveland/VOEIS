@@ -635,4 +635,4 @@
     });
     });
 -if !current_user.nil? && current_user.projects.include?(@project)
-  = render(:partial => "data_set", :locals =>{:project_uid=>@project.id})
+  = render(:partial => "data_set", :locals =>{:project_uid=>@project.id, :tab_id=>tabId})

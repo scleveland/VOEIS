@@ -47,20 +47,20 @@
   %strong
     %em TOO MANY RESULTS TO DISPLAY
 -else
-  %h2 Parallel Coordinate Graph of Results:
-  #center  
-    %div{:id=>"#{@tabId}_graph", :style=>"width:90%;height:400px;"}
-      GRAPH HERE!
+
+%h2 Parallel Coordinate Graph of Results:
+#center  
+  %div{:id=>"#{@tabId}_graph", :style=>"width:90%;height:400px;"}
+    GRAPH HERE!
       
 %h3 Grid Results- showing #{@data.count} rows and #{@dv_count} data values.
 %div{:id=>"#{@tabId}_grid", :style=>"width:auto;height:500px;margin-bottom:6px;"}
 %button{:dojoType=>"dijit.form.Button",:onclick=>"exportAll()", :style=>"margin-bottom:20px;padding:0;"}
   Export all to CSV
-%br
--#%button{:dojoType=>"dijit.form.Button",:onclick=>"exportSelected()"}
--#Export Selected Rows to CSV
-=form_tag 'search/export' do 
-  =hidden_field_tag('data')
+%button{:dojoType=>"dijit.form.Button",:onclick=>"exportSelected()", :style=>"margin-bottom:20px;padding:0;"}
+  Export Selected Rows to CSV
+=form_for("export", :url=>export_project_search_index_path(parent), :remote=>true) do |f|
+  =f.hidden_field('data')
 -#%textarea{:id=>"output"}
 :javascript
   dojo.require("dijit.dijit");
@@ -100,23 +100,15 @@
   ];
 
   function exportAll(){
-      //csv_string=""
-      //for (s in data_layout){
-      //  csv_string = csv_string + '"'+data_layout[s][:name]+'",'
-      //}
-      //csv_string = csv_string.substring(0, str.length - 1);
-      //csv_string = csv_string + "\n"
       #{@tabId}_data.searchGrid.exportGrid("csv", function(str){
-          dojo.byId("data").value = str;
+          dojo.byId("export_data").value = str;
           document.forms[0].submit()
       });
   };
   
-  function exportSelected(){
-      #{@tabId}_data.searchGrid.exportSelected("csv",function(str){
-          dojo.byId("data").value = str;
-          document.forms[0].submit()
-      });
+  function exportSelected(){                
+      $('#export_data').val(#{@tabId}_data.searchGrid.exportSelected("csv",function(str){}))
+      document.forms[0].submit()
   };
   
   // create a new site grid:
