@@ -23,7 +23,7 @@
 -# #pagination-links
 -# = pagination_links(@query, params[:page], 10)  
 
--if @row_array.empty?
+-if @data_structs.empty?
   %strong
     VARIABLE:
     = "#{@var_name} | #{@units}"
@@ -36,7 +36,8 @@
     console.log('FAILURR RESULT TABID: #{@tabId}');
     console.log('FAILURR RESULT DATAID: #{dataId}');
     var #{dataId} = {};
-    #{dataId}.value_data = #{@data_vals.to_json};
+    //#{dataId}.value_data = #{@data_vals.to_json};
+    #{dataId}.value_data = #{@data_structs.sql_to_json};
     #{dataId}.data = #{@graph_data.as_json};
     console.log('DATAID object:',#{dataId});
 
@@ -172,6 +173,7 @@
     console.log('RESULT -TABID: #{@tabId}');
     var #{dataId} = {};
     #{dataId}.value_data = #{@data_vals.to_json};
+    #{dataId}.value_data = #{@data_structs.sql_to_json};
     for(var i=0;i<#{dataId}.value_data.length;i++) 
       #{dataId}.value_data[i]['selected'] = 0;
     #{dataId}.data = #{@graph_data.as_json};
@@ -436,12 +438,8 @@
            cell:false,
            col:false,
            width:"40px", 
-           styles:"text-align: center;"},
-         pagination:{
-           sizeSwitch: true,
-           position: "top",
-           itemTitle: "Data Points"
-       }},
+           styles:"text-align: center;"}
+        },
        
        xonSelected: function(idx) {
          this.select_item = this.getItem(idx);
@@ -526,7 +524,6 @@
        }
     },
     document.createElement('div'));
-    #{dataId}.val_grid.changePageSize(10);
 
     // append the new grid to the div " ":
     //dojo.byId("gridContainer").appendChild(val_grid.domNode);
@@ -768,15 +765,11 @@
     %br
     %h3{:style=>"margin:0 0 10px 0;width:500px;float:left;"}
       = "#{@var_name} | #{@units}"
-    -if !@row_array.empty?
+    -if !@data_structs.empty?
       -form_tag({:html=>{:style=>'float:left;'}, :controller=>'samples', :action=>'export'}) do 
-        =hidden_field_tag('column_array', @column_array.to_json)
-        =hidden_field_tag('row_array', @row_array.to_json)
-        =hidden_field_tag('site_name', @site_name)
         =hidden_field_tag('site', @site.to_json)
         =hidden_field_tag('variable', @variable.to_json)
         =hidden_field_tag('start_date', @start_date)
-        =hidden_field_tag('data_vals', @data_vals.to_json)
         =hidden_field_tag('end_date', @end_date)
         =submit_tag("Export Results")
       =clear_break
@@ -806,26 +799,6 @@
           Add Selected Data to Data Set
     %br
     -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
-
-    -# %button{:onclick=>"exportAll()"}
-    -#   Export all to CSV
-    -# %button{:onclick=>"exportSelected()"}
-    -#   Export Selected Rows to CSV
-    -# %br
-    -# %textarea{:id=>"output"}
-
-    -# -i=0
-    -# %table
-    -#   %tr
-    -#     -column_array.each do |col|
-    -#       %th
-    -#         =col[0]
-    -#   -row_array.each do |row|
-    -#     -i=1-i
-    -#     %tr{:class=>"row#{i}"}
-    -#       -row.each do |col|
-    -#         %td{:class =>"search-results"}
-    -#           =col
 
 -if !current_user.nil? && current_user.projects.include?(@project)
   = render(:partial => "data_set", :locals =>{:project_uid=>@project.id, :tab_id=>@tabId})

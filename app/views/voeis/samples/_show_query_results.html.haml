@@ -31,7 +31,8 @@
     console.log('FAILURR RESULT TABID: #{tabId}');
     console.log('FAILURR RESULT DATAID: #{dataId}');
     var #{dataId} = {};
-    #{dataId}.value_data = #{data_vals.to_json};
+    //#{dataId}.value_data = #{data_vals.to_json};
+    # #{dataId}.value_data = #{data_structs.to_a.to_json}
     #{dataId}.data = #{graph_data.as_json};
     console.log('DATAID object:',#{dataId});
 
@@ -165,7 +166,8 @@
     
     console.log('RESULT -TABID: #{tabId}');
     var #{dataId} = {};
-    #{dataId}.value_data = #{data_vals.to_json};
+    //#{dataId}.value_data = #{data_vals.to_json};
+    #{dataId}.value_data = #{data_structs.to_json};
     for(var i=0;i<#{dataId}.value_data.length;i++) 
       #{dataId}.value_data[i]['selected'] = 0;
     #{dataId}.data = #{graph_data.as_json};
@@ -428,11 +430,7 @@
            col:false,
            width:"40px", 
            styles:"text-align: center;"},
-         pagination:{
-           sizeSwitch: true,
-           position: "top",
-           itemTitle: "Data Points"
-       }},
+         },
        
        onSelected: function(idx) {
          this.select_item = this.getItem(idx);
@@ -516,7 +514,7 @@
        }
     },
     document.createElement('div'));
-    #{dataId}.val_grid.changePageSize(10);
+    //#{dataId}.val_grid.changePageSize(10);
 
     // append the new grid to the div " ":
     //dojo.byId("gridContainer").appendChild(val_grid.domNode);
@@ -665,12 +663,12 @@
   -if !row_array.empty?
     -form_tag({:html=>{:style=>'float:left;'}, :controller=>'samples', :action=>'export'}) do 
       =hidden_field_tag('column_array', column_array.to_json)
-      =hidden_field_tag('row_array', row_array.to_json)
+      =hidden_field_tag('row_array', row_array.sql_to_json)
       =hidden_field_tag('site_name', site)
       =hidden_field_tag('site', site_data.to_json)
       =hidden_field_tag('variable', variable_data.to_json)
       =hidden_field_tag('start_date', start_date)
-      =hidden_field_tag('data_vals', data_vals.to_json)
+      =hidden_field_tag('data_vals', data_structs.to_json)#data_vals.to_json)
       =hidden_field_tag('end_date', end_date)
       =submit_tag("Export Results")
     =clear_break

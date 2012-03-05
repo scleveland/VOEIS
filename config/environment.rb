@@ -25,7 +25,7 @@ class Struct
 #assumes this is an array of Structs or Objects that have the to_hash method
 class Array
   def sql_to_json
-    self.map{|k| k.to_hash}.as_json
+    self.map{|k| k.to_hash}.to_json
   end
 end
 # Initialize the rails application
