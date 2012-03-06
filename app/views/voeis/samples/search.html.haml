@@ -20,6 +20,8 @@
     ERROR - invalid date entry
 
 =clear_break
+%strong
+  Displaying #{@data_structs.count} Records.
 -# #pagination-links
 -# = pagination_links(@query, params[:page], 10)  
 
@@ -35,10 +37,6 @@
   :javascript
     console.log('FAILURR RESULT TABID: #{@tabId}');
     console.log('FAILURR RESULT DATAID: #{dataId}');
-    var #{dataId} = {};
-    //#{dataId}.value_data = #{@data_vals.to_json};
-    #{dataId}.value_data = #{@data_structs.sql_to_json};
-    #{dataId}.data = #{@graph_data.as_json};
     console.log('DATAID object:',#{dataId});
 
 -else
@@ -172,18 +170,11 @@
     
     console.log('RESULT -TABID: #{@tabId}');
     var #{dataId} = {};
-    #{dataId}.value_data = #{@data_vals.to_json};
     #{dataId}.value_data = #{@data_structs.sql_to_json};
     for(var i=0;i<#{dataId}.value_data.length;i++) 
       #{dataId}.value_data[i]['selected'] = 0;
     #{dataId}.data = #{@graph_data.as_json};
-    
-    //console.log('1RESULT -DATAID(#{dataId}):',#{dataId});
-    //#{dataId}.values_json = {identifier: 'id', items: #{dataId}.value_data };
-    
-    //console.log('2RESULT -DATAID(#{dataId}):',#{dataId});
-    
-    //#{dataId}.val_store = new dojo.data.ItemFileReadStore({data: {identifier: 'id', items: #{dataId}.value_data }});
+
     #{dataId}.val_store = new dojo.data.ItemFileWriteStore({data: {identifier: 'id', items: #{dataId}.value_data }});
     
     /***
