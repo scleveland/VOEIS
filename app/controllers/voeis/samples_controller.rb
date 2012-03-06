@@ -270,8 +270,17 @@ class Voeis::SamplesController < Voeis::BaseController
   
   #export the results of search/browse to a csv file
   def export
-    site = JSON[params[:site]]
-    variable = JSON[params[:variable]]
+    if params[:site_select]
+      site=""
+      variable=""
+      parent.managed_repository do
+        site = JSON[Voeis::Site.get(params[:site_select].to_i).to_json]
+        variable = JSON[Voeis::Variable.get(params[:variable_select].to_i).to_json]
+      end  
+    else
+      site = JSON[params[:site]]
+      variable = JSON[params[:variable]]
+    end #if params[:site_select]
     export_q = parent.managed_repository{repository.adapter.send(:select_statement, Voeis::DataValue.all(:site_id => site["id"].to_i, :variable_id => variable["id"].to_i, :local_date_time.gte => params[:start_date], :local_date_time.lte => params[:end_date], :order=>[:local_date_time.asc]).query)}
     export_sql = export_q[0].gsub!("?").each_with_index{|v,i| "\'#{export_q[1][i]}\'" }
     rows=JSON[parent.managed_repository{repository.adapter.select(export_sql).sql_to_json}]
@@ -289,6 +298,7 @@ class Voeis::SamplesController < Voeis::BaseController
         csv << row.values
       end
     end
+
     #csv_string =JSON[params[:data_vals]].to_csv
     filename = site["name"] + ".csv"
     send_data(csv_string,
