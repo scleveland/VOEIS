@@ -1,0 +1,563 @@
+-### EDIT_CV widget view
+
+:javascript
+  //dojoConfig = { parseOnLoad: false };
+  console.log('JAVASCRIPT:LOADING!');
+  dojo.require("dojox.grid.EnhancedGrid");
+  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+  dojo.require("dojox.grid.enhanced.plugins.Filter");
+  dojo.require("dojo.data.ItemFileReadStore");
+  dojo.require("dijit.layout.TabContainer");
+  dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+  dojo.require("dijit.form.Form");
+  dojo.require("dijit.form.TextBox");
+  dojo.require("dijit.form.DateTextBox");
+  dojo.require("dijit.form.TimeTextBox");
+  dojo.require("dijit.form.ValidationTextBox");
+  dojo.require("dijit.form.SimpleTextarea"); 
+  dojo.require("dijit.form.Textarea"); 
+  dojo.require("dijit.form.Button");
+  dojo.require("voeis.voeis_util");
+  
+  //#### GLOBALS
+  
+  var #{@tabId}_data = {};
+  
+  #{@tabId}_data.global = #{@project.nil?};
+  #{@tabId}_data.cv_title = "#{@cv_title}";
+  #{@tabId}_data.cv_title2 = "#{@cv_title2}";
+  #{@tabId}_data.global_post_url = "/#{@cv_title2cv}s";
+  #{@tabId}_data.post_url = "#{@project.nil? ? '' : '/projects/'+@project.id}"+#{@tabId}_data.global_post_url;
+  
+  #{@tabId}_data.cv_fields = #{@cv_form.map{|x| [x[:field],x[:type].split('-')[-1]] unless x[:type][-2..-1]=='LL'}.compact.to_json};
+  
+  //#### DATA STORE
+  #{@tabId}_data.cv_data = #{@cv_data.to_json};
+  
+  //for(var i=0;i<#{@tabId}_data.cv_data.length;i++)
+  //  #{@tabId}_data.cv_data[i]['idx'] = i;
+  #{@tabId}_data.cv_data_json = {
+    identifier: 'id',
+    label: '#{@cv_name}',
+    items: #{@tabId}_data.cv_data };
+
+  #{@tabId}_data.cv_store = new dojo.data.ItemFileWriteStore({
+    data: #{@tabId}_data.cv_data_json
+  });
+  
+  //#### COPY STORE-- for GLOBAL > LOCAL copy
+  //#### ONLY LOCAL VerticaDatum/SpatialReference
+  if(#{!@copy_data.nil?}) {
+    #{@tabId}_data.copy_data = #{@copy_data.to_json};
+    //for(var i=0;i<#{@tabId}_data.copy_data.length;i++)
+    //  #{@tabId}_data.copy_data[i]['idx'] = i;
+    #{@tabId}_data.copy_data_json = {
+      identifier: 'id',
+      label: '#{@cv_name}',
+      items: #{@tabId}_data.copy_data };
+    #{@tabId}_data.copy_store = new dojo.data.ItemFileWriteStore({
+      data: #{@tabId}_data.copy_data_json
+    });
+  };
+  
+  
+  //###############################
+  
+  var #{@tabId}_exec = {};
+  
+  //###############################
+  
+  
+  //######################
+  // ITEM VALUE toString w/ null
+  function cleanString(val) {
+    if(val==null) return '';
+    return val.toString();
+  };
+  //######################
+  // GRID DISPLAY FILTERS
+  Formatter = {
+    trueFalse: function(value) {
+      var checked_img = '<img src="/images/true.png" />';
+      var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
+      if(value) return checked_img;
+      return blank_img;
+    },
+    dateTime: function(value) {
+      if(value==null || value=='') return '-';
+      // Format DateTime string
+      var d = new Date(value);
+      //var fmt = d.getMonth()+'/'+d.getFullYear()
+      return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss"});
+    },
+    controls: function(item) {
+      if(item==null || item.id==null) return '-';
+      //return 'TESTING--'+item[cv_name].toString();
+      var id = (item.id)[0];
+      //var idx = item.idx[0];
+      var idx = item._0;
+      var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" />';
+      var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" />';
+      //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
+      //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
+      //var hist_link = '<a href="'+post_url+'/versions/?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;">'+hist_icon+'</a>\n';
+      var hist_link = '<a href="javascript:" onclick="#{@tabId}_exec.cv_history('+id+');return false;">'+hist_icon+'</a>\n';
+      var delete_link = '<a href="javascript:" onclick="#{@tabId}_exec.cv_delete('+idx+');return false;">'+delete_icon+'</a>\n';
+      var spaces = '&nbsp;';
+      if(item.used[0]) return spaces+hist_link;
+      return spaces+hist_link+spaces+delete_link;
+    }
+  };
+  
+  
+  //###############################
+  
+  // GLOBAL: PROCESS STORE NEW
+  // LOCAL: POST TO GLOBAL + LOCAL
+  #{@tabId}_exec.cv_post_local = function(data0) {
+    if(#{@tabId}_data.global)
+      //GLOBAL
+      datastore.new(data0,#{@tabId}_data.cv_store);
+    else {
+      //LOCAL
+      var data = #{@tabId}_exec.cv_data_clean(data0);
+      console.log('POST-LOCAL-RAW:',data0);
+      console.log('POST-LOCAL:',data);
+      $.ajax({
+        type: 'POST',
+        url: "#{@project.nil? ? '' : '/projects/'+@project.id}"+#{@tabId}_data.global_post_url+'.json',
+        data: data,
+        success: function(dat) {
+          datastore.new(dat,#{@tabId}_data.cv_store);
+        },
+        dataType: 'json'
+      });
+      return true;
+    };
+  };
+  //######################################
+  
+  //### OPEN HISTORY
+  #{@tabId}_exec.cv_history = function(id) {
+    var hist_url = #{@tabId}_data.post_url+'/versions/?id='+id
+    var hist_id = "#{@cv_title2}_"+id+"_history";
+    var hist_title = "HISTORY: #{@cv_title}";
+    if(#{@tabId}_tab_loaded) {
+      var hist_callback = function(){};
+      dojo.publish('voeis/project/openTab',[hist_url,hist_id,hist_title,hist_callback]);
+    } else {
+      window.open(hist_url, hist_title, 'width=950,height=550');
+    };
+  };
+  //### DELETE ITEM
+  #{@tabId}_exec.cv_delete = function(item_idx, call_back) {
+    console.log('DELETE?',item_idx);
+    var item = #{@tabId}_data.cv_data[item_idx];
+    //var confirm = window.confirm('Are you quite sure you want to\n DELETE this #{@cv_title}?');
+    //var confirm = confirm_now('Are you quite sure you want to\n DELETE this #{@cv_title}?');
+    var text = 'Are you quite sure you want to\n DELETE this #{@cv_title}?';
+    confirmDialog('Please confirm &mdash;', text, 
+      function(yes) {
+        console.log('CONFIRM:',yes);
+        if(yes) {
+          //DELETE
+          console.log('DELETE:',item);
+          //return;     //TESTING
+          var cv_id = item.id;
+          var cv_idx = item._0;
+          //AJAX DELETE
+          $.ajax({
+            type: 'DELETE',
+            url: #{@tabId}_data.post_url+'/'+cv_id+'.json',
+            data: {},
+            dataType: 'json',
+            success: function(result) {
+              var errs = result.errors;
+              if(errs && errs.length) {
+                console.log('FAILED ERRORS:\n'+errs.join('/n'));
+              } else {
+                console.log('DELETED!');
+                //var item = cv_data[cv_idx];
+                datastore.delete(item,#{@tabId}_data.cv_store);
+                datastore.new(item,#{@tabId}_data.copy_store);
+                if(call_back) call_back();
+              };
+          }});
+        };
+        #{@tabId}_cv_dialog_box.hide();
+      }, 
+      {buttonOk: 'YES', buttonCancel: 'Cancel'});
+  };
+  //######################################
+  
+  // SAVE ITEM
+  #{@tabId}_exec.cv_save = function(id, data, call_back) {
+    var cv_id = parseInt(id);
+    if(cv_id) {
+      //UPDATE (id>0)
+      var post_type = 'PUT';
+      var post_result = #{@tabId}_exec.cv_store_upd;
+      var post_url = #{@tabId}_data.post_url+'/'+cv_id+'.json';
+    } else {
+      //NEW (id=0)
+      var post_type = 'POST';
+      var post_result = #{@tabId}_exec.cv_post_local;
+      var post_url = #{@tabId}_data.global_post_url+'.json';
+      delete data.id;
+    };
+    console.log('POST:',data);
+    console.log(post_type+' TO: '+post_url);
+    //AJAX POST/PUT
+    $.ajax({
+      type: post_type,
+      url: post_url,
+      data: data,
+      success: function(dat) {
+        post_result(dat);
+        if(call_back) call_back();
+      },
+      dataType: 'json'
+    });
+  };
+  
+  // SAVE CALLBACK for ITEM ROLLBACK
+  //#{@tabId}_exec.cv_datum_edit = function(item) {
+  function cv_item_restore0(item, call_back) {
+    var data = #{@tabId}_exec.cv_data_clean(item);
+    #{@tabId}_exec.cv_save(item.id, data, call_back);
+    // OPEN SAVE FORM... 
+    //var cv_item = cv_store_get(item.id);
+    //item['idx'] = cv_item.idx;
+    //cv_datum_upd(item);
+  };
+  
+  
+  // CV store update: call update on cv_store
+  #{@tabId}_exec.cv_store_upd = function(dat) {
+    datastore.update(dat,#{@tabId}_data.cv_store);
+  };
+  
+  
+  // CLEAN & FORMAT DATA for SAVE
+  #{@tabId}_exec.cv_data_clean = function(data0) {
+    return {#{@cv_title2cv}:#{@tabId}_exec.cv_data_filter(data0)};
+  };
+  // REMOVE ANY UNWANTED STUFF & DENULLIFY for SAVE
+  #{@tabId}_exec.cv_data_filter = function(data0) {
+    var cv_id = parseInt(data0['id']);
+    var form = #{@cv_title2}_form;
+    var elems = form.domNode.elements;
+    var fields = #{@tabId}_data.cv_fields;
+    var data = {};
+    for(var i=0;i<fields.length;i++) {
+      var fname = fields[i][0].toString();
+      if(data0.hasOwnProperty(fname)) {
+        if(fields[i][1][0]=='X')
+          continue;
+        else if(fields[i][1][0]=='B')
+          data[fname] = data0[fname] ? true : false;
+        else if(fields[i][1][0]=='I')
+          data[fname] = parseInt(data0[fname]);
+        else if(fields[i][1][0]=='N')
+          data[fname] = parseInt(data0[fname]);
+        else if(fields[i][1][0]=='F')
+          data[fname] = parseFloat(data0[fname]);
+        else
+          data[fname] = cleanString(data0[fname]);
+      };
+    };
+    if(cv_id) data.id = cv_id;
+    return data;
+  };
+  
+  // CLEAR DIALOG FORM
+  #{@tabId}_exec.cv_form_clear = function() {
+    var form = #{@cv_title2}_form;
+    var elems = form.domNode.elements;
+    var fields = #{@tabId}_data.cv_fields;
+    for(var i=0;i<fields.length;i++) {
+      var fname = fields[i][0].toString();
+      if(elems[fname]) {
+        if(fields[i][1].slice(1)=='CK')
+          elems[fname].checked = false;
+        else
+          elems[fname].value = '';
+      };
+    };
+    if(elems['id']) elems['id'].value = '0';
+  };
+  // POPULATE DIALOG FORM
+  #{@tabId}_exec.cv_form_populate = function(cv_item) {
+    //var cv_item = cv_data[idx];
+    //var cv_item = cv_store_get(id);
+    console.log('POPULATE:',cv_item);
+    var form = #{@cv_title2}_form;
+    var elems = form.domNode.elements;
+    var fields = #{@tabId}_data.cv_fields;
+    for(var i=0;i<fields.length;i++) {
+      var fname = fields[i][0].toString();
+      if(elems[fname] && cv_item.hasOwnProperty(fname))
+        if(fields[i][1].slice(1)=='CK')
+          elems[fname].checked = cv_item[fname][0]? true : false;
+        else
+          elems[fname].value = cv_item[fname].toString();
+    };
+  };
+  // FETCH DIALOG FORM DATA
+  #{@tabId}_exec.cv_form_fetch = function() {
+    //var cv_item = cv_data[idx];
+    //var cv_item = cv_store_get(id);
+    console.log('FORM-FETCH');
+    var form = #{@cv_title2}_form;
+    var elems = form.domNode.elements;
+    var id = elems['id'] ? parseInt(elems['id'].value) : 0;
+    var fields = #{@tabId}_data.cv_fields;
+    var data = {};
+    for(var i=0;i<fields.length;i++) {
+      var fname = fields[i][0].toString();
+      //##### SKIP X fields!
+      if(elems[fname] && fields[i][1][0]!='X')
+        if(fields[i][1]=='CK')
+          data[fname] = elems[fname].checked;
+        else
+          data[fname] = elems[fname].value;
+    };
+    //##### ID>0: NOT NEW (UPDATE)
+    if(id) {
+      data['id'] = id;
+      if(elems['provenance_comment'])
+        data['provenance_comment'] = elems['provenance_comment'].value;
+    };
+    return data;
+  };
+  
+  
+  //######################################
+  
+  // OPEN EDIT DIALOG
+  #{@tabId}_exec.cv_datum_edit = function(item) {
+    console.log('EDIT:',item);
+    delete item.provenance_comment;
+    #{@tabId}_cv_dialog_box.set('title', #{@tabId}_data.cv_title);
+    #{@tabId}_exec.cv_form_populate(item);
+    $('##{@cv_title2}_form #cv_prov_com').show();
+    #{@tabId}_cv_dialog_box.show();
+  };
+  // OPEN NEW DIALOG
+  #{@tabId}_exec.cv_datum_new = function() {
+    console.log('NEW');
+    #{@tabId}_cv_dialog_box.set('title', 'NEW '+#{@tabId}_data.cv_title);
+    #{@tabId}_exec.cv_form_clear();
+    $('##{@cv_title2}_form #cv_prov_com').hide();
+    #{@tabId}_cv_dialog_box.show();
+  };
+  
+  
+  //######################################
+  
+  //##### PAGE LOADED #####
+  $(window).ready(function(){ 
+    console.log('DONE LOADING!!');
+    
+  });
+
+
+
+-#################################
+
+-################# EDITING DIALOG
+
+%div{:id=>"#{@tabId}_cv_dialog_box", :dojoType=>"dijit.Dialog", :jsId=>"#{@tabId}_cv_dialog_box", :title=>"#{@cv_title}", :style=>"width:400px;"}
+  %form(id="#{@cv_title2}_form" jsId="#{@cv_title2}_form" dojoType="dijit.form.Form" method="post")
+    - cv_ta_style = 'width:98%!important;line-height:16px!important;'
+    - @cv_form.each do |cvinput|
+      - cvdelim = cvinput[:type].split('-')
+      - cvtype = cvdelim[-1]
+      - if cvdelim.length>1 && !cvdelim[0].blank?
+        -#= cvdelim
+        - cvdelim = cvdelim[0]
+        = (@delims[cvdelim[-1].to_sym] * (cvdelim[0..-2].blank? ? 1 : cvdelim[0..-2].to_i)).html_safe
+      -# dojotype = cvtype[:dojo].blank? ? '' : 'dojoType=%s'% cvtype[:dojo]
+      -# formtype = cvtype[:type].blank? ? '' : 'type=%s'% cvtype[:type]
+      - if cvtype=='LL'
+        %label{:style=>"#{cvinput[:style]}"}
+          = cvinput[:field]
+      - else
+        - cvstyle = cvinput[:style]
+        - if cvtype[1..2]=='TA'
+          - cvstyle = cv_ta_style+cvstyle
+        - cvtype = @types[cvtype[1..-1].to_sym]
+        - if !cvtype.nil?
+          %input{:name=>"#{cvinput[:field]}", :type=>"#{cvtype[:type]}", :dojoType=>"#{cvtype[:dojo]}", 
+                  :required=>"#{cvinput[:required]}", :style=>"#{cvstyle}", :rows=>"3"}
+      -#%input(name="source_id" type="#{cvtype[:type]}" dojoType="#{cvtype[:dojo]}" required="#{cvinput[:required]}")
+    %br{:style=>'float:none; clear:both;'}
+    
+    #cv_prov_com{:style=>"display:none;"}
+      %br
+      %label Provenance Comment
+      %br
+      %input(name="provenance_comment" dojoType="dijit.form.SimpleTextarea" rows="3" 
+            style="#{cv_ta_style}")
+    
+    -#%input(name="source_notes" dojoType="dijit.form.SimpleTextarea" id="site_source_notes" rows="5" 
+    -#      style="width:98%!important;line-height:16px!important;")
+    -#%input(name="lab_organization" dojoType="dijit_ext.ValidationTextarea" id="var_lab_organization" required="true" rows="5" 
+    -#      style="width:98%!important;line-height:16px!important;")
+    
+    %br{:style=>'float:none; clear:both;'}
+    %button{:dojoType=>"dijit.form.Button", :title=>'Create'}
+      Save #{@cv_title}
+      %script{:type=>"dojo/method", :event=>"startup"}
+        :plain
+          // set initial state
+          this.attr("disabled", !#{@cv_title2}_form.isValid());
+          //### ON-CHANGE
+          this.connect(#{@cv_title2}_form, "onValidStateChange", function(state){
+            this.attr("disabled", !state);
+          });
+          //### ON-CLICK
+          this.connect(this, "onClick", function(){
+            var form = #{@cv_title2}_form.domNode;
+            var cv_id = parseInt(form.elements['id'].value);
+            var cv_idx = form.elements['idx'].value;
+            var data0 = #{@tabId}_exec.cv_form_fetch();
+            var data = {#{@cv_title2cv}: data0};
+            console.log('POST:',data);
+            if(cv_id && cv_idx[0]=='#') {
+              //COPY GLOBAL
+              data0['provenance_comment'] = 'Copied from GLOBAL';
+              
+              #{@tabId}_exec.cv_post_local(data0);
+              
+              var copy_idx = parseInt(cv_idx.slice(1));
+              var del_item = #{@tabId}_data.copy_data[copy_idx];
+              datastore.delete(del_item,#{@tabId}_data.copy_store);
+            } else {
+              #{@tabId}_exec.cv_save(cv_id, data);
+            };
+          });
+    &nbsp;&nbsp;
+    %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"#{@tabId}_cv_dialog_box.hide();return false;"} Cancel
+
+
+-################# COPY GLOBAL DIALOG
+
+- if !@copy_data.nil?
+  %div{:id=>"#{@tabId}_copy_dialog_box", :dojoType=>"dijit.Dialog", :jsId=>"#{@tabId}_copy_dialog_box", :title=>"#{@cv_title}: Copy Global", 
+        :style=>"width:760px;"}
+    * click an entry to save a copy from these GLOBAL #{@cv_title} entries
+    %table{:dojoType=>"dojox.grid.EnhancedGrid", :store=>"#{@tabId}_data.copy_store", 
+            :plugins=> "{filter:true}",  
+            :clientSort=>"true", 
+            :sortInfo=>"2",
+            :style=>"width:100%;height:320px;margin:0;padding:0;border:#E3EBF2 2px solid;"}
+      %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
+        :plain
+          //SELECT GLOBAL CV TERM
+          var form = #{@cv_title2}_form.domNode;
+          var item = this.getItem(idx);
+          this.selection.clear();
+          var col = this.layout.cells[1];
+          this.focus.setFocusCell(col,idx);
+          #{@tabId}_copy_dialog_box.hide();
+          #{@tabId}_exec.cv_form_populate(item);
+          $('##{@cv_title2}_form #cv_prov_com').hide();
+          //$('##{@cv_title2}_idx').val('#'+item.idx);
+          form.elements['idx'].value = '#'+item._0;
+          #{@tabId}_cv_dialog_box.set('title', 'NEW '+#{@tabId}_data.cv_title);
+          #{@tabId}_cv_dialog_box.show();
+      %thead
+        %tr
+          - @copy_columns.each do |col|
+            %th{:field=>"#{col[:field]}", :filterable=>"#{col[:filterable]}", :width=>"#{col[:width]}", :style=>"#{col[:style]}", 
+                :formatter=>"#{col[:formatter].blank? ? '' : 'Formatter.'+col[:formatter]}"} #{col[:label]}
+
+
+-################# MAIN
+
+%strong
+  #{(@project.nil? ? 'GLOBAL ' : 'PROJECT ')+@cv_title.upcase} ENTRIES
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/cv_datum/new');")
+= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"#{@tabId}_exec.cv_datum_new();")
+- if !@copy_data.nil?
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  = link_to('COPY GLOBAL', 'javascript:', :class=>'icon icon-copy', :onclick=>"#{@tabId}_copy_dialog_box.show();")
+%br
+%br
+
+-#%div{:id=>"version_store_site#{@site.id}", :dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pversions_site#{@site.id}", :data=>"pversions_json_site#{@site.id}", :style=>"height:0;margin:0;padding:0;"}
+
+-#cv_management_tabs{:dojoType=>"dijit.layout.TabContainer", :style=>"width:870px;height:360px;margin-top:10px;padding-top:0;", 
+-#  :prop=>"parseOnLoad:true;", :tabPosition=>"top", :useSlider=>"true", :tabStrip=>"true"}
+-#  -#:prop=>"parseOnLoad:true;", :tabPosition=>"left-h", :tabStrip=>"false"}
+-#:selected=>"true", :useSlider=>"false", :tabStrip=>"false"}
+-#:style=>"width:870px;height:400px;margin:0;padding:0;", :selected=>"true"}
+%div{:id=>"#{@tabId}_cv_management", :dojoType=>"dijit.layout.ContentPane", :title=>"#{@cv_title}", 
+  :jsId=>"#{@tabId}_cv_management", :style=>"width:870px;height:360px;margin:0;padding:0;"}
+  -#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=>"{filter:true}",  :store=>"cv_store", :selected=>true, 
+  -#    :style=>"width:90%;margin:0;padding:2px;", :jsId=>"cv_management_grid", :id=>"cv_management_grid"}
+  -#  :style=>"width:90%;margin:0;", :rowSelector=>"20px", :jsId=>"VersionDisplayGrid", :id=>"VersionDisplayGrid"}
+  %table{:dojoType=>"dojox.grid.EnhancedGrid", :store=>"#{@tabId}_data.cv_store", 
+          :plugins=> "{nestedSorting:false, filter:true, indirectSelection:false}",  
+          :clientSort=>"true", 
+          :sortInfo=>"2",
+          :style=>"width:90%;margin:0;padding:0;border:#E3EBF2 2px solid;", 
+          :jsId=>"#{@tabId}_data.cv_management_grid", 
+          :id=>"#{@tabId}_data.cv_management_grid"}
+    %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
+      :plain
+        //SELECT CV TERM
+        var item = this.getItem(idx);
+        this.selection.clear();
+        //$('#cv_management').hide();
+        //$('#cv_management').show();
+        //cv_management_grid.dijit.focus;
+        //console.log('CLICKz', this.focus);
+        var this_col = this.focus.cell.index;
+        var col = this.layout.cells[1];
+        this.focus.setFocusCell(col,idx);
+        if(this_col==this.layout.cellCount-1) return;
+        console.log('CLICK!', item);
+        #{@tabId}_exec.cv_datum_edit(item);
+    %thead
+      %tr
+        - @cv_columns.each do |col|
+          %th{:field=>"#{col[:field]}", :filterable=>"#{col[:filterable]}", :width=>"#{col[:width]}", :style=>"#{col[:style]}", 
+              :formatter=>"#{col[:formatter].blank? ? '' : 'Formatter.'+col[:formatter]}"} #{col[:label]}
+        %th{:field=>"_item", :filterable=>false, :width=>"7%", :formatter=>"Formatter.controls"} DO
+      -#%th{:field=>"srs_id", :filterable=>true, :width=>"10%", :style=>""} Source ID
+      -#%th{:field=>"srs_name", :filterable=>true, :width=>"30%", :style=>""} Source Name
+      -#%th{:field=>"is_geographic", :filterable=>true, :width=>"10%", :style=>""} Geo?
+      -#%th{:field=>"notes", :filterable=>true, :width=>"", :style=>""} Notes
+      -#- @cv_columns.each do |col|
+      -#  %th{:field=>"#{col[:field]}", :filterable=>true, :width=>"#{col[:width]}", :style=>"#{col[:style]}"} #{col[:label]}
+
+%br{:style=>'float:none; clear:both;'}
+%br
+
+
+:javascript
+  (function(){
+
+    dojo.subscribe("voeis/cv_datum/edit", function(item) {
+      console.log('EDIT:',item);
+      console.log(arguments);
+      cv_dialog_box.set('title', cv_title);
+      cv_dialog_populate(item);
+      cv_delete_button(item.used[0]);
+      cv_dialog_box.show();
+    });
+
+    dojo.subscribe("voeis/cv_datum/new", function() {
+      console.log(arguments);
+      cv_dialog_box.set('title', 'NEW '+cv_title);
+      cv_dialog_clear();
+      $(delete_button.domNode).hide();
+      cv_dialog_box.show();
+    });
+  })();
+
