@@ -1,3 +1,6 @@
+= javascript_include_tag 'underscore.js', 'backbone.js','jquery-ui-1.8.11.custom.min.js', 'filter.js', 'parallel-coordinates.js','slickgrid/jquery.event.drag-2.0.min.js', 'slickgrid/slick.core.js','slickgrid/slick.grid.js','slickgrid/slick.dataview.js','slickgrid/slick.pager.js', 'grid.js'
+
+= stylesheet_link_tag 'slick.grid.css', 'parallel-coordinate.css'
 :javascript
   $(window).ready(function(){ 
     console.log('DONE LOADING GRAPH');
@@ -21,8 +24,6 @@
   large {
     font-size: medium;
   }
-
--#%h1 Search Results
 %h3{:style=>"margin-top:0;"}
   Search Results
   [#{@tabId[-3,3]}]
@@ -42,63 +43,17 @@
 %p
   %strong SEARCH URL:
   #{request.url}
+#pc-main
+  %h3 Parallel Coordinates
+  #parallel-coordinates
+  #grid-content
+    #myGrid
+    
 
--if @parallel_results.count > 500
-  %strong
-    %em TOO MANY RESULTS TO DISPLAY
--else
-
-%h2 Parallel Coordinate Graph of Results:
-#center  
-  %div{:id=>"#{@tabId}_graph", :style=>"width:90%;height:400px;"}
-    GRAPH HERE!
-      
-%h3 Grid Results- showing #{@data.count} rows and #{@dv_count} data values.
-%div{:id=>"#{@tabId}_grid", :style=>"width:auto;height:500px;margin-bottom:6px;"}
-%button{:dojoType=>"dijit.form.Button",:onclick=>"exportAll()", :style=>"margin-bottom:20px;padding:0;"}
-  Export all to CSV
-%button{:dojoType=>"dijit.form.Button",:onclick=>"exportSelected()", :style=>"margin-bottom:20px;padding:0;"}
-  Export Selected Rows to CSV
-=form_for("export", :url=>export_project_search_index_path(parent), :remote=>true) do |f|
-  =f.hidden_field('data')
--#%textarea{:id=>"output"}
 :javascript
-  dojo.require("dijit.dijit");
-  dojo.require("dijit.form.Button");
-  dojo.require("dojox.grid.EnhancedGrid");
-  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
-  dojo.require("dojox.grid.enhanced.plugins.Filter");
-  dojo.require("dijit.layout.TabContainer");
-  dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
-  dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
-  dojo.require("dojo.data.ItemFileWriteStore");
   
   console.log('SEARCH-RESULT TAB-ID: #{@tabId}');
-  var #{@tabId}_data = {};
-  #{@tabId}_data.units = #{@unit_names.to_json}
-
-  #{@tabId}_data.data_json = {
-    identifier: 'timestamp',
-    items: #{@data.to_json} };
-  #{@tabId}_data.data_store = new dojo.data.ItemFileWriteStore({data: #{@tabId}_data.data_json });
-  var search_grid_formatter = {};
-  search_grid_formatter.dateTime = function(value) {
-    if(value==null || value=='') return '-';
-    var d = new Date(value);
-    return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
-  };
-
-  #{@tabId}_data.data_layout = [
-    {
-       field: 'timestamp',
-       name: 'TimeStamp',
-       formatter: search_grid_formatter.dateTime,
-       //formatter: datastore.formats.dateTime,
-       width: '100px'
-    },
-    #{@variables.map{|v| '{field:"%s", name: "%s (%s)", width:"100px"}' % [v.id, v.variable_name.gsub(",","-"),@unit_names[v.variable_units_id] ]}.join(',')}
-  ];
-
+  
   function exportAll(){
       #{@tabId}_data.searchGrid.exportGrid("csv", function(str){
           dojo.byId("export_data").value = str;
@@ -111,162 +66,48 @@
       document.forms[0].submit()
   };
   
-  // create a new site grid:
-  #{@tabId}_data.searchGrid = new dojox.grid.EnhancedGrid({
-     store: #{@tabId}_data.data_store,
-     clientSort: true,
-     rowSelector: '20px',
-     structure: #{@tabId}_data.data_layout,
-     style: 'width:95%;',
-     plugins: {filter:true, exporter: true, indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"}},
-      onClick: function(ev) {
-        this.grid_click = ev;
-      },
-     },
-     document.createElement('div'));
-  // append the new grid to the div " ":
-  $('##{@tabId}_grid').append(#{@tabId}_data.searchGrid.domNode);
-  #{@tabId}_data.searchGrid.startup();
-  
   //######################
   // CREATE PARALLEL GRAPH
   function drawGraph() {
-    console.log('DRAWING GRAPH');
-    var cars = #{@parallel_results.to_json}
+    var dimensions = new Filter();
 
-    var units = {
-      timestamp: {name: "DateTime", unit: ""},
-      #{@variables.map{|v| 'var_%s: {name:"%s", unit: "%s"}' % [v.id, v.variable_name, ""] }.join(",")}
-    }
+    dimensions.set({data: #{@parallel_results.to_json}});
 
-    var dims = pv.keys(units);
+    var parallel = new Parallel_coordinates ({
+      title: 'Multidimensional Query - Parallel Coordinates',
+      model: dimensions,
+      el: document.getElementById('parallel-coordinates'),
+      columns: [
+        'timestamp',#{@variables.map{|v| '"var_%s"' % [v.id]}.join(",")}
+      ],
+      alias: {
+        'timestamp': 'Time (YYYYMMDDhhmmss)',
+        #{@variables.map{|v| '"var_%s": "%s (%s)"' % [v.id, v.variable_name, @unit_names[v.variable_units_id]]}.join(",")}
+      },
+      type: {
+        'four': 'category'
+      },
+      width: 1360,
+      height: 300,
+      gutter: { x: 100, y: 50 },
+    });
 
-    /* Sizing and scales. */
-    var wold = 1000,
-        w = parseInt($('##{@tabId}_graph').css('width')),
-        h = 350,
-        fudge = 0.5,
-        x = pv.Scale.ordinal(dims).splitFlush(0, w),
-        y = pv.dict(dims, function(t){return pv.Scale.linear(
-            cars.filter(function(d){return !isNaN(d[t])}),
-            function(d){return Math.floor(d[t])-fudge},
-            function(d){return Math.ceil(d[t])+fudge}
-            ).range(0, h)}),
-        c = pv.dict(dims, function(t){return pv.Scale.linear(
-            cars.filter(function(d){return !isNaN(d[t])}),
-            function(d){return Math.floor(d[t])-fudge},
-            function(d){return Math.ceil(d[t])+fudge}
-            ).range("steelblue", "brown")});
-
-    /* Interaction state. */
-    var filter = pv.dict(dims, function(t){
-        return {min: y[t].domain()[0], max: y[t].domain()[1]};
-      }), active = "timestamp";
-
-    /* The root panel. */
-    var vis = new pv.Panel().canvas('#{@tabId}_graph')
-        .width(w)
-        .height(h)
-        .left(30)
-        .right(30)
-        .top(30)
-        .bottom(20);
-
-    // The parallel coordinates display.
-    vis.add(pv.Panel)
-        .data(cars)
-        .visible(function(d){return dims.every(function(t){
-            return (d[t] >= filter[t].min) && (d[t] <= filter[t].max)})})
-      .add(pv.Line)
-        .data(dims)
-        .left(function(t, d){return x(t)})
-        .bottom(function(t, d){return y[t](d[t])})
-        .strokeStyle("#ddd")
-        .lineWidth(1)
-        .antialias(false);
-
-    // Rule per dimension.
-    rule = vis.add(pv.Rule)
-        .data(dims)
-        .left(x);
-
-    // Dimension label
-    rule.anchor("top").add(pv.Label)
-        .top(-12)
-        .font("bold 9px sans-serif")
-        .text(function(d){return units[d].name});
-
-    // The parallel coordinates display.
-    var change = vis.add(pv.Panel);
-
-    var line = change.add(pv.Panel)
-        .data(cars)
-        .visible(function(d){return dims.every(function(t){
-            return (d[t] >= filter[t].min) && (d[t] <= filter[t].max)})})
-      .add(pv.Line)
-        .data(dims)
-        .left(function(t, d){return x(t)})
-        .bottom(function(t, d){return y[t](d[t])})
-        .strokeStyle(function(t, d){return c[active](d[active])})
-        .lineWidth(1);
-
-    // Updater for slider and resizer.
-    function update(d) {
-      var t = d.dim;
-      filter[t].min = Math.max(y[t].domain()[0], y[t].invert(h - d.y - d.dy));
-      filter[t].max = Math.min(y[t].domain()[1], y[t].invert(h - d.y));
-      active = t;
-      change.render();
-      return false;
-    }
-
-    // Updater for slider and resizer.
-    function selectAll(d) {
-      if (d.dy < 3) {
-        var t = d.dim;
-        filter[t].min = Math.max(y[t].domain()[0], y[t].invert(0));
-        filter[t].max = Math.min(y[t].domain()[1], y[t].invert(h));
-        d.y = 0; d.dy = h;
-        active = t;
-        change.render();
+    var slicky = new grid({
+      model: dimensions,
+      width: 1360,
+      height: 400,
+      columns: [
+        'time',#{@variables.map{|v| '"var_%s"' % [v.id]}.join(",")}
+      ],
+      alias: {
+        'time': 'Time',
+         #{@variables.map{|v| '"var_%s": "%s (%s)"' % [v.id, v.variable_name, @unit_names[v.variable_units_id]]}.join(",")}
       }
-      return false;
-    }
+    });
 
-    /* Handle select and drag */
-    var handle = change.add(pv.Panel)
-        .data(dims.map(function(dim) { return {y:0, dy:h, dim:dim}; }))
-        .left(function(t){return x(t.dim) - 30})
-        .width(60)
-        .fillStyle("rgba(0,0,0,.001)")
-        .cursor("crosshair")
-        .event("mousedown", pv.Behavior.select())
-        .event("select", update)
-        .event("selectend", selectAll)
-      .add(pv.Bar)
-        .left(25)
-        .top(function(d){return d.y})
-        .width(10)
-        .height(function(d){return d.dy})
-        .fillStyle(function(t){return t.dim == active
-            ? c[t.dim]((filter[t.dim].max + filter[t.dim].min) / 2)
-            : "hsla(0,0,50%,.5)"})
-        .strokeStyle("white")
-        .cursor("move")
-        .event("mousedown", pv.Behavior.drag())
-        .event("dragstart", update)
-        .event("drag", update);
-
-    handle.anchor("bottom").add(pv.Label)
-        .textBaseline("top")
-        .text(function(d){return filter[d.dim].min.toFixed(0) + units[d.dim].unit});
-
-    handle.anchor("top").add(pv.Label)
-        .textBaseline("bottom")
-        .text(function(d){return filter[d.dim].max.toFixed(0) + units[d.dim].unit});
-
-    vis.render();
+    parallel.update();
+    slicky.update();
     
   }
-    
+
 
