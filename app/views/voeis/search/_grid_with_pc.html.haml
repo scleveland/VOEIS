@@ -1,0 +1,48 @@
+= javascript_include_tag 'underscore.js', 'backbone.js','jquery-ui-1.8.11.custom.min.js', 'filter.js', 'parallel-coordinates.js','slickgrid/jquery.event.drag-2.0.min.js', 'slickgrid/slick.core.js','slickgrid/slick.grid.js','slickgrid/slick.dataview.js','slickgrid/slick.pager.js', 'grid.js'
+
+= stylesheet_link_tag 'slick.grid.css', 'parallel-coordinate.css' 
+
+#pc-main
+  %h2 Parallel Coordinates
+  #parallel-coordinates
+  #grid-content
+    #myGrid
+      
+:javascript
+  var dimensions = new Filter();
+
+  dimensions.set({data: #{@parallel_results.to_json}});
+
+  var parallel = new Parallel_coordinates ({
+    title: 'Multidimensional Query - Parallel Coordinates',
+    model: dimensions,
+    el: document.getElementById('parallel-coordinates'),
+    columns: [
+      'timestamp',#{@variables.map{|v| '"var_%s"' % [v.id]}.join(",")}
+    ],
+    alias: {
+      'timestamp': 'Time (s)',
+      #{@variables.map{|v| '"var_%s": "%s (%s)"' % [v.id, v.variable_name, @unit_names[v.variable_units_id]]}.join(",")}
+    },
+    type: {
+      'four': 'category'
+    },
+    width: 1360,
+    height: 400,
+    gutter: { x: 100, y: 50 },
+  });
+
+  var slicky = new grid({
+    model: dimensions,
+    width: 1360,
+    columns: [
+      'timestamp',#{@variables.map{|v| '"var_%s"' % [v.id]}.join(",")}
+    ],
+    alias: {
+      'timestamp': 'UnixTime (s)',
+       #{@variables.map{|v| '"var_%s": "%s (%s)"' % [v.id, v.variable_name, @unit_names[v.variable_units_id]]}.join(",")}
+    }
+  });
+
+  parallel.update();
+  slicky.update();
