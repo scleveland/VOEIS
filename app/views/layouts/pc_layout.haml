@@ -4,7 +4,7 @@
     %meta(http-equiv="content-type" content="text/html;charset=UTF-8")/
     %title= "VOEIS Data Hub: #{controller.action_name}"
 
-    = stylesheet_link_tag 'compiled/screen.css', :media => 'screen, projection'
+    -#= stylesheet_link_tag 'compiled/screen.css', :media => 'screen, projection'
     -#= stylesheet_link_tag 'compiled/print.css', :media => 'print'
     = stylesheet_link_tag 'http://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/claro/claro.css'
     
@@ -12,11 +12,11 @@
     -#  = stylesheet_link_tag 'compiled/ie.css', :media => 'screen, projection'
 
     
-    = javascript_include_tag(:defaults, 'jquery-snippet.js', "dojo_old/dojo.js", "voeislayer.js", "jquery.flot.min.js", "date.format.js", )#"protovis.min.js")
+    = javascript_include_tag(:defaults, "dojo_old/dojo.js" )#"protovis.min.js")
     -#= javascript_include_tag('rails.js', 'jquery.1.7.1.min.js', 'jquery-snippet.js', "dojo_old/dojo.js", "voeislayer.js", "jquery.flot.min.js")
     = csrf_meta_tag
 
-    = stylesheet_link_tag('jquery-ui-1.8.1.custom')
+    -#= stylesheet_link_tag('jquery-ui-1.8.1.custom')
     
     -#= stylesheet_link_tag("/javascripts/dijit/themes/claro/claro.css")
     = stylesheet_link_tag("/javascripts/dojox/grid/resources/Grid.css") 	
@@ -41,18 +41,7 @@
       dojo.require("dijit.form.Button");
     
       dojo.require("yogo.ui.MenuLink");
-      //dojo.require("yogo.maps.google");    
     
-      //yogo.maps.google.load();
-    
-      var hideLoader = function(){
-          dojo.fadeOut({
-              node:"preloader",
-              onEnd: function(){
-                  dojo.style("preloader", "display", "none");
-              }
-          }).play();
-      }
       $(window).ready(function(){ 
           if(window.pre_dojo_parse) pre_dojo_parse();
           dojo.parser.parse();
@@ -60,17 +49,9 @@
           //hideLoader();
       });
 
-      dojo.addOnLoad(function(){
-         //dojo.when(yogo.maps.google.load(), function() {
-         //  dojo.parser.parse();
-         //});
-         //dojo.parser.parse();
-      });
       
     = yield(:javascripts)
 
-    = include_visualization_api
-    = render_visualizations
 
     %link{:rel => "shortcut icon", :href => "#{image_path("favicon.png")}"}/
 
@@ -296,8 +277,8 @@
         = yield :toolbar
       
       
-      #main_container{:dojoType=>"dijit.layout.ContentPane", :region=>"center", :gutters=>"false", :style=>"padding:0; "}
-        = content_for?(:content) ? yield(:content) : yield
+        #main_container
+          = content_for?(:content) ? yield(:content) : yield
 
 
       #bottom.claro{:dojoType => "dijit.layout.ContentPane", :region => "bottom", :gutters => "false", :style => "padding:0"}
@@ -321,4 +302,3 @@
             = link_to(image_tag("browser-icons/browsers-icon-safari-30.jpg", :alt => "Safari browser logo", :align => "left", :title=>"Safari browser"), 'http://www.apple.com/safari/download/', {:target=>'_blank'})
             = link_to(image_tag("browser-icons/browsers-icon-opera-30.jpg", :alt => "Opera browser logo", :align => "left", :title=>"Opera browser"), 'http://www.opera.com/download/', {:target=>'_blank'})
             %br
-            

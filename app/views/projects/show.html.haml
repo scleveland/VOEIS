@@ -1493,10 +1493,10 @@
 
 = clear_break
 
--#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width:905px;height:540px;margin-top:0;padding-top:0;"}
-#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width:905px;height:480px;margin-top:0;padding-top:0;", :prop=>"parseOnLoad:true"}
+-#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width:1200px;height:540px;margin-top:0;padding-top:0;"}
+#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width:1150;height:600px;margin-top:0;padding-top:0;", :prop=>"parseOnLoad:true"}
   #overview{:dojoType=>"dijit.layout.ContentPane", :title=>"Project", :style=>"margin:0;padding:0;float:left;", :selected=>true}
-    .show-map{:style=>"float:left;width:700px;height:100%;margin:0;padding:0;", :id=>@project.id}
+    .show-map{:style=>"float:left;width:900px;height:100%;margin:0;padding:0;", :id=>@project.id}
     -#.show-map{:style=>"float:left;width:700px;height:500px;margin:0;padding:0;", :id=>@project.id}
     -#= render(:partial => 'overview_map', :locals => { :project => @project,
     -#                                                  :sites => @sites,
@@ -1505,9 +1505,8 @@
       %table{:id=>'project_sites', :dojoType=>"dojox.grid.EnhancedGrid", 
               :jsId=>"OverviewGrid", 
               :store=>"psites", 
-              :autoWidth=>"false",
-              :style=>"width:200px;height:440px;float:left;margin:0;padding:0;cursor:pointer;"}
-        -#:style=>"width:200px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
+              :style=>"width:350px;height:560px;float:left;margin:0;padding:0;cursor:pointer;"}
+        -#:style=>"width:200px;height:100%;float:left;margin:0;padding:0;cursor:pointer;"}
         %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
           :plain
             //var map = dijit.byId(@project);
