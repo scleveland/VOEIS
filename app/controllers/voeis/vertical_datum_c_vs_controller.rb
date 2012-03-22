@@ -3,6 +3,7 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
 
   has_widgets do |root|
     root << widget(:versions)
+    root << widget(:edit_cv)
   end
 
 
@@ -95,7 +96,7 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
         !User.current.has_role?('Principal Investigator',@project) &&
         !User.current.has_role?('Data Manager',@project)
       flash[:notice] = 'You have inadequate permissions for this operation.'
-      redirect_to('/'+@project.id)
+      redirect_to(project_path(@project))
     else
       @global = false
       @cv_data0 = @project.managed_repository{Voeis::VerticalDatumCV.all}
@@ -103,18 +104,26 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
       @copy_data = Voeis::VerticalDatumCV.all(:id.not=>@cv_data0.collect(&:id)) #, :order=>[:srs_name.asc])
       @cv_title = 'Vertical Datum'
       @cv_title2 = 'vertical_datum'
+      @cv_title2cv = 'vertical_datum_c_v'
       @cv_id = 'id'
       @cv_name = 'term'
-      @cv_columns = [{:field=>"id", :label=>"ID", :width=>"5%", :filterable=>false, :formatter=>"", :style=>""},
-                    {:field=>"term", :label=>"Term", :width=>"15%", :filterable=>true, :formatter=>"", :style=>""},
+      @cv_columns = [{:field=>"id", :label=>"ID", :width=>"25px", :filterable=>false, :formatter=>"", :style=>""},
+                    {:field=>"term", :label=>"Term", :width=>"100px", :filterable=>true, :formatter=>"", :style=>""},
                     {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
-                    {:field=>"used", :label=>"USED", :width=>"6%", :filterable=>true, :formatter=>"trueFalse", :style=>""},
-                    {:field=>"updated_at", :label=>"Updated", :width=>"15%", :filterable=>true, :formatter=>"dateTime", :style=>""}]
+                    {:field=>"used", :label=>"USED", :width=>"40px", :filterable=>true, :formatter=>"trueFalse", :style=>""},
+                    {:field=>"updated_at", :label=>"Updated", :width=>"80px", :filterable=>true, :formatter=>"dateTime", :style=>""}]
       @copy_columns = [{:field=>"id", :label=>"ID", :width=>"5%", :filterable=>false, :formatter=>"", :style=>""},
                     {:field=>"term", :label=>"Term", :width=>"15%", :filterable=>true, :formatter=>"", :style=>""},
                     {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
                     {:field=>"updated_at", :label=>"Updated", :width=>"18%", :filterable=>true, :formatter=>"dateTime", :style=>""}]
-      render 'spatial_references/index.html.haml'
+      @cv_form = [{:field=>"id", :type=>"-XH", :required=>"", :style=>""},
+                    {:field=>"idx", :type=>"-XH", :required=>"", :style=>""},
+                    {:field=>"Term", :type=>"-LL", :required=>"", :style=>""},
+                    {:field=>"term", :type=>"1B-STB", :required=>"true", :style=>""},
+                    {:field=>"Definition", :type=>"2B-LL", :required=>"false", :style=>""},
+                    {:field=>"definition", :type=>"1B-STA", :required=>"false", :style=>""}]
+      #render 'spatial_references/index.html.haml'
+      render 'voeis/cv_index.html.haml'
     end
   end
 
@@ -126,38 +135,40 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
   # LOCAL: DELETE /VerticalDatum
   def destroy
     @project = parent
-    vertical_datum = @project.managed_repository{Voeis::VerticalDatumCV.get(params[:id])}
-    #debugger
-    #CHECK IF USED...
-    if !@project.sites.first(:vertical_datum_id=>vertical_datum.id).nil?
-      error_notice = 'This Vertical Datum is IN USE!'
-    else
-      error_notice = ''
-    end
-    if error_notice!='' || !vertical_datum.destroy
-      #FAILED!
-      #format.html { render :action => "update" }
-      error_notice = 'Vertical Datum delete FAILED!' if error_notice==''
-      respond_to do |format|
-        format.html {
-          flash[:error] = error_notice
-          redirect_to(vertical_datum_path())
-        }
-        format.json {
-          render :json=>{:id=>vertical_datum.id,:errors=>[error_notice]}.as_json, :callback=>params[:jsoncallback]
-        }
+    @project.managed_repository{
+      vertical_datum = Voeis::VerticalDatumCV.get(params[:id])
+      #debugger
+      #CHECK IF USED...
+      if !@project.sites.first(:vertical_datum_id=>vertical_datum.id).nil?
+        error_notice = 'This Vertical Datum is IN USE!'
+      else
+        error_notice = ''
       end
-    else
-      respond_to do |format|
-        format.html {
-          flash[:notice] = 'Vertical Datum was successfully deleted.'
-          redirect_to(vertical_datum_path())
-        }
-        format.json {
-          render :json => {:id=>vertical_datum.id}.as_json, :callback=>params[:jsoncallback]
-        }
+      if error_notice!='' || !vertical_datum.destroy
+        #FAILED!
+        #format.html { render :action => "update" }
+        error_notice = 'Vertical Datum delete FAILED!' if error_notice==''
+        respond_to do |format|
+          format.html {
+            flash[:error] = error_notice
+            redirect_to(vertical_datum_path())
+          }
+          format.json {
+            render :json=>{:id=>vertical_datum.id,:errors=>[error_notice]}.as_json, :callback=>params[:jsoncallback]
+          }
+        end
+      else
+        respond_to do |format|
+          format.html {
+            flash[:notice] = 'Vertical Datum was successfully deleted.'
+            redirect_to(vertical_datum_path())
+          }
+          format.json {
+            render :json => {:id=>vertical_datum.id}.as_json, :callback=>params[:jsoncallback]
+          }
+        end
       end
-    end
+    }
   end
   
   #HISTORY!

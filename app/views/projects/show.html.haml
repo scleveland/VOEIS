@@ -1600,12 +1600,14 @@
             console.log('tab-close:',tabId);
             //var this_pane = dojo.byId(tabId);
             //if(this_pane) this_pane = dijit.byNode(this_pane);
-            var this_pane = tabPane;
+            var this_pane = this;
+            console.log('close-pane:',this_pane);
             tabs.removeChild(this_pane);
-            this_pane.onClose();
             this_pane.destroyRecursive(false);
+            //dojo.destroy(this_pane);
             //### tab close callback
             //tabClose();
+            return false;
           },
           href: tabHref});
         tabs.addChild(tabPane);

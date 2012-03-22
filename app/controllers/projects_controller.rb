@@ -203,6 +203,24 @@ class ProjectsController < InheritedResources::Base
       @tab = params[:tab]
     end
     
+    #### more CV stuff - CV mangement list
+    @cv_list = [
+                {:cv_title=>"Data Type", :cv_title2=>"data_type", :cv_url=>""},
+                {:cv_title=>"General Category", :cv_title2=>"general_category", :cv_url=>""},
+                {:cv_title=>"Value Type", :cv_title2=>"value_type", :cv_url=>""},
+                {:cv_title=>"Variable Name", :cv_title2=>"variable_name", :cv_url=>""},
+                {:cv_title=>"Spatial Reference", :cv_title2=>"spatial_reference", :cv_url=>spatial_references_path},
+                {:cv_title=>"Vertical Datum", :cv_title2=>"vertical_datum", :cv_url=>vertical_datum_c_vs_path},
+                {:cv_title=>"Sample Type", :cv_title2=>"sample_type", :cv_url=>""},
+                {:cv_title=>"Sample Medium", :cv_title2=>"sample_medium", :cv_url=>""},
+                {:cv_title=>"Sample Material", :cv_title2=>"sample_material", :cv_url=>""},
+                {:cv_title=>"Speciation", :cv_title2=>"speciation", :cv_url=>""},
+                {:cv_title=>"Quality Control Level", :cv_title2=>"quality_control_level", :cv_url=>""},
+                {:cv_title=>"Sensor Type", :cv_title2=>"sensor_type", :cv_url=>""},
+                {:cv_title=>"Logger Type", :cv_title2=>"logger_type", :cv_url=>""}
+                ]
+    @cv_list.delete_if{|cv| cv[:cv_url]=="" }
+    
     # @current_data = Array.new
     #     @items = Array.new
     #     @start_time = nil

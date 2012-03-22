@@ -18,13 +18,13 @@
     //var cv_title = "#{@cv_title}";
     //var cv_name = "#{@cv_name}";
     
-    var #{@tabId}_tab_loaded = false;
+    //var #{@tabId}_tab_loaded = false;
     
     $(window).ready(function(){ 
       //##### 
       //console.log('READY-load-done-NOW');
-      if(#{@tabId}_tab_loaded)
-        $('##{@tabId}_proj_title').hide();
+      $('##{@tabId}_proj_title').show();
+      
     });
     
     // GO BACK or if no history- CLOSE WINDOW
@@ -41,8 +41,8 @@
 -###################
 
 -#%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;", :class=>"icon icon-#{@global ? 'voeis' : 'project'}"}
-%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;"}
-  %span(id="#{@tabId}_proj_title")
+%h3{:style=>"margin-top:0;padding-top:0;"}
+  %span(id="#{@tabId}_proj_title" style="display:none;")
     - if !@project.nil?
       %span.small{:style=>"font-size:14px;"}
         -#%strong

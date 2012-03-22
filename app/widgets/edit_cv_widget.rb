@@ -10,13 +10,13 @@ class EditCvWidget < Apotomo::Widget
     ###      2B preceed with 2x <br />
     ###      3S preceed with 3x &nbsp;
     @types = {:H=>{:type=>"hidden", :dojo=>""},
-              :TB=>{:type=>"", :dojo=>"dijit.form.ValidationTextBox"},
-              :NB=>{:type=>"", :dojo=>"dijit.form.NumberTextBox"},
-              :DB=>{:type=>"", :dojo=>"dijit.form.DateTextBox"},
-              :TA=>{:type=>"", :dojo=>"dijit.form.SimpleTextarea"},
-              :TA1=>{:type=>"", :dojo=>"dijit.form.Textarea"},
-              :TA2=>{:type=>"", :dojo=>"dijit_ext.ValidationTextarea"},
-              :CK=>{:type=>"", :dojo=>"dijit.form.CheckBox"},
+              :TB=>{:type=>"text", :dojo=>"dijit.form.ValidationTextBox"},
+              :NB=>{:type=>"text", :dojo=>"dijit.form.NumberTextBox"},
+              :DB=>{:type=>"text", :dojo=>"dijit.form.DateTextBox"},
+              :TA=>{:type=>"text", :dojo=>"dijit.form.SimpleTextarea"},
+              :TA1=>{:type=>"text", :dojo=>"dijit.form.Textarea"},
+              :TA2=>{:type=>"text", :dojo=>"dijit_ext.ValidationTextarea"},
+              :CK=>{:type=>"checkbox", :dojo=>"dijit.form.CheckBox"},
               :L=>{:type=>"", :dojo=>""}}   ###LABEL
     @delims = {:B=>'<br style="float:none;clear:both;"  />', :S=>'&nbsp;'}
     

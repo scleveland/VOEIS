@@ -3,6 +3,7 @@ class SpatialReferencesController < ApplicationController
 
   has_widgets do |root|
     root << widget(:versions)
+    root << widget(:edit_cv)
   end
 
 
@@ -41,8 +42,15 @@ class SpatialReferencesController < ApplicationController
     spatial_reference = Voeis::SpatialReference.get(params[:spatial_reference][:id])
     #debugger
     
-    params[:spatial_reference].each do |key, value|
-      spatial_reference[key] = value.blank? ? nil : value
+    cvparams = params[:spatial_reference]
+    cvparams.each do |prop,value| 
+      #v = value.strip
+      #cvparams[prop] = nil if v=='NaN' || v=='null'
+      cvparams[prop] = value.blank? ? nil : value
+    end
+    cvparams[:is_geographic] = cvparams[:is_geographic]=~(/(true|t|yes|y|1)$/i) ? true : false
+    cvparams.each do |prop,value|
+      spatial_reference[prop] = value
     end
     spatial_reference.updated_at = Time.now
     
@@ -65,22 +73,35 @@ class SpatialReferencesController < ApplicationController
   def index
     if User.current.nil? || User.current.system_role.name!='Administrator'
       flash[:notice] = 'You have inadequate permissions for this operation.'
-      redirect_to('/')
+      redirect_to(project_path(@project))
     end
     ### GLOBAL SPATIAL REFERENCE
     @global = true
     @cv_data = Voeis::SpatialReference.all
     @cv_data = @cv_data.map{|d| d.attributes.update({:used=>false})}
     @cv_title = 'Spatial Reference'
-    @cv_title2 = 'spatial_reference'
+    @cv_title2 = 'global_spatial_reference'
+    @cv_title2cv = 'spatial_reference'
     @cv_id = 'id'
     @cv_name = 'srs_name'
-    @cv_columns = [{:field=>"id", :label=>"ID", :width=>"5%", :filterable=>false, :formatter=>"", :style=>""},
-                  {:field=>"srs_name", :label=>"Source Name", :width=>"15%", :filterable=>true, :formatter=>"", :style=>""},
-                  {:field=>"srs_id", :label=>"Source ID", :width=>"10%", :filterable=>true, :formatter=>"", :style=>""},
-                  {:field=>"is_geographic", :label=>"GEO", :width=>"5%", :filterable=>true, :formatter=>"trueFalse", :style=>""},
+    @cv_columns = [{:field=>"id", :label=>"ID", :width=>"25px", :filterable=>false, :formatter=>"", :style=>""},
+                  {:field=>"srs_name", :label=>"Source Name", :width=>"110px", :filterable=>true, :formatter=>"", :style=>""},
+                  {:field=>"srs_id", :label=>"Source ID", :width=>"80px", :filterable=>true, :formatter=>"", :style=>""},
+                  {:field=>"is_geographic", :label=>"GEO", :width=>"40px", :filterable=>true, :formatter=>"trueFalse", :style=>""},
                   {:field=>"notes", :label=>"Notes", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
-                  {:field=>"updated_at", :label=>"Updated", :width=>"15%", :filterable=>true, :formatter=>"dateTime", :style=>""}]
+                  {:field=>"updated_at", :label=>"Updated", :width=>"80px", :filterable=>true, :formatter=>"dateTime", :style=>""}]
+    @cv_form = [{:field=>"id", :type=>"-IH", :required=>"", :style=>""},
+                  {:field=>"idx", :type=>"-XH", :required=>"", :style=>""},
+                  {:field=>"Source ID", :type=>"-LL", :required=>"", :style=>""},
+                  {:field=>"srs_id", :type=>"1B-INB", :required=>"true", :style=>""},
+                  {:field=>"Source Name", :type=>"2B-LL", :required=>"", :style=>""},
+                  {:field=>"srs_name", :type=>"1B-STB", :required=>"true", :style=>""},
+                  {:field=>"is_geographic", :type=>"6S-BCK", :required=>"false", :style=>""},
+                  {:field=>"Geographic", :type=>"1S-LL", :required=>"", :style=>""},
+                  {:field=>"Notes", :type=>"2B-LL", :required=>"", :style=>""},
+                  {:field=>"notes", :type=>"1B-STA", :required=>"false", :style=>""}]
+    #render 'spatial_references/index.html.haml'
+    render 'voeis/cv_index.html.haml'
   end
 
   def show
@@ -145,7 +166,7 @@ class SpatialReferencesController < ApplicationController
 #      {:label=>"ID", :name=>"id"},
       {:label=>"Source Name", :name=>"srs_name"},
       {:label=>"Source ID", :name=>"srs_id"},
-      {:label=>"Gergraphic", :name=>"is_geo_string"},
+      {:label=>"Geographic", :name=>"is_geo_string", :contains=>["is_geographic"]},
       {:label=>"Notes", :name=>"notes"}
       ]
     

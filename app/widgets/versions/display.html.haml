@@ -170,7 +170,7 @@
         - reset_cycle
         - @ver_properties.each do |prop|
           %tr{:class=>cycle('row1','row0')}
-            - prop_dirty = (version[:dirty]&[prop[:name]]+(prop[:contains].nil? ? []:prop[:contains])).empty?
+            - prop_dirty = (version[:dirty]&[prop[:name]]+(prop[:contains].nil? ? [] : prop[:contains])).empty?
             %td{:style=>"text-align:right;width:25%;"}
               %strong{:style=>"#{prop_dirty ? '' : 'color:#B22800'}"}
                 #{prop[:label]}

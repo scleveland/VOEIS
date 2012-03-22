@@ -3,6 +3,7 @@ class VerticalDatumCVsController < ApplicationController
 
   has_widgets do |root|
     root << widget(:versions)
+    root << widget(:edit_cv)
   end
 
 
@@ -65,21 +66,29 @@ class VerticalDatumCVsController < ApplicationController
   def index
     if User.current.nil? || User.current.system_role.name!='Administrator'
       flash[:notice] = 'You have inadequate permissions for this operation.'
-      redirect_to('/')
+      redirect_to(project_path(@project))
     end
     ### GLOBAL VERTICAL DATUM
     @global = true
     @cv_data = Voeis::VerticalDatumCV.all
     @cv_data = @cv_data.map{|d| d.attributes.update({:used=>false})}
     @cv_title = 'Vertical Datum'
-    @cv_title2 = 'vertical_datum'
+    @cv_title2 = 'global_vertical_datum'
+    @cv_title2cv = 'vertical_datum_c_v'
     @cv_id = 'id'
     @cv_name = 'term'
-    @cv_columns = [{:field=>"id", :label=>"ID", :width=>"5%", :filterable=>false, :formatter=>"", :style=>""},
-                  {:field=>"term", :label=>"Term", :width=>"15%", :filterable=>true, :formatter=>"", :style=>""},
+    @cv_columns = [{:field=>"id", :label=>"ID", :width=>"25px", :filterable=>false, :formatter=>"", :style=>""},
+                  {:field=>"term", :label=>"Term", :width=>"100px", :filterable=>true, :formatter=>"", :style=>""},
                   {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
-                  {:field=>"updated_at", :label=>"Updated", :width=>"15%", :filterable=>true, :formatter=>"dateTime", :style=>""}]
-    render 'spatial_references/index.html.haml'
+                  {:field=>"updated_at", :label=>"Updated", :width=>"80px", :filterable=>true, :formatter=>"dateTime", :style=>""}]
+    @cv_form = [{:field=>"id", :type=>"-IH", :required=>"", :style=>""},
+                  {:field=>"idx", :type=>"-XH", :required=>"", :style=>""},
+                  {:field=>"Term", :type=>"-LL", :required=>"", :style=>""},
+                  {:field=>"term", :type=>"1B-STB", :required=>"true", :style=>""},
+                  {:field=>"Definition", :type=>"2B-LL", :required=>"false", :style=>""},
+                  {:field=>"definition", :type=>"1B-STA", :required=>"false", :style=>""}]
+    #render 'spatial_references/index.html.haml'
+    render 'voeis/cv_index.html.haml'
   end
 
   def show
