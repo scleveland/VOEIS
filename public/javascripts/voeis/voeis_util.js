@@ -184,7 +184,7 @@ var datastore = {
         myitem = item;
       },
       onError: function(error,request) {
-        console.log('ERROR: '+error);
+        console.log('ERROR: ',error.message);
       }
     });
     return myitem;
@@ -209,7 +209,8 @@ var datastore = {
       store.newItem(item);
     }
     catch (e) { 
-      console.log('STORE ERROR: DUPLICATE KEY',e);
+      //console.log('STORE ERROR: DUPLICATE KEY',e);
+      console.log('STORE ERROR: '+e.message+' -- args:', e.arguments);
     };
     this.saveDirty('SAVED',store);
   },
@@ -234,6 +235,16 @@ var datastore = {
     });
     this.saveDirty('UPDATED',store);
   },
+  // NEW OR UPDATE ITEM IN DOJO STORE
+  new_upd: function(item, item_store) {
+    var store = item_store || this.store_default;
+		var id = parseInt(item.id.toString());
+    console.log('NEW-UPD:',item, store);
+		if(store._itemsByIdentity[id])
+			this.update(item, store);
+		else
+			this.new(item, store);
+	},
   // DELETE ITEM IN DOJO STORE
   delete: function(item, item_store) {
     var store = item_store || this.store_default;
@@ -241,7 +252,7 @@ var datastore = {
       store.deleteItem(item);
     }
     catch (e) { 
-      console.log('STORE ERROR:',e.message);
+      console.log('STORE ERROR: '+e.message+' -- args:', e.arguments);
     };
     this.saveDirty('DELETED',store);
   },
@@ -250,7 +261,7 @@ var datastore = {
     if(store.isDirty())
       store.save({
         onComplete: function() { console.log('STORE ITEM '+mess) },
-        onError: function(error) { console.log('STORE '+mess+' ERROR:',error) }
+        onError: function(error) { console.log('STORE '+mess+' ERROR:',error.message) }
       });
 	},
 	formats: {
@@ -284,5 +295,15 @@ var datastore = {
       return blank_img;
     }
   }
+};
+
+//***** REFRESH A TAB BY TAB-ID *****
+var refreshTab = function(tabId) {
+  var pane = dojo.byId(tabId);
+  console.log('REFRESH:',tabId,pane);
+  if(pane) {
+    pane = dijit.byNode(pane);
+    pane.refresh();
+  };
 };
 
