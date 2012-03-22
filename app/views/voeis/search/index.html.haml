@@ -48,7 +48,9 @@
     %em TOO MANY RESULTS TO DISPLAY
 -else
   %h2 Parallel Coordinate Graph of Results:
-  #center  
+  #center
+    -#%p{:style=>"margin-left:40px;"}
+    -#  = @variables.map{|v| '<a html="" onclick="doVarQuery(%s,%s);return false;"><img src="arrow_down_16.png" style="margin-left:%s%%;cursor:pointer;" /></a>' %[v[:site_id],v[:id],81/@variables.length]}.join("").html_safe
     %div{:id=>"#{@tabId}_graph", :style=>"width:90%;height:400px;"}
       GRAPH HERE!
       
@@ -96,8 +98,16 @@
        //formatter: datastore.formats.dateTime,
        width: '100px'
     },
-    #{@variables.map{|v| '{field:"%s", name: "%s (%s)", width:"100px"}' % [v.id, v.variable_name.gsub(",","-"),@unit_names[v.variable_units_id] ]}.join(',')}
+    #{@variables.map{|v| '{field:"%s", name:"%s (%s)", width:"100px"}' % [v[:id], v[:variable_name].gsub(",","-"), @unit_names[v[:variable_units_id]] ]}.join(',')}
   ];
+  
+  function doVarQuery(siteId,varId) {
+    var qstring = 'site_select='+siteId;
+    qstring += '&variable_select='+varId;
+    qstring += "&start_date=#{@start_date.to_date.strftime('%Y-%m-%d')}";
+    qstring += "&end_date=#{@end_date.to_date.strftime('%Y-%m-%d')}";
+    dojo.publish('voeis/project/dataquery/results', [siteId, qstring]);
+  };
 
   function exportAll(){
       //csv_string=""
@@ -135,6 +145,12 @@
   // append the new grid to the div " ":
   $('##{@tabId}_grid').append(#{@tabId}_data.searchGrid.domNode);
   #{@tabId}_data.searchGrid.startup();
+
+  
+  //######################
+  //#{@variables.map{|v| 'var_%s: {name:"<a href=\"\" onclick=\"doVarQuery(%s,%s);return false;\">%s</a>", unit: "%s"}' % [v[:id], v[:site_id], v[:id], v[:variable_name], ""] }.join(",").html_safe}
+  //######################
+
   
   //######################
   // CREATE PARALLEL GRAPH
@@ -144,7 +160,7 @@
 
     var units = {
       timestamp: {name: "DateTime", unit: ""},
-      #{@variables.map{|v| 'var_%s: {name:"%s", unit: "%s"}' % [v.id, v.variable_name, ""] }.join(",")}
+      #{@variables.map{|v| 'var_%s: {name:"%s", unit:"%s"}' % [v[:id], v[:variable_name], ""] }.join(",")}
     }
 
     var dims = pv.keys(units);
