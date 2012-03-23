@@ -133,9 +133,17 @@
       data: psites_json
     });
     
+    //#####################
     //DOJO datastore utils: set default store
     datastore.store_default = psites;
-        
+
+    //#######################
+    //CLEAR TOOLTIP on CLICK
+    $('body').click( function(e){
+      //console.log('DOM-CLICK:',e);
+      $("#tooltip").remove();
+    });
+    
     function edit_formatter(id) {
       var link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/pop\', ['+id+']);"><img src="/images/icons/blue-dot16.png" alt="MAP site" title="MAP" /></a>';
       //var vlink = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+id+']);"><img src="/images/icons/view.gif" alt="VIEW site" title="VIEW" /></a>';
@@ -153,26 +161,6 @@
       console.log('GET-SITE-ID: '+siteId);
       var site = datastore.get(siteId);
       return site;
-      ///////
-      /***
-      var site = {};
-      psites.fetch({query: {id: siteId},
-        onItem: function(item) {
-          //site = $.extend({},item);
-          //site = item;
-          console.log('FETCH ITEM:',item);
-          for(prop in item) {
-            if(item[prop]==null) site[prop] = null;
-            else site[prop] = item[prop].toString();
-          };
-        },
-        onError: function(error,request) {
-          console.log('ERROR: '+error);
-          //site = false;
-        }
-      });
-      return site;
-      ***/
     }
     
     function pmap_clear(siteId) {

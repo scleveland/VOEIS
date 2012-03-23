@@ -706,10 +706,8 @@
      
      $('body').click( function(e){
        //console.log('DOM-CLICK:',e);
-       if(#{dataId}.plotClick.length==0) {
-         $("#tooltip").remove();
-         return;
-       };
+       if(#{dataId}.plotClick.length==0) return;
+       
        var event = #{dataId}.plotClick[0];
        var pos = #{dataId}.plotClick[1];
        var item = #{dataId}.plotClick[2];
