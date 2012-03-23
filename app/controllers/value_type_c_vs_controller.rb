@@ -1,6 +1,11 @@
 class ValueTypeCVsController < ApplicationController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
+  has_widgets do |root|
+    root << widget(:versions)
+    root << widget(:edit_cv)
+  end
+
 
   # GET /variables/new
   def new

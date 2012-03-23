@@ -42,22 +42,27 @@ class QualityControlLevelsController  < InheritedResources::Base
     
   end
 
-  # GLOBAL: QualityControlLevel entries
+  # LOCAL: QualityControlLevel entries
   def index
     if User.current.nil? || User.current.system_role.name!='Administrator'
       flash[:notice] = 'You have inadequate permissions for this operation.'
       redirect_to(project_path(@project))
     end
-    ### GLOBAL QUALITY CONTROL LEVEL
+    ### LOCAL: QUALITY CONTROL LEVEL
     @global = true
     @cv_data = Voeis::QualityControlLevel.all
     @cv_data = @cv_data.map{|d| d.attributes.update({:used=>false})}
     @cv_title = 'Quality Control Level'
-    @cv_title2 = 'global_quality_control_level'
+    @cv_title2 = 'quality_control_level'
     @cv_title2cv = 'quality_control_level'
     @cv_id = 'id'
     @cv_name = 'quality_control_level_code'
     @cv_columns = [{:field=>"id", :label=>"ID", :width=>"25px", :filterable=>false, :formatter=>"", :style=>""},
+                  {:field=>"quality_control_level_code", :label=>"Quality Control Level", :width=>"100px", :filterable=>true, :formatter=>"", :style=>""},
+                  {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
+                  {:field=>"explanation", :label=>"Explanation", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
+                  {:field=>"updated_at", :label=>"Updated", :width=>"80px", :filterable=>true, :formatter=>"dateTime", :style=>""}]
+    @copy_columns = [{:field=>"id", :label=>"ID", :width=>"25px", :filterable=>false, :formatter=>"", :style=>""},
                   {:field=>"quality_control_level_code", :label=>"Quality Control Level", :width=>"100px", :filterable=>true, :formatter=>"", :style=>""},
                   {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
                   {:field=>"explanation", :label=>"Explanation", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
@@ -73,13 +78,18 @@ class QualityControlLevelsController  < InheritedResources::Base
     render 'voeis/cv_index.html.haml'
   end
 
-  ### GLOBAL: QUALITY CONTROL HISTORY!
+  ### LOCAL: QUALITY CONTROL HISTORY!
   def versions
-    @global = true
-    @cv_item = Voeis::QualityControlLevel.get(params[:id])
-    @cv_versions = @cv_item.versions.to_a
+    @global = false
+    @project = parent
+    #@cv_item = Voeis::QualityControlLevel.get(params[:id])
+    #@cv_versions = @cv_item.versions
+    @cv_item = @project.managed_repository{Voeis::QualityControlLevel.get(params[:id])}
+    #@cv_versions = @project.managed_repository{Voeis::VerticalDatumCV.get(params[:id]).versions}
+    @cv_versions = @project.managed_repository.adapter.select('SELECT * FROM voeis_quality_control_level_versions WHERE id=%s ORDER BY updated_at DESC'%@cv_item.id)
+    #@cv_versions = @project.managed_repository{@cv_item.versions_array}
     @cv_title = 'Quality Control Level'
-    @cv_title2 = 'global_quality_control_level'
+    @cv_title2 = 'quality_control_level'
     @cv_name = 'quality_control_level_code'
     @cv_term = 'quality_control_level_code'
     @cv_id = 'id'
@@ -87,13 +97,12 @@ class QualityControlLevelsController  < InheritedResources::Base
     @cv_refs = []
 
     @cv_properties = [
-#      {:label=>"Version", :name=>"version"},
-#      {:label=>"ID", :name=>"id"},
-      {:label=>"Quality Control Level", :name=>"quality_control_level_code"},
+      #{:label=>"Version", :name=>"version"},
+      #{:label=>"ID", :name=>"id"},
+      {:label=>"Quality Control Code", :name=>"quality_control_level_code"},
       {:label=>"Definition", :name=>"definition"},
       {:label=>"Explanation", :name=>"explanation"}
       ]
-
     render 'spatial_references/versions.html.haml'
   end
 

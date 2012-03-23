@@ -40,14 +40,14 @@ class VariableNameCVsController < ApplicationController
 
   end
 
-  # GLOBAL: List VariableName entries
+  # LOCAL: List VariableName entries
   def index
     if User.current.nil? || User.current.system_role.name!='Administrator'
       flash[:notice] = 'You have inadequate permissions for this operation.'
       redirect_to(project_path(@project))
     end
-    ### GLOBAL VARIABLE NAME
-    @global = true
+    ### LOCAL VARIABLE NAME
+    @global = false
     @cv_data = Voeis::VariableNameCV.all
     @cv_data = @cv_data.map{|d| d.attributes.update({:used=>false})}
     @cv_title = 'Variable Name'
@@ -59,6 +59,10 @@ class VariableNameCVsController < ApplicationController
                   {:field=>"term", :label=>"Term", :width=>"100px", :filterable=>true, :formatter=>"", :style=>""},
                   {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
                   {:field=>"updated_at", :label=>"Updated", :width=>"80px", :filterable=>true, :formatter=>"dateTime", :style=>""}]
+    @copy_columns = [{:field=>"id", :label=>"ID", :width=>"5%", :filterable=>false, :formatter=>"", :style=>""},
+                  {:field=>"term", :label=>"Term", :width=>"15%", :filterable=>true, :formatter=>"", :style=>""},
+                  {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
+                  {:field=>"updated_at", :label=>"Updated", :width=>"18%", :filterable=>true, :formatter=>"dateTime", :style=>""}]
     @cv_form = [{:field=>"id", :type=>"-IH", :required=>"", :style=>""},
                   {:field=>"idx", :type=>"-XH", :required=>"", :style=>""},
                   {:field=>"Term", :type=>"-LL", :required=>"", :style=>""},
@@ -68,26 +72,28 @@ class VariableNameCVsController < ApplicationController
     render 'voeis/cv_index.html.haml'
   end
 
-  ### GLOBAL: VARIABLE-NAME HISTORY!
+  ### LOCAL: VARIABLE-NAME HISTORY!
   def versions
-    @global = true
-    @cv_item = Voeis::VariableNameCV.get(params[:id])
-    @cv_versions = @cv_item.versions.to_a
+    @global = false
+    @project = parent
+    @cv_item = @project.managed_repository{Voeis::VariableNameCV.get(params[:id])}
+    #@cv_versions = @project.managed_repository{Voeis::VerticalDatumCV.get(params[:id]).versions}
+    @cv_versions = @project.managed_repository.adapter.select('SELECT * FROM voeis_variable_name_cv_versions WHERE id=%s ORDER BY updated_at DESC'%@cv_item.id)
+    #@cv_versions = @project.managed_repository{@cv_item.versions_array}
     @cv_title = 'Variable Name'
-    @cv_title2 = 'global_variable_name'
-    @cv_name = 'term'
+    @cv_title2 = 'variable_name'
     @cv_term = 'term'
+    @cv_name = 'term'
     @cv_id = 'id'
 
     @cv_refs = []
 
     @cv_properties = [
-#      {:label=>"Version", :name=>"version"},
-#      {:label=>"ID", :name=>"id"},
+      #{:label=>"Version", :name=>"version"},
+      #{:label=>"ID", :name=>"id"},
       {:label=>"Term", :name=>"term"},
       {:label=>"Definition", :name=>"definition"}
-      ]
-
+    ]
     render 'spatial_references/versions.html.haml'
   end
 
