@@ -43,26 +43,28 @@
 -else
   
   :css
-    div.zobutton {
+    div.gridbutton {
+        width: 10px;
+        height: 12px;
         font-size: smaller;
+        font-weight: bold;
+        text-align: center;
+        opacity:0.3;
+        filter:alpha(opacity=30); /* For IE8 and earlier */
         color: #999;
-        background-color: #eee;
-        padding: 4px;
+        color: #fff;
+        background-color: #ccc;
+        background-color: #055;
+        padding: 3px;
     }
-     .zobutton {
+    .gridbutton {
         position: absolute;
         cursor: pointer;
     }
-
-    div.zibutton {
-        font-size: smaller;
-        color: #999;
-        background-color: #eee;
-        padding: 2px;
-    }
-     .zibutton {
-        position: absolute;
-        cursor: pointer;
+    #xxx {
+        opacity:0.6;
+        filter:alpha(opacity=60); /* For IE8 and earlier */
+    
     }
     
     #gridContainer img { margin:0; }
@@ -190,15 +192,17 @@
       = "#{@var_name} | #{@units}"
 
       -if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         -#%p{:style=>"margin:7px 0;"}
         -#  %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
         -#    %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
         -#      Data Set:
         %button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
-          Add Selected Data &gt;&gt;
+          Add Selection &gt;&gt;
         - opts0 = "<option value='-'>- Select Data Set -</option>\n<option value='NEW'>NEW DATA SET</option>\n"
         = select_tag("#{@tabId}_data_set_select", (opts0+@data_set_options).html_safe)
+        -#%button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
+        -#  &lt;&lt; with Data Set
     
     =clear_break
     -# #pagination-links
@@ -264,18 +268,34 @@
     
     //console.log('3RESULT -DATAID(#{dataId}):',#{dataId});
     
+    //######################################
     //*** SWITCH VIEWS: PLOT/GRID
     #{dataId}.toggle_views = function() {
+      var val_grid = #{dataId}.val_grid;
+      var val_plot = #{dataId}.plot;
+      $("#tooltip").remove();
       if($('##{@tabId}_toggle_view_id').text()=='VIEW TABLE') {
         $('##{@tabId}_toggle_view_id').text('VIEW GRAPH');
         $('##{@tabId}_plot_view').hide();
         $('##{@tabId}_grid_view').show();
-        #{dataId}.val_grid.render();
+        //val_grid.render();
+        val_grid.update();
+        var grid_sel = val_grid.selection.getSelected()
+        if(grid_sel.length) {
+          console.log('SCROLL-TO:',grid_sel[0]._0);
+          setTimeout(function(){
+            val_grid.scrollTo(0);
+            val_grid.scrollToRow(grid_sel[0]._0);
+            val_grid.scrollToRow(grid_sel[0]._0);
+          },500);
+        };
         
       } else {
         $('##{@tabId}_toggle_view_id').text('VIEW TABLE');
         $('##{@tabId}_grid_view').hide();
         $('##{@tabId}_plot_view').show();
+        val_plot.unhighlight();
+        plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
       };
     };
     
@@ -333,6 +353,8 @@
           dijit.byId('loading_dialog').hide();
         });
     }
+    
+    //######################################
     //formatter: 'val_grid_formatter.dateTime',
     // grid formatters
     var val_grid_formatter = {
@@ -467,6 +489,7 @@
     ];
     if(!edit_auth) val_layout.pop();
 
+    //######################################
     // create a new grid:
     //#{dataId}.val_grid = new dijit_ext.Egrid({
     #{dataId}.val_grid = new dojox.grid.EnhancedGrid({
@@ -594,14 +617,25 @@
            zoom: {interative: true}
     });
 
-    // add zoom out button 
-    $('<div class="zobutton" style="right:20px;top:20px">-</div>').appendTo($("##{@tabId}_search_results #plotContainer")).click(function (e) {
+    // ADD ZOOM in/out button 
+    $('<div class="gridbutton" title="ZOOM-IN" style="right:20px;top:20px;">+</div>').appendTo($("##{@tabId}_search_results #plotContainer")).click(function (e) {
        e.preventDefault();
+       var sel = #{dataId}.val_grid.selection.getSelected();
+       #{dataId}.plot.unhighlight();
+       plotutils.highlightItems(sel,0,#{dataId}.plot);
+       #{dataId}.plot.zoom();
+    });
+    $('<div class="gridbutton" title="ZOOM-OUT" style="right:20px;top:44px;">-</div>').appendTo($("##{@tabId}_search_results #plotContainer")).click(function (e) {
+       e.preventDefault();
+       var sel = #{dataId}.val_grid.selection.getSelected();
+       #{dataId}.plot.unhighlight();
+       plotutils.highlightItems(sel,0,#{dataId}.plot);
        #{dataId}.plot.zoomOut();
     });
-    $('<div class="zibutton" style="right:20px;top:43px">+</div>').appendTo($("##{@tabId}_search_results #plotContainer")).click(function (e) {
-       e.preventDefault();
-       #{dataId}.plot.zoom();
+    // CLEAR SELECTION
+    $('<div class="gridbutton" title="CLEAR SELECTION" style="right:20px;bottom:40px;background-color:red;">x</div>').appendTo($("##{@tabId}_search_results #plotContainer")).click(function (e) {
+       #{dataId}.plot.unhighlight();
+       #{dataId}.val_grid.selection.deselectAll();
     });
 
     //Function ShowToolTip and previousPoint allow the hover function to display
@@ -638,12 +672,13 @@
      #{dataId}.previousPoint = null;
      #{dataId}.plotClick = [];
      #{dataId}.plotHover = [];
+     #{dataId}.domClick = 0;
      #{dataId}.hoverDelay = 0;
      
      //DOM hover event
      //$('tab_browser').hover( function(e){
      //$('body').mouseover( function(e){
-     $('xbody').hover( function(e){
+     $('xxbody').hover( function(e){
        //console.log('DOM-HOVER:',e);
        if(#{dataId}.plotHover.length==0) {
          $("#tooltip").remove();
@@ -653,21 +688,36 @@
        var pos = #{dataId}.plotHover[1];
        var item = #{dataId}.plotHover[2];
        if(!item) {
-         //$("#tooltip").remove();
+         $("#tooltip").remove();
          return;
        };
        console.log('DOM-PLOT-HOVER =',#{dataId}.plotHover,e);
        showPlotTooltip(event,pos,item);
-       //$("#tooltip").remove();
-       
+     },function(e){
        //CLEAR EVENT
        #{dataId}.plotHover = [];
      });
      
+     //HOVER ON TOOLTIP: REMOVE TOOLTIP
+     $("#tooltip").bind('mouseout', function(e){
+       console.log('TOOLTIP-OUT:',e);
+       $("#tooltip").remove();
+     });
+     $("#tooltip").bind('mouseleave', function(e){
+       console.log('TOOLTIP-LEAVE:',e);
+       $("#tooltip").remove();
+     });
+     
      //DOM click event
+     $('xxbody').click( function(e){
+       //console.log('DOM-CLICK:',e);
+       #{dataId}.domClick = e;
+     });
+     
      $('body').click( function(e){
        //console.log('DOM-CLICK:',e);
        if(#{dataId}.plotClick.length==0) return;
+       
        var event = #{dataId}.plotClick[0];
        var pos = #{dataId}.plotClick[1];
        var item = #{dataId}.plotClick[2];
@@ -678,12 +728,12 @@
          //var val_grid = dijit.byNode($('##{@tabId}_search_results #gridContainer div')[0]);
          var val_grid = #{dataId}.val_grid;
          var val_plot = #{dataId}.plot;
+         var val_sel = val_grid.selection;
          //var store = #{dataId}.val_store;
          console.log('PLOT-CLICK:',e,event,pos,item,val_item);
          if(e.shiftKey) {
            //SHIFT-CLICK: Select Range
-           //val_grid.changePageSize(0);
-           var sel = val_grid.selection.getSelected();
+           var sel = val_sel.getSelected();
            //#sel = sel.map(function(item){return new Date(item.local_date_time.toString()).valueOf()});
            //var selx = sel.map(function(item){return #{dataId}.data[item._0][0]});
            //var first = Math.min.apply(Math, selx);
@@ -691,19 +741,27 @@
            var limits = plotutils.selectionLimits(sel,val_plot)
            console.log('LIMITS:',limits);
            if(item.datapoint[0]<limits.values[0]) {
-             val_grid.selection.selectRange(val_item._0, limits[1]._0);
+             val_sel.selectRange(val_item._0, limits[1]._0);
+           } else if(item.datapoint[0]>limits.values[1]) {
+             val_sel.selectRange(limits[0]._0, val_item._0);
            } else {
-             if(item.datapoint[0]>limits.values[1]) {
-               val_grid.selection.selectRange(limits[0]._0, val_item._0);
-             } else {
-               val_grid.selection.selectRange(limits[0]._0, limits[1]._0);
-             };
+             val_sel.selectRange(limits[0]._0, limits[1]._0);
            };
            plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
-           val_grid.scrollTo(0);
-           var toend = limits[1]._0 - 4;
-           if(toend<0) toend = 0;
-           val_grid.scrollToRow(toend);
+           //val_grid.scrollTo(0);
+           //var toend = limits[1]._0 - 4;
+           //if(toend<0) toend = 0;
+           //val_grid.scrollToRow(toend);
+         } else if(e.altKey) {
+           //ALT-CLICK: EDIT DataValue at Point
+           var val_id = parseInt(val_item.id.toString());
+           val_grid.popEdit(val_id);
+           $("#tooltip").remove();
+           //#{dataId}.toggle_views();
+           //val_grid.scrollToRow(val_item._0);
+           //val_grid.scrollToRow(val_item._0);
+         } else if(e.ctrlKey) {
+           //CTRL-CLICK: UNUSABLE ON MAC
          } else {
            //NORMAL-CLICK: Select/Deselect Point
            //###SCROLL TO TOP of GRID
@@ -711,13 +769,26 @@
            //$('html #main_container').animate({scrollTop:580}, 'slow');//IE, FF
            //$('body #main_container').animate({scrollTop:580}, 'slow');//chrome, safari
            
-           if(val_grid.selection.isSelected(idx)) val_plot.unhighlight(0,idx);
-           else val_plot.highlight(0,idx);
+           if(val_grid.selection.isSelected(idx)) {
+             console.log('ALREADY SELECTED!');
+             //val_plot.unhighlight(0,idx);
+             val_sel.deselect(idx);
+           } else {
+             console.log('NOT SELECTED!');
+             //val_plot.highlight(0,idx);
+             if(val_sel.getSelectedCount())
+               val_sel.addToSelection(idx);
+             else val_sel.select(idx);
+           };
+           //plotutils.highlightItems(val_sel.getSelected(),0,val_plot);
+           setTimeout(function(){
+             plotutils.highlightItems(val_sel.getSelected(),0,val_plot);
+           },200);
            //val_grid.selection.deselectAll();
-           val_grid.scrollTo(0);
-           val_grid.scrollToRow(idx);
+           //val_grid.scrollTo(0);
+           //val_grid.scrollToRow(idx);
            //val_grid.selection.addToSelection(val_item);
-           val_grid.selection.toggleSelect(val_item);
+           //val_grid.selection.toggleSelect(val_item);
          };
          
          val_grid.update();
@@ -727,12 +798,41 @@
        #{dataId}.plotClick = [];
      });
      
+     //DOM bouble-click event
+     $('xxbody').dblclick( function(e){
+       //console.log('DOM-CLICK:',e);
+       if(#{dataId}.plotClick.length==0) return;
+       var event = #{dataId}.plotClick[0];
+       var pos = #{dataId}.plotClick[1];
+       var item = #{dataId}.plotClick[2];
+       //SELECT ROW IN GRID
+       if(item) {
+         var idx = item.dataIndex;
+         var val_item = #{dataId}.value_data[idx];
+         var val_id = parseInt(val_item.id.toString());
+         //var val_grid = dijit.byNode($('##{@tabId}_search_results #gridContainer div')[0]);
+         var val_grid = #{dataId}.val_grid;
+         var val_plot = #{dataId}.plot;
+         //var store = #{dataId}.val_store;
+         console.log('PLOT-DBL-CLICK:',e,event,pos,item,val_item);
+         val_grid.popEdit(val_id);
+         //val_grid.scrollToRow(val_item._0);
+         //#{dataId}.toggle_views();
+       };
+       //CLEAR EVENT
+       #{dataId}.plotClick = [];
+     });
+     
      
      $("##{@tabId}_search_results #plotContainer").bind("plothover", function (event, pos, item) {
        //
        //showPlotTooltip(event,pos,item);
        #{dataId}.plotHover = [event,pos,item];
-       showPlotTooltip(event,pos,item);
+       if(item) showPlotTooltip(event,pos,item);
+       else {
+           $("#tooltip").remove();
+           #{dataId}.previousPoint = null;            
+       };
        //console.log('PLOT-HOVER =',#{dataId}.plotHover);
        return;
        
@@ -771,37 +871,98 @@
      });
      
      function showPlotTooltip(event,pos,item) {
-         //var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
-         //var dDate = new Date();
-         //dDate.setTime(mEpoch);
-         //$("#x").text(dDate.toLocaleString());
-         //$("#y").text(pos.y);
-
-         if (item) {
-             if (#{dataId}.previousPoint != item.datapoint) {
-                 #{dataId}.previousPoint = item.datapoint;
-                 $("#tooltip").remove();
-                 var x = item.datapoint[0].toFixed(2),
-                     y = item.datapoint[1].toFixed(2);
-                 var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
-                 dDate = new Date();
-                 dDate.setTime(mEpoch);
-                 showTooltip(item.pageX, item.pageY,
-                   //*****You will need to change the sensor name here to the appropriate one selected above
-                            //dDate.toLocaleString() + " = " + y + " " + "#{@variable}|#{@units}" );
-                            val_grid_formatter.dateTime(dDate) + " = " + y + " " + "#{@var_name}|#{@units}" );
-             }
-         } else {
-             $("#tooltip").remove();
-             #{dataId}.previousPoint = null;            
-         }
+       //var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+       //var dDate = new Date();
+       //dDate.setTime(mEpoch);
+       //$("#x").text(dDate.toLocaleString());
+       //$("#y").text(pos.y);
+       
+       if (#{dataId}.previousPoint != item.datapoint) {
+         #{dataId}.previousPoint = item.datapoint;
+         $("#tooltip").remove();
+         var x = item.datapoint[0].toFixed(2),
+             y = item.datapoint[1].toFixed(2);
+         var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+         dDate = new Date();
+         dDate.setTime(mEpoch);
+         showTooltip(item.pageX, item.pageY,
+           //*****You will need to change the sensor name here to the appropriate one selected above
+                    //dDate.toLocaleString() + " = " + y + " " + "#{@variable}|#{@units}" ();
+                    val_grid_formatter.dateTime(dDate) + " = " + y + " " + "#{@var_name}|#{@units}<br/>"
+                    +"&nbsp; &bull; CLICK/SHIFT-CLICK to select<br/>"
+                    +"&nbsp; &bull; ALT-CLICK to edit DataValue" );
+       };
+       
      };
+     
      
      // PLOTCLICK event to scroll to point on datagrid
      $("##{@tabId}_search_results #plotContainer").bind("plotclick", function (event, pos, item) {
          //
          #{dataId}.plotClick = [event,pos,item];
+         //var e = #{dataId}.domClick;
          return;
+         
+         //SELECT ROW IN GRID
+         if(item) {
+           var idx = item.dataIndex;
+           var val_item = #{dataId}.value_data[idx];
+           //var val_grid = dijit.byNode($('##{@tabId}_search_results #gridContainer div')[0]);
+           var val_grid = #{dataId}.val_grid;
+           var val_plot = #{dataId}.plot;
+           //var store = #{dataId}.val_store;
+           console.log('PLOT-CLICK:',e,event,pos,item,val_item);
+           if(e.shiftKey) {
+             //SHIFT-CLICK: Select Range
+             //val_grid.changePageSize(0);
+             var sel = val_grid.selection.getSelected();
+             //#sel = sel.map(function(item){return new Date(item.local_date_time.toString()).valueOf()});
+             //var selx = sel.map(function(item){return #{dataId}.data[item._0][0]});
+             //var first = Math.min.apply(Math, selx);
+             //var last = Math.max.apply(Math, selx);
+             var limits = plotutils.selectionLimits(sel,val_plot)
+             console.log('LIMITS:',limits);
+             if(item.datapoint[0]<limits.values[0]) {
+               val_grid.selection.selectRange(val_item._0, limits[1]._0);
+             } else {
+               if(item.datapoint[0]>limits.values[1]) {
+                 val_grid.selection.selectRange(limits[0]._0, val_item._0);
+               } else {
+                 val_grid.selection.selectRange(limits[0]._0, limits[1]._0);
+               };
+             };
+             plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
+             val_grid.scrollTo(0);
+             var toend = limits[1]._0 - 4;
+             if(toend<0) toend = 0;
+             val_grid.scrollToRow(toend);
+           } else {
+             if(e.altKey) {
+               //ALT-CLICK: Select Range
+               #{dataId}.toggle_views();
+               val_grid.scrollToRow(val_item._0);
+             } else {
+               //NORMAL-CLICK: Select/Deselect Point
+               //###SCROLL TO TOP of GRID
+               //window.scrollTo(0,0);
+               //$('html #main_container').animate({scrollTop:580}, 'slow');//IE, FF
+               //$('body #main_container').animate({scrollTop:580}, 'slow');//chrome, safari
+
+               if(val_grid.selection.isSelected(idx)) val_plot.unhighlight(0,idx);
+               else val_plot.highlight(0,idx);
+               //val_grid.selection.deselectAll();
+               val_grid.scrollTo(0);
+               val_grid.scrollToRow(idx);
+               //val_grid.selection.addToSelection(val_item);
+               val_grid.selection.toggleSelect(val_item);
+             };
+           };
+
+           val_grid.update();
+         };
+
+         //CLEAR EVENT
+         #{dataId}.domClick = 0;
          
      });
      

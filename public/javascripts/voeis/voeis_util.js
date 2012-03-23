@@ -134,7 +134,9 @@ var plotutils = {
     var ser = series || 0;
     var pdata = myplot.getData()[ser].data;
     for(var i=0;i<items.length;i++){
-      myplot.highlight(ser,items[i]._0);
+      if(items[i])
+				myplot.highlight(ser,items[i]._0);
+			//###SOMETIMES GETTING: cannot read property '_0' of null !!
     };
   },
   // HIGHLIGHT RANGE OF GRAPH POINTS

@@ -95,17 +95,17 @@
   %strong SHOW SITE DETAILS
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  -if @auth
-    = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show-site00').hide();$('#edit-site00').show();")
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   -if @edit_auth
     -#= link_to('DATA QUERY QA/QC', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
     = link_to('DATA QUERY QA/QC', 'javascript:', :class=>'icon icon-proj', :onclick=>"$('#show-site00').hide();$('#query-site00').show();return false;")
   -else
     -#= link_to('DATA QUERY', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
     = link_to('DATA QUERY', 'javascript:', :class=>'icon icon-proj', :onclick=>"$('#show-site00').hide();$('#query-site00').show();return false;")
+  -if @auth
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show-site00').hide();$('#edit-site00').show();")
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
 
   -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   -#= link_to('SAMPLES', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
@@ -203,7 +203,7 @@
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   - tabId = 'site00_data'
   -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
-  = link_to('BACK TO SITE', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#query-site00').hide();$('#show-site00').show();return false;") 
+  = link_to('CANCEL QUERY', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#query-site00').hide();$('#show-site00').show();return false;") 
   %br
   %br
   %br
