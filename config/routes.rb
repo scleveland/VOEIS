@@ -26,9 +26,6 @@ Yogo::Application.routes.draw do
       resources :search do
         collection do
           post :export
-          get :parallel_coordinates
-          get :parallel_coordinates_d3
-          get :pc_search
         end
       end
       resources :sites do
