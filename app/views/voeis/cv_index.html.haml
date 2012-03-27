@@ -1,0 +1,75 @@
+= javascript_include_tag("jquery.flot.js")
+- content_for(:javascripts) do
+  :javascript
+    dojo.require("dijit.dijit");
+    dojo.require("dijit.Declaration");
+    dojo.require("dojox.layout.TableContainer");
+    dojo.require("dijit.form.TextBox");
+    dojo.require("dijit.layout.TabContainer");
+    dojo.require("dijit.layout.ContentPane");
+    dojo.require("dojox.layout.ContentPane");
+    dojo.require("dojox.grid.EnhancedGrid");
+    dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+    dojo.require("dojox.grid.enhanced.plugins.Filter");
+    dojo.require("dojo.data.ItemFileReadStore");
+    dojo.require("dojo.data.ItemFileWriteStore");
+    dojo.require("voeis.voeis_util");
+    
+    //var cv_title = "#{@cv_title}";
+    //var cv_name = "#{@cv_name}";
+    
+    //var #{@tabId}_tab_loaded = false;
+    
+    $(window).ready(function(){ 
+      //##### 
+      //console.log('READY-load-done-NOW');
+      $('##{@tabId}_proj_title').show();
+      
+    });
+    
+    // GO BACK or if no history- CLOSE WINDOW
+    function back_or_close() {
+      if(window.history.length>1)
+        window.history.back();
+      else
+        window.close();
+    };
+    
+  
+
+
+-###################
+
+-#%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;", :class=>"icon icon-#{@global ? 'voeis' : 'project'}"}
+%h3{:style=>"margin-top:0;padding-top:0;"}
+  %span(id="#{@tabId}_proj_title" style="display:none;")
+    - if !@project.nil?
+      %span.small{:style=>"font-size:14px;"}
+        -#%strong
+        PROJECT:
+      = @project.name
+    %br
+  %span.small{:style=>"font-size:14px;"}
+    -#%strong
+    CONTROLLED VOCABULARY:
+  = @cv_title
+  -#{'%s [Id:%s]'%[@site.name,@site.id]}
+
+
+- projId = @project.nil? ? '' : @project.id.to_s
+%div{:id=>"#{@cv_title2}-cv-edit"}
+  = render_widget :edit_cv, :display, :project=>@project,
+                                        :tabId=>@cv_title2,
+                                        :cv_data=>@cv_data,
+                                        :copy_data=>@copy_data,
+                                        :cv_title=>@cv_title,
+                                        :cv_title2=>@cv_title2,
+                                        :cv_title2cv=>@cv_title2cv,
+                                        :cv_id=>@cv_id,
+                                        :cv_name=>@cv_name,
+                                        :cv_columns=>@cv_columns,
+                                        :copy_columns=>@copy_columns,
+                                        :cv_form=>@cv_form,
+                                        :user=>current_user
+
+

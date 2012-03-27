@@ -9,7 +9,7 @@
   // ON LOAD
   $(window).ready(function(){ 
     //##### 
-    if(window.name=='HISTORY') {
+    if(window.name.slice(0,7)=='HISTORY') {
       $('#top').css('display','none');
       $('#bottom').css('display','none');
       $('#main_container').css('top','0');
@@ -17,11 +17,23 @@
       $('#main_container').css('height','100%');
       
     };
+    $('#cv-versions-return').show();
   });
+  
+  
+  //######################################
+  //##### TAB LOADED! #####
+  function loaded(){
+    $("#proj_title_#{@cv_title2+'_'+@cv_item.id.to_s}").hide();
+    $('#cv-versions-return').hide();
+    //$('#cv-versions-refresh').show();
+    
+  };
+  
   
   // GO BACK or if no history- CLOSE WINDOW
   function back_or_close() {
-    if(window.name=='HISTORY')
+    if(window.name.slice(0,7)=='HISTORY')
       window.close();
     else
       window.history.back();
@@ -29,11 +41,13 @@
   
   // SAVE CALLBACKs for ITEM ROLLBACK
   function cv_item_restore(item) {
-    if(window.name=='HISTORY') {
+    if(window.name.slice(0,7)=='HISTORY') {
       var goto = window.opener.cv_item_restore0;
       window.close();
       goto(item, window.location.reload);
       //window.opener.cv_item_restore0(item, window.location.reload);
+    } else if(#{@cv_title2}_tab_loaded) {
+      #{@cv_title2}_exec.cv_item_restore(item);
     } else {
       cv_item_restore0(item);
       window.location.reload();
@@ -41,7 +55,7 @@
   };
   // OLD ROLLBACK- close versions and edit form
   function cv_item_restore00(item) {
-    if(window.name=='HISTORY') {
+    if(window.name.slice(0,7)=='HISTORY') {
       var goto = window.opener.cv_item_restore0(item);
       window.close();
       goto(item);
@@ -51,14 +65,21 @@
     };
   };
   
+  //### REFRESH ###
+  function refresh_history(id){
+    var hist_id = "#{@cv_title2}_"+id+"_history";
+    refreshTab(hist_id);
+  };
+  
 
 -#%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;", :class=>"icon icon-#{@global ? 'voeis' : 'project'}"}
-%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;"}
+%h3{:style=>"margin-top:0;padding-top:0;"}
   - if !@project.nil?
-    %span.small{:style=>"font-size:14px;"}
-      PROJECT: 
-    = @project.name
-    %br
+    %span{:id=>"proj_title_#{@cv_title2+'_'+@cv_item.id.to_s}"}
+      %span.small{:style=>"font-size:14px;"}
+        PROJECT: 
+      = @project.name
+      %br
   %span.small{:style=>"font-size:14px;"}
     HISTORY: 
   :plain
@@ -68,9 +89,14 @@
 
 %strong
   = "SHOW %s VERSIONS"%((@global ? 'GLOBAL ' : '')+@cv_title.upcase)
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
+%span#cv-versions-return{:style=>"display:none;"}
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  = link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();return false;")
+%span#cv-versions-refresh
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  = link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"refresh_history(#{@cv_item.id});return false;")
 %br
 
 - projId = @project.nil? ? '' : @project.id.to_s
