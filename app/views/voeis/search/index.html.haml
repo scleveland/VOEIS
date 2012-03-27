@@ -1,3 +1,7 @@
+-#//######################
+-# var_map = @variables.map{|v| 'var_%s: {name:"<a href=\"\" onclick=\"doVarQuery(%s,%s);return false;\">%s</a>", unit: "%s"}' % [v[:id], v[:site_id], v[:id], v[:variable_name], ""] }.join(",").html_safe
+-#//######################
+
 :javascript
   $(window).ready(function(){ 
     console.log('DONE LOADING GRAPH');
@@ -148,9 +152,7 @@
 
   
   //######################
-  //#{@variables.map{|v| 'var_%s: {name:"<a href=\"\" onclick=\"doVarQuery(%s,%s);return false;\">%s</a>", unit: "%s"}' % [v[:id], v[:site_id], v[:id], v[:variable_name], ""] }.join(",").html_safe}
-  //######################
-
+  // var_map defined above
   
   //######################
   // CREATE PARALLEL GRAPH
