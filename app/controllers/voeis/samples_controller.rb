@@ -146,6 +146,9 @@ class Voeis::SamplesController < Voeis::BaseController
   end
   
   def query
+    #q = repository.adapter.send(:select_statement,VOEISMODELQUERY.query)
+    #sql = q[0].gsub!("?").each_with_index{|v,i| "\'#{q[1][i]}\'" }
+    
     siteid = params[:site_id]
     varid = params[:var_id]
     dt_start = params[:start_date]
@@ -216,8 +219,6 @@ class Voeis::SamplesController < Voeis::BaseController
     @start_date = @start_date.to_datetime
     @end_date = @end_date.to_datetime + 23.hour + 59.minute
     @project_uid = parent.id
-    @column_array = Array.new
-    @row_array = Array.new
     @data_set = parent.managed_repository{Voeis::DataSet.all}
     @data_set_opts_array = Array.new
     @data_set.all(:order => [:name.asc]).each do |ds|
@@ -229,92 +230,24 @@ class Voeis::SamplesController < Voeis::BaseController
     @site_name = site.name
     @site = site
     if params[:variable] != "None"
-      
-      if params[:variable] == "All"
-        @var_name = "All"
-        timestamp_array = Array.new
-        variable_hash = Hash.new #store all the datavalues[timestamp => datavalue] in and array 
-        site.samples.variables.each do |variable|
-          variable_hash[variable.id] = Hash.new
-        end
-        site.samples.variables.each do |variable|
-          value = (site.samples.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & variable.data_values).each do |val|
-            val_hash = Hash.new
-            val_hash[val.local_date_time.to_s] = val.string_value
-            puts val_hash.to_json
-            timestamp_array << val.local_date_time
-            variable_hash[variable.id] = variable_hash[variable.id].merge(val_hash)
-            puts variable_hash[variable.id].to_json
-          end #val
-        end #end variable
-        
-        @column_array = Array.new
-        @column_array << ["Timestamp", 'datetime']
-        variable_hash.keys.each do |key|
-          puts "KEY: #{key}"
-          var = parent.managed_repository{Voeis::Variable.get(key)}
-          @column_array << [var.variable_name, 'number']
-        end #end key
-        timestamp_array.uniq.sort.each do |stamp|
-          temp_array = Array.new
-          temp_array << stamp
-          variable_hash.keys.each do |key|
-            puts variable_hash[key]
-            if !variable_hash[key].nil?
-              temp_array << variable_hash[key][stamp.to_s]
-            end
-          end #end var
-          @row_array << temp_array
-        end #end stamp
-
-      else #we want only one variable
-        variable = parent.managed_repository{Voeis::Variable.get(params[:variable_select])}
-        @var_name = variable.variable_name
-        @variable = variable
-        @units = Voeis::Unit.get(variable.variable_units_id).units_name
-        @row_array = Array.new
-        @grid_array = Array.new
-        @column_array << ["Timestamp", 'datetime']
-        @column_array << ["Vertical Offset", 'number']
-        @column_array << [variable.variable_name, 'number']
-        @graph_data = Array.new
-        #@data_vals = (variable.data_values(:local_date_time.gte => @start_date, :local_date_time.lte => @end_date) & site.data_values)
-        @data_vals =parent.managed_repository{Voeis::DataValue.all(:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date, :order=>[:local_date_time.asc])}
-        @data_vals.each do |data_val|
-          temp_array = Array.new
-          row_hash = Hash.new
-          temp_array << data_val.local_date_time.to_datetime
-          row_hash[:datetime] = data_val.local_date_time.to_datetime
-          row_hash[:unixtime] = data_val.local_date_time.to_datetime.to_i
-          temp_array << data_val.vertical_offset
-          row_hash[:vertical_offset] = data_val.vertical_offset
-          temp_array << data_val.data_value
-          row_hash[:value] = data_val.data_value
-          @row_array << temp_array
-          @grid_array << @row_hash.as_json
-          @graph_data << Array[data_val.local_date_time.to_datetime.to_i*1000, data_val.data_value]
-        end
-      end #end if "ALL"
-      if params[:export] == 1
-         column_names = Array.new
-         @column_array.each do |col|
-           column_names << col[0]
-         end#end col
-         csv_string = CSV.generate do |csv|
-           csv << column_names
-           csv << @row_array
-         end#end csv
-         #csv_string = @data_vals.to_csv
-         filename = site.name + ".csv"
-         send_data(csv_string,
-           :type => 'text/csv; charset=utf-8; header=present',
-           :filename => filename)
-      else
-        respond_to do |format|
-          format.js if format.json
-          format.html if format.html
-        end#end format
-      end#end if export
+      variable = parent.managed_repository{Voeis::Variable.get(params[:variable_select])}
+      @var_name = variable.variable_name
+      @variable = variable
+      @units = Voeis::Unit.get(variable.variable_units_id).units_name
+      @graph_data = Array.new
+      @data_structs = ""  
+      parent.managed_repository do 
+        q = repository.adapter.send(:select_statement, Voeis::DataValue.all(:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date, :order=>[:local_date_time.asc],:fields=>[:id,:data_value,:local_date_time,:string_value,:datatype, :vertical_offset,:quality_control_level, :published, :date_time_utc, :site_id,:variable_id,:utc_offset,:end_vertical_offset, :value_accuracy,:replicate]).query)
+        sql = q[0].gsub!("?").each_with_index{|v,i| "\'#{q[1][i]}\'" }
+        @data_structs = repository.adapter.select(sql)
+      end
+      @data_structs.each do |data_val|
+        @graph_data << Array[data_val.date_time_utc.to_datetime.to_i*1000, data_val.data_value]
+      end
+      respond_to do |format|
+        format.js if format.json
+        format.html if format.html
+      end#end format
     else
       @var_name = "None"
     end #end if !site.empty?
@@ -337,15 +270,20 @@ class Voeis::SamplesController < Voeis::BaseController
   
   #export the results of search/browse to a csv file
   def export
-    debugger
-    headers = JSON[params[:column_array]]
-    site = JSON[params[:site]]
-    variable = JSON[params[:variable]]
-    rows = JSON[params[:data_vals]]
-    column_names = Array.new
-    headers.each do |col|
-      column_names << col[0]
-    end
+    if params[:site_select]
+      site=""
+      variable=""
+      parent.managed_repository do
+        site = JSON[Voeis::Site.get(params[:site_select].to_i).to_json]
+        variable = JSON[Voeis::Variable.get(params[:variable_select].to_i).to_json]
+      end  
+    else
+      site = JSON[params[:site]]
+      variable = JSON[params[:variable]]
+    end #if params[:site_select]
+    export_q = parent.managed_repository{repository.adapter.send(:select_statement, Voeis::DataValue.all(:site_id => site["id"].to_i, :variable_id => variable["id"].to_i, :local_date_time.gte => params[:start_date], :local_date_time.lte => params[:end_date], :order=>[:local_date_time.asc]).query)}
+    export_sql = export_q[0].gsub!("?").each_with_index{|v,i| "\'#{export_q[1][i]}\'" }
+    rows=JSON[parent.managed_repository{repository.adapter.select(export_sql).sql_to_json}]
     csv_string = CSV.generate do |csv|
       #csv << column_names
       csv<< ["Site Information"]
@@ -360,8 +298,9 @@ class Voeis::SamplesController < Voeis::BaseController
         csv << row.values
       end
     end
+
     #csv_string =JSON[params[:data_vals]].to_csv
-    filename = params[:site_name] + ".csv"
+    filename = site["name"] + ".csv"
     send_data(csv_string,
       :type => 'text/csv; charset=utf-8; header=present',
       :filename => filename)

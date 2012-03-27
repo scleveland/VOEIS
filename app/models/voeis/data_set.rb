@@ -20,10 +20,14 @@ class Voeis::DataSet
   
   def variables
     #get all unique variable ids and the fetch all variables and return as an array
-    sql = "SELECT DISTINCT variable_id FROM voeis_data_values WHERE id IN "
-    sql  = sql + self.data_values.map{|v| v.id}.to_s.gsub('[', '(').gsub(']',')')
-    results = repository.adapter.select(sql)
-    results.map{|v| Voeis::Variable.get(v)}
+    if self.data_values.count >0
+      sql = "SELECT DISTINCT variable_id FROM voeis_data_values WHERE id IN "
+      sql  = sql + self.data_values.map{|v| v.id}.to_s.gsub('[', '(').gsub(']',')')
+      results = repository.adapter.select(sql)
+      results.map{|v| Voeis::Variable.get(v)}
+    else
+      vars = []
+    end
   end
   
   def update_count

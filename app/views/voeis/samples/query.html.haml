@@ -12,6 +12,14 @@
 
 -#- content_for(:javascripts) do
 :javascript
+  function export_search(){
+     old_action = $("##{tabId}_query").attr("action")
+     $("##{tabId}_query").attr("action", "#{export_project_samples_path(@project)}")
+     //$("##{tabId}_query").attr("data-remote",false)
+     $("##{tabId}_query").submit()
+     //$("##{tabId}_query").attr("data-remote",true)
+     $("##{tabId}_query").attr("action", old_action)
+  }
   function update_site_vars() {
     var form_id = '##{tabId}_query ';
     var site_id = #{site_id} || $(form_id+'#site_select').val();
@@ -567,7 +575,7 @@
 - else
   %h2
     Data Query:
-= form_for(:query, @query, :url => { :action=>'search'}, :remote=>true, :html=>{:id=>tabId+'_query'}) do |f|
+= form_for(:query, @query, :url => { :action=>'search'}, :html=>{:id=>tabId+'_query'}) do |f|
   -#%input{:type=>"hidden", :name=>"tab_id", :value=>"#{tabId}"}
   -#=hidden_field_tag('tab_id', tabId)
   - if site_id>0
@@ -602,7 +610,8 @@
   -#  Search
   %button(dojoType="dijit.form.Button" type="submit" name="submit_form" value="Search" onclick="submit_query();return false;")
     Search
-  
+  %button(dojoType="dijit.form.Button" type="submit" name="submit_form" value="Search" onclick="export_search();return false;")
+    Download Search to CSV
   &nbsp;&nbsp;
   %button(dojoType="dijit.form.Button" name="cancel" value="Cancel" onclick="window.location=#{project_path(@project)}") 
     Cancel
@@ -628,6 +637,7 @@
 
 %div{:id=>"#{tabId}_search_results"}
   :javascript  
+    
     $(function() { 
     $('##{tabId}_query #site_select').change(function() { 
     update_site_vars();
@@ -635,4 +645,4 @@
     });
     });
 -if !current_user.nil? && current_user.projects.include?(@project)
-  = render(:partial => "data_set", :locals =>{:project_uid=>@project.id})
+  = render(:partial => "data_set", :locals =>{:project_uid=>@project.id, :tab_id=>tabId})

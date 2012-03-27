@@ -8,12 +8,10 @@ $("#<%= @tabId %>_search_results").html( '<%= escape_javascript(render(:partial 
                                       :units => @units,
                                       :start_date => @start_date,
                                       :end_date => @end_date,
-                                      :row_array => @row_array,
-                                      :grid_array => @grid_array,
-                                      :data_vals => @data_vals,
+                                      :data_structs =>@data_structs,
                                       :graph_data => @graph_data,
                                       :data_set_options => @data_set_options,
-                                      :column_array => @column_array }))%>' )
+                                       }))%>' )
 
 dijit.byId('<%= @tabId %>_loading_dialog').hide();
 

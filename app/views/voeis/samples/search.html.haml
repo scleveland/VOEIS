@@ -7,7 +7,12 @@
   Query Results
   [#{@tabId[-3,3]}]
 
--if @row_array.empty?
+
+-# #pagination-links
+-# = pagination_links(@query, params[:page], 10)  
+
+-#-if @row_array.empty?
+-if @data_structs.empty?
   %strong
     VARIABLE:
     = "#{@var_name} | #{@units}"
@@ -19,9 +24,6 @@
   :javascript
     console.log('FAILURR RESULT TABID: #{@tabId}');
     console.log('FAILURR RESULT DATAID: #{dataId}');
-    var #{dataId} = {};
-    #{dataId}.value_data = #{@data_vals.to_json};
-    #{dataId}.data = #{@graph_data.as_json};
     console.log('DATAID object:',#{dataId});
 
 -else
@@ -143,9 +145,9 @@
           -if @start_date > @end_date
             ERROR - start date should not come after end date
           -else
-            = @start_date.to_date.to_formatted_s(:long).gsub('00:00','')
+            = @start_date.to_date.strftime('%b %d, %Y')
             &ndash;
-            = @end_date.to_date.to_formatted_s(:long).gsub('00:00','')
+            = @end_date.to_date.strftime('%b %d, %Y')
             (#{@graph_data.length} Points)
         -else
           ERROR - invalid date entry
@@ -154,15 +156,22 @@
       -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
       = link_to('VIEW TABLE', 'javascript:', :class=>'icon icon-cancel', :id=>"#{@tabId}_toggle_view_id", :onclick=>"#{dataId}.toggle_views();return false;") 
     
-      -if !@row_array.empty?
-        =hidden_field_tag('column_array', @column_array.to_json)
-        =hidden_field_tag('row_array', @row_array.to_json)
-        =hidden_field_tag('site_name', @site_name)
+      -#if !@row_array.empty?
+      -if !@data_structs.empty?
+        -#=hidden_field_tag('column_array', @column_array.to_json)
+        -#=hidden_field_tag('row_array', @row_array.to_json)
+        -#=hidden_field_tag('site_name', @site_name)
+        -#=hidden_field_tag('site', @site.to_json)
+        -#=hidden_field_tag('variable', @variable.to_json)
+        -#=hidden_field_tag('start_date', @start_date)
+        -#=hidden_field_tag('data_vals', @data_vals.to_json)
+        -#=hidden_field_tag('end_date', @end_date)
+        
         =hidden_field_tag('site', @site.to_json)
         =hidden_field_tag('variable', @variable.to_json)
         =hidden_field_tag('start_date', @start_date)
-        =hidden_field_tag('data_vals', @data_vals.to_json)
         =hidden_field_tag('end_date', @end_date)
+        
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         -#=submit_tag("Export Results")
         = link_to('EXPORT RESULTS', 'javascript:', :class=>'icon icon-proj', 
@@ -206,7 +215,6 @@
       -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
   
     
-    
   :javascript
     dojo.require("dijit.dijit");
     dojo.require("dijit.Dialog");
@@ -234,17 +242,11 @@
     console.log('RESULT -TABID: #{@tabId}');
     
     var #{dataId} = {};
-    #{dataId}.value_data = #{@data_vals.to_json};
+    #{dataId}.value_data = #{@data_structs.sql_to_json};
     for(var i=0;i<#{dataId}.value_data.length;i++) 
       #{dataId}.value_data[i]['selected'] = 0;
     #{dataId}.data = #{@graph_data.as_json};
-    
-    //console.log('1RESULT -DATAID(#{dataId}):',#{dataId});
-    //#{dataId}.values_json = {identifier: 'id', items: #{dataId}.value_data };
-    
-    //console.log('2RESULT -DATAID(#{dataId}):',#{dataId});
-    
-    //#{dataId}.val_store = new dojo.data.ItemFileReadStore({data: {identifier: 'id', items: #{dataId}.value_data }});
+
     #{dataId}.val_store = new dojo.data.ItemFileWriteStore({data: {identifier: 'id', items: #{dataId}.value_data }});
     
     /***
@@ -569,8 +571,9 @@
        }
     },
     document.createElement('div'));
+    
     //#{dataId}.val_grid.changePageSize(10);
-
+    
     // append the new grid to the div " ":
     //dojo.byId("gridContainer").appendChild(val_grid.domNode);
     
@@ -993,6 +996,7 @@
 
 -if !current_user.nil? && current_user.projects.include?(@project)
   = render(:partial => "data_set", :locals =>{:project_uid=>@project.id, :tab_id=>@tabId})
+
 
 :javascript
   dojo.addOnLoad(function() {
