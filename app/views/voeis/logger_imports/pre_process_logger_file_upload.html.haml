@@ -57,7 +57,7 @@
     %span{:id=>"site_span"}None
     =clear_break
     = 'File to upload:'
-    = file_field_tag(:datafile, :accept => "text/csv,text/comma-separated-values,application/vnd.ms-excel",:onChange=>"enableButton();")
+    = file_field_tag(:datafile, :accept => "application/vnd.ms-excel|application/vnd.openxmlformats-officedocument.spreadsheetml.sheet|application/csv",:onChange=>"enableButton();")
     = hidden_field_tag( :project_id, :value =>@project.id)
     =clear_break
     = label_tag( :header_box, 'Check if logger file is from a Campbell Scientific Logger:')

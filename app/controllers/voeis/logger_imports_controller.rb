@@ -354,95 +354,111 @@ class Voeis::LoggerImportsController < Voeis::BaseController
         @current_user = current_user
         #save uploaded file if possible
         if !params[:datafile].nil? && datafile = params[:datafile]
-          if ! ['text/csv', 'text/comma-separated-values', 'application/vnd.ms-excel',
-                'application/octet-stream','application/csv'].include?(datafile.content_type)
-            flash[:error] = "File type #{datafile.content_type} not allowed"
+          if !params['datafile'].original_filename.include?(".csv") &&
+                 !params['datafile'].original_filename.include?(".xls") &&
+                 !params['datafile'].original_filename.include?(".xlsx") &&
+                 !params['datafile'].original_filename.include?(".dat") 
+            #! ['text/csv', 'text/comma-separated-values', 'application/vnd.ms-excel','application/octet-stream','application/csv','application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'].include?(datafile.content_type)
+            flash[:error] = "File #{params['datafile'].original_filename} has an usupported file extension.  Voeis accepts .csv, .xls, .xlsx and .dat(csv format)."
             redirect_to(:controller =>"voeis/logger_imports", :action => "pre_process_logger_file_upload", :params => {:id => params[:project_id]})
 
           else
-            #file can be saved
-            name = Time.now.to_s + params['datafile'].original_filename
-            directory = "temp_data"
-            @new_file = File.join(directory,name)
-            File.open(@new_file, "wb"){ |f| f.write(params['datafile'].read)}
-
-            @start_line = params[:start_line].to_i
-            if params[:header_box] == "Campbell"
-              @start_line = 5
-            end
-            #get the first row that has information in the CSV file
-            @start_row = get_row(@new_file, @start_line)
-            @row_size = @start_row.size-1
-
-            @header_rows = @start_line < 2 ? -1 : @start_line -2
-
-
-            @columns = Array.new
-            (1..@start_row.size).map{|x| @columns << x}
-            @vars = Hash.new
-
-            Voeis::Variable.all.each do |v| 
-
-              @vars=@vars.merge({v.variable_name => v.id})
-            end
-
-
-
-            # @site_offset = Hash.new
-            # @sites = {"None"=>"None"}
-            # parent.managed_repository{Voeis::Site.all}.each do |s|
-            #   @sites = @sites.merge({s.name => s.id})
-            #   @site_offset = @site_offset.merge({s.id => s.time_zone_offset})
-            #   if s.time_zone_offset.to_s == "unknown"
-            #     begin
-            #       s.fetch_time_zone_offset
-            #     rescue
-            #       #do nothing
-            #     end
-            #   end
-            # end
-            @site = parent.managed_repository{Voeis::Site.get(params[:site_id].to_i)}
-            if @site.time_zone_offset.to_s == "unknown" || @site.time_zone_offset.nil?
-              begin
-                @site.fetch_time_zone_offset
-              rescue
-                #do nothing
+            begin
+              #file can be saved
+              name = Time.now.to_s + params['datafile'].original_filename
+              directory = "temp_data"
+              @new_file = File.join(directory,name)
+              File.open(@new_file, "wb"){ |f| f.write(params['datafile'].read)}
+            
+              if name.include?('.xlsx')
+                xlsx = Excelx.new("#{directory}/#{name}")
+                csv_name = name.gsub('.xlsx','csv')
+                xlsx.to_csv("#{directory}/#{csv_name}")
+                @new_file = File.join(directory,csv_name)
+              elsif name.include?('.xls')
+                xls = Excel.new("#{directory}/#{name}")
+                csv_name = name.gsub('.xls', '.csv')
+                xls.to_csv("#{directory}/#{csv_name}")
+                @new_file = File.join(directory,csv_name)
               end
-            end
-            @utc_offset_options=Hash.new
-            (-12..12).map{|k| @utc_offset_options = @utc_offset_options.merge({k => k})}           
-            @sources = {"None"=>"None", "Example:SampleName"=>-1}
-             Voeis::Source.all.each do |s|
-               @sources = @sources.merge({s.organization + ':' + s.contact_name => s.id})
-             end
+            
+              @start_line = params[:start_line].to_i
+              if params[:header_box] == "Campbell"
+                @start_line = 5
+              end
+              #get the first row that has information in the CSV file
+              @start_row = get_row(@new_file, @start_line)
+              @row_size = @start_row.size-1
 
-            @variables = Voeis::Variable.all
-            @var_properties = Array.new
-            Voeis::Variable.properties.each do |prop|
+              @header_rows = @start_line < 2 ? -1 : @start_line -2
 
-              @var_properties << prop.name
-            end
-            @var_properties.delete_if {|x| x.to_s == "id" || x.to_s == "his_id" || x.to_s == "time_units_id" || x.to_s == "is_regular" || x.to_s == "time_support" || x.to_s == "variable_code" || x.to_s == "created_at" || x.to_s == "updated_at" || x.to_s == "updated_by" || x.to_s == "updated_comment"}
 
-            @campbell_scientific = params[:header_box]
-            @variable = Voeis::Variable.new
-            @lab_methods = Voeis::LabMethod.all
-            @field_methods = Voeis::FieldMethod.all
-            @units = Voeis::Unit.all
-            @offset_units = @units
-            @spatial_offset_types = Voeis::SpatialOffsetType.all
-            @time_units = Voeis::Unit.all(:units_type.like=>'%Time%')
-            @variable_names = Voeis::VariableNameCV.all
-            @quality_control_levels = Voeis::QualityControlLevel.all
-            @sample_mediums= Voeis::SampleMediumCV.all
-            @sample_types = Voeis::SampleTypeCV.all
-            @sensor_types = Voeis::SensorTypeCV.all
-            @logger_types = Voeis::LoggerTypeCV.all
-            @value_types= Voeis::ValueTypeCV.all
-            @speciations = Voeis::SpeciationCV.all
-            @data_types = Voeis::DataTypeCV.all
-            @general_categories = Voeis::GeneralCategoryCV.all
-            @batch = Voeis::MetaTag.first_or_create(:name => "Batch", :category =>"Chemistry", :value=>"")
+              @columns = Array.new
+              (1..@start_row.size).map{|x| @columns << x}
+              @vars = Hash.new
+
+              Voeis::Variable.all.each do |v| 
+
+                @vars=@vars.merge({v.variable_name => v.id})
+              end
+
+
+
+              # @site_offset = Hash.new
+              # @sites = {"None"=>"None"}
+              # parent.managed_repository{Voeis::Site.all}.each do |s|
+              #   @sites = @sites.merge({s.name => s.id})
+              #   @site_offset = @site_offset.merge({s.id => s.time_zone_offset})
+              #   if s.time_zone_offset.to_s == "unknown"
+              #     begin
+              #       s.fetch_time_zone_offset
+              #     rescue
+              #       #do nothing
+              #     end
+              #   end
+              # end
+              @site = parent.managed_repository{Voeis::Site.get(params[:site_id].to_i)}
+              if @site.time_zone_offset.to_s == "unknown" || @site.time_zone_offset.nil?
+                begin
+                  @site.fetch_time_zone_offset
+                rescue
+                  #do nothing
+                end
+              end
+              @utc_offset_options=Hash.new
+              (-12..12).map{|k| @utc_offset_options = @utc_offset_options.merge({k => k})}           
+              @sources = {"None"=>"None", "Example:SampleName"=>-1}
+               Voeis::Source.all.each do |s|
+                 @sources = @sources.merge({s.organization + ':' + s.contact_name => s.id})
+               end
+
+              @variables = Voeis::Variable.all
+              @var_properties = Array.new
+              Voeis::Variable.properties.each do |prop|
+
+                @var_properties << prop.name
+              end
+              @var_properties.delete_if {|x| x.to_s == "id" || x.to_s == "his_id" || x.to_s == "time_units_id" || x.to_s == "is_regular" || x.to_s == "time_support" || x.to_s == "variable_code" || x.to_s == "created_at" || x.to_s == "updated_at" || x.to_s == "updated_by" || x.to_s == "updated_comment"}
+
+              @campbell_scientific = params[:header_box]
+              @variable = Voeis::Variable.new
+              @lab_methods = Voeis::LabMethod.all
+              @field_methods = Voeis::FieldMethod.all
+              @units = Voeis::Unit.all
+              @offset_units = @units
+              @spatial_offset_types = Voeis::SpatialOffsetType.all
+              @time_units = Voeis::Unit.all(:units_type.like=>'%Time%')
+              @variable_names = Voeis::VariableNameCV.all
+              @quality_control_levels = Voeis::QualityControlLevel.all
+              @sample_mediums= Voeis::SampleMediumCV.all
+              @sample_types = Voeis::SampleTypeCV.all
+              @sensor_types = Voeis::SensorTypeCV.all
+              @logger_types = Voeis::LoggerTypeCV.all
+              @value_types= Voeis::ValueTypeCV.all
+              @speciations = Voeis::SpeciationCV.all
+              @data_types = Voeis::DataTypeCV.all
+              @general_categories = Voeis::GeneralCategoryCV.all
+              @batch = Voeis::MetaTag.first_or_create(:name => "Batch", :category =>"Chemistry", :value=>"")
              @labs = Voeis::Lab.all
 
              
@@ -464,13 +480,16 @@ class Voeis::LoggerImportsController < Voeis::BaseController
               i = i + 1
             end
             @csv_size = i -1
-          end       
-
-        else
+          rescue
+            flash[:error] = "File #{params['datafile'].original_filename} could not be parsed correclty by VOEIS.  Check your file to be sure it is correct."
             redirect_to(:controller =>"voeis/logger_imports", :action => "pre_process_logger_file_upload", :params => {:id => params[:project_id]})
           end
-
+        end       
+      else
+        flash[:error] = "It appears something was wrong with you file. Please try again.  You may need to try another version of your file."
+        redirect_to(:controller =>"voeis/logger_imports", :action => "pre_process_logger_file_upload", :params => {:id => params[:project_id]})
       end
+    end
    
     # Parses a csv file containing logger data values
     #
