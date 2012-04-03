@@ -15,8 +15,16 @@ class Voeis::SitesController < Voeis::BaseController
   has_widgets do |root|
     root << widget(:versions)
   end
+
   
   @project = parent
+  
+  def index
+    sites = parent.managed_repository{Voeis::Site.all}
+    respond_to do |format|
+       format_response(sites, format)
+     end
+  end
   
   def new
     @project = parent
@@ -329,4 +337,23 @@ class Voeis::SitesController < Voeis::BaseController
        end
      end
   end
+  
+  private
+  
+  
+  def format_response(data_obj, format)
+    format.json do
+      render :json => data_obj.as_json, :callback => params[:jsoncallback]
+    end
+    format.xml do
+      render :xml => data_obj.to_xml
+    end
+    format.csv do
+      render :text => data_obj.to_csv.to_s.gsub(/\n\n/, "\n")
+    end
+    format.wml do 
+      render :xml => data_obj.to_wml
+    end
+  end
+  
 end

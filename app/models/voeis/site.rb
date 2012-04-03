@@ -77,6 +77,60 @@ class Voeis::Site
 
   before :save, :update_associations
   
+  #
+  #  @returns[:Nokogiri:XML::Builder] :xml a nokogiri xml document
+  def self.wml_header
+    builder = Nokogiri::XML::Builder.new do |xml|
+      xml.siteResponse("xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance", "xmlns:xsd"=>"http://www.w3.org/2001/XMLSchema", "xmlns"=>"http://www.cuahsi.org/waterML/1.1/"){
+        xml.queryInfo {
+          xml.creationTime DateTime.now
+          xml.criteria("MethodCalled"=>"GetSites")
+          xml.note  "All Sites"
+        }
+      }
+    end
+    builder.doc
+  end
+   
+
+  # 
+  # @params[Nokogiri::XML::Builder] :xml
+  def wml_body(doc = nil)
+    @repo = self.repository
+    @project_name = ""
+    DataMapper.repository("default") do
+      @project_name = Project.get(@repo.name.to_s.gsub('_','-').chop).id
+    end
+    unless doc
+      doc =Nokogiri::XML::Document.new
+    end
+    builder = Nokogiri::XML::Builder.with(doc.at('siteResponse')) do |xml|
+      xml.site{
+        xml.siteInfo{
+          xml.siteName  self.name
+          xml.siteCode(self.code, :network=>@project_name, :siteID=>self.id)
+          xml.geoLocation{
+            xml.geogLocation("xsi:type"=>"LatLonPointType", :srs=> self.lat_long_datum ? self.lat_long_datum.srs_name : "WGS84"){
+              xml.latitude self.latitude
+              xml.longitude self.longitude
+            }
+            xml.localSiteXY(:projectionInformation => self.local_projection ? self.local_projection.srs_name : ""){
+              xml.X  self.local_x
+              xml.Y  self.local_y
+            }
+          }
+          xml.elevation_m  self.elevation_m
+          xml.verticalDatum  self.vertical_datum
+          xml.siteProperty(self.county, :name=>"County")
+          xml.siteProperty(self.state, :name => "State")
+          xml.siteProperty(self.comments, :name => "Site Comments")
+          xml.siteProperty(self.pos_accuracy_m, :name => "PosAccuracy_m")
+        }
+      }
+    end 
+    builder.doc
+  end
+  
   def update_associations
     debugger
     if !self.vertical_datum_id.nil? && self.vertical_datum_id != 0

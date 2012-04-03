@@ -71,5 +71,13 @@ module DataMapper
       
       return query
     end
+    def to_wml
+      #setup xml
+      doc = self.first.class.wml_header     
+      self.each do |obj|
+        doc = obj.wml_body(doc)
+      end
+      doc.to_xml
+    end
   end
 end
