@@ -10,7 +10,7 @@ class Voeis::SitesController < Voeis::BaseController
             :instance_name => 'site',
             :resource_class => Voeis::Site
   
-  respond_to :html, :json
+  respond_to :html, :json, :wml
   
   has_widgets do |root|
     root << widget(:versions)
@@ -19,13 +19,14 @@ class Voeis::SitesController < Voeis::BaseController
   
   @project = parent
   
-  def index
-    sites = parent.managed_repository{Voeis::Site.all}
-    respond_to do |format|
-       format_response(sites, format)
-     end
-  end
-  
+  # def index
+  #   
+  #   sites = parent.managed_repository{Voeis::Site.all}
+  #   respond_to do |format|
+  #      format_response(sites, format)
+  #   end
+  # end
+  # 
   def new
     @project = parent
     @sites = Voeis::Site.all
