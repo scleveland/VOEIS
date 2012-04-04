@@ -57,7 +57,7 @@ class Voeis::BaseController < InheritedResources::Base
   require 'action_controller/metal/responder'
   class ActionController::Responder
     def to_wml
-      controller.render :xml => resource
+      controller.render :wml => resource
     end
   end
   
