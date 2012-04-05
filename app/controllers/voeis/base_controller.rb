@@ -46,9 +46,9 @@ class Voeis::BaseController < InheritedResources::Base
 
   responders :rql
   
+  # Add WML respond support that will work with RQL because we want
+  # to be awesome
   require 'action_controller/metal/renderers'
-  
-  
   ActionController::Renderers.add :wml do |object, options|
     self.content_type ||= 'text/waterml'
     self.response_body  = object.respond_to?(:to_wml) ? object.to_wml : object.to_xml
@@ -60,24 +60,7 @@ class Voeis::BaseController < InheritedResources::Base
       controller.render :wml => resource
     end
   end
-  
-  # before_filter proc { |controller|
-  #    if params[:format] && params[:format]=='wml' && controller.collect_mimes_from_class_level.include?(:wml)
-  #      controller.action_has_layout = false
-  #      controller.request.format    = 'xml'
-  #      render :xml => data_obj.to_wml
-  #    end
-  #  }
-  
-  # # to add it to only one action
-  # active_scaffold do |config|
-  #   config.index.formats << :wml
-  # end
-  # 
-  # def show_respond_to_wml
-  #   #render whatever you want here
-  #   render :xml => data_obj.to_wml
-  # end
+
 
   protected
 
