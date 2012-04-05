@@ -101,22 +101,38 @@ class Voeis::DataValue
     #site = Voeis::Site.get(site_id)
     data_col_array = Array.new
     sensor_col_array = Array.new
+    sensor_col_hash = Hash.new
     sensor_cols = Array.new
     variable_cols = Array.new
+    meta_tag_cols = Array.new
+    meta_tag_hash = Hash.new
     sample_id = -1
+    puts "Creating Hashes ********************************"
     Voeis::DataStream.get(data_stream_template_id).data_stream_columns.each do |col|
       data_col_array[col.column_number] = [col.variables.first, col.unit, col.name]
-      if col.name != "Ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "VerticalOffset" && col.name !=  "EndingVerticalOffset" && col.name !=  "SampleID" && col.name != "ignore"
+      if col.name != "Ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "VerticalOffset" && col.name !=  "EndingVerticalOffset" && col.name !=  "SampleID" && col.name != "ignore" && col.name != "MetaTag"
+        puts "Variable COL ********************************"
         variable_cols << col.column_number
+        
+        unless col.sensor_types.empty?
+          puts "Sensor HASH ********************************"
+          sensor_cols << col.column_number
+          sensor_col_hash[col.column_number.to_s] = col.sensor_types.first.id
+        end
       elsif col.name ==  "SampleID"
+        puts "SAMPLE ID COL ********************************"
         sample_id = col.column_number
+      elsif col.name = "MetaTag"
+        puts "MetaTag HASH ********************************"
+        meta_tag_cols = col.column_number
+        meta_tag_hash[col.column_number.to_s] = col.meta_tag
       end
-      sensor_col_array[col.column_number] = [col.sensor_types.first, col.unit, col.name]
-      if col.name != "ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "VerticalOffset" && col.name != "Ignore"
-        sensor_cols << col.column_number
-      end
+      # sensor_col_array[col.column_number] = [col.sensor_types.first, col.unit, col.name]
+      # if col.name != "ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "VerticalOffset" && col.name != "Ignore"
+        
+      #end
     end
-    
+    puts "DONE Creating Hashes ********************************"
     if Voeis::DataValue.last(:order =>[:id.asc]).nil?
       starting_id = -9999
     else
@@ -154,7 +170,7 @@ class Voeis::DataValue
           if !row[data_timestamp_col].nil? && !row[data_timestamp_col].empty?        
           Rails.logger.info '#{row.join(', ')}'
           #puts row.join(', ')
-            results = parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols, source_id, dst_time, dst, user, csv_file)
+            results = parse_logger_row(data_timestamp_col, data_stream_template_id, vertical_offset_col, date_col, time_col,  row, site_id, data_col_array, variable_cols, meta_tag_cols, meta_tag_hash, sample_id, sample_type, sample_medium, end_vertical_offset_col,sensor_col_array,sensor_cols, sensor_col_hash, source_id, dst_time, dst, user, csv_file, rows_parsed)
             
             if results[:result_ids].empty?
               skipped_rows += 1
@@ -200,7 +216,7 @@ class Voeis::DataValue
   # @author Yogo Team
   #
   # @api public
-  def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array,sensor_cols, source_id, dst_time, dst, user,filename)
+  def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, meta_tag_cols, meta_tag_hash, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array,sensor_cols, sensor_col_hash, source_id, dst_time, dst, user,filename, row_number)
     require 'chronic'  #for robust timestamp parsing
      puts "INSIDE USER ID: #{user.id} ********************************"
     name = 2
@@ -209,6 +225,7 @@ class Voeis::DataValue
     unit = 1
     errors = ""
     result_ids = Array.new
+    meta_ids = Array.new
     begin
     #Voeis::SensorValue.transaction do
     #timestamp = (data_timestamp_col == "") ? Time.parse(row[date_col].to_s + ' ' + row[time_col].to_s).strftime("%Y-%m-%dT%H:%M:%S%z") : row[data_timestamp_col.to_i]
@@ -229,43 +246,77 @@ class Voeis::DataValue
     #if (Voeis::DataValue.first(:local_date_time => timestamp) & 
     
     if Voeis::DataValue.first(:datatype=>data_stream.type, :local_date_time=>timestamp, :site_id=> site_id, :variable_id => data_col_array[variable_cols[0]][variable].id).nil?
+          puts "INSIDE For Insert ********************************"
           created_at = updated_at = Time.now.strftime("%Y-%m-%dT%H:%M:%S%z")
           create_comment = "Created at #{created_at} by #{user.first_name} #{user.last_name} [#{user.login}]"
           row_values = []
+          meta_values =[] 
           (0..row.size-1).each do |i|
-            if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore"
+            if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "MetaTag"
                 cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
                 row_values << "(#{cv.to_s}, '#{timestamp.to_s}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc.to_s}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id},  '#{filename}' )"
-              end #end if
+            elsif data_col_array[i][name] == "MetaTag"
+              meta_values << "('#{row[i].to_s}', '#{meta_tag_hash[i.to_s].name}', '#{meta_tag_hash[i.to_s].category}', '#{updated_at}', '#{created_at}', #{user.id}, '#{create_comment}')"
+              puts "INSIDE META VALUES ********************************"
+            end #end if
           end #end loop
           if !row_values.empty?
+            puts "INSERTING DATA VALUES ********************************"
             sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\", \"site_id\", \"variable_id\", \"filename\") VALUES "
             sql << row_values.join(',')
             sql << " RETURNING \"id\""
             result_ids = repository.adapter.select(sql)
+            puts "DONE INSERTING DATA VALUES ********************************"
+            #insert meta-tags
+            unless meta_values.empty?
+              sql = "INSERT INTO voeis_meta_tags (value, name, category, updated_at, created_at, updated_by, updated_comment) VALUES "
+              sql << meta_values.join(',')
+              sql << "RETURNING id"
+              meta_ids = repository.adapter.select(sql)
+            end
             variable_sql = Array.new
             site_sql = Array.new
+            meta_tag_sql = Array.new
+            sensor_sql = Array.new
             data_stream_sql = Array.new
             source_sql = Array.new
+            puts "PREPPRING ASSOCIATIONS ********************************"
             (0..result_ids.length-1).each do |i|
               variable_sql << "(#{result_ids[i]},#{data_col_array[variable_cols[i]][variable].id})"
               site_sql << "(#{result_ids[i]},#{site_id})"
               data_stream_sql <<  "(#{result_ids[i]},#{data_stream_id})"
               source_sql << "(#{result_ids[i]},#{source_id})"
+              if sample_id == -1
+                sensor_sql << "(#{result_ids[i]},#{sensor_col_hash[i.to_s]})"
+              end
+              unless meta_values.empty?
+                meta_tag_sql << (0..meta_ids.length-1).map{|m| "(#{result_ids[i]},#{meta_ids[m]})"}.join(',')
+              end
             end
+            puts "DONE PREPPRING ASSOCIATIONS ********************************"
             sql = "INSERT INTO \"voeis_data_value_variables\" (\"data_value_id\",\"variable_id\") VALUES "
             sql << variable_sql.join(',')
             repository.adapter.execute(sql)
+            puts "AFTER VARIABLE ASSOC ********************************"
             sql = "INSERT INTO \"voeis_data_value_sites\" (\"data_value_id\",\"site_id\") VALUES "
             sql << site_sql.join(',')
             repository.adapter.execute(sql)
+            puts "AFTER SITE ASSOC ********************************"
             sql = "INSERT INTO \"voeis_data_stream_data_values\" (\"data_value_id\",\"data_stream_id\") VALUES "
             sql << data_stream_sql.join(',')
             repository.adapter.execute(sql)
+            puts "AFTER DATA-STREAM ASSOC ********************************"
             sql = "INSERT INTO \"voeis_data_value_sources\" (\"data_value_id\",\"source_id\") VALUES "
             sql << source_sql.join(',')
             repository.adapter.execute(sql)
-            
+            puts "AFTER SOURCE ASSOC ********************************"
+            unless meta_values.empty?
+              puts "INERTING META VALUES ********************************"
+              sql = "INSERT INTO \"voeis_data_value_meta_tags\" (\"data_value_id\",\"meta_tag_id\") VALUES "
+              sql << meta_tag_sql.join(',')
+              repository.adapter.execute(sql)
+              puts "AFTER META-TAG ASSOC ********************************"
+            end
             if sample_id != -1
               sample_value=[]
               sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\") VALUES "
@@ -286,18 +337,19 @@ class Voeis::DataValue
                 "(#{newsample_id.insert_id},#{data_col_array[variable_cols[i]][variable].id})"
               }.join(',')
               repository.adapter.execute(sql)
+              puts "AFTER SAMPLE ASSOC ********************************"
             else
                sql = "INSERT INTO \"voeis_data_value_sensor_types\" (\"data_value_id\",\"sensor_type_id\") VALUES "
-               sql << (0..result_ids.length-1).collect{|i|
-                 "(#{result_ids[i]},#{sensor_col_array[sensor_cols[i]][sensor].id})"
-               }.join(',')
+               sql << sensor_sql.join(',')
                repository.adapter.execute(sql)
+               puts "AFTER SENSOR TYPE ASSOC ********************************"
            end
         end#end if
 
     end
     rescue Exception => e
-      errors = "Row: #{row} - - did not store correclty.  ERROR:#{e}"
+      errors = "Row #{row_number}: #{row} - - did not store correclty.  ERROR:  #{e.inspect}"
+      puts errors
     end
     return {:result_ids => result_ids, :errors => errors}
   end
@@ -393,10 +445,10 @@ class Voeis::DataValue
         data_value = {:message => "No new Records were saved - it appears this file has already been parsed and stored."}
      end
      return_hash = {:total_records_saved => total_records, :rows_skipped => skipped_rows, :total_rows_parsed => rows_parsed, :last_record => Voeis::DataValue.last(:site_id=> site_id, :variable_id => data_col_array[variable_cols.last][0].id, :order => [:created_at]).as_json, :last_record_for_this_file => data_value.as_json,:errors=>errors}
-   end
+  end
    
    
-   def self.parse_sim_row(data_stream_id, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, sensor_col_array,sensor_cols, user,filename, timestamp)
+  def self.parse_sim_row(data_stream_id, row, site_id, data_col_array, variable_cols, sample_id, sample_type, sample_medium, sensor_col_array,sensor_cols, user,filename, timestamp)
      #require 'chronic'  #for robust timestamp parsing
       puts "INSIDE USER ID: #{user.id} ********************************"
      name = 2
@@ -496,5 +548,5 @@ class Voeis::DataValue
        errors = "Row: #{row} - - did not store correclty.  ERROR:#{e}"
      end
      return {:result_ids => result_ids, :errors => errors}
-   end
+  end
 end
