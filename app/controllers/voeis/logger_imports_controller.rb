@@ -714,7 +714,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
           redirect_to project_path(params[:project_id]) and return
         rescue Exception => e  
           email_exception(e,request.env)
-          Voeis::Site.get(site.id).update_site_data_catalog
+          parent.managed_repository{Voeis::Site.get(site.id).update_site_data_catalog}
           flash[:error] = "Problem Parsing Logger File: "+ e.message
           redirect_to(:controller =>"voeis/logger_imports", :action => "pre_process_logger_file_upload", :params => {:id => params[:project_id]})
         end

@@ -11,7 +11,7 @@ class Voeis::MetaTag
   #timestamps :at
   yogo_versioned
 
-  has n, :sensor_values, :model => 'Voeis::SensorValue', :through => Resource
+  #has n, :sensor_values, :model => 'Voeis::SensorValue', :through => Resource
   has n, :data_values, :model => 'Voeis::DataValue', :through => Resource
   has n, :variables, :model => 'Voeis::Variable', :through => Resource
   has n, :data_stream_columns, :model => 'Voeis::DataStreamColumn', :through => Resource
