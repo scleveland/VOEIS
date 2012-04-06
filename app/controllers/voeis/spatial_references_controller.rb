@@ -1,3 +1,5 @@
+require 'responders/rql'
+
 class Voeis::SpatialReferencesController < Voeis::BaseController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 

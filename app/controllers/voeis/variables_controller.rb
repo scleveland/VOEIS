@@ -89,6 +89,15 @@ class Voeis::VariablesController < Voeis::BaseController
     @lab_methods = @project.managed_repository{ Voeis::LabMethod.all }
     @field_methods = @project.managed_repository{ Voeis::FieldMethod.all }
     
+    #@var_names = @project.managed_repository{ Voeis::VariableNameCV.all }
+    #@var_vtypes = @project.managed_repository{ Voeis::ValueTypeCV.all }
+    ##@var_dtypes = @project.managed_repository{ Voeis::DataTypeCV.all }
+    #@var_qcvalues = @project.managed_repository{ Voeis::QualityControlLevel.all }
+    @var_names = Voeis::VariableNameCV.all(:order => [:term.asc])
+    @var_vtypes = Voeis::ValueTypeCV.all(:order => [:term.asc])
+    @var_dtypes = Voeis::DataTypeCV.all(:order => [:term.asc])
+    @var_qcvalues = Voeis::QualityControlLevel.all(:order => [:quality_control_level_code.asc])
+    
     #logger.debug('>>>> graph_data = '+@graph_data.to_s)
     #logger.debug('>>>> data = '+@data.to_s)
     #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}

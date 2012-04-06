@@ -1,4 +1,6 @@
-class VerticalDatumCVsController < ApplicationController
+require 'responders/rql'
+
+class VerticalDatumCVsController < InheritedResources::Base
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
   has_widgets do |root|
@@ -7,7 +9,7 @@ class VerticalDatumCVsController < ApplicationController
   end
 
 
-  # GLOBAL: GET /VerticalDatum/new
+  # GLOBAL: GET /vertical_datum_c_vs/new
   def new
     @vertical_datum = Voeis::VerticalDatumCV.new
 
@@ -16,7 +18,7 @@ class VerticalDatumCVsController < ApplicationController
     end
   end
   
-  # GLOBAL: POST /VerticalDatum
+  # GLOBAL: POST /vertical_datum_c_vs
   def create
     @vertical_datum = Voeis::VerticalDatumCV.new(params[:vertical_datum_c_v])
     
@@ -37,7 +39,7 @@ class VerticalDatumCVsController < ApplicationController
     end
   end
 
-  # GLOBAL: PUT /VerticalDatum
+  # GLOBAL: PUT /vertical_datum_c_vs
   def update
     vertical_datum = Voeis::VerticalDatumCV.get(params[:vertical_datum_c_v][:id])
     #debugger

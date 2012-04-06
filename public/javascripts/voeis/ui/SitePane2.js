@@ -158,10 +158,16 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			data += '</option>\n';
 		};
 		sitePaneContent = sitePaneContent.replace(/\$\$\$site-variable-select\$\$\$/, data);
-		siteDate1 = (dates1.length) ? new Date(Math.min.apply(null,dates1)).format('isoDate') : '';
-		siteDate2 = (dates2.length) ? new Date(Math.max.apply(null,dates2)).format('isoDate') : '';
+		siteDate01 = (dates1.length) ? new Date(Math.min.apply(null,dates1)) : 0;
+		siteDate02 = (dates2.length) ? new Date(Math.max.apply(null,dates2)) : 0;
+		siteDate1 = siteDate01 ? siteDate01.format('m/dd/yyyy') : '';
+		siteDate2 = siteDate02 ? siteDate02.format('m/dd/yyyy') : '';
+		siteDate3 = siteDate02 ? new Date(siteDate02.valueOf()-(1000*60*60*24)).format('isoDate') : '';
+		siteDate4 = siteDate02 ? siteDate02.format('isoDate') : '';
 		sitePaneContent = sitePaneContent.replace(/\$\$\$site-data-start\$\$\$/, siteDate1);
 		sitePaneContent = sitePaneContent.replace(/\$\$\$site-data-end\$\$\$/, siteDate2);
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-date-start\$\$\$/, siteDate3);
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-date-end\$\$\$/, siteDate4);
 		
 
 		//sitePaneContent = sitePaneContent.replace(/dojotype_dialog/g, 'dojoType="dijit.Dialog"');

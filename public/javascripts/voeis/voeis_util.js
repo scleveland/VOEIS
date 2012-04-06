@@ -173,8 +173,11 @@ var datastore = {
   // SET IDX IF THE STORE HAS IT??!
   set_idx: function(item, item_store) {
     var store = item_store || this.store_default;
-    if(store._arrayOfAllItems[0].hasOwnProperty('idx')) 
+    if(item.hasOwnProperty('idx') || 
+				store._arrayOfAllItems[0] && 
+				store._arrayOfAllItems[0].hasOwnProperty('idx')) 
       item['idx'] =  store._arrayOfAllItems.length;
+		return item;
   },
   // DOJO STORE RAW FETCH
   get_raw: function(id, item_store) {
@@ -200,8 +203,7 @@ var datastore = {
   // CREATE NEW ITEM IN DOJO STORE
   new: function(item, item_store) {
     var store = item_store || this.store_default;
-    if(store._arrayOfAllItems[0].hasOwnProperty('idx')) 
-      item['idx'] =  store._arrayOfAllItems.length;
+    item = this.set_idx(item, store);
     //item['used'] = false;
     d = new Date();
     item['created_at'] = d.format(this.date_format);
@@ -242,7 +244,7 @@ var datastore = {
     var store = item_store || this.store_default;
 		var id = parseInt(item.id.toString());
     console.log('NEW-UPD:',item, store);
-		if(store._itemsByIdentity[id])
+		if(store._itemsByIdentity && store._itemsByIdentity[id])
 			this.update(item, store);
 		else
 			this.new(item, store);

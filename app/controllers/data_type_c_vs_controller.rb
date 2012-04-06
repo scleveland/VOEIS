@@ -7,7 +7,7 @@ class DataTypeCVsController < ApplicationController
   end
 
 
-  # GET /variables/new
+  ### GLOBAL: GET /data_type_c_vs/new
   def new
     @data_type = Voeis::DataTypeCV.new
 
@@ -16,7 +16,7 @@ class DataTypeCVsController < ApplicationController
     end
   end
   
-  # POST /variables
+  ### GLOBAL: POST /data_type_c_vs
   def create
     if params[:data_type_c_v].nil?
       @data_type = Voeis::DataTypeCV.new(:term=> params[:term], :definition => params[:definition])
@@ -35,10 +35,94 @@ class DataTypeCVsController < ApplicationController
       end
     end
   end
-  def show
+  
+  ### GLOBAL: PUT /data_type_c_vs
+  def update
+    cvparams = params
+    cvparams = params[:data_type_c_v] if !params[:data_type_c_v].nil?
     
+    @data_type = Voeis::DataTypeCV.get(cvparams[:id])
+    cvparams.each do |key, value|
+      @data_type[key] = value.blank? ? nil : value
+    end
+    @data_type.updated_at = Time.now
+    
+    respond_to do |format|
+      if @data_type.save
+        format.html do
+          flash[:notice] = 'Data Type was successfully updated.'
+          redirect_to(new_data_type_c_v_path()) 
+        end
+        format.json do
+          render :json => @data_type.as_json, :callback => params[:jsoncallback]
+        end
+      else
+        format.html { render :action => "new" }
+      end
+    end
+  end
+  
+  ### GLOBAL: DELETE /data_type_c_vs
+  def destroy
+    data_type = Voeis::DataTypeCV.get(params[:id])
+    #debugger
+    if !data_type.destroy
+      #FAILED!
+      #format.html { render :action => "update" }
+      error_notice = 'Data Type delete FAILED!'
+      respond_to do |format|
+        format.html {
+          flash[:error] = error_notice
+          redirect_to(data_type_path())
+        }
+        format.json {
+          render :json=>{:id=>data_type.id,:errors=>[error_notice]}.as_json, :callback=>params[:jsoncallback]
+        }
+      end
+    else
+      respond_to do |format|
+        format.html {
+          flash[:notice] = 'Data Type was successfully deleted.'
+          redirect_to(data_type_path())
+        }
+        format.json {
+          render :json => {:id=>data_type.id}.as_json, :callback=>params[:jsoncallback]
+        }
+      end
+    end
+  end
+  
+  def show
   end
 
+  ### GLOBAL: GET /data_type_c_vs
+  def index
+    if User.current.nil? || User.current.system_role.name!='Administrator'
+      flash[:notice] = 'You have inadequate permissions for this operation.'
+      redirect_to(project_path(@project))
+    end
+    ### GLOBAL DataType
+    @global = true
+    @cv_data0 = Voeis::DataTypeCV.all
+    @cv_data = @cv_data0.map{|d| d.attributes.update({:used=>false})}
+    @cv_title = 'Data Type'
+    @cv_title2 = 'global_data_type'
+    @cv_title2cv = 'data_type_c_v'
+    @cv_id = 'id'
+    @cv_name = 'term'
+    @cv_columns = [{:field=>"id", :label=>"ID", :width=>"25px", :filterable=>false, :formatter=>"", :style=>""},
+                  {:field=>"term", :label=>"Term", :width=>"180px", :filterable=>true, :formatter=>"", :style=>""},
+                  {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
+                  {:field=>"updated_at", :label=>"Updated", :width=>"80px", :filterable=>true, :formatter=>"dateTime", :style=>""}]
+    @cv_form = [{:field=>"id", :type=>"-IH", :required=>"", :style=>""},
+                  {:field=>"idx", :type=>"-XH", :required=>"", :style=>""},
+                  {:field=>"Term", :type=>"-LL", :required=>"", :style=>""},
+                  {:field=>"term", :type=>"1B-STB", :required=>"true", :style=>""},
+                  {:field=>"Definition", :type=>"2B-LL", :required=>"false", :style=>""},
+                  {:field=>"definition", :type=>"1B-STA", :required=>"false", :style=>""}]
+    render 'voeis/cv_index.html.haml'
+  end
+  
   def invalid_page
     redirect_to(:back)
   end

@@ -59,6 +59,36 @@ Yogo::Application.routes.draw do
           get :versions
         end
       end
+      resources :variable_name_c_vs do
+        collection do
+          get :versions
+        end
+      end
+      resources :quality_control_levels do
+        collection do
+          get :versions
+        end
+      end
+      resources :sample_type_c_vs do
+        collection do
+          get :versions
+        end
+      end
+      resources :value_type_c_vs do
+        collection do
+          get :versions
+        end
+      end
+      resources :data_type_c_vs do
+        collection do
+          get :versions
+        end
+      end
+      resources :sample_medium_c_vs do
+        collection do
+          get :versions
+        end
+      end
       resources :variables do
         collection do
           get :versions
@@ -211,7 +241,6 @@ Yogo::Application.routes.draw do
   resources :units
   resources :sources
   resources :spatial_offset_types
-  resources :quality_control_levels
   resources :visits
   resources :campaigns
   resources :system_roles
@@ -230,19 +259,44 @@ Yogo::Application.routes.draw do
       get :versions
     end
   end
-  resources :variable_name_c_vs
-  resources :sample_medium_c_vs
-  resources :value_type_c_vs
+  resources :variable_name_c_vs do
+    collection do
+      get :versions
+    end
+  end
+  resources :quality_control_levels do
+    collection do
+      get :versions
+    end
+  end
+  resources :sample_type_c_vs do
+    collection do
+      get :versions
+    end
+  end
+  resources :value_type_c_vs do
+    collection do
+      get :versions
+    end
+  end
+  resources :data_type_c_vs do
+    collection do
+      get :versions
+    end
+  end
+  resources :sample_medium_c_vs do
+    collection do
+      get :versions
+    end
+  end
+  resources :sample_materials
   resources :sensor_type_c_vs
   resources :logger_type_c_vs
   resources :speciation_c_vs
-  resources :data_type_c_vs
   resources :general_category_c_vs
-  resources :sample_type_c_vs
   resources :labs
   resources :lab_methods
   resources :field_methods
-  resources :sample_materials
   resource  :password,                :only => [:show, :update, :edit]
   resources :dashboards,              :only => [:show], :requirements => {:id => /[\w]+/}
   resources :pages,                   :only => [:show], :requirements => {:id => /[\w]+/}

@@ -1,4 +1,6 @@
-class SpatialReferencesController < ApplicationController
+require 'responders/rql'
+
+class SpatialReferencesController < InheritedResources::Base
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
   has_widgets do |root|

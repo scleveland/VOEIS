@@ -48,6 +48,7 @@
     dojo.require("dijit.form.ValidationTextBox");
     dojo.require("dijit.form.SimpleTextarea"); 
     dojo.require("dijit.form.Textarea"); 
+    dojo.require("dijit.form.Select");
     dojo.require("dijit.form.ComboBox");
     dojo.require("dijit.Tooltip");
     dojo.require("dijit.layout.TabContainer");
@@ -68,6 +69,7 @@
     //#####################
     // GLOBALS & STORES
     var projectSearchCount = 0;
+    var update_select_element = false;
     var projectsDataStore = voeis.Server.DEFAULT.projectsDataStore();
     var projectStore = dojo.store.JsonRest({target: "#{root_url}projects.json?"});
     //var Sitestore = voeis.Server.DEFAULT.projectSitesDataStore('#{@project.id}');
@@ -426,6 +428,7 @@
         style: 'width:560px;',
         item: 0,
         site_id: 0,
+        editing: false,
         saved_callback: 0,
         populate: function(item,callback) {
           var item = item || this.item;
@@ -442,17 +445,21 @@
           var d = new Date(d0.getTime()+((d0.getTimezoneOffset()/60-item.utc_offset)*3600000))
           form.reset();
           console.log('ITEM:',item);
+          console.log('ITEM.local_data_time:',item['local_date_time'].toString());
+          console.log('ITEM-utc-d0:',d0.format('UTC:m/d/yyyy HH:MM:ss')+' UTC');
           var data_val = item.data_value.toString();
           console.log('data_value:',data_val);
           //dijit.byId('DV_data_value').set('value', item['data_value'].toString());
           dijit.byId('DV_data_value').set('value', data_val);
-          dijit.byId('DV_data_type').set('value', item['datatype'].toString());
+          //dijit.byId('DV_data_type').set('value', item['datatype'].toString());
+          $('#DV_data_type_sel').val(item['datatype'].toString());
           dijit.byId('DV_string_value').set('value', item['string_value'].toString());
           dijit.byId('DV_value_accuracy').set('value', item['value_accuracy'].toString());
           dijit.byId('DV_replicate').set('value', item['replicate'].toString());
           dijit.byId('DV_vertical_offset').set('value', item['vertical_offset'].toString());
           dijit.byId('DV_end_vertical_offset').set('value', item['end_vertical_offset'].toString());
-          dijit.byId('DV_quality_control_level').set('value', item['quality_control_level'].toString());
+          //dijit.byId('DV_quality_control_level').set('value', item['quality_control_level'].toString());
+          $('#DV_quality_control_level_sel').val(item['quality_control_level'].toString());
           if(item['published'][0]) dijit.byId('DV_published').set('checked', true);
           dijit.byId('DV_local_date').set('value', item['local_date_time'].toString());
           dijit.byId('DV_local_time').set('value', item['local_date_time'].toString());
@@ -533,9 +540,12 @@
           var x = $('#dv_var_name').text();
           $('#dv_var_name').text(x+' -- TEST!');
         },
+        onClose: function() {
+          this.editing = false;
+        },
         startup: function() {
-      		this.set('content', edit_data_value_content);
-      		this.parsedWidgets = dojo.parser.parse(this.domNode);
+          this.set('content', edit_data_value_content);
+          this.parsedWidgets = dojo.parser.parse(this.domNode);
           //this.set('content', edit_data_value_content);
           console.log('PARSE:',this.parsedWidgets);
           var form = dijit.byId('data_value_edit_form');
@@ -692,7 +702,9 @@
         %td
           %label Data Type
           %br
-          %input(name="data_type" dojoType="dijit.form.ValidationTextBox" id="DV_data_type" required="true" style="width:200px;")
+          -#%input(name="data_type" dojoType="dijit.form.ValidationTextBox" id="DV_data_type" required="true" style="width:200px;")
+          %select(name="data_type" id="DV_data_type_sel" class="data_type_select")
+            = options_for_select(@cv_data_types.all.map{|v| [v.term, v.term]})
       %tr
         -#%td{:colspan=>"2"}
         %td
@@ -747,8 +759,10 @@
         %td
           %label Q/C Level
           %br
-          %input(name="quality_control_level" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'##########'}" 
-                id="DV_quality_control_level" style="width:70px!important;" required="true")
+          -#%input(name="quality_control_level" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'##########'}" 
+          -#      id="DV_quality_control_level" style="width:70px!important;" required="true")
+          %select(name="var_qcval" id="DV_quality_control_level_sel" class="quality_control_level_select")
+            = options_for_select(@cv_qcvalues.all.map{|v| ["%s: %s"%[v.quality_control_level_code,v.definition[0..20]], v.quality_control_level_code]})
           &nbsp;&nbsp;&nbsp;
           &nbsp;&nbsp;&nbsp;
           %input(name="published" dojoType="dijit.form.CheckBox" id="DV_published") 
@@ -1580,7 +1594,7 @@
             //dojo.parser.parse(this.domNode);
             console.log('TEST-'+TEST);
             if(window[tabId+"_tab_loaded"]) window[tabId+"_tab_loaded"] = true;
-            tabLoad();
+            if(tabLoad) tabLoad();
           },
           onClose: function(){
             //console.log('tab-close:---WORKING');

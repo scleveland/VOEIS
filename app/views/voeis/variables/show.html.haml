@@ -363,8 +363,14 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_name"} Variable Name *
-              %input(name="var_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.variable_name}" required="true")
+                %a{:href=>"#{project_path(@project)}/variable_name_c_vs", :onclick=>"cv_pop('Variable Name','variable_name',this.href,'#{varId}_var_qcval_sel');return false;"}
+                  %label{:for=>"var_name", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
+                    Variable Name *
+              -#%input(name="var_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.variable_name}" required="true")
+              -#%select(name="var_name"  dojoType="dijit.form.Select")
+              %select(name="var_name" class="variable_name_select" id="#{varId}_var_name_sel")
+                = options_for_select(@var_names.all.map{|v| [v.term, v.term]}, 
+                      selected=@variable.variable_name.to_s)
           %td{:colspan=>"2"}
             .from-element
               %span{:class=>'label'}
@@ -396,8 +402,14 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_vtype"} Value Type *
-              %input(name="var_vtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.value_type}" required="true")
+                %a{:href=>"#{project_path(@project)}/value_type_c_vs", :onclick=>"cv_pop('Value Type','value_type',this.href,'#{varId}_var_vtype_sel');return false;"}
+                  %label{:for=>"var_vtype", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
+                    Value Type *
+              -#%input(name="var_vtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.value_type}" required="true")
+              -#%select(name="var_vtype"  dojoType="dijit.form.Select")
+              %select(name="var_vtype" class="value_type_select" id="#{varId}_var_vtype_sel")
+                = options_for_select(@var_vtypes.all.map{|v| [v.term,v.term]}, 
+                      selected=@variable.value_type.to_s)
           %td
             .from-element
               %span{:class=>'label'}
@@ -408,13 +420,24 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_dtype"} Data Type *
-              %input(name="var_dtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.data_type}" required="true")
+                %a{:href=>"#{project_path(@project)}/data_type_c_vs", :onclick=>"cv_pop('Data Type','data_type',this.href,'#{varId}_var_dtype_sel');return false;"}
+                  %label{:for=>"var_dtype", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
+                    Data Type *
+              -#%input(name="var_dtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.data_type}" required="true")
+              -#%select(name="var_dtype"  dojoType="dijit.form.Select")
+              %select(name="var_dtype" class="data_type_select" id="#{varId}_var_dtype_sel")
+                = options_for_select(@var_dtypes.all.map{|v| [v.term,v.term]}, selected=@variable.data_type)
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_qcval"} Quality Control *
-              %input(name="var_qcval" class="TextBox_half" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########'}" type="text" value="#{@variable.quality_control}" required="true")
+                %a{:href=>"#{project_path(@project)}/quality_control_levels", :onclick=>"cv_pop('Quality Control Level','quality_control_level',this.href,'#{varId}_var_qcval_sel');return false;"}
+                  %label{:for=>"var_qcval", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
+                    Quality Control *
+              -#%input(name="var_qcval" class="TextBox_half" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########'}" type="text" value="#{@variable.quality_control}" required="true")
+              -#%select(name="var_qcval"  dojoType="dijit.form.Select")
+              %select(name="var_qcval" class="quality_control_level_select" id="#{varId}_var_qcval_sel")
+                = options_for_select(@var_qcvalues.all.map{|v| ["%s: %s"%[v.quality_control_level_code,v.definition[0..30]], 
+                        v.quality_control_level_code.to_i]}, selected=@variable.quality_control.to_i)
       
         %tr
           %td

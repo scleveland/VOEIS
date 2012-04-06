@@ -224,15 +224,22 @@
     %br
     %br
     
+    %p
+      %strong
+        Data available for:
+      $$$site-data-start$$$
+      &mdash;
+      $$$site-data-end$$$
+    
     Dates After: 
     -#= date_select('range', 'start_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
     -#%input(name="start_date" dojoType="dijit.form.DateTextBox" id="start_date00" value="#{@start_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
-    %input(name="start_date" dojoType="dijit.form.DateTextBox" value="$$$site-data-start$$$" style="width:200px!important;")
+    %input(name="start_date" dojoType="dijit.form.DateTextBox" value="$$$site-date-start$$$" style="width:200px!important;")
     &nbsp;&nbsp;&nbsp;
     Dates Before: 
     -#= date_select('range', 'end_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
     -#%input(name="end_date" dojoType="dijit.form.DateTextBox" id="end_date00" value="#{@end_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
-    %input(name="end_date" dojoType="dijit.form.DateTextBox" value="$$$site-data-end$$$" style="width:200px!important;")
+    %input(name="end_date" dojoType="dijit.form.DateTextBox" value="$$$site-date-end$$$" style="width:200px!important;")
     %br{:style=>'float:none; clear:both;'}
     %br
     %br
@@ -704,12 +711,13 @@
             .from-element{:style=>"cursor:pointer;"}
               -#%span{:class=>'label', :style=>"cursor:pointer;"}
               -#%label{:for=>"site_lat_long_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site_new_spatial_reference.open($('.site00_spatial_ref'),$('#site00_lat_long_datum'));"}
-              %a{:href=>"javascript:", :onclick=>"thisSite='site00';site_new_spatial_reference.show();return false;"}
+              -#%a{:href=>"javascript:", :onclick=>"thisSite='site00';site_new_spatial_reference.show();return false;"}
+              %a{:href=>"#{project_path(@project)}/spatial_references", :onclick=>"cv_pop_new('Spatial Reference','spatial_reference',this.href,'site00_lat_long_datum');return false;"}
                 %label{:for=>"site_lat_long_datum", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                   Latitude Longitude Datum
             -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
             -#= f.select('local_projection',  options_for_select(@local_projection_items, '$$$local_projection$$$'), :class=>"form-dropdown")
-            %select(id="site00_lat_long_datum" class="site00_spatial_ref" name="site_lat_long_datum")
+            %select(id="site00_lat_long_datum" class="site00_spatial_ref spatial_reference_select" name="site_lat_long_datum")
               - @local_projection_items.each do |item|
                 %option(value="#{item[1]}") #{item[0]}
 
@@ -741,12 +749,14 @@
           %td{:colspan=>"2"}
             .from-element{:style=>"cursor:pointer;"}
               -#%span{:class=>'label', :style=>"cursor:pointer;"}
-              %a{:href=>"javascript:", :onclick=>"thisSite='site00';site_new_spatial_reference.show();return false;"}
+              -#%a{:href=>"javascript:", :onclick=>"thisSite='site00';site_new_spatial_reference.show();return false;"}
+              -#%a{:href=>"#{project_path(@project)}/spatial_references", :onclick=>"cv_pop_new('Spatial Reference','spatial_reference',this.href,'site00_lat_long_datum');return false;"}
+              %a{:href=>"javascript:", :onclick=>"cv_pop_new('Spatial Reference','spatial_reference','#{project_path(@project)}/spatial_references','site00_local_projection');return false;"}
                 %label{:for=>"site_local_projection", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                   Local Projection
             -#= f.text_field("local_projection", :value=>"$$$local_projection$$$") 
             -#= f.select('local_projection',  options_for_select(@local_projection_items, '$$$local_projection$$$'), :class=>"form-dropdown")
-            %select(id="site00_local_projection" class="site00_spatial_ref" name="site_local_projection")
+            %select(id="site00_local_projection" class="site00_spatial_ref spatial_reference_select" name="site_local_projection")
               - @local_projection_items.each do |item|
                 %option(value="#{item[1]}") #{item[0]}
             -#%td{:style=>"padding-top:20px;"}
@@ -761,13 +771,14 @@
               -#%span{:class=>'label', :style=>"cursor:pointer;"}
               -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"dijit.byNode(dojo.byId('site00')).showDialog('site00_xnew_vertical_datum');"}
               -#%label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"icon icon-add", :onclick=>"site_new_vertical_datum.open($('#site00_vertical_datum'),$('#site00_vertical_datum'));"}
-              %a{:href=>"javascript:", :onclick=>"thisSite='site00';site_new_vertical_datum.show();return false;"}
+              -#%a{:href=>"javascript:", :onclick=>"thisSite='site00';site_new_vertical_datum.show();return false;"}
+              %a{:href=>"#{project_path(@project)}/vertical_datum_c_vs", :onclick=>"cv_pop_new('Vertical Datum','vertical_datum',this.href,'site00_vertical_datum');return false;"}
                 %label{:for=>"site_vertical_datum", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                   Vertical Datum
             -#= f.text_field("vertical_datum", :value=>"$$$vertical_datum_id$$$") 
             -#= f.select("site00_vertical_datum", options_for_select([]), :class=>"form-dropdown")
             -#= f.select('vertical_datum', options_for_select(@vertical_datum_items), :class=>"form-dropdown")
-            %select(id="site00_vertical_datum" name="site_vertical_datum")
+            %select(id="site00_vertical_datum" name="site_vertical_datum" class="vertical_datum_select")
               - @vertical_datum_items.each do |item|
                 %option(value="#{item[1]}") #{item[0]}
             -#%td{:style=>"padding-top:20px;"}

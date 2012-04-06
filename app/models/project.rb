@@ -75,6 +75,7 @@ class Project
                           "voeis/variable$retrieve",
                           "voeis/lab_method$retrieve",
                           "voeis/sample$retrieve",
+                          "voeis/sample_type_cv$retrieve",
                           "voeis/sample_material$retrieve",
                           "voeis/data_set$retrieve",
                           "voeis/site_data_catalog$retrieve",

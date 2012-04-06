@@ -1,3 +1,5 @@
+require 'responders/rql'
+
 class Voeis::VerticalDatumCVsController < Voeis::BaseController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
@@ -7,7 +9,7 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
   end
 
 
-  # LOCAL: GET /VerticalDatum/new
+  # LOCAL: GET /vertical_datum_c_vs/new
   def new
     @vertical_datum = parent.managed_repository{Voeis::VerticalDatumCV.new}
 
@@ -16,7 +18,7 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
     end
   end
   
-  # LOCAL: POST /VerticalDatum
+  # LOCAL: POST /vertical_datum_c_vs
   def create
     #@vertical_datum = parent.managed_repository{Voeis::VerticalDatumCV.new(params[:vertical_datum_c_v])}
     #@vertical_datum = parent.managed_repository{Voeis::VerticalDatumCV.first_or_create(:id=>params[:vertical_datum_c_v][:id],
@@ -44,13 +46,13 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
     
       respond_to do |format|
         #if @vertical_datum.save
-          format.html do
-            flash[:notice] = 'Vertical Datum was successfully created.'
-            redirect_to(vertical_datum_c_v_path())
-          end
-          format.json do
-            render :json => @vertical_datum.as_json, :callback => params[:jsoncallback]
-          end
+        format.html do
+          flash[:notice] = 'Vertical Datum was successfully created.'
+          redirect_to(vertical_datum_c_v_path())
+        end
+        format.json do
+          render :json => @vertical_datum.as_json, :callback => params[:jsoncallback]
+        end
         #else
         #  flash[:error] = 'Vertical Datum create FAILED!'
         #  #format.html { render :action => "new" }
@@ -60,7 +62,7 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
     }
   end
   
-  # LOCAL: PUT /VerticalDatum
+  # LOCAL: PUT /vertical_datum_c_vs
   def update
     @project = parent
     @project.managed_repository{
@@ -87,7 +89,7 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
     }
   end
 
-  # LOCAL: List VerticalDatum entries
+  # LOCAL: List VerticalDatum entries -- GET /vertical_datum_c_vs
   def index
     ### LOCAL VERTICAL DATUM
     @project = parent
@@ -101,7 +103,7 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
       @global = false
       @cv_data0 = @project.managed_repository{Voeis::VerticalDatumCV.all}
       @cv_data = @cv_data0.map{|d| d.attributes.update({:used=>!@project.sites.first(:vertical_datum_id=>d[:id]).nil?})}
-      @copy_data = Voeis::VerticalDatumCV.all(:id.not=>@cv_data0.collect(&:id)) #, :order=>[:srs_name.asc])
+      @copy_data = Voeis::VerticalDatumCV.all(:id.not=>@cv_data0.collect(&:id)) #, :order=>[:term.asc])
       @cv_title = 'Vertical Datum'
       @cv_title2 = 'vertical_datum'
       @cv_title2cv = 'vertical_datum_c_v'

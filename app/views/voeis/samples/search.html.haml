@@ -667,6 +667,7 @@
      #{dataId}.plotHover = [];
      #{dataId}.domClick = 0;
      #{dataId}.hoverDelay = 0;
+     #{dataId}.editData = false;
      
      //DOM hover event
      //$('tab_browser').hover( function(e){
@@ -747,6 +748,7 @@
            //val_grid.scrollToRow(toend);
          } else if(e.altKey) {
            //ALT-CLICK: EDIT DataValue at Point
+           data_value_edit.editing = true;
            var val_id = parseInt(val_item.id.toString());
            val_grid.popEdit(val_id);
            $("#tooltip").remove();
@@ -761,18 +763,18 @@
            //window.scrollTo(0,0);
            //$('html #main_container').animate({scrollTop:580}, 'slow');//IE, FF
            //$('body #main_container').animate({scrollTop:580}, 'slow');//chrome, safari
-           
-           if(val_grid.selection.isSelected(idx)) {
-             console.log('ALREADY SELECTED!');
-             //val_plot.unhighlight(0,idx);
-             val_sel.deselect(idx);
-           } else {
-             console.log('NOT SELECTED!');
-             //val_plot.highlight(0,idx);
-             if(val_sel.getSelectedCount())
-               val_sel.addToSelection(idx);
-             else val_sel.select(idx);
-           };
+           if(!data_value_edit.editing)
+             if(val_grid.selection.isSelected(idx)) {
+               console.log('ALREADY SELECTED!');
+               //val_plot.unhighlight(0,idx);
+               val_sel.deselect(idx);
+             } else {
+               console.log('NOT SELECTED!');
+               //val_plot.highlight(0,idx);
+               if(val_sel.getSelectedCount())
+                 val_sel.addToSelection(idx);
+               else val_sel.select(idx);
+             };
            //plotutils.highlightItems(val_sel.getSelected(),0,val_plot);
            setTimeout(function(){
              plotutils.highlightItems(val_sel.getSelected(),0,val_plot);

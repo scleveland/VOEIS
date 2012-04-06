@@ -119,10 +119,19 @@
   #{@tabId}_exec.cv_store_new = function(item0,store) {
     var new_store = store || #{@tabId}_data.cv_store;
     //console.log('STORE_NEW:',item0,item);
+    $('##{@tabId}_cv_empty').hide();
+    $('##{@tabId}_cv_management').show();
+    #{@tabId}_data.cv_management_grid.update();
     var item = #{@tabId}_exec.cv_data_filter(item0)
     item['used'] = false;
     console.log('STORE_NEW:',item0,item,new_store);
     datastore.new_upd(item,new_store);
+    //update selects in forms
+    $('select.#{@cv_title2}_select').append($("<option></option>").attr("value",item0['id']).text(item0['#{@cv_name}']));
+    if(window.update_select_element) {
+      $(window.update_select_element).val(item0['id']);
+      window.update_select_element = false;
+    }
   };
   //###############################
   // UPDATE ITEM IN DOJO STORE
@@ -134,7 +143,7 @@
   //###############################
   //### OPEN HISTORY
   #{@tabId}_exec.cv_history = function(id) {
-    var hist_url = #{@tabId}_data.post_url+'/versions/?id='+id
+    var hist_url = #{@tabId}_data.post_url+'/versions/?api_key=#{@current_user.api_key}&id='+id
     var hist_id = "#{@cv_title2}_"+id+"_history";
     var hist_title = "Hist: #{@cv_title} ["+id+"]";
     if(#{@tabId}_tab_loaded) {
@@ -160,7 +169,7 @@
       console.log('POST-LOCAL:',data);
       $.ajax({
         type: 'POST',
-        url: "#{@project.nil? ? '' : '/projects/'+@project.id}"+#{@tabId}_data.global_post_url+'.json',
+        url: "#{@project.nil? ? '' : '/projects/'+@project.id}"+#{@tabId}_data.global_post_url+'.json?api_key=#{@current_user.api_key}',
         data: data,
         success: function(dat) {
           console.log('POSTED:', data0, data, dat);
@@ -182,13 +191,14 @@
       //UPDATE (id>0)
       var post_type = 'PUT';
       var post_result = #{@tabId}_exec.cv_store_upd;
-      var post_url = #{@tabId}_data.post_url+'/'+cv_id+'.json';
+      var post_url = #{@tabId}_data.post_url+'/'+cv_id+'.json?api_key=#{@current_user.api_key}';
     } else {
       //NEW (id=0)
       var post_type = 'POST';
       var post_result = #{@tabId}_exec.cv_post_local;
-      var post_url = #{@tabId}_data.global_post_url+'.json';
+      var post_url = #{@tabId}_data.global_post_url+'.json?api_key=#{@current_user.api_key}';
       delete data.id;
+      delete data.#{@cv_title2cv}.id;
     };
     console.log('POST:',data);
     console.log(post_type+' TO: '+post_url);
@@ -225,7 +235,7 @@
           //AJAX DELETE
           $.ajax({
             type: 'DELETE',
-            url: #{@tabId}_data.post_url+'/'+cv_id+'.json',
+            url: #{@tabId}_data.post_url+'/'+cv_id+'.json?api_key=#{@current_user.api_key}',
             data: {},
             dataType: 'json',
             success: function(result) {
@@ -530,7 +540,7 @@
 -################# MAIN
 
 %strong
-  #{(@project.nil? ? 'GLOBAL ' : 'PROJECT ')+@cv_title.upcase} ENTRIES
+  #{(@project.nil? ? 'GLOBAL ' : 'PROJECT ')+@cv_title.upcase} ENTRIES (#{@cv_data.length})
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 -#= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/cv_datum/new');")
@@ -549,8 +559,16 @@
 -#  -#:prop=>"parseOnLoad:true;", :tabPosition=>"left-h", :tabStrip=>"false"}
 -#:selected=>"true", :useSlider=>"false", :tabStrip=>"false"}
 -#:style=>"width:870px;height:400px;margin:0;padding:0;", :selected=>"true"}
+
+%div{:id=>"#{@tabId}_cv_empty", :style=>"display:#{@cv_data.empty? ? 'block' : 'none'}"}
+  %br
+  %br
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  %strong.icon.icon-warning
+    %em NO #{@cv_title.upcase}S EXIST!
+
 %div{:id=>"#{@tabId}_cv_management", :dojoType=>"dijit.layout.ContentPane", :title=>"#{@cv_title}", 
-  :jsId=>"#{@tabId}_cv_management", :style=>"width:860px;height:360px;"}
+  :jsId=>"#{@tabId}_cv_management", :style=>"width:860px;height:340px; display:#{@cv_data.empty? ? 'none' : 'block'}"}
   -#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=>"{filter:true}",  :store=>"cv_store", :selected=>true, 
   -#    :style=>"width:90%;margin:0;padding:2px;", :jsId=>"cv_management_grid", :id=>"cv_management_grid"}
   -#  :style=>"width:90%;margin:0;", :rowSelector=>"20px", :jsId=>"VersionDisplayGrid", :id=>"VersionDisplayGrid"}
@@ -590,7 +608,6 @@
       -#  %th{:field=>"#{col[:field]}", :filterable=>true, :width=>"#{col[:width]}", :style=>"#{col[:style]}"} #{col[:label]}
 
 %br{:style=>'float:none; clear:both;'}
-%br
 
 
 :javascript

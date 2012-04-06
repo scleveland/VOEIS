@@ -54,13 +54,28 @@
           }).play();
       }
       
-      function cv_pop(title,title2,href) {
+      // OPEN CV MANAGEMENT TAB
+      function cv_pop(title,title2,href,updElemID,callback) {
         var cv_url = href;
         var cv_id = title2;
         var cv_title = title;
+        if(updElemID)
+          window.update_select_element=$('#'+updElemID);
         //window.open(hist_url, hist_title, 'width=950,height=550'); return;
-        var cv_callback = function(){ if(window.loaded) window.loaded() };
+        var cv_callback = callback || function(){ if(window.loaded) window.loaded() };
         dojo.publish('voeis/project/openTab',[cv_url,cv_id,cv_title,cv_callback]);
+      }
+      // OPEN CV MANAGEMENT TAB-- return to CURR TAB and POP NEW
+      function cv_pop_new(title,title2,href,updElemID) {
+        var tabs = dijit.byId('tab_browser');
+        var mytab = tabs.selectedChildWidget;
+        cv_pop(title,title2,href,updElemID,function(){
+          window[title2+'_exec'].cv_datum_new();
+        });
+        tabs.selectChild(mytab);
+        //var newtab = dijit.byId(title2);
+        if(window[title2+'_exec'] && window[title2+'_exec'].cv_datum_new)
+          window[title2+'_exec'].cv_datum_new();
       }
       
       $(window).ready(function(){ 
@@ -139,6 +154,15 @@
             = link_to("Development Activity", page_url(:activity), :dojoType => "yogo.ui.MenuLink")
             = link_to("Development Roadmap", page_url(:roadmap), :dojoType => "yogo.ui.MenuLink")
             = link_to("Developers", "/doc/yard/", :dojoType => "yogo.ui.MenuLink", :target=>"_blank") 
+            -if current_user.system_role.name=='Administrator'
+              %div{:dojoType=>"dijit.MenuSeparator"}
+              %div{:dojoType=>"dijit.PopupMenuItem"}
+                %span Administration
+                %div{:dojoType => "dijit.Menu"}
+                  -#= link_to("MAIN", "/pages/admin", :dojoType => "yogo.ui.MenuLink")
+                  = link_to("Users", "/users", :dojoType => "yogo.ui.MenuLink")
+                  = link_to("Roles & Permissions", "/roles", :dojoType => "yogo.ui.MenuLink")
+                  = link_to("Settings", "/settings", :dojoType => "yogo.ui.MenuLink")
             
         #projectsButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
           %span{:style => "font-weight:bold"}
@@ -259,10 +283,10 @@
                   -#= link_to("Simple QA/QC", query_project_samples_path(@project), :dojoType => "yogo.ui.MenuLink") 
                   -#= link_to("Search Data",new_project_search_path(@project), :dojoType => "yogo.ui.MenuLink") 
                   
-                  - if !@edit_auth.nil? && @edit_auth
-                    = link_to("Data Query QA/QC", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
-                  - else
-                    = link_to("Data Query", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
+                  -#- if !@edit_auth.nil? && @edit_auth
+                  -#  = link_to("Data Query QA/QC", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
+                  -#- else
+                  -#  = link_to("Data Query", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
                   = link_to("Data Search", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/search'); return false;")
                   = link_to("Job Queue", project_jobs_path(@project), :dojoType => "yogo.ui.MenuLink")
                   -if !current_user.nil?
