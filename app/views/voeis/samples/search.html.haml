@@ -175,7 +175,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         -#=submit_tag("Export Results")
         = link_to('EXPORT RESULTS', 'javascript:', :class=>'icon icon-proj', 
-              :onclick=>"$('##{@tabId}_search_results form').get().submit();return false;") 
+              :onclick=>"$('##{@tabId}_search_results form')[0].submit();return false;") 
     
     =clear_break
     -#simplechart{:style=>"width: 250px; height: 150px;"}
@@ -272,15 +272,19 @@
         $('##{@tabId}_plot_view').hide();
         $('##{@tabId}_grid_view').show();
         //val_grid.render();
-        val_grid.update();
+        //val_grid.update();
+        val_grid.resize();
         var grid_sel = val_grid.selection.getSelected()
         if(grid_sel.length) {
           console.log('SCROLL-TO:',grid_sel[0]._0);
-          setTimeout(function(){
-            val_grid.scrollTo(0);
-            val_grid.scrollToRow(grid_sel[0]._0);
-            val_grid.scrollToRow(grid_sel[0]._0);
-          },500);
+          val_grid.scrollTo(0);
+          val_grid.scrollToRow(grid_sel[0]._0);
+          val_grid.scrollToRow(grid_sel[0]._0);
+          //setTimeout(function(){
+          //  val_grid.scrollTo(0);
+          //  val_grid.scrollToRow(grid_sel[0]._0);
+          //  val_grid.scrollToRow(grid_sel[0]._0);
+          //},500);
         };
         
       } else {
@@ -547,14 +551,15 @@
          //var item = this.getItem(idx);
          //var item = #{dataId}.value_data[idx];
          var item = datastore.get_raw(id,#{dataId}.val_store);
-         var point = #{dataId}.data[item._0];
          if(!item){
            console.log('NO ITEM!');
            return;
          };
+         var point = #{dataId}.data[item._0];
          //EDIT datavalue
          console.log('EDIT ITEM:',item);
          data_value_edit.pop(item, function(data) {
+           var item = data_value_edit.item;
            //### Update Graph
            //data['selected'] = item.selected;
            #{dataId}.data[item._0] = [point[0],data.data_value]

@@ -380,6 +380,30 @@
 
     function data_value_edit_setup(){};
     
+    // OPEN CV MANAGEMENT TAB
+    function cv_pop(title,title2,href,updElemID,callback) {
+      var cv_url = href;
+      var cv_id = title2;
+      var cv_title = title;
+      if(updElemID)
+        window.update_select_element=$('#'+updElemID);
+      //window.open(hist_url, hist_title, 'width=950,height=550'); return;
+      var cv_callback = callback || function(){ if(window.loaded) window.loaded() };
+      dojo.publish('voeis/project/openTab',[cv_url,cv_id,cv_title,cv_callback]);
+    }
+    // OPEN CV MANAGEMENT TAB-- return to CURR TAB and POP NEW
+    function cv_pop_new(title,title2,href,updElemID) {
+      var tabs = dijit.byId('tab_browser');
+      var mytab = tabs.selectedChildWidget;
+      cv_pop(title,title2,href,updElemID,function(){
+        window[title2+'_exec'].cv_datum_new();
+      });
+      tabs.selectChild(mytab);
+      //var newtab = dijit.byId(title2);
+      if(window[title2+'_exec'] && window[title2+'_exec'].cv_datum_new)
+        window[title2+'_exec'].cv_datum_new();
+    }
+    
     $(window).ready(function(){ 
       console.log('DONE LOADING!!');
       pmap_init();
@@ -578,13 +602,15 @@
             //var diso = dt+'T'+tm+tz;
             var data = {data_value: {
               data_value: dijit.byId('DV_data_value').get('value'),
-              datatype: dijit.byId('DV_data_type').get('value'),
+              //datatype: dijit.byId('DV_data_type').get('value'),
+              datatype: $('#DV_data_type_sel').val().toString(),
               string_value: dijit.byId('DV_string_value').get('value'),
               value_accuracy: dijit.byId('DV_value_accuracy').get('value'),
               replicate: dijit.byId('DV_replicate').get('value'),
               vertical_offset: dijit.byId('DV_vertical_offset').get('value'),
               end_vertical_offset: dijit.byId('DV_end_vertical_offset').get('value'),
-              quality_control_level: dijit.byId('DV_quality_control_level').get('value'),
+              //quality_control_level: dijit.byId('DV_quality_control_level').get('value'),
+              quality_control_level: $('#DV_quality_control_level_sel').val().toString(),
               published: dijit.byId('DV_published').get('checked').toString(),
               local_date_time: dt+'T'+tm+tz,
               utc_offset: utcval,
@@ -597,7 +623,9 @@
               data: data,
               dataType: 'json',
               success: function(dat){
-                data_value_edit.saved_callback(dat);
+                console.log('>>>>>THIS:',data_value_edit);
+                console.log('CALLBACK:',data_value_edit.saved_callback);
+                if(data_value_edit.saved_callback) data_value_edit.saved_callback(dat);
                 data_value_edit.hide();
               }
             });

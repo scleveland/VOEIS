@@ -54,30 +54,6 @@
           }).play();
       }
       
-      // OPEN CV MANAGEMENT TAB
-      function cv_pop(title,title2,href,updElemID,callback) {
-        var cv_url = href;
-        var cv_id = title2;
-        var cv_title = title;
-        if(updElemID)
-          window.update_select_element=$('#'+updElemID);
-        //window.open(hist_url, hist_title, 'width=950,height=550'); return;
-        var cv_callback = callback || function(){ if(window.loaded) window.loaded() };
-        dojo.publish('voeis/project/openTab',[cv_url,cv_id,cv_title,cv_callback]);
-      }
-      // OPEN CV MANAGEMENT TAB-- return to CURR TAB and POP NEW
-      function cv_pop_new(title,title2,href,updElemID) {
-        var tabs = dijit.byId('tab_browser');
-        var mytab = tabs.selectedChildWidget;
-        cv_pop(title,title2,href,updElemID,function(){
-          window[title2+'_exec'].cv_datum_new();
-        });
-        tabs.selectChild(mytab);
-        //var newtab = dijit.byId(title2);
-        if(window[title2+'_exec'] && window[title2+'_exec'].cv_datum_new)
-          window[title2+'_exec'].cv_datum_new();
-      }
-      
       $(window).ready(function(){ 
           if(window.pre_dojo_parse) pre_dojo_parse();
           dojo.parser.parse();
@@ -171,7 +147,7 @@
             = link_to("Browse", projects_path, :dojoType => "yogo.ui.MenuLink")
             -if !current_user.nil?
               = link_to("New...", new_project_path, :dojoType => "yogo.ui.MenuLink")
-              -if current_user.system_role.name=='Administrator'
+              -if current_user.system_role.name=='Administrator' &&  !@cv_list.nil?
                 %div{:dojoType=>"dijit.PopupMenuItem"}
                   %span Controlled Vocabulary
                   %div{:dojoType=>"dijit.Menu", :id=>"manageCVmenu"}
@@ -179,9 +155,8 @@
                     -#= link_to("Vertical Datum", vertical_datum_c_vs_path, :dojoType => "yogo.ui.MenuLink")
                     -#= link_to("Spatial Reference", spatial_references_path, :onclick=>"cv_pop('Global Spatial References','global_spatial_references',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
                     -#= link_to("Vertical Datum", vertical_datum_c_vs_path, :onclick=>"cv_pop('Global Vertical Datums','global_vertical_datums',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
-                    - if !@cv_list.nil?
-                      - @cv_list.each do |cv|
-                        = link_to('Global '+cv[:cv_title], cv[:cv_url], :onclick=>"cv_pop('Global #{cv[:cv_title]}','global_#{cv[:cv_title2]}',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
+                    - @cv_list.each do |cv|
+                      = link_to('Global '+cv[:cv_title], cv[:cv_url], :onclick=>"cv_pop('Global #{cv[:cv_title]}','global_#{cv[:cv_title2]}',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
               %div{:dojoType=>"dijit.MenuSeparator"}
               %div{:dojoType=>"dijit.PopupMenuItem"}
                 %span My Projects
@@ -225,12 +200,12 @@
                 = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_sample_menu")
                 = link_to("Add Logger Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")
 
-                %div{:dojoType=>"dijit.PopupMenuItem"}
-                  %span Controlled Vocabulary
-                  %div{:dojoType=>"dijit.Menu", :id=>"projectCVmenu"}
-                    -#= link_to("Spatial Reference", project_spatial_references_path(@project.id), :onclick=>"cv_pop('Spatial References','spatial_references',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
-                    -#= link_to("Vertical Datum", project_vertical_datum_c_vs_path(@project.id), :onclick=>"cv_pop('Vertical Datums','vertical_datums',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
-                    - if !@cv_list.nil?
+                - if !@cv_list.nil?
+                  %div{:dojoType=>"dijit.PopupMenuItem"}
+                    %span Controlled Vocabulary
+                    %div{:dojoType=>"dijit.Menu", :id=>"projectCVmenu"}
+                      -#= link_to("Spatial Reference", project_spatial_references_path(@project.id), :onclick=>"cv_pop('Spatial References','spatial_references',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
+                      -#= link_to("Vertical Datum", project_vertical_datum_c_vs_path(@project.id), :onclick=>"cv_pop('Vertical Datums','vertical_datums',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
                       - @cv_list.each do |cv|
                         = link_to(cv[:cv_title], project_path(@project)+cv[:cv_url], :onclick=>"cv_pop('#{cv[:cv_title]}','#{cv[:cv_title2]}',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
 
