@@ -175,7 +175,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         -#=submit_tag("Export Results")
         = link_to('EXPORT RESULTS', 'javascript:', :class=>'icon icon-proj', 
-              :onclick=>"$('##{@tabId}_search_results form').get().submit();return false;") 
+              :onclick=>"$('##{@tabId}_search_results form')[0].submit();return false;") 
     
     =clear_break
     -#simplechart{:style=>"width: 250px; height: 150px;"}
