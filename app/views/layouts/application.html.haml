@@ -264,6 +264,14 @@
                   - else
                     = link_to("Data Query", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
                   = link_to("Data Search", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/search'); return false;")
+                  %div{:dojoType=>"dijit.PopupMenuItem"}
+                    %span Data Sets
+                    %div{:dojoType=>"dijit.Menu", :id=>"datasetSubMenu"}
+                      - if @project.managed_repository{Voeis::DataSet.all}.count > 0 
+                        - @project.managed_repository{Voeis::DataSet.all}.each do |dataset|
+                          = link_to(dataset.name, project_data_set_path(@project, dataset), :dojoType => "yogo.ui.MenuLink")
+                      - else
+                        None
                   = link_to("Job Queue", project_jobs_path(@project), :dojoType => "yogo.ui.MenuLink")
                   -if !current_user.nil?
                     -#= link_to("Search", campaigns_path, :dojoType => "yogo.ui.MenuLink")
