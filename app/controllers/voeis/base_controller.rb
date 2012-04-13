@@ -42,9 +42,25 @@ class Voeis::BaseController < InheritedResources::Base
   belongs_to :project, :parent_class => Project, :finder => :get
 
   # All Voeis resources should handle html and json
-  respond_to :html, :json
+  respond_to :html, :json, :xml, :wml
 
   responders :rql
+  
+  # Add WML respond support that will work with RQL because we want
+  # to be awesome
+  require 'action_controller/metal/renderers'
+  ActionController::Renderers.add :wml do |object, options|
+    self.content_type ||= 'text/waterml'
+    self.response_body  = object.respond_to?(:to_wml) ? object.to_wml : object.to_xml
+  end
+  
+  require 'action_controller/metal/responder'
+  class ActionController::Responder
+    def to_wml
+      controller.render :wml => resource
+    end
+  end
+
 
   protected
 

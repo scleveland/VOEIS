@@ -1,7 +1,7 @@
 require 'responders/rql'
 
 class Voeis::DataValuesController < Voeis::BaseController
-  
+  layout :choose_layout
   # Properly override defaults to ensure proper controller behavior
   # @see Voeis::BaseController
   responders :rql
@@ -14,6 +14,7 @@ class Voeis::DataValuesController < Voeis::BaseController
   
   has_widgets do |root|
     root << widget(:versions)
+    #root << widget(:data_value)
   end
   
   @project = parent
@@ -25,8 +26,10 @@ class Voeis::DataValuesController < Voeis::BaseController
   #def index
   #end
   
-  #def show
-  #end
+  def show
+   @data_value=parent.managed_repository{Voeis::DataValue.get(params[:id].to_i)}
+   @meta_tags = @data_value.meta_tags
+  end
   
   # DELETE /data_values/$ID$
   def destroy
@@ -108,6 +111,9 @@ class Voeis::DataValuesController < Voeis::BaseController
   
   #def create
   #end
+  def meta_tags
+    @data_value = @project.managed_repository{Voeis::DataValue.get(params[:id].to_i)}
+  end
   
   def versions
     #@tabId = params[:tab_id]
@@ -1561,7 +1567,7 @@ class Voeis::DataValuesController < Voeis::BaseController
          redirect_to project_path(params[:project_id]) and return
          rescue Exception => e  
            email_exception(e,request.env)
-           Voeis::Site.get(site.id).update_site_data_catalog_variables(@variables)
+           parent.managed_repository{Voeis::Site.get(site.id).update_site_data_catalog}
            flash[:error] = "Problem Parsing Sample File: "+ e.message
            redirect_to(:controller =>"voeis/data_values", :action => "pre_process_samples_file_upload", :params => {:id => params[:project_id]})
          end
@@ -1715,6 +1721,12 @@ class Voeis::DataValuesController < Voeis::BaseController
       #return our Awesome new data_stream or template if you would be so kind
       data_template_hash = {:data_template_id => @data_stream.id}
    end
-  
-
+  private
+  def choose_layout
+     if action_name == 'show'
+       return 'data_value'
+     else
+       return 'application'
+     end
+   end
 end

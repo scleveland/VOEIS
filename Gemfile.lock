@@ -387,6 +387,7 @@ DEPENDENCIES
   inherited_resources!
   jquery-rails
   mime-types
+  nokogiri
   rails
   rails_warden (= 0.5.2)
   rake

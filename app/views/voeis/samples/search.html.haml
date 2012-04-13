@@ -241,7 +241,8 @@
     
     
     console.log('RESULT -TABID: #{@tabId}');
-    
+   
+    var #{dataId}_str = #{@meta_tags.to_json}.toString();
     var #{dataId} = {};
     #{dataId}.value_data = #{@data_structs.sql_to_json};
     for(var i=0;i<#{dataId}.value_data.length;i++) 
@@ -357,6 +358,8 @@
         });
     }
     
+
+    
     //######################################
     //formatter: 'val_grid_formatter.dateTime',
     // grid formatters
@@ -428,6 +431,15 @@
         //if(item.used[0]) return spaces+hist_link;
         //return spaces+hist_link+spaces+delete_link;
         return spaces+edit_link+spaces+hist_link+spaces+delete_link;
+      },
+      meta_tag: function(item){
+        if (#{dataId}_str.match(item.id.toString()))
+          
+          //return '<a href="#", onClick="'+ "$('#data_value_show').attr('href','#{root_url.chop}#{project_data_values_path(@project)}/" + item.id.toString() + "')" + ";dijit.byId('data_value_show').show()" + '">View</a>';
+          return '<button onClick="'+ "dijit.byId('data_value_show').set('href','#{root_url.chop}#{project_data_values_path(@project)}/" + item.id.toString() + "')" + ";dijit.byId('data_value_show').show()" + '" type="button">View</button>';
+        else
+          return "None"
+        end
       }
     };
 
@@ -476,6 +488,12 @@
        field: 'quality_control_level',
        name: 'QC Lvl',
        width: '6%'
+    },
+    {
+      field: '_item',
+      name: 'Meta Tags',
+      formatter: val_grid_formatter.meta_tag,
+      width: '5%'
     },
     {
        field: 'published',
@@ -981,6 +999,7 @@
 
      });
 
+#data_value_show{:dojoType=>"dijit.Dialog", :title=>"Data Value", :href=>"", :style=>"overflow:auto; width: 500px; height: 400px;"}
 
 -if !current_user.nil? && current_user.projects.include?(@project)
   = render(:partial => "data_set", :locals =>{:project_uid=>@project.id, :tab_id=>@tabId})

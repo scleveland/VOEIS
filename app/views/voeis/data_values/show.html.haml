@@ -1,0 +1,50 @@
+%h1
+  Data Value: #{@data_value.id}
+#data_values
+  %table(border="1")
+    %tr
+      %th ID
+      %th UTC DateTime
+      %th Value
+      %th String Value
+      %th Site ID
+      %th Variable ID
+      %th Vertical Offset
+      %th QA/QC Level
+      %th Published
+      %th Created At
+      %th Updated At
+      %th Update By ID
+      %th Updated Comment
+      %th Provenance Comment
+    %tr
+      %td #{@data_value.id}
+      %td #{@data_value.date_time_utc}
+      %td #{@data_value.data_value}
+      %td #{@data_value.string_value}
+      %td #{@data_value.site_id}
+      %td #{@data_value.variable_id}
+      %td #{@data_value.vertical_offset}
+      %td #{@data_value.quality_control_level}
+      %td #{@data_value.published}
+      %td #{@data_value.created_at}
+      %td #{@data_value.updated_at}
+      %td #{@data_value.updated_by}
+      %td #{@data_value.updated_comment}
+      %td #{@data_value.provenance_comment}
+%h2 
+  Associated Meta Tags
+%table(id="meta_tags" border="1")
+  %tr
+    %th Name
+    %th Category
+    %th Value
+  -@meta_tags.each do |mt|
+    %tr
+      %td  #{mt.name}
+      %td  #{mt.category}
+      %td  #{mt.value}
+
+%br
+%br
+%br

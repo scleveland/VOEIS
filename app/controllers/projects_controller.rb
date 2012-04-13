@@ -330,13 +330,24 @@ class ProjectsController < InheritedResources::Base
   
   def get_user_projects
     @projects = Array.new
-    current_user.projects.all(:fields => [:id, :name, :description]).map {|project| @projects << {"id" => project.id.to_s, "name" => project.name, "description" => project.description} }
-    respond_to do |format|
-      format.json do
-       render :json => @projects.as_json, :callback => params[:jsoncallback]
+    if current_user
+      current_user.projects.all(:fields => [:id, :name, :description]).map {|project| @projects << {"id" => project.id.to_s, "name" => project.name, "description" => project.description} }
+      respond_to do |format|
+        format.json do
+         render :json => @projects.as_json, :callback => params[:jsoncallback]
+        end
+        format.xml do
+         render :xml => @projects.to_xml
+        end
       end
-      format.xml do
-       render :xml => @projects.to_xml
+    else
+      respond_to do |format|
+        format.json do
+         render :json => {:errors => "An authenticated user is required for this API call.  VOEIS does not detect an authenticated user.  Please send the API-Key."}.as_json, :callback => params[:jsoncallback]
+        end
+        format.xml do
+         render :xml => {:errors => "An authenticated user is required for this API call.  Please send the API-Key."}.as_json.to_xml
+        end
       end
     end
   end
