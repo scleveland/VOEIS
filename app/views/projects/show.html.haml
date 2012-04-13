@@ -564,6 +564,9 @@
           var x = $('#dv_var_name').text();
           $('#dv_var_name').text(x+' -- TEST!');
         },
+        onHide: function() {
+          this.editing = false;
+        },
         onClose: function() {
           this.editing = false;
         },
@@ -1486,14 +1489,15 @@
 
     var openDataHistoryTab = function(tabs, projectId, dataId, dataVal, varId, varName, siteId) {
       var tabTitle = 'History: Site-'+siteId+' / '+varName+' ('+dataVal+')';
-      var projVarHistHref = "/projects/#{@project.id}/data_values/versions?id="+dataId;
+      var projHistHref = "/projects/#{@project.id}/data_values/versions?id="+dataId;
+      projHistHref += '&api_key=#{current_user.api_key}';
       // "/projects/#{@project.id}/variables/versions?id="+varId+"&site_id="+siteId;
-      var projVarHistId = '#{@project.id}--datavalue'+dataId+'-history';
+      var projHistId = '#{@project.id}--datavalue'+dataId+'-history';
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
-      var projVarHistLoad = function(siteId,varName) {
+      var projHistLoad = function(siteId,varName) {
       };
-      openProjTab(tabs, projVarHistHref, projVarHistId, tabTitle, projVarHistLoad);
+      openProjTab(tabs, projHistHref, projHistId, tabTitle, projHistLoad);
       //##
     };
 

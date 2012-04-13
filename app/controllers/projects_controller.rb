@@ -83,6 +83,7 @@ class ProjectsController < InheritedResources::Base
     @project = Project.get(params[:id])
     @auth = !current_user.nil? && current_user.projects.include?(@project)
     @edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project))
+    @api_key = current_user.nil? ? '' : current_user.api_key
     
     if resource.nil?
       flash[:error] = "Could not find that project"

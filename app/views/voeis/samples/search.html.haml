@@ -882,14 +882,15 @@
          var x = item.datapoint[0].toFixed(2),
              y = item.datapoint[1].toFixed(2);
          var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+         var ttip_help = "&nbsp; &bull; CLICK/SHIFT-CLICK to select";
+         if(edit_auth) ttip_help += "<br/>&nbsp; &bull; ALT-CLICK to edit DataValue";
          dDate = new Date();
          dDate.setTime(mEpoch);
          showTooltip(item.pageX, item.pageY,
            //*****You will need to change the sensor name here to the appropriate one selected above
                     //dDate.toLocaleString() + " = " + y + " " + "#{@variable}|#{@units}" ();
                     val_grid_formatter.dateTime(dDate) + " = " + y + " " + "#{@var_name}|#{@units}<br/>"
-                    +"&nbsp; &bull; CLICK/SHIFT-CLICK to select<br/>"
-                    +"&nbsp; &bull; ALT-CLICK to edit DataValue" );
+                    +ttip_help);
        };
        
      };
