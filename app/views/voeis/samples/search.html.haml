@@ -184,13 +184,14 @@
     %h3{:style=>"margin:0;float:left;"}
       = "#{@var_name} | #{@units}"
 
-      -if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
+      -#-if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
+      -if !current_user.nil? && current_user.projects.include?(@project)
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         -#%p{:style=>"margin:7px 0;"}
         -#  %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
         -#    %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
         -#      Data Set:
-        %button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
+        %button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet('#{@tabId}');") 
           Add Selection &gt;&gt;
         - opts0 = "<option value='-'>- Select Data Set -</option>\n<option value='NEW'>NEW DATA SET</option>\n"
         = select_tag("#{@tabId}_data_set_select", (opts0+@data_set_options).html_safe)
@@ -332,21 +333,26 @@
     function getProperDate(local_date_time, rowIndex){
       return local_date_time.slice(0,local_date_time.length-6);
     }
-    function addSelectedToDataSet(){
+    function addSelectedToDataSet(tab_id){
+      var tab_data = window[tab_id+'_data'];
+      var dataset_id = $('#'+tab_id+'_data_set_select').val();
+      console.log('ADD-TO-DATASET:',tab_id,dataset_id,tab_data);
       //abort if NO DataSet selected
-      if((parseInt($('##{@tabId}_data_set_select').val())||0)==0) return;
+      if(!(parseInt(dataset_id)||0)) return;
       //get the data values
       dijit.byId('loading_dialog').show();
-      var data_value_ids_string = ""
-      data_array = #{dataId}.val_grid.selection.getSelected();
+      data_array = tab_data.val_grid.selection.getSelected();
+      var data_value_ids = [];
       for (i=0; i<data_array.length; i=i+1)
-      {
-        data_value_ids_string= data_value_ids_string + "&data_value_ids[]=" + data_array[i].id.toString();
-      }
+        data_value_ids.push(parseInt(data_array[i].id.toString()));
+      //  data_value_ids_string= data_value_ids_string + "&data_value_ids[]=" + data_array[i].id.toString();
       //form has a hidden data_set_id
-      $.post('#{root_url}projects/#{@project_uid}/apivs/add_data_to_project_data_set.json?data_set_id=' + $("#data_set").val() + data_value_ids_string,
+      //$.post('#{root_url}projects/#{@project_uid}/apivs/add_data_to_project_data_set.json?data_set_id=' + $("#data_set").val() + data_value_ids_string,
+      $.post('#{project_path(@project)}/apivs/add_data_to_project_data_set.json?data_set_id='+dataset_id,
+        {data_value_ids: data_value_ids},
         function(data) {
-          $('.result').html(data);
+          console.log('ADDED TO DATASET:',dataset_id,data);
+          //$('.result').html(data);
           dijit.byId('loading_dialog').hide();
         });
     }
@@ -562,8 +568,14 @@
            var item = data_value_edit.item;
            //### Update Graph
            //data['selected'] = item.selected;
-           #{dataId}.data[item._0] = [point[0],data.data_value]
            //### Update Grid
+           #{dataId}.data[item._0] = [point[0],data.data_value]
+           var data_upd = #{dataId}.plot.getData();
+           #{dataId}.plot.setData(data_upd);
+           #{dataId}.plot.draw();
+           #{dataId}.plot.unhighlight();
+           var val_selected = #{dataId}.val_grid.selection.getSelected();
+           plotutils.highlightItems(val_selected,0,#{dataId}.plot);
            //#####STORE SAVE
            datastore.update(data,#{dataId}.val_store);
            //### Refresh
@@ -707,12 +719,6 @@
        $("#tooltip").remove();
      });
      
-     //DOM click event
-     $('xxbody').click( function(e){
-       //console.log('DOM-CLICK:',e);
-       #{dataId}.domClick = e;
-     });
-     
      $('body').click( function(e){
        //console.log('DOM-CLICK:',e);
        if(#{dataId}.plotClick.length==0) return;
@@ -768,7 +774,7 @@
            //window.scrollTo(0,0);
            //$('html #main_container').animate({scrollTop:580}, 'slow');//IE, FF
            //$('body #main_container').animate({scrollTop:580}, 'slow');//chrome, safari
-           if(!data_value_edit.editing)
+           if(!data_value_edit || !data_value_edit.editing)
              if(val_grid.selection.isSelected(idx)) {
                console.log('ALREADY SELECTED!');
                //val_plot.unhighlight(0,idx);
@@ -794,31 +800,6 @@
          val_grid.update();
        };
        
-       //CLEAR EVENT
-       #{dataId}.plotClick = [];
-     });
-     
-     //DOM bouble-click event
-     $('xxbody').dblclick( function(e){
-       //console.log('DOM-CLICK:',e);
-       if(#{dataId}.plotClick.length==0) return;
-       var event = #{dataId}.plotClick[0];
-       var pos = #{dataId}.plotClick[1];
-       var item = #{dataId}.plotClick[2];
-       //SELECT ROW IN GRID
-       if(item) {
-         var idx = item.dataIndex;
-         var val_item = #{dataId}.value_data[idx];
-         var val_id = parseInt(val_item.id.toString());
-         //var val_grid = dijit.byNode($('##{@tabId}_search_results #gridContainer div')[0]);
-         var val_grid = #{dataId}.val_grid;
-         var val_plot = #{dataId}.plot;
-         //var store = #{dataId}.val_store;
-         console.log('PLOT-DBL-CLICK:',e,event,pos,item,val_item);
-         val_grid.popEdit(val_id);
-         //val_grid.scrollToRow(val_item._0);
-         //#{dataId}.toggle_views();
-       };
        //CLEAR EVENT
        #{dataId}.plotClick = [];
      });

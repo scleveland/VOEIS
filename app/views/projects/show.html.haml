@@ -623,8 +623,7 @@
               data: data,
               dataType: 'json',
               success: function(dat){
-                console.log('>>>>>THIS:',data_value_edit);
-                console.log('CALLBACK:',data_value_edit.saved_callback);
+                console.log('DataValue- SAVE THIS:',data_value_edit);
                 if(data_value_edit.saved_callback) data_value_edit.saved_callback(dat);
                 data_value_edit.hide();
               }

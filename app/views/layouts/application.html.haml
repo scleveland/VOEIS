@@ -130,7 +130,7 @@
             = link_to("Development Activity", page_url(:activity), :dojoType => "yogo.ui.MenuLink")
             = link_to("Development Roadmap", page_url(:roadmap), :dojoType => "yogo.ui.MenuLink")
             = link_to("Developers", "/doc/yard/", :dojoType => "yogo.ui.MenuLink", :target=>"_blank") 
-            -if current_user.system_role.name=='Administrator'
+            -if !current_user.nil? && current_user.system_role.name=='Administrator'
               %div{:dojoType=>"dijit.MenuSeparator"}
               %div{:dojoType=>"dijit.PopupMenuItem"}
                 %span Administration
