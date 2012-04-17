@@ -1,5 +1,5 @@
 class Voeis::SearchController < Voeis::BaseController
-  layout :choose_layout
+  #layout :choose_layout
   # Properly override defaults to ensure proper controller behavior
   # @see Voeis::BaseController
 
