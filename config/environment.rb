@@ -27,6 +27,13 @@ class Array
   def sql_to_json
     self.map{|k| k.to_hash}.to_json
   end
+  def sql_to_xml
+    self.map{|k| k.to_hash}.to_xml
+  end
+  def sql_to_csv
+    header = self[0].to_hash.keys.map{|k| k}.join(',') + "\n"
+    header << self.map{|k| k.to_a.to_csv}.join("\n")
+  end
 end
 
 module DataMapper
@@ -40,3 +47,8 @@ end
 Yogo::Application.initialize!
 
 
+class Time
+  def round(seconds = 60)
+    Time.at((self.to_f / seconds).round * seconds)
+  end
+end

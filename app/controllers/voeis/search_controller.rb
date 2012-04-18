@@ -1,4 +1,7 @@
 class Voeis::SearchController < Voeis::BaseController
+
+  layout :choose_layout, :only=>[:index, :parallel_coordinate_d3]
+
   # Properly override defaults to ensure proper controller behavior
   # @see Voeis::BaseController
 
@@ -20,68 +23,80 @@ class Voeis::SearchController < Voeis::BaseController
   end
   
   def index
-    @tabId = params[:tab_id]
-    site_ids    = params[:site_ids].split(',')
-    variable_ids = params[:var_ids].split(',')
-    start_date   = params[:start_date]
-    end_date     = params[:end_date]
-    @start_date = Date.parse(start_date)
-    @end_date = Date.parse(end_date)
-    @units = Voeis::Unit.all
-    @unit_names = Hash.new
-    @units.map{|u| @unit_names = @unit_names.merge({u.id => u.units_abbreviation})}
-    data = ""
-    #@variables = ""
-    
-    parent.managed_repository do
-      #data = DataMapper.raw_select(Voeis::DataValue.all(:variable_id => variable_ids, 
-      #                      :site_id => site_ids,
-      #                      :local_date_time.gte => start_date,
-      #                      :local_date_time.lte => end_date,
-      #                      :fields=>[:date_time_utc, :data_value,:variable_id, :site_id]))
-      data =Voeis::DataValue.all(:variable_id => variable_ids, 
-                             :site_id => site_ids,
-                             :local_date_time.gte => start_date,
-                             :local_date_time.lte => end_date)
-     # @variables  = data.variables(:unique=>true)
-    end
-    @dv_count = data.count
-    
-    results = {}
-    presults = {}
-    @variables=[]
-    # result[timestamp] = {var_id=>val,var_id=>val,var_id=>val}
-    data.each do |d|
-      #results[d.local_date_time] ||= {}
-      #results[d.local_date_time][d.variable_id] = d.data_value
-      #presults[d.local_date_time.strftime("%Y%m%d%H%M").to_i] ||= {}
-      #presults[d.local_date_time.strftime("%Y%m%d%H%M").to_i]["var_#{d.variable_id}"] = d.data_value
-      results[d.date_time_utc] ||= {}
-      results[d.date_time_utc][d.variable_id] = d.data_value
-      presults[d.date_time_utc.strftime("%Y%m%d%H%M").to_i] ||= {}
-      presults[d.date_time_utc.strftime("%Y%m%d%H%M").to_i]["var_#{d.variable_id}"] = d.data_value
-      @variables << d.variable unless @variables.include?(d.variable)
-      #@variables << d.variable.to_hash.update({:site_id=>d.site_id}) unless var_ids.include?(d.variable.id)
-      #@variable_ids << d.variable_id unless @variable_ids.include?(d.variable_id)
-      #var_ids << d.variable.id
-    
-    end
-    null_variables={}
-    if !@variables.empty?
-      @variables.each do |v|
-        if !v.nil?
-          null_variables["var_#{v}"] = -9999
-          #null_variables["var_#{v['id']}"] = -9999
+
+       #@tabId = params[:tab_id]
+        site_ids    = params[:site_ids].split(',')
+        variable_ids = params[:var_ids].split(',')
+        start_date   = params[:start_date]
+        end_date     = params[:end_date]
+        @start_date = Date.parse(start_date)
+        @end_date = Date.parse(end_date)
+        @units = Voeis::Unit.all
+        @unit_names = Hash.new
+        @units.map{|u| @unit_names = @unit_names.merge({u.id => u.units_abbreviation})}
+        @sites = ""
+        data = ""
+        @variables = ""
+        parent.managed_repository do
+          data = DataMapper.raw_select(Voeis::DataValue.all(:variable_id => variable_ids, 
+                                :site_id => site_ids,
+                                :local_date_time.gte => start_date,
+                                :local_date_time.lte => end_date,
+                                :fields=>[:date_time_utc, :data_value,:variable_id, :site_id],
+                                :order=>[:date_time_utc]))
+          
+          @sites = Voeis::Site.all(:id=>site_ids)
+          @variables = Voeis::Variable.all(:id=> variable_ids)
         end
-      end
-    end
-    @parallel_results=[]
-    presults.each do |k,pr| 
-      @parallel_results << {:timestamp => k}.merge(null_variables.merge(pr))
-    end
-    @data = results.map{|k,v| {:timestamp => k}.merge(v) }
-   # @parallel_results = presults.map{|k,v| {:timestamp => k}.merge(v) }
-    @data = @data.sort{|a,b| a[:timestamp] <=> b[:timestamp] }
+        site_names = {}
+        @sites.map{|s| site_names[s.id]=s.code}
+        variable_names = {}
+        @variables.map{|v| variable_names[v.id]= v.variable_name+"("+@unit_names[v.variable_units_id]+")"}
+        @dv_count = data.count
+        #results = {}
+        presults = {}
+        @variable_ids=[]
+        # result[timestamp] = {var_id=>val,var_id=>val,var_id=>val}
+        data.each do |d|
+          #results[d.date_time_utcto_datetime.change(:offset => "+00:00")] ||= {}
+          #results[d.date_time_utc.to_datetime.change(:offset => "+00:00")][d.variable_id] = d.data_value
+          presults[(Time.at((d.date_time_utc.to_time.change(:offset => "+00:00").to_f / 60).round * 60)).to_datetime.change(:offset => "+00:00")] ||= {}
+          presults[(Time.at((d.date_time_utc.to_time.change(:offset => "+00:00").to_f / 60).round * 60)).to_datetime.change(:offset => "+00:00")]["#{site_names[d.site_id]}: #{variable_names[d.variable_id]}"] = d.data_value
+          #@variable_ids << d.variable_id unless @variable_ids.include?(d.variable_id)
+          @variable_ids << "#{site_names[d.site_id]}: #{variable_names[d.variable_id]}" unless  @variable_ids.include?("#{site_names[d.site_id]}: #{variable_names[d.variable_id]}")
+        end
+        # null_variables={}
+        # if !@variable_ids.empty?
+        #   @variable_ids.each do |v|
+        #     if !v.nil?
+        #       null_variables["var_#{v}"] = -9999
+        #     end
+        #     @variables << parent.managed_repository{Voeis::Variable.get(v)}
+        #   end
+        # end
+        @parallel_results=[]
+        var_ids_hash = {:Timestamp => nil}
+        @variable_ids.each{|v| var_ids_hash[v.to_sym]=nil}
+        @parallel_results << var_ids_hash
+        presults.each do |k,pr| 
+          #@parallel_results << {:timestamp => k}.merge(null_variables.merge(pr))
+          @parallel_results << {:Timestamp => k}.merge(pr)
+        end
+   respond_to do |format|
+     format.html do
+       render :index 
+     end
+     format.json do
+       render :json => data.sql_to_json, :callback => params[:jsoncallback]
+     end
+     format.xml do
+       render :xml => data.sql_to_xml
+     end
+     format.csv do
+       render :text => data.sql_to_csv.to_s.gsub(/\n\n/, "\n")
+     end
+   end
+
   end
   
   #export the results of search/browse to a csv file
@@ -91,5 +106,18 @@ class Voeis::SearchController < Voeis::BaseController
       :type => 'text/csv; charset=utf-8; header=present',
       :filename => filename)
   end
+
+  
+  private
+  
+  def choose_layout
+    if action_name == 'parallel_coordinates_d3' || action_name == 'index' 
+      return 'pc_layout'
+    else
+      return 'application'
+    end
+  end
+  
+
 
 end
