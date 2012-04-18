@@ -1,33 +1,6 @@
-= javascript_include_tag 'underscore.js', 'backbone.js','jquery-ui-1.8.11.custom.min.js', 'filter.js', 'parallel-coordinates.js','slickgrid/jquery.event.drag-2.0.min.js', 'slickgrid/slick.core.js','slickgrid/slick.grid.js','slickgrid/slick.dataview.js','slickgrid/slick.pager.js', 'grid.js'
+= javascript_include_tag 'd3/d3.js', 'd3/d3.csv.js','d3/d3.layout.js','parallel-coordinates-veggie.js','jquery.js','underscore.js', 'backbone.js','jquery-ui-1.8.11.custom.min.js', 'filter.js', 'slickgrid/jquery.event.drag-2.0.min.js', 'slickgrid/slick.core.js','slickgrid/slick.grid.js','slickgrid/slick.dataview.js','slickgrid/slick.pager.js', 'grid-d3.js', 'options.js'
 
-= stylesheet_link_tag 'slick.grid.css', 'parallel-coordinate.css'
-:javascript
-  $(window).ready(function(){ 
-    console.log('DONE LOADING GRAPH');
-    drawGraph();
-  });
-
-:css
-  ##{@tabId}_graph {
-    position: relative;
-    margin: auto;
-  }
-
-  #title {
-    position: absolute;
-    top: 70px;
-    left: 200px;
-    padding: 10px;
-    background: white;
-  }
-
-  large {
-    font-size: medium;
-  }
-%h3{:style=>"margin-top:0;"}
-  Search Results
-  [#{@tabId[-3,3]}]
-  
+= stylesheet_link_tag 'slick.grid.css', 'parallel-coordinates-d3.css' 
 %strong
   SEARCH DATES:
   -if !@start_date.nil?
@@ -43,71 +16,140 @@
 %p
   %strong SEARCH URL:
   #{request.url}
-#pc-main
-  %h3 Parallel Coordinates
-  #parallel-coordinates
-  #grid-content
-    #myGrid
-    
-
+#nav
+  :plain
+    <h1>Parallel Coordinates</h1>
+    <div class="pc_widget right toggle">
+      <input type="range" min="0" max="1" value="0.2" step="0.01" name="power" list="powers" id="line_opacity"></input>
+     <br/>
+      Opacity: <span id="opacity_level">20%</span>
+    </div>
+    <div><a href="#" id="shadows" class="right toggle">Shadows</a></div>
+    <div><a href="#" id="no_ticks" class="right toggle">Hide Scale</a></div>
+</div>
+#main
+%div{:class=>"pc_widgets"}
+  :plain
+    <h3></h3>
+    <div id="totals" class="widget right"></div>
+    <a href="#" id="export_selected" class="button green filter_control">Export</a>
+    <a href="#" id="remove_selected" class="button red filter_control">Remove</a>
+    <a href="#" id="keep_selected" class="button green filter_control">Keep</a>
+    <div id="pager" class="info"></div>
+        <div id="legend">
+    </div>
+#parallel
+#myGrid"
+  
 :javascript
+  dojo.addOnLoad(function(){
+    
+   //$(function() {
   
-  console.log('SEARCH-RESULT TAB-ID: #{@tabId}');
-  
-  function exportAll(){
-      #{@tabId}_data.searchGrid.exportGrid("csv", function(str){
-          dojo.byId("export_data").value = str;
-          document.forms[0].submit()
-      });
-  };
-  
-  function exportSelected(){                
-      $('#export_data').val(#{@tabId}_data.searchGrid.exportSelected("csv",function(str){}))
-      document.forms[0].submit()
-  };
-  
-  //######################
-  // CREATE PARALLEL GRAPH
-  function drawGraph() {
     var dimensions = new Filter();
+    var highlighter = new Selector();
 
     dimensions.set({data: #{@parallel_results.to_json}});
 
-    var parallel = new Parallel_coordinates ({
-      title: 'Multidimensional Query - Parallel Coordinates',
-      model: dimensions,
-      el: document.getElementById('parallel-coordinates'),
-      columns: [
-        'timestamp',#{@variables.map{|v| '"var_%s"' % [v.id]}.join(",")}
-      ],
-      alias: {
-        'timestamp': 'Time (YYYYMMDDhhmmss)',
-        #{@variables.map{|v| '"var_%s": "%s (%s)"' % [v.id, v.variable_name, @unit_names[v.variable_units_id]]}.join(",")}
-      },
-      type: {
-        'four': 'category'
-      },
-      width: 1360,
-      height: 300,
-      gutter: { x: 100, y: 50 },
-    });
+    var columns = [
+      'timestamp',#{@variables.map{|v| '"var_%s"' % [v.id]}.join(",")}
+    ]
+    var axes = columns
+
+
+    var pc = parallel(dimensions);
+
 
     var slicky = new grid({
       model: dimensions,
-      width: 1360,
+      selector: highlighter,
+      width: $('body').width(),
       height: 400,
-      columns: [
-        'time',#{@variables.map{|v| '"var_%s"' % [v.id]}.join(",")}
-      ],
-      alias: {
-        'time': 'Time',
-         #{@variables.map{|v| '"var_%s": "%s (%s)"' % [v.id, v.variable_name, @unit_names[v.variable_units_id]]}.join(",")}
-      }
+      columns: columns
+    });
+    
+    // vertical full screen
+    var parallel_height = $(window).height() - 64 - 12 - 120 - 320;
+    if (parallel_height < 120) parallel_height = 120;  // min height
+    if (parallel_height > 340) parallel_height = 340;  // max height
+    $('#parallel').css({
+        height: parallel_height + 'px',
+        width: $(window).width() + 'px'
+    });
+    
+    slicky.update();
+    pc.render();
+    
+    dimensions.bind('change:filtered', function() {
+      var data = dimensions.get('data');
+      var filtered = dimensions.get('filtered');
+      var data_size = _(data).size();
+      var filtered_size = _(filtered).size();
+      totals.update([filtered_size, data_size - filtered_size]);
+      
+      var opacity = _([2/Math.pow(filtered_size,0.37), 100]).min();
+      $('#line_opacity').val(opacity).change();
+    });
+    
+    highlighter.bind('change:selected', function() {
+      var highlighted = this.get('selected');
+      pc.highlight(highlighted);
     });
 
-    parallel.update();
-    slicky.update();
+    $('#remove_selected').click(function() {
+      dimensions.outliers();
+      pc.update(dimensions.get('data'));
+      pc.render();
+      dimensions.trigger('change:filtered');
+      return false;
+    });
     
-  }
+    $('#keep_selected').click(function() {
+      dimensions.inliers();
+      pc.update(dimensions.get('data'));
+      pc.render();
+      dimensions.trigger('change:filtered');
+      return false;
+    });
+    
+    $('#export_selected').click(function() {
+      var data = dimensions.get('filtered');
+      var keys = _.keys(data[0]);
+      var csv = keys.join(",");
+      _(data).each(function(row) {
+        csv += "\n";
+        csv += _(keys).map(function(k) {
+          return row[k];
+        }).join(",");
+      });
+      var uriContent = "data:application/octet-stream," + encodeURIComponent(csv);
+      var myWindow = window.open(uriContent, "VOEIS_CSV");
+      myWindow.focus();
+      return false;
+    });
+
+    $('#line_opacity').change(function() {
+      var val = $(this).val();
+      $('#parallel .foreground path').css('stroke-opacity', val.toString());
+      $('#opacity_level').html((Math.round(val*10000)/100) + "%");
+    });
+    
+    $('#parallel').resize(function() {
+      // vertical full screen
+      pc.render();
+      var val = $('#line_opacity').val();
+      $('#parallel .foreground path').css('stroke-opacity', val.toString());
+    });
+    
+    $('#parallel').resizable({
+      handles: 's',
+      resize: function () { return false; }
+    });
+    
+    $('#myGrid').resizable({
+      handles: 's'
+    });
+    
+  });
 
 
