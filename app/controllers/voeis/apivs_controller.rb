@@ -56,7 +56,7 @@ class Voeis::ApivsController < Voeis::BaseController
        @dts.data_stream_columns.sensor_types.each do |sensor|
          @var_hash = Hash.new
          @var_hash = sensor.variables.first.as_json
-         if params[:small_data]
+         if params[:small_data] == 'true'
            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{sensor.variables.first.id} AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
            @var_hash = @var_hash.merge({'data' =>repository.adapter.select(sql)})
            @values << @var_hash
@@ -709,7 +709,7 @@ class Voeis::ApivsController < Voeis::BaseController
        @site.variables. each do |var|
          @var_hash = Hash.new
          @var_hash = var.as_json
-         if params[:small_data]
+         if params[:small_data] == 'true'
            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
            @var_hash = @var_hash.merge({'time_series' => repository.adapter.select(sql)})
            sql = "SELECT COUNT(*) FROM  voeis_data_values WHERE  variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
@@ -869,7 +869,7 @@ class Voeis::ApivsController < Voeis::BaseController
        #if sensor.nil?
       #  @data_values[:error] = "There are no Sensor Value for this site and variable combination"
       # else
-      if params[:small_data]
+      if params[:small_data] == 'true'
         sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@variable.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
         @data_values[:data] = repository.adapter.select(sql)
         
@@ -977,7 +977,7 @@ class Voeis::ApivsController < Voeis::BaseController
        #if sensor.nil?
       #  @data_values[:error] = "There are no Sensor Value for this site and variable combination"
       # else
-      if params[:small_data]
+      if params[:small_data] == 'true'
         sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@variable.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
         @data_values[:data] = repository.adapter.select(sql)
         
@@ -1204,7 +1204,7 @@ class Voeis::ApivsController < Voeis::BaseController
         @data_values[:error] = "There is no variable with the ID:"+params[:variable_id]
       else
         @var_hash = Hash.new
-        if params[:small_data]
+        if params[:small_data] == 'true'
           sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE variable_id=#{@var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
           @var_hash = @var_hash.merge({'time_series' => repository.adapter.select(sql)})
           
@@ -1331,7 +1331,7 @@ class Voeis::ApivsController < Voeis::BaseController
         else
           @var_hash = Hash.new
           @var_hash = @var.as_json
-          if params[:small_data]
+          if params[:small_data] == 'true'
             sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
             @var_hash = @var_hash.merge({'time_series_data' => repository.adapter.select(sql)})
             sql = "SELECT COUNT(*) FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
@@ -1931,7 +1931,7 @@ class Voeis::ApivsController < Voeis::BaseController
     sql =""
     parent.managed_repository do
       @data_set_data = Voeis::DataSet.get(params[:data_set_id].to_i).data_values    
-      if params[:small_data]
+      if params[:small_data] == 'true'
         if params[:variable_id]
           sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE variable_id=#{params[:variable_id]} AND id IN ( #{@data_set_data.map{|k| k.id}.join(',')})"
         else
@@ -1970,9 +1970,10 @@ class Voeis::ApivsController < Voeis::BaseController
      sql =""
      parent.managed_repository do
        if data_set = Voeis::DataSet.get(params[:data_set_id].to_i)
+         debugger
          data_set.add_data_values(params[:data_value_ids])
          @data_set_data = data_set.data_values    
-         if params[:small_data]
+         if params[:small_data] == 'true'
            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE id IN ( #{@data_set_data.map{|k| k.id}.join(',')})"
            @data_hash[:data] = repository.adapter.select(sql)
          else
@@ -2011,7 +2012,7 @@ class Voeis::ApivsController < Voeis::BaseController
         if data_set = Voeis::DataSet.get(params[:data_set_id].to_i)
           data_set.remove_data_values(params[:data_value_ids])
           @data_set_data = data_set.data_values    
-          if params[:small_data]
+          if params[:small_data] == 'true'
             sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE id IN ( #{@data_set_data.map{|k| k.id}.join(',')})"
             @data_hash[:data] = repository.adapter.select(sql)
           else

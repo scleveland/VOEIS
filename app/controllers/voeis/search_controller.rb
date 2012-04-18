@@ -85,6 +85,46 @@ class Voeis::SearchController < Voeis::BaseController
    respond_to do |format|
      format.html do
        render :index 
+
+     end
+     format.json do
+       render :json => data.sql_to_json, :callback => params[:jsoncallback]
+     end
+     format.xml do
+       render :xml => data.sql_to_xml
+     end
+     format.csv do
+       render :text => data.sql_to_csv.to_s.gsub(/\n\n/, "\n")
+     end
+   end
+  end
+  
+  
+  def parallel_coordinates
+     #@tabId = params[:tab_id]
+     site_ids    = params[:site_ids].split(',')
+     variable_ids = params[:var_ids].split(',')
+     start_date   = params[:start_date]
+     end_date     = params[:end_date]
+     @start_date = Date.parse(start_date)
+     @end_date = Date.parse(end_date)
+     @units = Voeis::Unit.all
+     @unit_names = Hash.new
+     @units.map{|u| @unit_names = @unit_names.merge({u.id => u.units_abbreviation})}
+     data = ""
+     @variables = []
+     parent.managed_repository do
+       data = DataMapper.raw_select(Voeis::DataValue.all(:variable_id => variable_ids, 
+                             :site_id => site_ids,
+                             :local_date_time.gte => start_date,
+                             :local_date_time.lte => end_date,
+                             :fields=>[:date_time_utc, :data_value,:variable_id, :site_id]))
+       #data =Voeis::DataValue.all(:variable_id => variable_ids, 
+                             # :site_id => site_ids,
+                             # :local_date_time.gte => start_date,
+                             # :local_date_time.lte => end_date)
+      # @variables  = data.variables(:unique=>true)
+
      end
      format.json do
        render :json => data.sql_to_json, :callback => params[:jsoncallback]
@@ -118,6 +158,5 @@ class Voeis::SearchController < Voeis::BaseController
     end
   end
   
-
 
 end
