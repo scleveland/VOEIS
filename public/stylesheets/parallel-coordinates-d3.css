@@ -21,6 +21,11 @@ a:hover {
   min-width: 760px;
   margin: 8px auto;
 }
+#main_pc{
+  width: 100%;
+  min-height: 500px;
+  overflow-y: auto;
+}
 #nav {
   height: 64px;
   width: 100%;
@@ -73,7 +78,7 @@ p {
 }
 .pc_widgets {
   margin: 0 4% 0 0;
-  height: 120px;
+  height: 40px;
 }
 .pc_widgets h3 {
   float: left;
@@ -96,9 +101,9 @@ p {
   border: 1px solid #ccc;
 }
 .pc_widget {
-  margin-top: 4px;
-  padding: 2px 8px;
-  height: 36px;
+  margin-top: 2px;
+  padding: 2px 2px;
+  height: 26px;
   line-height: 11px;
   font-size: 11px;
   text-align: center;
@@ -384,7 +389,7 @@ body.inverted {
 }
 /*SlickGrid */
 #myGrid {
-  width: 1000px; //100% !important;  /* vs jquery resizable */
+  width: 100% !important;  /* vs jquery resizable */
   height: 260px;
 }
 .slick-header-column {

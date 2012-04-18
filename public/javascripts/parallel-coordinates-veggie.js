@@ -1,6 +1,7 @@
 (function(d3) {
 
-  window.parallel = function(model, colors) {
+  //window.parallel = function(model, colors) {
+  window.parallel = function(model, columns) {
     var self = {},
         dimensions,
         dragging = {},
@@ -38,7 +39,7 @@
 
       // Extract the list of dimensions and create a scale for each.
       x.domain(dimensions = d3.keys(cars[0]).filter(function(d) {
-        return d != "name" && d != "group" && d != "id" &&
+        return d != "name" && d != "group" && d != "id" && d != "Timestamp" &&
                d != "Eqid" && d != "Src" && d != "Datetime" && d != "Region" &&   // Earthquake csv
                (y[d] = d3.scale.linear()
             .domain(d3.extent(cars, function(p) { return +p[d]; }))
