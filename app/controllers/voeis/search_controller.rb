@@ -126,6 +126,9 @@ class Voeis::SearchController < Voeis::BaseController
       # @variables  = data.variables(:unique=>true)
 
      end
+    
+     respond_to do |format|
+
      format.json do
        render :json => data.sql_to_json, :callback => params[:jsoncallback]
      end
