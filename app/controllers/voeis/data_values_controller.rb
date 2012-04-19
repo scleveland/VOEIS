@@ -116,7 +116,7 @@ class Voeis::DataValuesController < Voeis::BaseController
   end
   
   def versions
-    #@tabId = params[:tab_id]
+    @tabId = params[:tab_id]
     @project = parent
     @data_value = @project.managed_repository{Voeis::DataValue.get(params[:id].to_i)}
     
