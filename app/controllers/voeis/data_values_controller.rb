@@ -1,7 +1,7 @@
 require 'responders/rql'
 
 class Voeis::DataValuesController < Voeis::BaseController
-  #layout :choose_layout
+  layout :choose_layout, :only=>[:show]
   # Properly override defaults to ensure proper controller behavior
   # @see Voeis::BaseController
   responders :rql
