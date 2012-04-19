@@ -267,7 +267,6 @@
                     %span Data Sets
                     %div{:dojoType=>"dijit.Menu", :id=>"datasetSubMenu"}
                       - if @project.managed_repository{Voeis::DataSet.all}.count > 0 
-
                         - @project.managed_repository{Voeis::DataSet.all}.each do |dataset|
                           = link_to(dataset.name, project_data_set_path(@project, dataset), :dojoType => "yogo.ui.MenuLink")
                       - else
