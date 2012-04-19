@@ -702,6 +702,67 @@
                                           :user=>current_user,
                                           :root_url=>root_url
 
+-if !current_user.nil? && current_user.projects.include?(@project)
+  -#= render(:partial => "data_set", :locals =>{:project_uid=>@project.id})
+  -#%h3{:style=>"margin-top:0px;"} Create a new Data Set:
+  #new_data_set{:dojoType=>"dijit.Dialog", :title=>"Create New Data Set", :jsId=>"new_data_set"}
+    = form_for :data_set, :html=>{:dojoType=>"dijit.form.Form", :id=>"data_set_form"} do |f|
+      %label Name:
+      =clear_break    
+      %input{:type=>"text", :name=>"name", :dojoType=>"dijit.form.ValidationTextBox", :size=>30,  :style=>"width:30em", :required=>"true", :invalidMessage=>"A DataSet Name is required."}
+      =clear_break      
+      =clear_break 
+      %label Description:
+      %br
+      -#=f.text_area :description, :cols=> 30, :rows => 3
+      %input{:type=>"text", :name=>"description", :size => 30, :style=>"width:30em",:dojoType=>"dijit.form.TextBox"}
+      =clear_break
+      =clear_break
+      %label Type:
+      %br
+      %input{:type=>"text", :name=>"type", :size => 30, :style=>"width:30em",:dojoType=>"dijit.form.TextBox"}
+      =clear_break
+      =clear_break 
+      %br
+      %button{:dojoType=>"dijit.form.Button", :title=>'Create'}
+        Create Data Set
+        %script{:type=>"dojo/method", :event=>"startup"}
+          :plain
+            new_data_set.upd_select_id = false;
+            new_data_set.setup = function(upd_select) {
+              new_data_set.upd_select_id = upd_select;
+              new_data_set.show();
+            };
+            var form = dijit.byId("data_set_form");
+            //### set initial state
+            this.attr("disabled", !form.isValid());
+            this.connect(form, "onValidStateChange", function(state){
+              this.attr("disabled", !state);
+            });
+            //### ON-SHOW
+            new_data_set.connect(new_data_set, "onShow", function(state){
+              form.reset();
+            });
+            //### ON-CLICK: SAVE
+            this.connect(this, "onClick", function(){
+              var els = dojo.byId("data_set_form").elements;
+              //var qstr = "name="+els.name.value+"&description="+els.description.value+"&type="+els.type.value+"&api_key=#{User.current.api_key}";
+              var vardata = {name: els.name.value, description: els.description.value, type: els.type.value};
+              $.post("#{project_path(@project)}/apivs/create_project_data_set.json?api_key=#{User.current.api_key}",
+                vardata,
+                function(data) {
+                  if(new_data_set.upd_select_id) {
+                    $('#'+new_data_set.upd_select_id).append($("<option></option>").attr("value",data['id']).text(els.name.value)); 
+                    $('#'+new_data_set.upd_select_id).val(data['id']);
+                  };
+                  //$('#data_set_select').append($("<option></option>").attr("value",data['id']).text(els.name.value)); 
+                  //$('#data_set_select').val(data['id']);
+                  dijit.byId("new_data_set").hide();
+              });
+            });
+      &nbsp;&nbsp;
+      %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"new_data_set.hide();return false;"} Cancel
+
 #edit_data_value_content{:style=>"display:none;width:540px;"}
   %form(id="data_value_edit_form" dojoType="dijit.form.Form" method="post" style="overflow:scroll;")
     -#%script{:type=>"dojo/method", :event=>"onValidStateChange", :args=>"state"}
@@ -1487,20 +1548,6 @@
       //##
     };
 
-    var openDataHistoryTab = function(tabs, projectId, dataId, dataVal, varId, varName, siteId) {
-      var tabTitle = 'History: Site-'+siteId+' / '+varName+' ('+dataVal+')';
-      var projHistHref = "/projects/#{@project.id}/data_values/versions?id="+dataId;
-      projHistHref += '&api_key=#{current_user.api_key}';
-      // "/projects/#{@project.id}/variables/versions?id="+varId+"&site_id="+siteId;
-      var projHistId = '#{@project.id}--datavalue'+dataId+'-history';
-      //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
-      //projectSitePath(this.projectId, this.siteId)
-      var projHistLoad = function(siteId,varName) {
-      };
-      openProjTab(tabs, projHistHref, projHistId, tabTitle, projHistLoad);
-      //##
-    };
-
     var openSearchTab = function(tabs, projectId) {
       var tabTitle = 'Data Search &ndash;';
       var tabId = '#{@project.id}-search';
@@ -1561,18 +1608,6 @@
       //##
     };
 
-    var openVarHistoryTab = function(tabs, projectId, varId, varName, siteId) {
-      var tabTitle = 'History: Site-'+siteId+': '+varName;
-      var projVarHistHref = "/projects/#{@project.id}/variables/versions?id="+varId+"&site_id="+siteId;
-      var projVarHistId = '#{@project.id}-site'+siteId+'-var'+varId+'-history';
-      //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
-      //projectSitePath(this.projectId, this.siteId)
-      var projVarHistLoad = function(siteId,varName) {
-      };
-      openProjTab(tabs, projVarHistHref, projVarHistId, tabTitle, projVarHistLoad);
-      //##
-    };
-
     var openSampTab = function(tabs, projectId, sampId, sampName) {
       //var varPane = new voeis.ui.VariablePane();
       var tabTitle = 'Site-'+siteId+': '+sampName;
@@ -1586,19 +1621,49 @@
       //##
     };
 
+    //##### SITE HISTORY TAB
     var openHistoryTab = function(tabs, projectId, siteId) {
       //var varPane = new voeis.ui.VariablePane();
+      var projTabTitle = 'History: Site-'+siteId;
       var projHistHref = "/projects/#{@project.id}/sites/versions?id="+siteId;
       var projHistId = '#{@project.id}-site'+siteId+'-history';
-      var projHistName = 'History: Site-'+siteId;
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
       var projHistLoad = function(siteId,varName) {
       };
-      openProjTab(tabs, projHistHref, projHistId, projHistName, projHistLoad);
+      openProjTab(tabs, projHistHref, projHistId, projTabTitle, projHistLoad);
       //##
     };
 
+    //##### DATA-VALUE HISTORY TAB
+    var openDataHistoryTab = function(tabs, projectId, dataId, dataVal, varId, varName, siteId) {
+      var tabTitle = 'History: Site-'+siteId+' / '+varName+' ('+dataVal+')';
+      var projHistHref = "/projects/#{@project.id}/data_values/versions?id="+dataId;
+      projHistHref += '&api_key=#{current_user.api_key}';
+      // "/projects/#{@project.id}/variables/versions?id="+varId+"&site_id="+siteId;
+      var projHistId = '#{@project.id}--datavalue'+dataId+'-history';
+      //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
+      //projectSitePath(this.projectId, this.siteId)
+      var projHistLoad = function(siteId,varName) {
+      };
+      openProjTab(tabs, projHistHref, projHistId, tabTitle, projHistLoad);
+      //##
+    };
+
+    //##### VARIABLE HISTORY TAB
+    var openVarHistoryTab = function(tabs, projectId, varId, varName, siteId) {
+      var tabTitle = 'History: Site-'+siteId+': '+varName;
+      var projVarHistHref = "/projects/#{@project.id}/variables/versions?id="+varId+"&site_id="+siteId;
+      var projVarHistId = '#{@project.id}-site'+siteId+'-var'+varId+'-history';
+      //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
+      //projectSitePath(this.projectId, this.siteId)
+      var projVarHistLoad = function(siteId,varName) {
+      };
+      openProjTab(tabs, projVarHistHref, projVarHistId, tabTitle, projVarHistLoad);
+      //##
+    };
+
+    //######### open project tab ##########
     var openProjTab = function(tabs, tabHref, tabId, tabTitle, tabLoad) {
       //###SCROLL TO TOP
       //window.scrollTo(0,0);
@@ -1621,9 +1686,11 @@
           onDownloadEnd: function(){
             console.log('tab-load-done-NOW!');
             if(window.tab_pre_dojo_parse) tab_pre_dojo_parse();
-            console.log('NOW parse dijits');
+            //console.log('NOW parse dijits');
             //dojo.parser.parse(this.domNode);
             console.log('TEST-'+TEST);
+            //$('#top').css('display','none');
+            //$('#bottom').css('display','none');
             if(window[tabId+"_tab_loaded"]) window[tabId+"_tab_loaded"] = true;
             if(tabLoad) tabLoad();
           },

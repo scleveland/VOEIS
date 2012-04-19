@@ -1863,7 +1863,7 @@ class Voeis::ApivsController < Voeis::BaseController
      parent.managed_repository do
        if params[:name]
          if Voeis::DataSet.first(:name => params[:name]).nil?
-           if params[:type].empty?
+           if params[:type].nil? || params[:type].empty?
              params[:type] = "default"
            end
            if params[:description].nil?

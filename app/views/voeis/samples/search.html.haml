@@ -444,18 +444,12 @@
     };
 
     var val_layout = [
-    //{
-    //   field: '_item',
-    //   name: '-',
-    //   formatter: val_grid_formatter.selectItem,
-    //   width: '24px'
-    //},
     {
        //field: 'local_date_time',
        field: '_item',
        name: 'Timestamp',
        formatter: val_grid_formatter.dataDateTime,
-       width: '185px'
+       width: '170px'
     },
     {
        field: 'data_value',
@@ -470,7 +464,7 @@
     {
        field: 'datatype',
        name: 'DataType',
-       width: '10%'
+       width: '80px'
     },
     //{
     //   field: 'vertical_offset',
@@ -482,30 +476,30 @@
        name: 'Vertical Offset',
        formatter: val_grid_formatter.vertical_offset,
     //   width: '15%'
-       width: 'auto'
+       width: '80px'
     },
     {
        field: 'quality_control_level',
-       name: 'QC Lvl',
-       width: '6%'
+       name: 'QC level',
+       width: '50px'
     },
     {
       field: '_item',
       name: 'Meta Tags',
       formatter: val_grid_formatter.meta_tag,
-      width: '5%'
+      width: '80px'
     },
     {
        field: 'published',
        name: 'Pub',
        formatter: val_grid_formatter.trueFalse,
-       width: '5%'
+       width: '40px'
     },
     {
        field: '_item',
        name: 'DO',
        formatter: val_grid_formatter.controls,
-       width: '10%'
+       width: '80px'
     }
     ];
     if(!edit_auth) val_layout.pop();
@@ -984,7 +978,7 @@
          if(this.value!='NEW') return;
          //OPEN DIALOG
          $("##{@tabId}_data_set_select").val('-');
-         dijit.byNode($('##{@tabId}_new_data_set')[0]).show();
+         new_data_set.setup("#{@tabId}_data_set_select");
          
        });
 
@@ -1000,10 +994,7 @@
 
      });
 
-#data_value_show{:dojoType=>"dijit.Dialog", :title=>"Data Value", :href=>"", :style=>"overflow:auto; width: 500px; height: 400px;"}
-
--if !current_user.nil? && current_user.projects.include?(@project)
-  = render(:partial => "data_set", :locals =>{:project_uid=>@project.id, :tab_id=>@tabId})
+-#data_value_show{:dojoType=>"dijit.Dialog", :title=>"Data Value", :href=>"", :style=>"overflow:auto; width: 500px; height: 400px;"}
 
 
 :javascript

@@ -1,5 +1,3 @@
-require 'responders/rql'
-
 class Voeis::QualityControlLevelsController  < Voeis::BaseController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
   responders :rql
@@ -192,7 +190,8 @@ class Voeis::QualityControlLevelsController  < Voeis::BaseController
       {:label=>"Definition", :name=>"definition"},
       {:label=>"Explanation", :name=>"explanation"}
       ]
-    render 'spatial_references/versions.html.haml'
+    #render 'spatial_references/versions.html.haml'
+    render 'voeis/cv_versions.html.haml'
   end
 
   def invalid_page

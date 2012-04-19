@@ -550,7 +550,6 @@
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   = link_to('COPY GLOBAL', 'javascript:', :class=>'icon icon-copy', :onclick=>"#{@tabId}_copy_dialog_box.show();")
 %br
-%br
 
 -#%div{:id=>"version_store_site#{@site.id}", :dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pversions_site#{@site.id}", :data=>"pversions_json_site#{@site.id}", :style=>"height:0;margin:0;padding:0;"}
 
@@ -568,7 +567,7 @@
     %em NO #{@cv_title.upcase}S EXIST!
 
 %div{:id=>"#{@tabId}_cv_management", :dojoType=>"dijit.layout.ContentPane", :title=>"#{@cv_title}", 
-  :jsId=>"#{@tabId}_cv_management", :style=>"width:860px;height:340px; display:#{@cv_data.empty? ? 'none' : 'block'}"}
+  :jsId=>"#{@tabId}_cv_management", :style=>"width:860px;height:350px;margin-top:10px;display:#{@cv_data.empty? ? 'none' : 'block'}"}
   -#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=>"{filter:true}",  :store=>"cv_store", :selected=>true, 
   -#    :style=>"width:90%;margin:0;padding:2px;", :jsId=>"cv_management_grid", :id=>"cv_management_grid"}
   -#  :style=>"width:90%;margin:0;", :rowSelector=>"20px", :jsId=>"VersionDisplayGrid", :id=>"VersionDisplayGrid"}
@@ -607,7 +606,7 @@
       -#- @cv_columns.each do |col|
       -#  %th{:field=>"#{col[:field]}", :filterable=>true, :width=>"#{col[:width]}", :style=>"#{col[:style]}"} #{col[:label]}
 
-%br{:style=>'float:none; clear:both;'}
+-#%br{:style=>'float:none; clear:both;'}
 
 
 :javascript

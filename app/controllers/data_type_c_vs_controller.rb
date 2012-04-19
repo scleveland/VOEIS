@@ -122,7 +122,30 @@ class DataTypeCVsController < ApplicationController
                   {:field=>"definition", :type=>"1B-STA", :required=>"false", :style=>""}]
     render 'voeis/cv_index.html.haml'
   end
-  
+
+  ### GLOBAL: DataType HISTORY!
+  def versions
+    @global = true
+    @cv_item = Voeis::DataTypeCV.get(params[:id])
+    @cv_versions = @cv_item.versions.to_a
+    @cv_title = 'Data Type'
+    @cv_title2 = 'data_type'
+    @cv_term = 'term'
+    @cv_name = 'term'
+    @cv_id = 'id'
+
+    @cv_refs = []
+
+    @cv_properties = [
+      #{:label=>"Version", :name=>"version"},
+      #{:label=>"ID", :name=>"id"},
+      {:label=>"Term", :name=>"term"},
+      {:label=>"Definition", :name=>"definition"}
+    ]
+    #render 'spatial_references/versions.html.haml'
+    render 'voeis/cv_versions.html.haml'
+  end
+
   def invalid_page
     redirect_to(:back)
   end
