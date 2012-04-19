@@ -30,7 +30,7 @@
 =clear_break
 =clear_break
 %strong Select Variables:
-#varGrid{:style=>"width:900px;height:300px;"}
+#varGrid{:style=>"width:900px;height:220px;"}
 =clear_break
 =clear_break
 %p
@@ -67,7 +67,6 @@
 
 #query_string
 :javascript
-  var counter = 0;
   function updateVariables(){
     site_var_array = siteDataGrid.selection.getSelected();
     site_ids = [];
@@ -108,8 +107,8 @@
   function doSearch(){
     BuildQuery();
     //window.location=$("#query_string").html();
-    window.open($("#query_string").html(), "Search Results "+counter.toString(),'',false);
-    counter = counter +1;
+    window.open($("#query_string").html(), "Search Results "+projectSearchCount.toString(),'',false);
+    projectSearchCount = projectSearchCount +1;
     //dojo.publish('voeis/project/search/results', [$("#query_string").html()])
   }
   function doSearch2(){
