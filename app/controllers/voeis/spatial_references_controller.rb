@@ -1,5 +1,3 @@
-require 'responders/rql'
-
 class Voeis::SpatialReferencesController < Voeis::BaseController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
@@ -252,7 +250,8 @@ class Voeis::SpatialReferencesController < Voeis::BaseController
         {:label=>"Notes", :name=>"notes"}
         ]
     #}
-    render 'spatial_references/versions.html.haml'
+    #render 'spatial_references/versions.html.haml'
+    render 'voeis/cv_versions.html.haml'
   end
 
   def invalid_page

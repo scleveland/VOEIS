@@ -1,5 +1,3 @@
-require 'responders/rql'
-
 class Voeis::ValueTypeCVsController < Voeis::BaseController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
@@ -171,7 +169,8 @@ class Voeis::ValueTypeCVsController < Voeis::BaseController
       {:label=>"Term", :name=>"term"},
       {:label=>"Definition", :name=>"definition"}
     ]
-    render 'spatial_references/versions.html.haml'
+    #render 'spatial_references/versions.html.haml'
+    render 'voeis/cv_versions.html.haml'
   end
 
   def invalid_page

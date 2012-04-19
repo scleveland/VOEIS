@@ -1,5 +1,3 @@
-require 'responders/rql'
-
 class SpatialReferencesController < InheritedResources::Base
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
@@ -179,6 +177,7 @@ class SpatialReferencesController < InheritedResources::Base
                   {:field=>"notes", :label=>"Notes", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
                   {:field=>"updated_at", :label=>"Updated", :width=>"15%", :filterable=>true, :formatter=>"dateTime", :style=>""}]
     
+    render 'voeis/cv_versions.html.haml'
   end
 
   def invalid_page

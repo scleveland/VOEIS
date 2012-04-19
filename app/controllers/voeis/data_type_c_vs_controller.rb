@@ -1,5 +1,3 @@
-require 'responders/rql'
-
 class Voeis::DataTypeCVsController < Voeis::BaseController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
@@ -139,6 +137,32 @@ class Voeis::DataTypeCVsController < Voeis::BaseController
                   {:field=>"Definition", :type=>"2B-LL", :required=>"false", :style=>""},
                   {:field=>"definition", :type=>"1B-STA", :required=>"false", :style=>""}]
     render 'voeis/cv_index.html.haml'
+  end
+
+  ### LOCAL: DataType HISTORY!
+  def versions
+    @global = false
+    @project = parent
+    @cv_item = @project.managed_repository{Voeis::DataTypeCV.get(params[:id])}
+    #@cv_versions = @project.managed_repository{Voeis::VerticalDatumCV.get(params[:id]).versions}
+    #@cv_versions = @project.managed_repository{@cv_item.versions_array}
+    @cv_versions = @project.managed_repository.adapter.select('SELECT * FROM voeis_data_type_cv_versions WHERE id=%s ORDER BY updated_at DESC'%@cv_item.id)
+    @cv_title = 'Data Type'
+    @cv_title2 = 'data_type'
+    @cv_term = 'term'
+    @cv_name = 'term'
+    @cv_id = 'id'
+
+    @cv_refs = []
+
+    @cv_properties = [
+      #{:label=>"Version", :name=>"version"},
+      #{:label=>"ID", :name=>"id"},
+      {:label=>"Term", :name=>"term"},
+      {:label=>"Definition", :name=>"definition"}
+    ]
+    #render 'spatial_references/versions.html.haml'
+    render 'voeis/cv_versions.html.haml'
   end
   
   def invalid_page

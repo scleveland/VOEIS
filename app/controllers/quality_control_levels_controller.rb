@@ -1,5 +1,3 @@
-require 'responders/rql'
-
 class QualityControlLevelsController  < InheritedResources::Base
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
   responders :rql
@@ -156,7 +154,8 @@ class QualityControlLevelsController  < InheritedResources::Base
       {:label=>"Explanation", :name=>"explanation"}
       ]
 
-    render 'spatial_references/versions.html.haml'
+    #render 'spatial_references/versions.html.haml'
+    render 'voeis/cv_versions.html.haml'
   end
 
   def invalid_page

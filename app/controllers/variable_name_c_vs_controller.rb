@@ -1,5 +1,3 @@
-require 'responders/rql'
-
 class VariableNameCVsController < InheritedResources::Base
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
@@ -150,7 +148,8 @@ class VariableNameCVsController < InheritedResources::Base
       {:label=>"Definition", :name=>"definition"}
       ]
 
-    render 'spatial_references/versions.html.haml'
+    #render 'spatial_references/versions.html.haml'
+    render 'voeis/cv_versions.html.haml'
   end
 
   def invalid_page
