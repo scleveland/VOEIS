@@ -67,7 +67,7 @@
 
 #query_string
 :javascript
-  
+  var counter = 0;
   function updateVariables(){
     site_var_array = siteDataGrid.selection.getSelected();
     site_ids = [];
@@ -108,13 +108,14 @@
   function doSearch(){
     BuildQuery();
     //window.location=$("#query_string").html();
-    window.open($("#query_string").html(), "Search Results");
+    window.open($("#query_string").html(), "Search Results "+counter.toString(),'',false);
+    counter = counter +1;
     //dojo.publish('voeis/project/search/results', [$("#query_string").html()])
   }
   function doSearch2(){
     BuildQuery();
     //window.location=$("#query_string").html();
-    //window.open($("#query_string").html(), "Search Results");
+    //window.open($("#query_string").html(), "Search Results",'','false');
     dojo.publish('voeis/project/search/results', [$("#query_string").html()])
   }
   //formatter: 'val_grid_formatter.dateTime',
