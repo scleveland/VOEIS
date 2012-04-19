@@ -1,6 +1,6 @@
 -# DATA VALUE VERSIONS PANE
 
-- tabId = 'site'+@site.id.to_s+'_data'
+- tabId = @tabId
 - dataId = tabId+'_data'
 - projId = @project.nil? ? '' : @project.id.to_s
 
@@ -48,13 +48,14 @@
       window.location.reload();
     };
   };
-  //GRID CONTROL FUNCTIONS
+  
+  // DataValue ROLLBACK SAVE CALLBACK
   function dv_item_restore(item){
     console.log('DV ROLLBACK:',item);
     var id = item.id;
     var data = {};
     data = {data_value: item};
-    delete data.data_value.id;
+    //delete data.data_value.id;
     delete data.data_value.datetime_string;
     delete data.data_value.vertical_offset_range;
     delete data.data_value.published_string;
@@ -68,10 +69,21 @@
       data: data,
       dataType: 'json',
       success: function(dat){
+        //### Update Plot
+        var item0 = datastore.get(id,#{dataId}.val_store);
+        var dateval = new Date(item.date_time_utc.toString());
+        dateval = parseInt(dateval/1000)*1000;
+        #{dataId}.data[item0._0] = [dateval,item.data_value]
+        var data_upd = #{dataId}.plot.getData();
+        #{dataId}.plot.setData(data_upd);
+        #{dataId}.plot.draw();
+        #{dataId}.plot.unhighlight();
+        var val_selected = #{dataId}.val_grid.selection.getSelected();
+        plotutils.highlightItems(val_selected,0,#{dataId}.plot);
+        //### Update Grid
         datastore.update(item,#{dataId}.val_store);
-        //### Refresh
         #{dataId}.val_grid.update();
-        //#{dataId}.plot.update();
+        dojo.publish('voeis/project/data/history/update',[item.id,#{@site.id}]);
       }
     });
   };
