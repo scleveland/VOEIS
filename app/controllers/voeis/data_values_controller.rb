@@ -195,6 +195,72 @@ class Voeis::DataValuesController < Voeis::BaseController
     ###
   end
   
+  ### UPDATE ALL SELECTED DataValues from QUERY-RESULT (search) via Rscript
+  # @params['data_vals'] = array of DataValue IDs
+  # @params['script'] = string - R-script to execute on DataValue's
+  def update_script
+    #require 'rserve/simpler/R'
+    R = Rserve::Simpler.new
+    data_vals = params['data_vals']
+    rscript0 = params['script']
+    dv_fields = ['data_value',
+                  'string_value',
+                  'utc_offset',
+                  'datatype',
+                  'replicate',
+                  'value_accuracy',
+                  'quality_control_level',
+                  'vertical_offset',
+                  'end_vertical_offset',
+                  'published',
+                  'variable_id']
+    dv_fields_omit = []
+    #CLEAN RSCRIPT!
+    #HERE! - remove 'System' calls - etc
+    rscript = ""
+    rscript0.split(/\r\n|\n|\r/).each{|ln|
+      rscript += ln+"\n" unless (ln=~/system/i)!=nil
+    }
+    data_vals.each{ |dvid|
+      #LOAD DV FIELDS
+      data_value = parent.managed_repository{Voeis::DataValue.get(dvid.to_i)}
+      vars = {}
+      dv_fields.each{|fld| vars[fld] = data_value[fld] }
+      vars['date'] = data_value.local_date_time.date.xxx
+      vars['time'] = data_value.local_date_time.time.xxx
+      varsx = {id: data_value.id,
+              data_value: data_value.data_value,
+              string_value: data_value.string_value,
+              #date: data_value.local_date_time.date.xxx,
+              #time: data_value.local_date_time.time.xxx,
+              data_type: data_value.datatype,
+              replicate: data_value.replicate,
+              value_accuracy: data_value.value_accuracy,
+              quality_control_level: data_value.quality_control_level.xxx,
+              vertical_offset: data_value.vertical_offset,
+              end_vertical_offset: data_value.end_vertical_offset,
+              published: data_value.published,
+              variable_id: data_value.variable_id}
+      #EXECUTE SCRIPT
+      try { R.command(vars){rscript} }
+      except(e) {
+        ###SYNTAX ERROR IN SCRIPT
+        
+      }
+      #SAVE DV FIELDS
+      dv_fields.reject{|fld| dv_fields_omit.include?(fld) }.each{|fld| data_value[fld] = R>>fld }
+      #data_value.local_date_time = R>>'date'
+      #data_value.local_date_time = R>>'time'
+      #data_value.local_date_time = R>>'time'
+      
+      #data_value.local_date_time = R>>'date'
+      #data_value.local_date_time = R>>'time'
+      #data_value.date_time_utc = R>>'data_value'
+      
+    }
+    R.close
+  end
+  
   
   # Gather information necessary to store sample data
   #
