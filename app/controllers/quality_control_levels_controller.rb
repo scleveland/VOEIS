@@ -107,6 +107,7 @@ class QualityControlLevelsController  < InheritedResources::Base
     if User.current.nil? || User.current.system_role.name!='Administrator'
       flash[:notice] = 'You have inadequate permissions for this operation.'
       redirect_to :back
+      return
     end
     ### GLOBAL QUALITY CONTROL LEVEL
     @global = true

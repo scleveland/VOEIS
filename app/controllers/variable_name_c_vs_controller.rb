@@ -105,6 +105,7 @@ class VariableNameCVsController < InheritedResources::Base
     if User.current.nil? || User.current.system_role.name!='Administrator'
       flash[:notice] = 'You have inadequate permissions for this operation.'
       redirect_to(project_path(@project))
+      return
     end
     ### GLOBAL VARIABLE NAME
     @global = true

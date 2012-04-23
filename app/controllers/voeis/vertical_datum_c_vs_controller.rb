@@ -97,6 +97,7 @@ class Voeis::VerticalDatumCVsController < Voeis::BaseController
         !User.current.has_role?('Data Manager',@project)
       flash[:notice] = 'You have inadequate permissions for this operation.'
       redirect_to(project_path(@project))
+      return
     else
       @global = false
       @cv_data0 = @project.managed_repository{Voeis::VerticalDatumCV.all}

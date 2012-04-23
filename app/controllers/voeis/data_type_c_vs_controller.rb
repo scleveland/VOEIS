@@ -110,6 +110,7 @@ class Voeis::DataTypeCVsController < Voeis::BaseController
     if User.current.nil? || User.current.system_role.name!='Administrator'
       flash[:notice] = 'You have inadequate permissions for this operation.'
       redirect_to(project_path(@project))
+      return
     end
     ### LOCAL DataType
     @global = false

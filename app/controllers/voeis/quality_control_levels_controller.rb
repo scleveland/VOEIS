@@ -132,6 +132,7 @@ class Voeis::QualityControlLevelsController  < Voeis::BaseController
     if User.current.nil? || User.current.system_role.name!='Administrator'
       flash[:notice] = 'You have inadequate permissions for this operation.'
       redirect_to(project_path(@project))
+      return
     end
     ### LOCAL: QUALITY CONTROL LEVEL
     @global = true
