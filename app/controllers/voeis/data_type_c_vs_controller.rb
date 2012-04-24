@@ -107,7 +107,10 @@ class Voeis::DataTypeCVsController < Voeis::BaseController
   ### LOCAL: GET /data_type_c_vs
   def index
     @project = parent
-    if User.current.nil? || User.current.system_role.name!='Administrator'
+    if User.current.nil? || 
+        !@project.users.include?(User.current) ||
+        (!User.current.has_role?('Principal Investigator',@project) &&
+        !User.current.has_role?('Data Manager',@project))
       flash[:notice] = 'You have inadequate permissions for this operation.'
       redirect_to(project_path(@project))
       return
