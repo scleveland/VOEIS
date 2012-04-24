@@ -473,7 +473,6 @@
           console.log('ITEM-utc-d0:',d0.format('UTC:m/d/yyyy HH:MM:ss')+' UTC');
           var data_val = item.data_value.toString();
           console.log('data_value:',data_val);
-          //dijit.byId('DV_data_value').set('value', item['data_value'].toString());
           dijit.byId('DV_data_value').set('value', data_val);
           //dijit.byId('DV_data_type').set('value', item['datatype'].toString());
           $('#DV_data_type_sel').val(item['datatype'].toString());
@@ -787,8 +786,8 @@
         %td
           %label Data Value
           %br
-          %input(name="data_value" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########.########'}" id="DV_data_value" 
-              style="width:200px;" required="true")
+          %input(name="data_value" dojoType="dijit.form.NumberTextBox" constraints="{places:'8,8', pattern:'########.########'}" 
+              id="DV_data_value" style="width:200px;" required="true")
             %span{:class=>'label'}
         %td
           %label Data Type
@@ -807,8 +806,8 @@
         %td
           %label Value Accuracy
           %br
-          %input(name="value_accuracy" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'######.######'}" id="DV_value_accuracy" 
-              style="width:200px;" required="false")
+          %input(name="value_accuracy" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########.######'}" 
+              id="DV_value_accuracy" style="width:200px;" required="false")
       %tr
         %td{:colspan=>"2"}
           #dv_local_date{:style=>"float:left;margin-right:8px;"}
@@ -835,13 +834,13 @@
         %td
           %label Vertical Offset
           %br
-          %input(name="vertical_offset" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########.######'}" id="DV_vertical_offset" 
-              style="width:200px;" required="false")
+          %input(name="vertical_offset" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########.######'}" 
+              id="DV_vertical_offset" style="width:200px;" required="false")
         %td
           %label End Vertical Offset
           %br
-          %input(name="end_vertical_offset" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########.######'}" id="DV_end_vertical_offset" 
-              style="width:200px;" required="false")
+          %input(name="end_vertical_offset" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########.######'}" 
+              id="DV_end_vertical_offset" style="width:200px;" required="false")
       %tr
         %td
           %label Replicate
@@ -1343,6 +1342,7 @@
       &nbsp;&nbsp;
       %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"var_new_field_method.hide();return false;"} Cancel
 
+-##############MAIN PAGE STUFF#####
 
 #content-title{:style=>"margin:0;padding:0;"} 
   %a{:href=>"javascript:", :onclick=>"dijit.byId('overview_dialog').show();return false;", 
