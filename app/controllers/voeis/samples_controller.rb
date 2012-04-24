@@ -246,7 +246,7 @@ class Voeis::SamplesController < Voeis::BaseController
       end
       @meta_tag_hash=Hash.new
       @data_structs.each do |data_val|
-        @graph_data << Array[data_val.date_time_utc.to_datetime.to_i*1000, data_val.data_value]
+        @graph_data << Array[data_val.local_date_time.to_datetime.to_i*1000, data_val.data_value]
         #@meta_tag_hash[data_val.id] = @meta_tags.map{|m| m.data_value_id == data_val.id}.to_a
       end
       respond_to do |format|

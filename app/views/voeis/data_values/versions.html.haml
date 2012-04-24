@@ -71,7 +71,7 @@
       success: function(dat){
         //### Update Plot
         var item0 = datastore.get(id,#{dataId}.val_store);
-        var dateval = new Date(item.date_time_utc.toString());
+        var dateval = new Date(item.local_date_time.toString());
         dateval = parseInt(dateval/1000)*1000;
         #{dataId}.data[item0._0] = [dateval,item.data_value]
         var data_upd = #{dataId}.plot.getData();

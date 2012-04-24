@@ -581,7 +581,7 @@
            //### Update Graph
            //data['selected'] = item.selected;
            //### Update Plot
-           var dateval = new Date(data.date_time_utc.toString());
+           var dateval = new Date(data.local_date_time.toString());
            dateval = parseInt(dateval/1000)*1000;
            #{dataId}.data[item._0] = [dateval,data.data_value]
            var data_upd = #{dataId}.plot.getData();
