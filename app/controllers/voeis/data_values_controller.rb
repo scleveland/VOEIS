@@ -200,7 +200,7 @@ class Voeis::DataValuesController < Voeis::BaseController
   # @params['script'] = string - R-script to execute on DataValue's
   def update_script
     #require 'rserve/simpler/R'
-    R = Rserve::Simpler.new
+    rr = Rserve::Simpler.new
     data_vals = params['data_vals']
     rscript0 = params['script']
     dv_fields = ['data_value',
@@ -214,7 +214,7 @@ class Voeis::DataValuesController < Voeis::BaseController
                   'end_vertical_offset',
                   'published',
                   'variable_id']
-    dv_fields_omit = []
+    dv_fields_omit_update = []
     #CLEAN RSCRIPT!
     #HERE! - remove 'System' calls - etc
     rscript = ""
@@ -226,8 +226,10 @@ class Voeis::DataValuesController < Voeis::BaseController
       data_value = parent.managed_repository{Voeis::DataValue.get(dvid.to_i)}
       vars = {}
       dv_fields.each{|fld| vars[fld] = data_value[fld] }
-      vars['date'] = data_value.local_date_time.date.xxx
-      vars['time'] = data_value.local_date_time.time.xxx
+      vars['date_string'] = data_value.local_date_time.iso8601.sub('T',' ').slice(0,19)
+      #vars['date_string_utc'] = data_value.date_time_utc.iso8601.sub('T',' ').slice(0,19)
+      todatetime = "datetime <- as.POSIXct(date_string)\n"
+      #todatetime += "datetime_utc <- as.POSIXct(date_string_utc)\n"
       varsx = {id: data_value.id,
               data_value: data_value.data_value,
               string_value: data_value.string_value,
@@ -242,20 +244,16 @@ class Voeis::DataValuesController < Voeis::BaseController
               published: data_value.published,
               variable_id: data_value.variable_id}
       #EXECUTE SCRIPT
-      try { R.command(vars){rscript} }
+      try { rr.command(vars){todatetime+rscript} }
       except(e) {
         ###SYNTAX ERROR IN SCRIPT
         
       }
       #SAVE DV FIELDS
-      dv_fields.reject{|fld| dv_fields_omit.include?(fld) }.each{|fld| data_value[fld] = R>>fld }
-      #data_value.local_date_time = R>>'date'
-      #data_value.local_date_time = R>>'time'
-      #data_value.local_date_time = R>>'time'
-      
-      #data_value.local_date_time = R>>'date'
-      #data_value.local_date_time = R>>'time'
-      #data_value.date_time_utc = R>>'data_value'
+      dv_fields.reject{|fld| dv_fields_omit_update.include?(fld) }.each{|fld| data_value[fld] = R>>fld }
+      data_value.local_date_time = DateTime.parse(rr>>'format(datetime,"%Y-%m-%d %H:%M:%S")')
+      #data_value.date_time_utc = DateTime.parse(rr>>'format(datetime_utc,"%Y-%m-%d %H:%M:%S")')
+      data_value.date_time_utc = data_value.local_date_time-data_value.utc_offset.hours
       
     }
     R.close
