@@ -195,7 +195,7 @@ Yogo::Application.routes.draw do
         collection do
           get :versions
           get :pre_process
-          post :update_script
+          post :query_script_update
           post  :pre_process_samples_file
           get  :pre_process_samples_file_upload
           post :store_samples_and_data_from_file

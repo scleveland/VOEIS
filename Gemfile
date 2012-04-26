@@ -53,7 +53,7 @@ gem 'aaronh-chronic',  :git =>"git://github.com/scleveland/chronic.git"
 gem 'rql', ">= 0.0.1",        :git => "git://github.com/yogo/rql-ruby.git"
 
 # Rserve client -for 'R' interface
-gem 'rserve-simpler'
+gem 'rserve-simpler',         :require => 'rserve/simpler'
 
 platforms(:ruby_19) {
   gem "therubyracer", :require => "v8"

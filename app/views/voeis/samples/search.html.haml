@@ -55,6 +55,8 @@
     
     #gridContainer img { margin:0; }
     #gridContainer a { margin:0; }
+    
+    ##{@tabId}_query_script .dijitButton .dijitButtonNode { width:70px!important; }
 
   
   = javascript_include_tag(:defaults, "jquery.flot.min.js", "jquery.flot.selection.min.js","jquery.flot.navigate.min.js")
@@ -135,8 +137,7 @@
       var data_del_url = '';
   
   
-  %div{:id=>"#{@tabId}_search_results"}
-  
+  %div{:id=>"#{@tabId}_query_results"}
     -form_tag(:controller=>'samples', :action=>'export') do 
       
       %strong
@@ -158,6 +159,11 @@
     
       -#if !@row_array.empty?
       -if !@data_structs.empty?
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
+        -#= link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.pop_query_script();return false;") 
+        = link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('##{@tabId}_query_results').hide();$('##{@tabId}_query_script').show();return false;")
+        
         -#=hidden_field_tag('column_array', @column_array.to_json)
         -#=hidden_field_tag('row_array', @row_array.to_json)
         -#=hidden_field_tag('site_name', @site_name)
@@ -175,7 +181,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         -#=submit_tag("Export Results")
         = link_to('EXPORT RESULTS', 'javascript:', :class=>'icon icon-proj', 
-              :onclick=>"$('##{@tabId}_search_results form')[0].submit();return false;") 
+              :onclick=>"$('##{@tabId}_query_results form')[0].submit();return false;") 
     
     =clear_break
     -#simplechart{:style=>"width: 250px; height: 150px;"}
@@ -215,6 +221,117 @@
       -# 33e 3A7594 3889AA
       -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
   
+  -if !@data_structs.empty?
+    %div{:id=>"#{@tabId}_query_script", :style=>"display:none;"}
+      %form(id="#{@tabId}_query_script_form" dojoType="dijit.form.Form" method="post" style="overflow:scroll;")
+      
+        %strong
+          QUERY SCRIPT: &nbsp;
+        
+        ON
+        - opts00 = "<option value='SEL'>Selected Data</option>\n<option value='ALL'>ALL Data (#{@graph_data.length} Points)</option>\n"
+        = select_tag("#{@tabId}_query_script_select", (opts00+@data_set_options).html_safe)
+        
+        &nbsp;&nbsp;&nbsp;
+        %input(name="dryrun" dojoType="dijit.form.CheckBox" id="#{@tabId}_query_script_dryrun" checked)
+        DRYRUN
+        
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        = link_to('QUERY RESULTS', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('##{@tabId}_query_script').hide();$('##{@tabId}_query_results').show();return false;")
+        
+        %br
+        %br
+        %em
+          ENTER R-SCRIPT HERE
+        %br
+        %input(name="script" dojoType="dijit.form.SimpleTextarea" id="#{@tabId}_query_script_text" rows="20" 
+              style="width:600px!important;line-height:16px!important;float:left;" required="true")
+        
+        - dv_fields = ['data_value',
+                        'string_value',
+                        'date_time',
+                        'utc_offset',
+                        'datatype',
+                        'replicate',
+                        'value_accuracy',
+                        'quality_control_level',
+                        'vertical_offset',
+                        'end_vertical_offset',
+                        'published',
+                        'variable_id'].join("\n")
+        %p(style="width:150px;margin-left:10px;float:left;")
+          %strong
+            FIELDS:
+          %br
+          = dv_fields
+          %br
+          %br
+          %br
+          %button{:dojoType=>"dijit.form.Button", :title=>"Clear", :onclick=>"$('##{@tabId}_query_script_text').val('');"}
+            CLEAR
+          %br
+          %br
+          %button{:dojoType=>"dijit.form.Button", :title=>"Execute"}
+            EXECUTE!
+            %script{:type=>"dojo/method", :event=>"startup"}
+              :plain
+                var form = dijit.byId("#{@tabId}_query_script_form");
+                //### set initial state
+                this.attr("disabled", !form.isValid());
+                this.connect(form, "onValidStateChange", function(state){
+                  this.attr("disabled", !state);
+                });
+                //### ON-CLICK: SAVE
+                this.connect(this, "onClick", function(){
+                  dijit.byId('loading_dialog').show();
+                  var data_vals = [];
+                  var formdata = {
+                    script: dijit.byId('#{@tabId}_query_script_text').get('value'), 
+                    dryrun: dijit.byId('#{@tabId}_query_script_dryrun').get('checked').toString()};
+                  var datasource = $('##{@tabId}_query_script_select').val();
+                  if(datasource=='SEL') {
+                    var valdata = #{dataId}.val_grid.selection.getSelected();
+                    for(var i=0; i<valdata.length; i++) 
+                      data_vals.push(valdata[i].id[0]);
+                    formdata['data_vals'] = data_vals;
+                  } else if(datasource=='ALL') {
+                    var valdata = #{dataId}.value_data;
+                    for(var i=0; i<valdata.length; i++) 
+                      data_vals.push(valdata[i].id[0]);
+                    formdata['data_vals'] = data_vals;
+                  } else {
+                    formdata['data_set'] = datasource;
+                  };
+                
+                  $.post("#{project_path(@project)}/data_values/query_script_update?api_key=#{User.current.api_key}",
+                    formdata,
+                    function(data) {
+                      //QUERY SCRIPT RESULTS
+                      console.log('SCRIPT RESULTS:',data);
+                      //UPDATE GRID/PLOT
+                      if(formdata.dryrun=='false') {
+                        for(var i=0; i<data.length; i++) {
+                          datastore.update(data[i],#{dataId}.val_store);
+                          if(data[i].hasOwnProperty('data_value')) {
+                            var item = datastore.get(data[i].id,#{dataId}.val_store);
+                            var dateval = new Date(item.local_date_time.toString());
+                            dateval = parseInt(dateval/1000)*1000;
+                            #{dataId}.data[item._0] = [dateval,item.data_value]
+                          };
+                        };
+                        var data_upd = #{dataId}.plot.getData();
+                        #{dataId}.plot.setData(data_upd);
+                        #{dataId}.plot.draw();
+                        #{dataId}.plot.unhighlight();
+                        var val_selected = #{dataId}.val_grid.selection.getSelected();
+                        plotutils.highlightItems(val_selected,0,#{dataId}.plot);
+                        #{dataId}.val_grid.update();
+                      };
+                      dijit.byId('loading_dialog').hide();
+                  });
+                });
+    
     
   :javascript
     dojo.require("dijit.dijit");
@@ -296,6 +413,17 @@
         val_plot.unhighlight();
         plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
       };
+    };
+    
+    //*** OPEN QUERY-SCRIPT TAB
+    #{dataId}.pop_query_script = function() {
+      var search_count = '#{@tabId}'.slice(-3);
+      var tab_url = '#{project_path(@project)}/query_script?tab_id=#{@tabId}';
+      var tab_id = 'site#{@site.id}_dataquery_script_'+search_count;
+      var tab_title = 'Query Script: Site-#{@site.id} ['+search_count+']';
+      //window.open(hist_url, hist_title, 'width=950,height=550'); return;
+      var tab_callback = function(){  };
+      dojo.publish('voeis/project/openTab',[tab_url,tab_id,tab_title,tab_callback]);
     };
     
     //var chart1 = new dojox.charting.Chart2D("simplechart");
@@ -606,7 +734,7 @@
     // append the new grid to the div " ":
     //dojo.byId("gridContainer").appendChild(val_grid.domNode);
     
-    $('##{@tabId}_search_results #gridContainer').append(#{dataId}.val_grid.domNode);
+    $('##{@tabId}_query_results #gridContainer').append(#{dataId}.val_grid.domNode);
 
     // Call startup, in order to render the grid:
     #{dataId}.val_grid.startup();
@@ -623,7 +751,7 @@
     //    $("#tooltip").remove();
     //});    
     
-    #{dataId}.plot = $.plot($("##{@tabId}_search_results #plotContainer"), [#{dataId}.data],{
+    #{dataId}.plot = $.plot($("##{@tabId}_query_results #plotContainer"), [#{dataId}.data],{
            series: {
                color : "blue",
                lines: { show: true },
@@ -640,14 +768,14 @@
     });
 
     // ADD ZOOM in/out button 
-    $('<div class="gridbutton" title="ZOOM-IN" style="right:20px;top:20px;">+</div>').appendTo($("##{@tabId}_search_results #plotContainer")).click(function (e) {
+    $('<div class="gridbutton" title="ZOOM-IN" style="right:20px;top:20px;">+</div>').appendTo($("##{@tabId}_query_results #plotContainer")).click(function (e) {
        e.preventDefault();
        var sel = #{dataId}.val_grid.selection.getSelected();
        #{dataId}.plot.unhighlight();
        plotutils.highlightItems(sel,0,#{dataId}.plot);
        #{dataId}.plot.zoom();
     });
-    $('<div class="gridbutton" title="ZOOM-OUT" style="right:20px;top:44px;">-</div>').appendTo($("##{@tabId}_search_results #plotContainer")).click(function (e) {
+    $('<div class="gridbutton" title="ZOOM-OUT" style="right:20px;top:44px;">-</div>').appendTo($("##{@tabId}_query_results #plotContainer")).click(function (e) {
        e.preventDefault();
        var sel = #{dataId}.val_grid.selection.getSelected();
        #{dataId}.plot.unhighlight();
@@ -655,7 +783,7 @@
        #{dataId}.plot.zoomOut();
     });
     // CLEAR SELECTION
-    $('<div class="gridbutton" title="CLEAR SELECTION" style="right:20px;bottom:40px;background-color:red;">x</div>').appendTo($("##{@tabId}_search_results #plotContainer")).click(function (e) {
+    $('<div class="gridbutton" title="CLEAR SELECTION" style="right:20px;bottom:40px;background-color:red;">x</div>').appendTo($("##{@tabId}_query_results #plotContainer")).click(function (e) {
        #{dataId}.plot.unhighlight();
        #{dataId}.val_grid.selection.deselectAll();
     });
@@ -685,7 +813,7 @@
      };
 
      //remove tooltip on mouseout
-     //$("##{@tabId}_search_results #placeholder").bind("onmouseout", function (event) {
+     //$("##{@tabId}_query_results #placeholder").bind("onmouseout", function (event) {
      //  $("#tooltip").remove();
      //};
 
@@ -742,7 +870,7 @@
        if(item) {
          var idx = item.dataIndex;
          var val_item = #{dataId}.value_data[idx];
-         //var val_grid = dijit.byNode($('##{@tabId}_search_results #gridContainer div')[0]);
+         //var val_grid = dijit.byNode($('##{@tabId}_query_results #gridContainer div')[0]);
          var val_grid = #{dataId}.val_grid;
          var val_plot = #{dataId}.plot;
          var val_sel = val_grid.selection;
@@ -817,7 +945,7 @@
      });
      
      
-     $("##{@tabId}_search_results #plotContainer").bind("plothover", function (event, pos, item) {
+     $("##{@tabId}_query_results #plotContainer").bind("plothover", function (event, pos, item) {
        //
        //showPlotTooltip(event,pos,item);
        #{dataId}.plotHover = [event,pos,item];
@@ -891,7 +1019,7 @@
      
      
      // PLOTCLICK event to scroll to point on datagrid
-     $("##{@tabId}_search_results #plotContainer").bind("plotclick", function (event, pos, item) {
+     $("##{@tabId}_query_results #plotContainer").bind("plotclick", function (event, pos, item) {
          //
          #{dataId}.plotClick = [event,pos,item];
          //var e = #{dataId}.domClick;
@@ -901,7 +1029,7 @@
          if(item) {
            var idx = item.dataIndex;
            var val_item = #{dataId}.value_data[idx];
-           //var val_grid = dijit.byNode($('##{@tabId}_search_results #gridContainer div')[0]);
+           //var val_grid = dijit.byNode($('##{@tabId}_query_results #gridContainer div')[0]);
            var val_grid = #{dataId}.val_grid;
            var val_plot = #{dataId}.plot;
            //var store = #{dataId}.val_store;
@@ -964,7 +1092,7 @@
      //window.scrollTo(0,0);
      //$('html #main_container').animate({scrollTop:220}, 'slow');//IE, FF
      //$('body #main_container').animate({scrollTop:220}, 'slow');//chrome, safari
-     //$('##{@tabId}_search_results').animate({scrollTop:200}, 'slow');
+     //$('##{@tabId}_query_results').animate({scrollTop:200}, 'slow');
 
 
      //ON-TAB-LOAD!
