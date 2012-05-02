@@ -1,7 +1,6 @@
 require 'responders/rql'
 
 class Voeis::DataValuesController < Voeis::BaseController
-  layout :choose_layout, :only=>[:show]
   # Properly override defaults to ensure proper controller behavior
   # @see Voeis::BaseController
   responders :rql
@@ -29,6 +28,7 @@ class Voeis::DataValuesController < Voeis::BaseController
   def show
    @data_value=parent.managed_repository{Voeis::DataValue.get(params[:id].to_i)}
    @meta_tags = @data_value.meta_tags
+   render :layout=>'data_value'
   end
   
   # DELETE /data_values/$ID$
@@ -1802,12 +1802,5 @@ class Voeis::DataValuesController < Voeis::BaseController
       #return our Awesome new data_stream or template if you would be so kind
       data_template_hash = {:data_template_id => @data_stream.id}
    end
-  private
-  def choose_layout
-     if action_name == 'show'
-       return 'data_value'
-     else
-       return 'application'
-     end
-   end
+ 
 end
