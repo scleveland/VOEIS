@@ -106,9 +106,9 @@
     -if @auth && @site
       %span{:id=>"#{varId}_buttons"}
         = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('##{varId}_show').hide();$('##{varId}_edit').show();")
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{@site.id}]);")
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{@site.id}]);")
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     
     
     -#= link_to('DATA', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")

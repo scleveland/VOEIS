@@ -17,7 +17,7 @@ class Voeis::VariablesController < Voeis::BaseController
   def show
     @project = parent
     #@sites = Voeis::Site.all
-    @auth = !current_user.nil? && current_user.projects.include?(@project)
+    @auth = !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
     @var_id = params[:id].to_i
     @variable = Voeis::Variable.new
     @variable.id = 0
