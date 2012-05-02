@@ -202,78 +202,88 @@ class Voeis::DataValuesController < Voeis::BaseController
   # @params['script'] = string - R-script to execute on DataValues
   # @params['dryrun'] = don't save any DataValues if TRUE
   def query_script_update
-    rr = ::Rserve::Simpler.new
-    data_val_ids = params['data_vals']
-    dryrun = params['dryrun'].nil? || params['dryrun'] =~ /(false|f|no|0)/i || blank? ? false : true
-    if data_set = parent.managed_repository{ Voeis::DataSet.get(params[:data_set].to_i) }
-      #data_values = data_set.data_values.map{|dv| dv.id}
-      data_values = data_set.data_values
-    else
-      data_values = parent.managed_repository{ Voeis::DataValue.all(:id=>data_val_ids) }
-    end
-    rscript0 = params['script']
-    dv_fields = ['data_value',
-                  'string_value',
-                  'utc_offset',
-                  'datatype',
-                  'replicate',
-                  'value_accuracy',
-                  'quality_control_level',
-                  'vertical_offset',
-                  'end_vertical_offset',
-                  'published',
-                  'variable_id']
-    dv_fields_omit_update = []
-    updated = []
-    #CLEAN RSCRIPT!
-    #HERE! - remove 'System' calls - etc
-    rscript = ""
-    rscript0.split(/\r\n|\n|\r/).each{|ln|
-      rscript += ln+"\n" unless ln=~/system/i
-    }
-    data_values.each{ |data_value|
-      #LOAD DV FIELDS
-      dv = {:id=>data_value.id.to_i}
-      vars = {}
-      dv_fields.each{|fld| vars[fld] = data_value[fld] }
-      vars['date_string'] = data_value.local_date_time.iso8601.sub('T',' ').slice(0,19)
-      #vars['date_string_utc'] = data_value.date_time_utc.iso8601.sub('T',' ').slice(0,19)
-      todatetime = "date_time <- as.POSIXct(date_string)\n"
-      #todatetime += "datetime_utc <- as.POSIXct(date_string_utc)\n"
-      #EXECUTE SCRIPT
-      begin
-        rr.command(todatetime+rscript, vars)
-      rescue Exception => e
-        ###SYNTAX ERROR IN SCRIPT
-        
+    parent.managed_repository{
+      rr = ::Rserve::Simpler.new
+      data_val_ids = params['data_vals']
+      dryrun = params['dryrun'].nil? || params['dryrun'] =~ /(false|f|no|0)/i || blank? ? false : true
+      if data_set = Voeis::DataSet.get(params[:data_set].to_i)
+        #data_values = data_set.data_values.map{|dv| dv.id}
+        data_values = data_set.data_values
+      else
+        data_values = Voeis::DataValue.all(:id=>data_val_ids)
       end
-      #SAVE DV FIELDS
-      dv_fields.reject{|fld| dv_fields_omit_update.include?(fld) }.each{|fld| 
-        updfld = rr>>fld
-        if updfld!=data_value[fld]
-          data_value[fld] = updfld if !dryrun
-          dv[fld] = updfld
-        end
+      rscript0 = params['script']
+      dv_fields = ['data_value',
+                    'string_value',
+                    'utc_offset',
+                    'datatype',
+                    'replicate',
+                    'value_accuracy',
+                    'quality_control_level',
+                    'vertical_offset',
+                    'end_vertical_offset',
+                    'published',
+                    'variable_id']
+      dv_fields_omit_update = []
+      updated = []
+      #CLEAN RSCRIPT!
+      #HERE! - remove 'System' calls - etc
+      rscript = ""
+      rscript0.split(/\r\n|\n|\r/).each{|ln|
+        rscript += ln+"\n" unless ln=~/system/i
       }
-      date_time_str = rr>>'format(date_time,"%Y-%m-%d %H:%M:%S")'
-      date_time = DateTime.parse(date_time_str)
-      if date_time.to_s!=data_value.local_date_time.to_s
+      data_values.each{ |data_value|
+        #LOAD DV FIELDS
+        dv = {:id=>data_value.id.to_i}
+        provenance = []
+        vars = {}
+        dv_fields.each{|fld| vars[fld] = data_value[fld] }
+        vars['date_string'] = data_value.local_date_time.iso8601.sub('T',' ').slice(0,19)
+        #vars['date_string_utc'] = data_value.date_time_utc.iso8601.sub('T',' ').slice(0,19)
+        todatetime = "date_time <- as.POSIXct(date_string)\n"
+        #todatetime += "datetime_utc <- as.POSIXct(date_string_utc)\n"
+        #EXECUTE SCRIPT
+        begin
+          rr.command(todatetime+rscript, vars)
+        rescue Exception => e
+          ###SYNTAX ERROR IN SCRIPT
+        
+        end
+        #SAVE DV FIELDS
+        dv_fields.reject{|fld| dv_fields_omit_update.include?(fld) }.each{|fld| 
+          updfld = rr>>fld
+          if updfld!=data_value[fld]
+            if !dryrun
+              provenance << fld+'='+data_value[fld].to_s
+              data_value[fld] = updfld
+            end
+            dv[fld] = updfld
+          end
+        }
+        date_time_str = rr>>'format(date_time,"%Y-%m-%d %H:%M:%S")'
+        date_time = DateTime.parse(date_time_str)
+        debugger
+        if date_time.to_i!=data_value.local_date_time.to_i
+          if !dryrun
+            provenance << 'local_date_time='+data_value.local_date_time.to_s
+            data_value.local_date_time = date_time
+            #data_value.date_time_utc = DateTime.parse(rr>>'format(date_time_utc,"%Y-%m-%d %H:%M:%S")')
+            data_value.date_time_utc = date_time-data_value.utc_offset.hours
+          end
+          dv['local_date_time'] = date_time_str
+        end
+        #debugger
         if !dryrun
-          data_value.local_date_time = date_time
-          #data_value.date_time_utc = DateTime.parse(rr>>'format(date_time_utc,"%Y-%m-%d %H:%M:%S")')
-          data_value.date_time_utc = date_time-data_value.utc_offset.hours
+          data_value.provenance_comment = 'SCRIPTED FROM: '+provenance.join('; ')
+          if !data_value.save
+            dv['error'] = 'SAVE ERROR!'
+          end
         end
-        dv['local_date_time'] = date_time_str
-      end
-      if !dryrun
-        if !data_vlaue.save
-          dv['error'] = 'SAVE ERROR!'
-        end
-      end
-      updated << dv
+        updated << dv
+      }
+      rr.close
+      render :json=>updated.as_json, :callback=>params[:jsoncallback]
     }
-    rr.close
-    render :json=>updated.as_json, :callback=>params[:jsoncallback]
   end
   
   
