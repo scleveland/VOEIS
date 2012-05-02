@@ -701,6 +701,21 @@
                                           :user=>current_user,
                                           :root_url=>root_url
 
+#error_dialog{:dojoType=>"dijit.Dialog", :disableCloseButton=>true, :title=>"ERROR", :style=>"width:500px;", :jsId=>"error_dialog"}
+  %script{:type=>"dojo/method", :event=>"startup"}
+    :plain
+      error_dialog.pop = function(msg,dly){
+        var delay = dly || 3000;
+        $('#error_dialog .error_message').text(msg);
+        error_dialog.show();
+        setTimeout(function(){
+          error_dialog.hide();
+        },delay);
+      };
+  %div.error_message{:style=>"color:#8A1F11;text-align:center;font-weight:bold;"}
+    %strong{:style=>"color:#8A1F11;text-align:center;font-weight:bold;"}
+      Error message here...
+
 -if !current_user.nil? && current_user.projects.include?(@project)
   -#= render(:partial => "data_set", :locals =>{:project_uid=>@project.id})
   -#%h3{:style=>"margin-top:0px;"} Create a new Data Set:
@@ -1639,7 +1654,7 @@
     var openDataHistoryTab = function(tabs, projectId, dataId, dataVal, varId, varName, siteId, tabId) {
       var tabTitle = 'History: Site-'+siteId+' / '+varName+' ('+dataVal+')';
       var projHistHref = "/projects/#{@project.id}/data_values/versions?id="+dataId+"&tab_id="+tabId;
-      projHistHref += '&api_key=#{current_user.api_key}';
+      projHistHref += '#{current_user.nil? ? "" : "&api_key="+current_user.api_key}';
       // "/projects/#{@project.id}/variables/versions?id="+varId+"&site_id="+siteId;
       var projHistId = '#{@project.id}--datavalue'+dataId+'-history';
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
