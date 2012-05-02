@@ -261,8 +261,8 @@ class Voeis::DataValuesController < Voeis::BaseController
           end
         }
         date_time_str = rr>>'format(date_time,"%Y-%m-%d %H:%M:%S")'
-        date_time = DateTime.parse(date_time_str)
-        debugger
+        date_time = DateTime.parse(date_time_str+('%+05.2f'%data_value.utc_offset).sub('.',''))
+        #debugger
         if date_time.to_i!=data_value.local_date_time.to_i
           if !dryrun
             provenance << 'local_date_time='+data_value.local_date_time.to_s
