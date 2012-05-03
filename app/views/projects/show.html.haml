@@ -484,6 +484,8 @@
           //dijit.byId('DV_quality_control_level').set('value', item['quality_control_level'].toString());
           $('#DV_quality_control_level_sel').val(item['quality_control_level'].toString());
           if(item['published'][0]) dijit.byId('DV_published').set('checked', true);
+          $('#DV_variable_sel').val(item['variable_id'][0]);
+          
           dijit.byId('DV_local_date').set('value', item['local_date_time'].toString());
           dijit.byId('DV_local_time').set('value', item['local_date_time'].toString());
           dijit.byId('DV_utc_offset').set('value', item['utc_offset'].toString());
@@ -893,12 +895,17 @@
           %br
           -#%input(name="quality_control_level" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'##########'}" 
           -#      id="DV_quality_control_level" style="width:70px!important;" required="true")
-          %select(name="var_qcval" id="DV_quality_control_level_sel" class="quality_control_level_select")
-            = options_for_select(@cv_qcvalues.all.map{|v| ["%s: %s"%[v.quality_control_level_code,v.definition[0..20]], v.quality_control_level_code]})
-          &nbsp;&nbsp;&nbsp;
-          &nbsp;&nbsp;&nbsp;
+          %select(name="qcval" id="DV_quality_control_level_sel" class="quality_control_level_select")
+            = options_for_select(@cv_qcvalues.all.map{|v| ["%s: %s"%[v.quality_control_level_code,v.definition[0..16]], v.quality_control_level_code]})
+          &nbsp;&nbsp;&nbsp;&nbsp;
           %input(name="published" dojoType="dijit.form.CheckBox" id="DV_published") 
           Published
+      %tr
+        %td{:colspan=>"2"}
+          %label Variable
+          %br
+          %select(name="variable" id="DV_variable_sel" class="quality_control_level_select")
+            = options_for_select(@vars.map{|v| ["%s[%s] | %s (%s)"%[v[:variable_name],v[:id],v[:var_units_abbr],v[:data_type]], v[:id]]})
       %tr
         %td{:colspan=>"2"}
           %label Provenance Comment
