@@ -460,7 +460,7 @@
           var form = dijit.byId('data_value_edit_form');
           var site0 = window['site'+this.site_id+'ref'].site;
           $('#dv_site_name').text(site0.name.toString()+' [Id:'+site0.id.toString()+']');
-          var var0 = $('#site'+this.site_id+'_data_query #variable_select option').filter(':selected');
+          var var0 = $('#query-site'+this.site_id+' #variable_select option').filter(':selected');
           var0 = var0.text().split('(')[0]+' [Id:'+var0.val()+']';
           console.log('VAR:',var0);
           //$('#dv_var_name').text(item.variable_name.toString()+' [Id:'+item.id.toString()+']');
@@ -701,7 +701,7 @@
                                           :user=>current_user,
                                           :root_url=>root_url
 
-#error_dialog{:dojoType=>"dijit.Dialog", :disableCloseButton=>true, :title=>"ERROR", :style=>"width:500px;", :jsId=>"error_dialog"}
+#error_dialog{:dojoType=>"dijit.Dialog", :title=>"ERROR", :style=>"width:500px;", :jsId=>"error_dialog"}
   %script{:type=>"dojo/method", :event=>"startup"}
     :plain
       error_dialog.pop = function(msg,dly){
@@ -715,6 +715,33 @@
   %div.error_message{:style=>"color:#8A1F11;text-align:center;font-weight:bold;"}
     %strong{:style=>"color:#8A1F11;text-align:center;font-weight:bold;"}
       Error message here...
+
+-## general purpose DataGrid Dialog -- .pop(ttl,struct,data) --to open
+-##     ttl=Dialog Title, struct=Grid structure array, data=array of items for Grid dataStore
+#grid_dialog{:dojoType=>"dijit.Dialog", :title=>"title here", :style=>"width:800px;", :jsId=>"grid_dialog"}
+  %script{:type=>"dojo/method", :event=>"startup"}
+    :plain
+      grid_dialog.grid = grid_dialog_grid;
+      grid_dialog.pop = function(ttl,struct,data){
+        grid_dialog.set('title', ttl);
+        var mystore = new dojo.data.ItemFileWriteStore({data: {identifier: 'id', items: data }});
+        grid_dialog.show();
+        grid_dialog.grid.set('store',mystore);
+        grid_dialog.grid.set('structure',struct);
+        grid_dialog.grid.startup();
+        //###########
+      };
+  #grid_dialog_grid{:dojoType=>"dojox.grid.EnhancedGrid", :style=>"width:100%;height:350px;", 
+          :plugins=> "{nestedSorting:false, filter:false, indirectSelection:false}",  
+          :store=>"psites", 
+          :structure=>"[{field:'id',name:'ID'}]",
+          :jsId=>"grid_dialog_grid"}
+    %script{:type => "dojo/method", :event => "onRowDblClick", :args => "evt"}
+      :plain
+        //WAS OPEN SITE DETAIL (no longer needed)
+        //var item = this.getItem(evt.rowIndex);
+        //window.location += '/sites/'+item.id;
+
 
 -if !current_user.nil? && current_user.projects.include?(@project)
   -#= render(:partial => "data_set", :locals =>{:project_uid=>@project.id})
@@ -778,7 +805,7 @@
       %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"new_data_set.hide();return false;"} Cancel
 
 #edit_data_value_content{:style=>"display:none;width:540px;"}
-  %form(id="data_value_edit_form" dojoType="dijit.form.Form" method="post" style="overflow:scroll;")
+  %form(id="data_value_edit_form" dojoType="dijit.form.Form" method="post" style="overflow:visible;")
     -#%script{:type=>"dojo/method", :event=>"onValidStateChange", :args=>"state"}
     -#  :plain
     -#    var saveBtn = dijit.byId('data_value_edit_submit');
@@ -840,7 +867,7 @@
             %br
             %input(name="utc_offset" dojoType="dijit.form.NumberTextBox" id="DV_utc_offset" 
                   required="true" constraints="{pattern:'###.##'}" style="width:60px!important;")
-          #utc_datetime{:style=>"background:#ddd;padding:2px 5px;margin:16px 0 0 20px;float:left;"} utc
+          #utc_datetime{:style=>"background:#ddd;padding:3px 5px;margin:16px 0 0 20px;float:left;"} utc
           -#&nbsp;&nbsp;&nbsp;
           -#C4DEF6  border:solid 1px #4885F7;
           -##utc_datetime{:style=>"background:#ddd;padding:2px 5px;margin:16px 0 0 20px;float:left;"} utc
@@ -1379,7 +1406,7 @@
 = clear_break
 
 -#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width:905px;height:540px;margin-top:0;padding-top:0;"}
-#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width-min:920px;width:1100px;height-min:480px;height:600px;margin-top:0;padding-top:0;", :prop=>"parseOnLoad:true"}
+#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width-min:920px;width:1100px;height-min:480px;height:540px;margin-top:0;padding-top:0;"}
   #overview{:dojoType=>"dijit.layout.ContentPane", :title=>"Project", :style=>"margin:0;padding:0;float:left;", :selected=>true}
     .show-map{:style=>"float:left;width:700px;height:100%;margin:0;padding:0;", :id=>@project.id}
     -#.show-map{:style=>"float:left;width:700px;height:500px;margin:0;padding:0;", :id=>@project.id}
@@ -1449,6 +1476,8 @@
         -#%th{:field=>"latitude", :width=>"100px", :filterable=>true} Lat
         -#%th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
   
+  = clear_break
+  
   -#%table{:id=>'project_sites_test', :dojoType=>"dojox.grid.EnhancedGrid", 
   -#        :jsId=>"OverviewGrid_test", 
   -#        :title=>"TestTab", 
@@ -1472,7 +1501,6 @@
   -#= clear_break
 
   
-  = clear_break
   -#%p{:style=>'font-size:10px;margin-top:5px;'}
   -#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   -#  (double-click above for Site details)
