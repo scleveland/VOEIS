@@ -568,7 +568,6 @@
       },
       controls: function(item) {
         if(item==null || item=='') return '-';
-        if(!edit_auth) return '-must login-'
         //return 'TESTING-- #';
         var id = item.id[0];
         var idx = item._0;
@@ -585,6 +584,7 @@
         var spaces = '&nbsp;';
         //if(item.used[0]) return spaces+hist_link;
         //return spaces+hist_link+spaces+delete_link;
+        if(!edit_auth) return spaces+hist_link;
         return spaces+edit_link+spaces+hist_link+spaces+delete_link;
       },
       meta_tag: function(item){
@@ -657,7 +657,7 @@
        width: '80px'
     }
     ];
-    if(!edit_auth) val_layout.pop();
+    //if(!edit_auth) val_layout.pop();
 
     //######################################
     // create a new grid:

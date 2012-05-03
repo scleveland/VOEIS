@@ -9,7 +9,7 @@ class SitePane2Widget < Apotomo::Widget
     @current_user = options[:user]
     @root_url = options[:root_url]
     #@id = UUIDTools::UUID.timestamp_create
-    @auth = !@current_user.nil? && @current_user.projects.include?(@project)
+    @auth = !@current_user.nil? && @current_user.projects.include?(@project) && !@current_user.has_role?('Observer',@project)
     @edit_auth = !@current_user.nil? && (@current_user.has_role?('Data Manager',@project) || @current_user.has_role?('Principal Investigator',@project))
     
     #@newSite = Voies::

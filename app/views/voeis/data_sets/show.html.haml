@@ -185,8 +185,9 @@
   Data Set: #{@data_set.name}
 
 #dataSetGrid{:style=>"width:900px;height:475px;"}
-%button(dojoType="dijit.form.Button" name="remove_data_button" id="remove_data_button" onclick="RemoveSelectedFromDataSet();") 
-  Remove Selected Data from Data Set
+-if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
+  %button(dojoType="dijit.form.Button" name="remove_data_button" id="remove_data_button" onclick="RemoveSelectedFromDataSet();") 
+    Remove Selected Data from Data Set
 
 :javascript
   var dataSet = {}

@@ -188,7 +188,7 @@
                 - atroot = false
                 = link_to("Project Home", project_path(@project), :dojoType => "yogo.ui.MenuLink")
                 
-              -if !current_user.nil? && current_user.projects.include?(@project)
+              -if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
                 - if atroot
                   -#= link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
                   = link_to("Add Site", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/site/new');")
