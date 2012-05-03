@@ -162,7 +162,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
         -#= link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.pop_query_script();return false;") 
-        = link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('##{@tabId}_query_results').hide();$('##{@tabId}_query_script').show();return false;")
+        = link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.show_scripting(true);return false;")
         
         -#=hidden_field_tag('column_array', @column_array.to_json)
         -#=hidden_field_tag('row_array', @row_array.to_json)
@@ -222,8 +222,8 @@
       -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
   
   -if !@data_structs.empty?
-    %div{:id=>"#{@tabId}_query_script", :style=>"display:none;"}
-      %form(id="#{@tabId}_query_script_form" dojoType="dijit.form.Form" method="post" style="overflow:scroll;")
+    %div{:id=>"#{@tabId}_query_script", :style=>"display:none;overflow:visible;"}
+      %form(id="#{@tabId}_query_script_form" dojoType="dijit.form.Form" method="post" style="overflow:visible;")
       
         %strong
           QUERY SCRIPT: &nbsp;
@@ -238,15 +238,16 @@
         
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        = link_to('QUERY RESULTS', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('##{@tabId}_query_script').hide();$('##{@tabId}_query_results').show();return false;")
+        = link_to('QUERY RESULTS', 'javascript:', :class=>'icon icon-cancel', :onclick=>"#{dataId}.show_scripting(false);return false;")
         
         %br
         %br
         %em
           ENTER R-SCRIPT HERE
+          -#[ ENTER R-SCRIPT HERE ] &nbsp; -or- &nbsp; [ SELECT SAVED ]
         %br
         %input(name="script" dojoType="dijit.form.SimpleTextarea" id="#{@tabId}_query_script_text" rows="20" 
-              style="width:600px!important;line-height:16px!important;float:left;" required="true")
+              style="width:600px!important;line-height:16px!important;float:left;")
         
         - dv_fields = ['data_value',
                         'string_value',
@@ -259,7 +260,7 @@
                         'vertical_offset',
                         'end_vertical_offset',
                         'published',
-                        'variable_id'].join("\n")
+                        'variable_id'].join("<br/>\n").html_safe
         %p(style="width:150px;margin-left:10px;float:left;")
           %strong
             FIELDS:
@@ -276,18 +277,14 @@
             EXECUTE!
             %script{:type=>"dojo/method", :event=>"startup"}
               :plain
-                var form = dijit.byId("#{@tabId}_query_script_form");
-                //### set initial state
-                this.attr("disabled", !form.isValid());
-                this.connect(form, "onValidStateChange", function(state){
-                  this.attr("disabled", !state);
-                });
                 //### ON-CLICK: SAVE
                 this.connect(this, "onClick", function(){
                   dijit.byId('loading_dialog').show();
+                  var textarea = dijit.byId("#{@tabId}_query_script_text");
                   var data_vals = [];
+                  var script = '';
                   var formdata = {
-                    script: dijit.byId('#{@tabId}_query_script_text').get('value'), 
+                    script: '', 
                     dryrun: dijit.byId('#{@tabId}_query_script_dryrun').get('checked').toString()};
                   var datasource = $('##{@tabId}_query_script_select').val();
                   if(datasource=='SEL') {
@@ -303,7 +300,26 @@
                   } else {
                     formdata['data_set'] = datasource;
                   };
-                
+                  console.log('>>>DATA-VALS:',data_vals);
+                  console.log('>>>DATASOUREC:',datasource);
+                  if(!data_vals.length && !parseInt(datasource)) {
+                    //textarea.set('value','###NO DATA TO EXECUTE ON!\r\n'+textarea.value);
+                    dijit.byId('loading_dialog').hide();
+                    error_dialog.pop('### NO DATA TO EXECUTE ON ###');
+                    return;
+                  };
+                  lines = textarea.value.split(/\r\n|\n|\r/);
+                  lines.forEach(function(ln,idx){
+                    ln = ln.replace(/^\s+|\s+$/g, '');  //TRIM
+                    if(ln[0]!='#' && ln.length) script += ln+'\r\n';
+                  });
+                  if(!script.length) {
+                    //textarea.set('value','###NOTHING TO EXECUTE!\r\n'+textarea.value);
+                    dijit.byId('loading_dialog').hide();
+                    error_dialog.pop('### NOTHING TO EXECUTE ###');
+                    return;
+                  };
+                  formdata['script'] = script;
                   $.post("#{project_path(@project)}/data_values/query_script_update?api_key=#{User.current.api_key}",
                     formdata,
                     function(data) {
@@ -327,6 +343,16 @@
                         var val_selected = #{dataId}.val_grid.selection.getSelected();
                         plotutils.highlightItems(val_selected,0,#{dataId}.plot);
                         #{dataId}.val_grid.update();
+                      } else {
+                        var grid_struct = val_layout.slice(0,-1);
+                        var grid_data = []
+                        for(var i=0; i<data.length; i++){
+                          var item = datastore.get(data[i].id,#{dataId}.val_store);
+                          for(fld in data[i])
+                            if(fld!='id') item[fld] = data[i][fld];
+                          grid_data.push(item);
+                        };
+                        grid_dialog.pop('SCRIPT RESULTS',grid_struct,grid_data);
                       };
                       dijit.byId('loading_dialog').hide();
                   });
@@ -415,15 +441,16 @@
       };
     };
     
-    //*** OPEN QUERY-SCRIPT TAB
-    #{dataId}.pop_query_script = function() {
-      var search_count = '#{@tabId}'.slice(-3);
-      var tab_url = '#{project_path(@project)}/query_script?tab_id=#{@tabId}';
-      var tab_id = 'site#{@site.id}_dataquery_script_'+search_count;
-      var tab_title = 'Query Script: Site-#{@site.id} ['+search_count+']';
-      //window.open(hist_url, hist_title, 'width=950,height=550'); return;
-      var tab_callback = function(){  };
-      dojo.publish('voeis/project/openTab',[tab_url,tab_id,tab_title,tab_callback]);
+    //*** SHOW/HIDE QUERY-SCRIPT DIV
+    #{dataId}.show_scripting = function(show) {
+      if(show){
+        $('##{@tabId}_query_results').hide();
+        $('##{@tabId}_query_script').show();
+      } else {
+        $('##{@tabId}_query_script').hide();
+        $('##{@tabId}_query_results').show();
+        #{dataId}.val_grid.resize();
+      };
     };
     
     //var chart1 = new dojox.charting.Chart2D("simplechart");
@@ -564,7 +591,7 @@
         if (#{dataId}_str.match(item.id.toString()))
           
           //return '<a href="#", onClick="'+ "$('#data_value_show').attr('href','#{root_url.chop}#{project_data_values_path(@project)}/" + item.id.toString() + "')" + ";dijit.byId('data_value_show').show()" + '">View</a>';
-          return '<button onClick="'+ "dijit.byId('data_value_show').set('href','#{root_url.chop}#{project_data_values_path(@project)}/" + item.id.toString() + "')" + ";dijit.byId('data_value_show').show()" + '" type="button">View</button>';
+          return '<button onClick="'+"dijit.byId('#{@tabId}_data_value_show').set('href','#{root_url.chop}#{project_data_values_path(@project)}/"+item.id.toString()+"')"+";dijit.byId('data_value_show').show()"+'" type="button">View</button>';
         else
           return "None"
         end
@@ -1122,7 +1149,8 @@
 
      });
 
-#data_value_show{:dojoType=>"dijit.Dialog", :title=>"Data Value", :href=>"", :style=>"overflow:auto; width: 500px; height: 400px;"}
+-##data_value_show{:dojoType=>"dijit.Dialog", :title=>"Data Value", :href=>"", :style=>"overflow:auto; width: 500px; height: 400px;"}
+%div{:id=>"#{@tabId}_data_value_show", :dojoType=>"dijit.Dialog", :title=>"Data Value", :href=>"", :style=>"overflow:auto; width: 500px; height: 400px;"}
 
 
 :javascript
