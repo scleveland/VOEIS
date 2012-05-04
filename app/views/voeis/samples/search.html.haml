@@ -162,7 +162,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
         -#= link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.pop_query_script();return false;") 
-        = link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.show_scripting(true);return false;")
+        -#= link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.show_scripting(true);return false;")
         
         -#=hidden_field_tag('column_array', @column_array.to_json)
         -#=hidden_field_tag('row_array', @row_array.to_json)
