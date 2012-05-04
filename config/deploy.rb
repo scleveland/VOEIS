@@ -25,6 +25,29 @@ task :development do
   default_run_options[:pty] = false
 end
 
+desc "Setup NEW Development Settings"
+task :development2 do
+  set :rvm_ruby_string, 'ruby-1.9.2-p180@passenger'
+  
+  set :application, "voeis"
+  set :use_sudo,    false
+  
+  set :scm, :git
+  set :repository,  "git://github.com/yogo/VOEIS.git"
+  set :shell, "/bin/bash"
+  
+  set :branch, "master"
+  set :deploy_via, :remote_cache
+  set :copy_exclude, [".git"]
+  
+  set  :user, "rails"
+  role :web, "voeis-dev.rcg.montana.edu"
+  role :app, "voeis-dev.rcg.montana.edu"
+  set  :deploy_to, "/var/rails"
+  set :deploy_via, :remote_cache
+
+  default_run_options[:pty] = false
+end
 
 
 desc "Setup Production Settings"
