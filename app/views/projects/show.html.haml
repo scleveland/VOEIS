@@ -710,9 +710,10 @@
         var delay = dly || 3000;
         $('#error_dialog .error_message').text(msg);
         error_dialog.show();
-        setTimeout(function(){
-          error_dialog.hide();
-        },delay);
+        if(delay>0)
+          setTimeout(function(){
+            error_dialog.hide();
+          },delay);
       };
   %div.error_message{:style=>"color:#8A1F11;text-align:center;font-weight:bold;"}
     %strong{:style=>"color:#8A1F11;text-align:center;font-weight:bold;"}
