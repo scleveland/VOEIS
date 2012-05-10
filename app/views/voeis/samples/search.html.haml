@@ -163,7 +163,7 @@
           &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
           -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
           -#= link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.pop_query_script();return false;") 
-          = link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.show_scripting(true);return false;")
+          = link_to('BATCH QA/QC', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.show_scripting(true);return false;")
         
         -#=hidden_field_tag('column_array', @column_array.to_json)
         -#=hidden_field_tag('row_array', @row_array.to_json)
@@ -227,16 +227,16 @@
       %form(id="#{@tabId}_query_script_form" dojoType="dijit.form.Form" method="post" style="overflow:visible;")
       
         %strong
-          QUERY SCRIPT: &nbsp;
+          BATCH QA/QC &nbsp;
         
-        ON
-        - opts00 = "<option value='SEL'>Selected Data</option>\n<option value='ALL'>ALL Data (#{@graph_data.length} Points)</option>\n"
-        = select_tag("#{@tabId}_query_script_select", (opts00+@data_set_options).html_safe)
-        
-        &nbsp;&nbsp;&nbsp;
-        %input(name="dryrun" dojoType="dijit.form.CheckBox" id="#{@tabId}_query_script_dryrun" checked)
-        DRYRUN
-        
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        -#= link_to('ROLLBACK LAST CHANGE', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+        = link_to('ROLLBACK LAST CHANGE', 'javascript:', :class=>'icon icon-hist', :onclick=>"#{dataId}.batch_rollback();return false;")
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         = link_to('QUERY RESULTS', 'javascript:', :class=>'icon icon-cancel', :onclick=>"#{dataId}.show_scripting(false);return false;")
@@ -244,10 +244,15 @@
         %br
         %br
         %em
-          ENTER R-SCRIPT HERE
-          -#[ ENTER R-SCRIPT HERE ] &nbsp; -or- &nbsp; [ SELECT SAVED ]
+          -#ENTER R-SCRIPT HERE
+          ENTER R-SCRIPT HERE &nbsp; -or- &nbsp; LOAD/SAVE: &nbsp;
+        - opts02 = "<option value='-'>- select -</option>\n"
+        - opts02 += "<option value='SAVE'>Save Script</option>\n"
+        - opts02 += "<option value='12'>Script-1</option>\n<option value='13'>Script-2</option>\n"
+        - opts02 += "<option value='14'>Script-3</option>\n<option value='15'>Script-4</option>\n"
+        = select_tag("#{@tabId}_script_load_select", (opts02).html_safe)
         %br
-        %input(name="script" dojoType="dijit.form.SimpleTextarea" id="#{@tabId}_query_script_text" rows="20" 
+        %input(name="script" dojoType="dijit.form.SimpleTextarea" id="#{@tabId}_query_script_text" rows="21" 
               style="width:600px!important;line-height:16px!important;float:left;")
         
         - dv_fields = ['data_value',
@@ -255,27 +260,68 @@
                         'date_time',
                         'utc_offset',
                         'datatype',
-                        'replicate',
                         'value_accuracy',
                         'quality_control_level',
+                        'replicate',
                         'vertical_offset',
                         'end_vertical_offset',
                         'published',
                         'variable_id'].join("<br/>\n").html_safe
-        %p(style="width:150px;margin-left:10px;float:left;")
+        - dv_fields0 = ['data_value, string_value,',
+                        'date_time, utc_offset,',
+                        'datatype, value_accuracy,',
+                        'quality_control_level, replicate,',
+                        'vertical_offset, end_vertical_offset',
+                        'published,',
+                        'variable_id'].join("<br/>\n").html_safe
+        - dv_fields1 = ['data_value',
+                        'date_time',
+                        'datatype',
+                        'quality_control_level',
+                        'vertical_offset',
+                        'published'].join("<br/>\n").html_safe
+        - dv_fields2 = ['string_value',
+                        'utc_offset',
+                        'value_accuracy',
+                        'replicate',
+                        'end_vertical_offset',
+                        'variable_id'].join("<br/>\n").html_safe
+        %div(style="width:350px;margin-left:10px;float:left;")
           %strong
             FIELDS:
           %br
-          = dv_fields
+          -#= dv_fields
+          %table
+            %tr
+              %td(style="width:40%;")
+                = dv_fields1
+              %td
+                = dv_fields2
+          %br
+          %strong
+            SOURCE:
+          %br
+          - opts00 = "<option value='SEL'>Selected Data</option>\n<option value='ALL'>ALL Data (#{@graph_data.length} Points)</option>\n"
+          = select_tag("#{@tabId}_query_script_select", (opts00+@data_set_options).html_safe)
           %br
           %br
+          %strong
+            TARGET:
           %br
-          %button{:dojoType=>"dijit.form.Button", :title=>"Clear", :onclick=>"$('##{@tabId}_query_script_text').val('');"}
-            CLEAR
+          - opts01 = "<option value='SELF'>Update SELF</option>\n<option value='DISP'>Grid Display</option>\n"
+          - opts01 += "<option value='CSV'>CSV File</option>\n"
+          - opts01 += "<option value='12'>Variable-1</option>\n<option value='13'>Variable-2</option>\n"
+          - opts01 += "<option value='14'>Variable-3</option>\n<option value='15'>Variable-4</option>\n"
+          = select_tag("#{@tabId}_script_target_select", (opts01).html_safe)
+          -#= select_tag("#{@tabId}_script_target_select", (opts01+@data_set_options).html_safe)
+          %br
+          %br
+          %input(name="dryrun" dojoType="dijit.form.CheckBox" id="#{@tabId}_query_script_dryrun" checked)
+          DRYRUN
           %br
           %br
           %button{:dojoType=>"dijit.form.Button", :title=>"Execute"}
-            EXECUTE!
+            EXECUTE
             %script{:type=>"dojo/method", :event=>"startup"}
               :plain
                 //### ON-CLICK: SAVE
@@ -384,6 +430,9 @@
                       dijit.byId('loading_dialog').hide();
                   });
                 });
+          &nbsp;&nbsp;
+          %button{:dojoType=>"dijit.form.Button", :title=>"Clear", :onclick=>"$('##{@tabId}_query_script_text').val('');"}
+            CLEAR
     
     
   :javascript
