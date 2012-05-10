@@ -184,7 +184,7 @@ class Voeis::Variable
   def recent_values(site,outcount=12)
     # LAST 12 VALUES / 24 HOURS -or- LAST 12 VALUES
     dresults = Voeis::DataValue.all(:site_id=>site.id, :variable_id=>self.id, :order=>[:local_date_time.desc], :limit=>400)
-    if results.length > 0
+    if dresults.length > 0
       results = dresults.all(:local_date_time.gt=>dresults[0][:local_date_time]-24.hours)
       if results.length<outcount
         results = dresults[0,outcount]
