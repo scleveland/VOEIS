@@ -222,7 +222,7 @@ class Voeis::SamplesController < Voeis::BaseController
     @data_set = parent.managed_repository{Voeis::DataSet.all}
     @data_set_opts_array = Array.new
     @data_set.all(:order => [:name.asc]).each do |ds|
-      @data_set_opts_array << [ds.name.capitalize, ds.id.to_s]
+      @data_set_opts_array << [ds.name.capitalize+' (DataSet)', ds.id.to_s]
     end
     @data_set_options = opts_for_select(@data_set_opts_array)
     

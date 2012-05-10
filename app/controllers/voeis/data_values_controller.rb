@@ -170,7 +170,7 @@ class Voeis::DataValuesController < Voeis::BaseController
 
     @ver_properties = [
 #      {:label=>"Version", :name=>"version"},
-#      {:label=>"Value ID", :name=>"id"},
+      {:label=>"DataValue ID", :name=>"id"},
 #      {:label=>"Site", :name=>"site"},
 #      {:label=>"Variable", :name=>"variable"},
       {:label=>"Date/Time", :name=>"datetime_string", :contains=>["local_date_time","date_time_utc","utc_offset"]},
@@ -212,6 +212,7 @@ class Voeis::DataValuesController < Voeis::BaseController
       else
         data_values = Voeis::DataValue.all(:id=>data_val_ids)
       end
+      data_values = data_values.all(:limit=>20) if dryrun
       rscript0 = params['script']
       dv_fields = ['data_value',
                     'string_value',
@@ -237,6 +238,7 @@ class Voeis::DataValuesController < Voeis::BaseController
         dv = {:id=>data_value.id.to_i}
         provenance = []
         vars = {}
+        err = ''
         dv_fields.each{|fld| vars[fld] = data_value[fld] }
         vars['date_string'] = data_value.local_date_time.iso8601.sub('T',' ').slice(0,19)
         #vars['date_string_utc'] = data_value.date_time_utc.iso8601.sub('T',' ').slice(0,19)
@@ -247,7 +249,10 @@ class Voeis::DataValuesController < Voeis::BaseController
           rr.command(todatetime+rscript, vars)
         rescue Exception => e
           ###SYNTAX ERROR IN SCRIPT
-        
+          err = '*** SYNTAX ERROR!'
+          dv['error'] = err
+          updated << dv
+          break
         end
         #SAVE DV FIELDS
         dv_fields.reject{|fld| dv_fields_omit_update.include?(fld) }.each{|fld| 
@@ -262,7 +267,6 @@ class Voeis::DataValuesController < Voeis::BaseController
         }
         date_time_str = rr>>'format(date_time,"%Y-%m-%d %H:%M:%S")'
         date_time = DateTime.parse(date_time_str+('%+05.2f'%data_value.utc_offset).sub('.',''))
-        #debugger
         if date_time.to_i!=data_value.local_date_time.to_i
           if !dryrun
             provenance << 'local_date_time='+data_value.local_date_time.to_s
@@ -272,13 +276,13 @@ class Voeis::DataValuesController < Voeis::BaseController
           end
           dv['local_date_time'] = date_time_str
         end
-        #debugger
         if !dryrun
           data_value.provenance_comment = 'SCRIPTED FROM: '+provenance.join('; ')
-          if !data_value.save
-            dv['error'] = 'SAVE ERROR!'
+          if err.blank? && !data_value.save
+            err = '*** SAVE ERROR!'
           end
         end
+        dv['error'] = err if !err.blank?
         updated << dv
       }
       rr.close

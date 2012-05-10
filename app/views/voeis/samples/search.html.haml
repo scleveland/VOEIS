@@ -159,10 +159,11 @@
     
       -#if !@row_array.empty?
       -if !@data_structs.empty?
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
-        -#= link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.pop_query_script();return false;") 
-        = link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.show_scripting(true);return false;")
+        -if edit_auth
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
+          -#= link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.pop_query_script();return false;") 
+          = link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.show_scripting(true);return false;")
         
         -#=hidden_field_tag('column_array', @column_array.to_json)
         -#=hidden_field_tag('row_array', @row_array.to_json)
@@ -221,7 +222,7 @@
       -# 33e 3A7594 3889AA
       -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
   
-  -if !@data_structs.empty?
+  -if !@data_structs.empty? and edit_auth
     %div{:id=>"#{@tabId}_query_script", :style=>"display:none;overflow:visible;"}
       %form(id="#{@tabId}_query_script_form" dojoType="dijit.form.Form" method="post" style="overflow:visible;")
       
@@ -280,6 +281,7 @@
                 //### ON-CLICK: SAVE
                 this.connect(this, "onClick", function(){
                   dijit.byId('loading_dialog').show();
+                  var start_time = new Date().valueOf();
                   var textarea = dijit.byId("#{@tabId}_query_script_text");
                   var data_vals = [];
                   var script = '';
@@ -320,20 +322,27 @@
                     return;
                   };
                   formdata['script'] = script;
-                  $.post("#{project_path(@project)}/data_values/query_script_update?api_key=#{User.current.api_key}",
+                  $.post("#{project_path(@project)}/data_values/query_script_update#{current_user.nil? ? '' : '?api_key='+current_user.api_key}",
                     formdata,
                     function(data) {
                       //QUERY SCRIPT RESULTS
                       console.log('SCRIPT RESULTS:',data);
-                      //UPDATE GRID/PLOT
+                      var errs = '';
                       if(formdata.dryrun=='false') {
+                        //UPDATE GRID/PLOT
                         for(var i=0; i<data.length; i++) {
-                          datastore.update(data[i],#{dataId}.val_store);
-                          if(data[i].hasOwnProperty('data_value')) {
-                            var item = datastore.get(data[i].id,#{dataId}.val_store);
-                            var dateval = new Date(item.local_date_time.toString());
-                            dateval = parseInt(dateval/1000)*1000;
-                            #{dataId}.data[item._0] = [dateval,item.data_value]
+                          var item = datastore.get(data[i].id,#{dataId}.val_store);
+                          var dateval = new Date(item.local_date_time.toString());
+                          if(data[i].error) {
+                            errs += data[i].error+' -- ';
+                            errs += '['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
+                            errs += '<br/>\n';
+                          } else {
+                            datastore.update(data[i],#{dataId}.val_store);
+                            if(data[i].hasOwnProperty('data_value')) {
+                              dateval = parseInt(dateval/1000)*1000;
+                              #{dataId}.data[item._0] = [dateval,data[i].data_value]
+                            };
                           };
                         };
                         var data_upd = #{dataId}.plot.getData();
@@ -344,16 +353,34 @@
                         plotutils.highlightItems(val_selected,0,#{dataId}.plot);
                         #{dataId}.val_grid.update();
                       } else {
+                        //DRY-RUN: SHOW DRY-RUN GRID
                         var grid_struct = val_layout.slice(0,-1);
                         var grid_data = []
                         for(var i=0; i<data.length; i++){
                           var item = datastore.get(data[i].id,#{dataId}.val_store);
-                          for(fld in data[i])
-                            if(fld!='id') item[fld] = data[i][fld];
+                          var dateval = new Date(item.local_date_time.toString());
+                          for(fld in data[i]) {
+                            if(fld!='id' && fld!='error') item[fld] = data[i][fld];
+                            else if(fld=='error') {
+                              item['string_value'] = data[i]['error'];
+                              errs += data[i].error+' -- ';
+                              errs += '['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
+                              errs += '<br/>\n';
+                            };
+                          };
                           grid_data.push(item);
                         };
-                        grid_dialog.pop('SCRIPT RESULTS',grid_struct,grid_data);
+                        grid_dialog.pop('DRY-RUN SCRIPT RESULTS (first 20)',grid_struct,grid_data);
                       };
+                      var elapsed = (new Date().valueOf()-start_time)/1000;
+                      var elapsed_mins = parseInt(elapsed/60);
+                      var elapsed_secs = (elapsed%60).toFixed(3);
+                      elapsed = 'Executed: ';
+                      if(elapsed_mins) elapsed += elapsed_mins+' mins, '
+                      elapsed += elapsed_secs+' secs\n';
+                      if(errs) elapsed += '<br/><br/>\n'+errs;
+                      console.log(elapsed);
+                      error_dialog.pop(elapsed,0,'SCRIPT COMPLETED');
                       dijit.byId('loading_dialog').hide();
                   });
                 });

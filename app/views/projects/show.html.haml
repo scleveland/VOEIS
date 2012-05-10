@@ -706,9 +706,10 @@
 #error_dialog{:dojoType=>"dijit.Dialog", :title=>"ERROR", :style=>"width:500px;", :jsId=>"error_dialog"}
   %script{:type=>"dojo/method", :event=>"startup"}
     :plain
-      error_dialog.pop = function(msg,dly){
-        var delay = dly || 3000;
-        $('#error_dialog .error_message').text(msg);
+      error_dialog.pop = function(msg,dly,ttl){
+        var delay = dly==null ? 3000 : dly;
+        if(ttl) error_dialog.set('title',ttl);
+        $('#error_dialog .error_message').html(msg);
         error_dialog.show();
         if(delay>0)
           setTimeout(function(){
