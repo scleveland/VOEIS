@@ -42,7 +42,7 @@ class Voeis::BaseController < InheritedResources::Base
   belongs_to :project, :parent_class => Project, :finder => :get
 
   # All Voeis resources should handle html and json
-  respond_to :html, :json, :xml, :wml
+  respond_to :html, :json, :xml, :wml, :csv
 
   responders :rql
   
@@ -52,6 +52,19 @@ class Voeis::BaseController < InheritedResources::Base
   ActionController::Renderers.add :wml do |object, options|
     self.content_type ||= 'text/waterml'
     self.response_body  = object.respond_to?(:to_wml) ? object.to_wml : object.to_xml
+  end
+  
+  # Add CSV respond support that will work with RQL because we want
+  # to be awesome
+  require 'action_controller/metal/renderers'
+  ActionController::Renderers.add :csv do |object, options|
+    self.content_type ||= 'text/csv'
+    csv_string = CSV.generate do |csv|
+      #csv = object.attributes.keys.map{|k| k}.join(',') + "\n"
+      csv = csv.to_s + object.to_csv
+    end
+    
+    self.response_body  = object.first.attributes.keys{|k| k.name}.join(',') + "\n" + object.to_csv
   end
   
   require 'action_controller/metal/responder'
