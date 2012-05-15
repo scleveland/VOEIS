@@ -40,8 +40,8 @@ GIT
 
 GIT
   remote: git://github.com/yogo/rql-ruby.git
-  revision: 9ddf77fd732c43d13c2b0719ab46950df30e12b1
-  branch: master
+  revision: cda958811e8d9465a4aaca0973bdde202f05401a
+  branch: voeis-rql
   specs:
     rql (0.0.1)
       execjs (~> 0.1.1)
