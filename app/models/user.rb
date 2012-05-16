@@ -37,7 +37,7 @@ class User
   property :last_login_at,        DateTime
   property :current_login_at,     DateTime
 
-  property :api_key,  String, :required => false, :length => 64, :index => true, :writer => :private
+  property :api_key,  String, :required => false, :length => 64, :index => true, :writer => :private, :default=>::SecureRandom.hex(32)
 
   # Long enough for an ipv6 address.
   property :last_login_ip,      String, :length => 36
@@ -54,6 +54,8 @@ class User
   has n, :roles, :through => :memberships
 
   belongs_to :system_role
+  
+ 
 
   #validates_confirmation_of :password
 
