@@ -225,6 +225,10 @@ class Voeis::SamplesController < Voeis::BaseController
       @data_set_opts_array << [ds.name.capitalize+' (DataSet)', ds.id.to_s]
     end
     @data_set_options = opts_for_select(@data_set_opts_array)
+    @variables = parent.variables.all(:order=>[:variable_name.asc])
+    @variables_opts_array = @variables.reject{|v| v.id.to_s==params[:varaible_select]}
+      .map{|v| ["%s | %s [%s]"%[v.variable_name.slice(0,32),v.variable_units.units_abbreviation,v.id],v.id.to_s]}
+    @variables_options = opts_for_select(@variables_opts_array)
     
     site = parent.managed_repository{Voeis::Site.get(params[:site_select])}
     @site_name = site.name
@@ -256,6 +260,17 @@ class Voeis::SamplesController < Voeis::BaseController
     else
       @var_name = "None"
     end #end if !site.empty?
+    
+    ##@variables = parent.managed_repository{parent.variables}
+    #@variables_opts_array = @variables.reject{|v| v.id==@variable.id}.map{|v| [v.variable_name,v.id.to_s]}
+    #variables_opts_array = []
+    #@variables.each do |v|
+    #  variables_opts_array << [v.variable_name, v.id.to_s]
+    #end
+    #@variables_options = opts_for_select(@variables_opts_array)
+    #@testing = "<option value='TEST'>TESTING-1-2-3</option>\n"
+    #debugger
+    
     #render 'search.html.haml'
   end #end def
   

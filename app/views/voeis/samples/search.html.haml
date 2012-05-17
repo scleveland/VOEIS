@@ -210,14 +210,14 @@
     -# = pagination_links(@query, params[:page], 10)  
     %br
     
-    %div{:id=>"#{@tabId}_plot_view"}
+    %div{:id=>"#{@tabId}_plot_view", :style=>"margin:0;"}
       
-      #plotContainer{:style=>"width:800px;height:310px;"}
+      #plotContainer{:style=>"width:800px;height:310px;margin:0;"}
       %br
       
-    %div{:id=>"#{@tabId}_grid_view"}
+    %div{:id=>"#{@tabId}_grid_view", :style=>"margin:0;"}
       
-      #gridContainer{:style=>"width:850px;height:310px;border:solid 1px #3A7594;"}
+      #gridContainer{:style=>"width:850px;height:310px;margin:0;border:solid 1px #3A7594;"}
       %br
       -# 33e 3A7594 3889AA
       -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
@@ -236,7 +236,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         -#= link_to('ROLLBACK LAST CHANGE', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
-        = link_to('ROLLBACK LAST CHANGE', 'javascript:', :class=>'icon icon-hist', :onclick=>"#{dataId}.batch_rollback();return false;")
+        = link_to('ROLLBACK BATCH CHANGE', 'javascript:', :class=>'icon icon-hist', :onclick=>"#{dataId}.rollback_batch();return false;")
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         = link_to('QUERY RESULTS', 'javascript:', :class=>'icon icon-cancel', :onclick=>"#{dataId}.show_scripting(false);return false;")
@@ -245,12 +245,13 @@
         %br
         %em
           -#ENTER R-SCRIPT HERE
-          ENTER R-SCRIPT HERE &nbsp; -or- &nbsp; LOAD/SAVE: &nbsp;
+          ENTER R-SCRIPT HERE &nbsp; &mdash; &nbsp; 
+          -#LOAD/SAVE: 
         - opts02 = "<option value='-'>- select -</option>\n"
-        - opts02 += "<option value='SAVE'>Save Script</option>\n"
-        - opts02 += "<option value='12'>Script-1</option>\n<option value='13'>Script-2</option>\n"
-        - opts02 += "<option value='14'>Script-3</option>\n<option value='15'>Script-4</option>\n"
-        = select_tag("#{@tabId}_script_load_select", (opts02).html_safe)
+        - opts02 += "<option value='SAVE'>SAVE SCRIPT</option>\n"
+        - opts02 += "<option value='12'>LOAD: Script-1</option>\n<option value='13'>LOAD: Script-2</option>\n"
+        - opts02 += "<option value='14'>LOAD: Script-3</option>\n<option value='15'>LOAD: Script-4</option>\n"
+        -#= select_tag("#{@tabId}_script_load_select", (opts02).html_safe)
         %br
         %input(name="script" dojoType="dijit.form.SimpleTextarea" id="#{@tabId}_query_script_text" rows="21" 
               style="width:600px!important;line-height:16px!important;float:left;")
@@ -301,19 +302,18 @@
           %strong
             SOURCE:
           %br
-          - opts00 = "<option value='SEL'>Selected Data</option>\n<option value='ALL'>ALL Data (#{@graph_data.length} Points)</option>\n"
-          = select_tag("#{@tabId}_query_script_select", (opts00+@data_set_options).html_safe)
+          - opts00 = "<option value='SEL'>SELECTED DATA</option>\n<option value='ALL'>ALL DATA (#{@graph_data.length} Points)</option>\n"
+          = select_tag("#{@tabId}_script_source_select", (opts00+@data_set_options).html_safe)
           %br
           %br
-          %strong
-            TARGET:
-          %br
-          - opts01 = "<option value='SELF'>Update SELF</option>\n<option value='DISP'>Grid Display</option>\n"
-          - opts01 += "<option value='CSV'>CSV File</option>\n"
-          - opts01 += "<option value='12'>Variable-1</option>\n<option value='13'>Variable-2</option>\n"
-          - opts01 += "<option value='14'>Variable-3</option>\n<option value='15'>Variable-4</option>\n"
-          = select_tag("#{@tabId}_script_target_select", (opts01).html_safe)
-          -#= select_tag("#{@tabId}_script_target_select", (opts01+@data_set_options).html_safe)
+          -#%strong
+          -#  TARGET:
+          -#%br
+          - opts01 =  "<option value='SELF'>UPDATE SELF</option>\n"
+          - opts01 += "<option value='DISP'>POPULATE DISPLAY GRID</option>\n"
+          - opts01 += "<option value='CSV'>EXPORT CSV FILE</option>\n"
+          - opts01 += @variables_options
+          -#= select_tag("#{@tabId}_script_target_select", opts01.html_safe)
           %br
           %br
           %input(name="dryrun" dojoType="dijit.form.CheckBox" id="#{@tabId}_query_script_dryrun" checked)
@@ -334,28 +334,17 @@
                   var formdata = {
                     script: '', 
                     dryrun: dijit.byId('#{@tabId}_query_script_dryrun').get('checked').toString()};
-                  var datasource = $('##{@tabId}_query_script_select').val();
-                  if(datasource=='SEL') {
-                    var valdata = #{dataId}.val_grid.selection.getSelected();
-                    for(var i=0; i<valdata.length; i++) 
-                      data_vals.push(valdata[i].id[0]);
-                    formdata['data_vals'] = data_vals;
-                  } else if(datasource=='ALL') {
-                    var valdata = #{dataId}.value_data;
-                    for(var i=0; i<valdata.length; i++) 
-                      data_vals.push(valdata[i].id[0]);
-                    formdata['data_vals'] = data_vals;
-                  } else {
-                    formdata['data_set'] = datasource;
-                  };
-                  console.log('>>>DATA-VALS:',data_vals);
-                  console.log('>>>DATASOUREC:',datasource);
-                  if(!data_vals.length && !parseInt(datasource)) {
+                  // GET BATCH DATA
+                  var batch = #{dataId}.get_batch()
+                  if(batch.error) {
                     //textarea.set('value','###NO DATA TO EXECUTE ON!\r\n'+textarea.value);
                     dijit.byId('loading_dialog').hide();
+                    //error_dialog.pop(batch.error);
                     error_dialog.pop('### NO DATA TO EXECUTE ON ###');
                     return;
                   };
+                  $.extend(formdata, batch);
+                  //CLEANUP SCRIPT
                   lines = textarea.value.split(/\r\n|\n|\r/);
                   lines.forEach(function(ln,idx){
                     ln = ln.replace(/^\s+|\s+$/g, '');  //TRIM
@@ -368,38 +357,17 @@
                     return;
                   };
                   formdata['script'] = script;
-                  $.post("#{project_path(@project)}/data_values/query_script_update#{current_user.nil? ? '' : '?api_key='+current_user.api_key}",
+                  $.post("#{project_path(@project)}/data_values/batch_update#{current_user.nil? ? '' : '?api_key='+current_user.api_key}",
                     formdata,
                     function(data) {
                       //QUERY SCRIPT RESULTS
                       console.log('SCRIPT RESULTS:',data);
-                      var errs = '';
                       if(formdata.dryrun=='false') {
                         //UPDATE GRID/PLOT
-                        for(var i=0; i<data.length; i++) {
-                          var item = datastore.get(data[i].id,#{dataId}.val_store);
-                          var dateval = new Date(item.local_date_time.toString());
-                          if(data[i].error) {
-                            errs += data[i].error+' -- ';
-                            errs += '['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
-                            errs += '<br/>\n';
-                          } else {
-                            datastore.update(data[i],#{dataId}.val_store);
-                            if(data[i].hasOwnProperty('data_value')) {
-                              dateval = parseInt(dateval/1000)*1000;
-                              #{dataId}.data[item._0] = [dateval,data[i].data_value]
-                            };
-                          };
-                        };
-                        var data_upd = #{dataId}.plot.getData();
-                        #{dataId}.plot.setData(data_upd);
-                        #{dataId}.plot.draw();
-                        #{dataId}.plot.unhighlight();
-                        var val_selected = #{dataId}.val_grid.selection.getSelected();
-                        plotutils.highlightItems(val_selected,0,#{dataId}.plot);
-                        #{dataId}.val_grid.update();
+                        var errs = #{dataId}.val_grid.batchUpdate(data);
                       } else {
                         //DRY-RUN: SHOW DRY-RUN GRID
+                        var errs = [];
                         var grid_struct = val_layout.slice(0,-1);
                         var grid_data = []
                         for(var i=0; i<data.length; i++){
@@ -409,9 +377,8 @@
                             if(fld!='id' && fld!='error') item[fld] = data[i][fld];
                             else if(fld=='error') {
                               item['string_value'] = data[i]['error'];
-                              errs += data[i].error+' -- ';
-                              errs += '['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
-                              errs += '<br/>\n';
+                              var val_string = ' -- ['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
+                              errs.push(data[i].error+val_string);
                             };
                           };
                           grid_data.push(item);
@@ -424,7 +391,7 @@
                       elapsed = 'Executed: ';
                       if(elapsed_mins) elapsed += elapsed_mins+' mins, '
                       elapsed += elapsed_secs+' secs\n';
-                      if(errs) elapsed += '<br/><br/>\n'+errs;
+                      if(errs) elapsed += '<br/><br/>\n'+errs.join('<br/>\n');
                       console.log(elapsed);
                       error_dialog.pop(elapsed,0,'SCRIPT COMPLETED');
                       dijit.byId('loading_dialog').hide();
@@ -517,7 +484,8 @@
       };
     };
     
-    //*** SHOW/HIDE QUERY-SCRIPT DIV
+    //################################### BATCH-STUFF
+    //*** SHOW/HIDE BATCH-SCRIPT DIV
     #{dataId}.show_scripting = function(show) {
       if(show){
         $('##{@tabId}_query_results').hide();
@@ -529,6 +497,62 @@
       };
     };
     
+    //*** GET BATCH DATA (for BATCH OPS)
+    #{dataId}.get_batch = function() {
+      console.log('>>>GET_BATCH...');
+      var batch = {};
+      var valdata = [];
+      var data_vals = [];
+      var datasource = $('##{@tabId}_script_source_select').val();
+      if(datasource=='SEL') {
+        console.log('>>>SEL');
+        valdata = #{dataId}.val_grid.selection.getSelected();
+        for(var i=0; i<valdata.length; i++) 
+          data_vals.push(valdata[i].id[0]);
+        batch['data_vals'] = data_vals;
+        //batch['data_vals'] = valdata;
+      } else if(datasource=='ALL') {
+        valdata = #{dataId}.value_data;
+        for(var i=0; i<valdata.length; i++) 
+          data_vals.push(valdata[i].id[0]);
+        batch['data_vals'] = data_vals;
+        //batch['data_vals'] = valdata;
+      } else {
+        batch['data_set'] = datasource;
+      };
+      console.log('>>>DATA-VALS:',valdata);
+      console.log('>>>DATA-VALS:',data_vals);
+      console.log('>>>DATASOUREC:',datasource);
+      if(!valdata.length && !parseInt(datasource)) {
+        //textarea.set('value','###NO DATA TO EXECUTE ON!\r\n'+textarea.value);
+        batch['error'] = '### NO DATA TO EXECUTE ON ###';
+      };
+      return batch;
+    }
+    
+    //*** ROLLBACK BATCH
+    #{dataId}.rollback_batch = function() {
+      var rollbackdata = {rollback:true};
+      var batch = #{dataId}.get_batch()
+      if(batch.error) return;
+      $.extend(rollbackdata, batch);
+      $.post("#{project_path(@project)}/data_values/batch_update#{current_user.nil? ? '' : '?api_key='+current_user.api_key}",
+        rollbackdata,
+        function(data) {
+          //ROLLBACK RESULTS
+          var errs = #{dataId}.val_grid.batchUpdate(data);
+          if(errs){
+            var rollback_msg = errs.length.toString()+' ROLLBACK ERRORS of '+data.length+' DataValues rolled back:\n<br/><br/>';
+            rollback_msg += errs.join('\n<br/>');
+          } else {
+            var rollback_msg = 'ROLLBACK SUCCESSFUL: '+data.length+' DataValues';
+          };
+          error_dialog.pop(rollback_msg,0,'ROLLBACK COMPLETE');
+        });
+      //
+    };
+    
+    //##############TESTING
     //var chart1 = new dojox.charting.Chart2D("simplechart");
     function trans1(store, item){
       // let's create our object
@@ -739,96 +763,122 @@
     // create a new grid:
     //#{dataId}.val_grid = new dijit_ext.Egrid({
     #{dataId}.val_grid = new dojox.grid.EnhancedGrid({
-       store: #{dataId}.val_store,
-       clientSort: true,
-       rowSelector: '0',
-       //rowsPerPage: 10,
-       selectionMode:'extended',
-       structure: val_layout,
-       //style: 'width:100%;',
-       //TURN-OFF clickSelectEvent
-       rowSelect: false,
-       plugins: {filter:true, exporter:true,
-         indirectSelection:{
-           headerSelector:true, 
-           rowSelector:'multi',
-           selectionMode:'extended',
-           cell:false,
-           col:false,
-           width:"40px", 
-           styles:"text-align: center;"}
-         //pagination:{
-         //  sizeSwitch: true,
-         //  position: "top",
-         //  itemTitle: "Data Points"
-       },
-       
-       onSelected: function(idx) {
-         console.log('SELECT:',idx);
-         var val_plot = #{dataId}.plot;
-         val_plot.unhighlight();
-         plotutils.highlightItems(this.selection.getSelected(),0,val_plot);
-       },
-       onDeselected: function(idx) {
-         console.log('DESELECT:',idx);
-         var val_plot = #{dataId}.plot;
-         val_plot.unhighlight();
-         plotutils.highlightItems(this.selection.getSelected(),0,val_plot);
-       },
-       xonClick: function(ev) {
-         this.select_click = ev;
-         console.log('GRID-CLICK:',ev);
-         //var select_col = this.select_focus.cell.index;
-         return;
-         if(this.select_focus.cell==null) return;
-         if(this.select_item){
-           if(this.select_focus.cell.index!=0){
-             this.selection.deselect(this.select_item);
-             return;
-           };
-           this.select_item = false;
-         };
-         if(this.deselect_item){
-           if(this.select_focus.cell.index!=0){
-             this.selection.addToSelection(this.select_item);
-             return;
-           };
-           this.deselect_item = false;
-         };
-       },
-       popEdit: function(id) {
-         //var item = this.getItem(idx);
-         //var item = #{dataId}.value_data[idx];
-         var item = datastore.get_raw(id,#{dataId}.val_store);
-         if(!item){
-           console.log('NO ITEM!');
+      store: #{dataId}.val_store,
+      clientSort: true,
+      rowSelector: '0',
+      //rowsPerPage: 10,
+      selectionMode:'extended',
+      structure: val_layout,
+      style: 'margin:0;',
+      //TURN-OFF clickSelectEvent
+      rowSelect: false,
+      plugins: {filter:true, exporter:true,
+       indirectSelection:{
+         headerSelector:true, 
+         rowSelector:'multi',
+         selectionMode:'extended',
+         cell:false,
+         col:false,
+         width:"40px", 
+         styles:"text-align: center;"}
+       //pagination:{
+       //  sizeSwitch: true,
+       //  position: "top",
+       //  itemTitle: "Data Points"
+      },
+    
+      onSelected: function(idx) {
+       console.log('SELECT:',idx);
+       var val_plot = #{dataId}.plot;
+       val_plot.unhighlight();
+       plotutils.highlightItems(this.selection.getSelected(),0,val_plot);
+      },
+      onDeselected: function(idx) {
+       console.log('DESELECT:',idx);
+       var val_plot = #{dataId}.plot;
+       val_plot.unhighlight();
+       plotutils.highlightItems(this.selection.getSelected(),0,val_plot);
+      },
+      xonClick: function(ev) {
+       this.select_click = ev;
+       console.log('GRID-CLICK:',ev);
+       //var select_col = this.select_focus.cell.index;
+       return;
+       if(this.select_focus.cell==null) return;
+       if(this.select_item){
+         if(this.select_focus.cell.index!=0){
+           this.selection.deselect(this.select_item);
            return;
          };
-         var point = #{dataId}.data[item._0];
-         //EDIT datavalue
-         console.log('EDIT ITEM:',item);
-         data_value_edit.pop(item, function(data) {
-           var item = data_value_edit.item;
-           //### Update Graph
-           //data['selected'] = item.selected;
-           //### Update Plot
-           var dateval = new Date(data.local_date_time.toString());
-           dateval = parseInt(dateval/1000)*1000;
-           #{dataId}.data[item._0] = [dateval,data.data_value]
-           var data_upd = #{dataId}.plot.getData();
-           #{dataId}.plot.setData(data_upd);
-           #{dataId}.plot.draw();
-           #{dataId}.plot.unhighlight();
-           var val_selected = #{dataId}.val_grid.selection.getSelected();
-           plotutils.highlightItems(val_selected,0,#{dataId}.plot);
-           //### Update Grid
-           datastore.update(data,#{dataId}.val_store);
-           #{dataId}.val_grid.update();
-         });
-       },
-       onFetchError: function(err) {
-         console.log('GRID FETCH ERROR:',err);
-       }
+         this.select_item = false;
+       };
+       if(this.deselect_item){
+         if(this.select_focus.cell.index!=0){
+           this.selection.addToSelection(this.select_item);
+           return;
+         };
+         this.deselect_item = false;
+       };
+      },
+      popEdit: function(id) {
+       //var item = this.getItem(idx);
+       //var item = #{dataId}.value_data[idx];
+       var item = datastore.get_raw(id,#{dataId}.val_store);
+       if(!item){
+         console.log('NO ITEM!');
+         return;
+       };
+       var point = #{dataId}.data[item._0];
+       //EDIT datavalue
+       console.log('EDIT ITEM:',item);
+       data_value_edit.pop(item, function(data) {
+         var item = data_value_edit.item;
+         //### Update Graph
+         //data['selected'] = item.selected;
+         //### Update Plot
+         var dateval = new Date(data.local_date_time.toString());
+         dateval = parseInt(dateval/1000)*1000;
+         #{dataId}.data[item._0] = [dateval,data.data_value]
+         var data_upd = #{dataId}.plot.getData();
+         #{dataId}.plot.setData(data_upd);
+         #{dataId}.plot.draw();
+         #{dataId}.plot.unhighlight();
+         var val_selected = #{dataId}.val_grid.selection.getSelected();
+         plotutils.highlightItems(val_selected,0,#{dataId}.plot);
+         //### Update Grid
+         datastore.update(data,#{dataId}.val_store);
+         #{dataId}.val_grid.update();
+       });
+      },
+      batchUpdate: function(data) {
+       //UPDATE GRID/PLOT
+       errs = []
+       for(var i=0; i<data.length; i++) {
+         var item = datastore.get(data[i].id,#{dataId}.val_store);
+         var dateval = new Date(item.local_date_time.toString());
+         if(data[i].error) {
+           var val_string = ' -- ['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
+           errs.push(data[i].error+val_string);
+         } else {
+           datastore.update(data[i],#{dataId}.val_store);
+           if(data[i].hasOwnProperty('data_value')) {
+             dateval = parseInt(dateval/1000)*1000;
+             #{dataId}.data[item._0] = [dateval,data[i].data_value]
+           };
+         };
+       };
+       var data_upd = #{dataId}.plot.getData();
+       #{dataId}.plot.setData(data_upd);
+       #{dataId}.plot.draw();
+       #{dataId}.plot.unhighlight();
+       var val_selected = #{dataId}.val_grid.selection.getSelected();
+       plotutils.highlightItems(val_selected,0,#{dataId}.plot);
+       #{dataId}.val_grid.update();
+       return errs;
+      },
+      onFetchError: function(err) {
+       console.log('GRID FETCH ERROR:',err);
+      }
     },
     document.createElement('div'));
     
