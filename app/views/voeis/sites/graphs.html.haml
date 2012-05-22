@@ -1,0 +1,88 @@
+= javascript_include_tag("jquery.flot.js")
+:javascript
+  var date_formatter = function(value) {
+    if(value==null || value=='') return '-';
+    // Format DateTime string
+    var d = new Date(value);
+    //var fmt = d.getMonth()+'/'+d.getFullYear()
+    return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+  };
+
+-@variables.each do |var|
+
+  %h3
+    #{var.variable_name} (#{@units.first(:id=> var.variable_units_id).units_name})
+  %div{:id=>"graph-site"+var.id.to_s, :style=>"width:400px;height:250px;margin:0 0 25px 50px;"}
+  %br
+  :javascript        
+
+    var gdata_#{var.id.to_s} = #{@graph_data[var.id.to_s].to_json};
+    gdata_#{var.id.to_s} = gdata_#{var.id.to_s} || {};
+
+
+        var plot_#{var.id.to_s} = $.plot($("#graph-site#{var.id.to_s}"), [gdata_#{var.id.to_s}],{
+            series: {
+                color : "blue",
+                lines: { show: true },
+                points: { show: true }
+            },
+            ticks: 12,
+            grid:  { hoverable: true, clickable: true },
+            xaxis: { mode: "time" },
+            pan:   { interactive: true },
+            zoom:  { interactive: true }
+        });
+
+
+    //Function ShowToolTip and previousPoint allow the hover function to display
+    //a message for each data point on the graph when the cursor hoversover
+
+    //I would only mess with the css if you really need to otherwise this
+    //shouldn't need any modification
+    var showTooltip_#{var.id.to_s} = function(x, y, contents) {
+        $('<div id="tooltip_#{var.id.to_s}">' + contents + '</div>').css( {
+            position: 'absolute',
+            //'min-width': '50%',
+            display: 'none',
+            //overflow: 'visible',
+            'z-index': 1000,
+            top: y + 5,
+            left: x + 5,
+            border: '1px solid #fdd',
+            padding: '2px',
+            'background-color': '#fee',
+            opacity: 0.80
+        }).appendTo("body").fadeIn(200);
+    };
+
+    //Most of this should remain the same
+    //NOTE-- the time string for #x is in UTC format and currently is in GMT time
+
+        var previousPoint_#{var.id.to_s} = null;
+        $("#{"#graph-site"+var.id.to_s}").bind("plothover", function (event, pos, item) {
+            var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+            dDate = new Date();
+            dDate.setTime(mEpoch);
+            //console.log('>>>plothover');
+            $("#x").text(dDate.toLocaleString());
+            $("#y").text(pos.y);
+
+            if (item) {
+                if (previousPoint_#{var.id.to_s} != item.datapoint) {
+                    previousPoint_#{var.id.to_s} = item.datapoint;
+                    $("#tooltip_#{var.id.to_s}").remove();
+                    var x = item.datapoint[0].toFixed(2),
+                    y = item.datapoint[1].toFixed(2);
+                    var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+                    dDate = new Date();
+                    dDate.setTime(mEpoch);
+                    showTooltip_#{var.id.to_s}(item.pageX, item.pageY,
+     
+                        date_formatter(dDate.toLocaleString())+" = "+y+"#{var.variable_name} | #{@units.first(:id=>var.variable_units_id).units_name}");
+                };
+            } else {
+                $("#tooltip_#{var.id.to_s}").remove();
+                previousPoint_#{var.id.to_s} = null;            
+            }
+        });
+    

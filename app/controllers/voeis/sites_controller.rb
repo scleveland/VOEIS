@@ -229,6 +229,33 @@ class Voeis::SitesController < Voeis::BaseController
     #     end
   end
 
+  # graphs
+  # display graphs for all variables for at least the last 24 hours
+  #
+  def graphs
+    @units = Voeis::Unit.all()
+    parent.managed_repository do
+      @site =  Voeis::Site.get(params[:site_id])
+      #fetch all variables that have measurements for this site
+      @site_catalog_items = Voeis::SiteDataCatalog.all(:site_id => @site.id, :record_number.gt => 0)
+      @variables = Voeis::Variable.all(:id => @site_catalog_items.map{|v| v.variable_id})
+      @graph_data = {}
+      @variables.each do |var|
+        @graph_data[var.id.to_s] = var.values_graph(@site, params[:number].nil? ? 12 : params[:number].to_i)
+      end
+      
+      # respond_to do |format|
+      #   format.html{
+      #     flash[:notice] = "Site was Updated successfully."
+      #     redirect_to project_url(parent)
+      #   }
+      #   format.json{
+      #     render :json => site.as_json, :callback => params[:jsoncallback]
+      #   }
+      # end #end format
+    end #end repository
+  end
+
   def create
     @project = parent
     # This should be handled by the framework, but isn't when using jruby.

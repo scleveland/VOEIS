@@ -33,6 +33,7 @@ Yogo::Application.routes.draw do
           post :save_site
           get :versions
           get :site_samples
+          get :graphs
         end
       end
       resources :data_streams do
