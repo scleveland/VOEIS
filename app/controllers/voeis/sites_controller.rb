@@ -243,7 +243,7 @@ class Voeis::SitesController < Voeis::BaseController
       @variables.each do |var|
         @graph_data[var.id.to_s] = var.values_graph(@site, params[:number].nil? ? 12 : params[:number].to_i)
       end
-      
+      render :layout=>'site'
       # respond_to do |format|
       #   format.html{
       #     flash[:notice] = "Site was Updated successfully."

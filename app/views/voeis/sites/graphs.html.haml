@@ -4,8 +4,7 @@
     if(value==null || value=='') return '-';
     // Format DateTime string
     var d = new Date(value);
-    //var fmt = d.getMonth()+'/'+d.getFullYear()
-    return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+    return d.toLocaleString()
   };
 
 -@variables.each do |var|
