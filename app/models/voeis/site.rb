@@ -76,7 +76,7 @@ class Voeis::Site
   alias :site_code= :code=
 
   before :save, :update_associations
-  
+  after :destroy, :remove_site_data_catalog_entries
   #
   #  @returns[:Nokogiri:XML::Builder] :xml a nokogiri xml document
   def self.wml_header
@@ -229,6 +229,10 @@ class Voeis::Site
     his_id = new_his_site.id
     save
     new_his_site
+  end
+  
+  def remove_site_data_catalog_entries
+    Voeis::SiteDataCatalog.all(:site_id=>self.id).destroy
   end
   
   def update_site_data_catalog
