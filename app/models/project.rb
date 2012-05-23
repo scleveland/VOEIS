@@ -37,7 +37,15 @@ class Project
 
 
   def upgrade_global_models
-    DataMapper.auto_upgrade!
+    self.managed_repository do
+      DataMapper::Model.descendants.each do |model|
+        begin
+          model.auto_upgrade!
+        rescue => e
+          puts model.name+": #{e}"
+        end
+      end
+    end
   end
   ##
   # Permissions on the object for the user that is passed in
