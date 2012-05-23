@@ -120,11 +120,12 @@
     =image_tag("v2/voeis_logo.png", :style=>"padding-left: 1em; display: inline-block; height: 135px;")
     %div(style="padding: 2em; float: right; display: inline-block;")
       -#=link_to("Browse Public Projects in VOEIS", projects_path($project), :style=>"margin-left:10px;")
-      %button{:class=>"startButton", :onclick=>projects_path($project)} 
+      -#%button{:class=>"startButton", :onclick=>projects_path($project)} 
+      %button{:class=>"startButton", :onclick=>"location.href='#{projects_path()}';"} 
         Start Browsing Public Data
 
   -#= form_for(:user_session, :url => user_session_path, :builder => YogoFormBuilder) do |f|
-  %div(dojoType="dijit.layout.TabContainer" style="font-size: 12pt; text-align: right; font-weight:bold; width:100%; height:760px;" 
+  #HomeTabs(dojoType="dijit.layout.TabContainer" style="font-size:12pt; text-align:right; font-weight:bold; width:100%; height:480px;" 
         controllerWidget="dijit.layout.TabController")
 
     #Home(dojoType="dojox.layout.ContentPane" selected="selected" title="Home" class="splashElement" href="/static/v2pages/Home.html" 
