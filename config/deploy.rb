@@ -28,6 +28,7 @@ end
 desc "Setup NEW Development Settings"
 task :development2 do
   set :rvm_ruby_string, 'ruby-1.9.2-p180@passenger'
+  set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p180/bin/bundle"
   
   set :application, "voeis"
   set :use_sudo,    false
