@@ -197,13 +197,12 @@ class Voeis::DataValuesController < Voeis::BaseController
   
   ### BATCH UPDATE: SELECTED DataValues via Rscript or Rollback
   # (ajax/json)
-  # @params['data_vals'] = array of DataValue IDs
-  # @params['data_set'] = a DataSet ID (alternative to data_vals)
-  # @params['script'] = string - R-script to execute on DataValues
+  # @params['data_vals'] = array of DataValue IDs (optional, or 'data_set')
+  # @params['data_set'] = a DataSet ID (optional, or 'data_vals')
+  # @params['script'] = string - R-script to execute on DataValues (optional, or 'rollback')
   # @params['dryrun'] = don't save any DataValues if TRUE
-  # @params['rollback'] = no script, ROLLBACK VERSION on batch
-   
-  # @params['mode'] = update type: 
+  # @params['rollback'] = TRUE = ROLLBACK VERSION on batch (optional, or 'script')
+  # @params['target'] = variable_id -OR- target type: 'CSV' / etc.  (optional, or update self)
   ##def query_script_update
   def batch_update
     parent.managed_repository{
@@ -211,6 +210,12 @@ class Voeis::DataValuesController < Voeis::BaseController
       data_val_ids = params['data_vals']
       dryrun = params['dryrun'].nil? || params['dryrun'] =~ /(false|f|no|0)/i || blank? ? false : true
       rollback = params['rollback'].nil? || params['rollback'] =~ /(false|f|no|0)/i || blank? ? false : true
+      target = params['target']
+      if(!target.nil?)
+        
+        target_var = target.to_i==0 ? false : target.to_i
+        target_var = Voeis::Variable.get(target_var) if target_var
+      end
       if data_set = Voeis::DataSet.get(params[:data_set].to_i)
         #data_values = data_set.data_values.map{|dv| dv.id}
         data_values = data_set.data_values
@@ -271,12 +276,28 @@ class Voeis::DataValuesController < Voeis::BaseController
             break
           end
           #SAVE DV FIELDS
+          if target
+            if target_var
+              #NEW DATA_VALUE AT TARGET_VAR
+              
+            end
+            if target=='CSV'
+              #EXPORT TO CSV
+              
+            else
+              dryrun = true
+            end
+          else
+            #NO TARGET: UPDATE SELF
+            new_data_value = data_value
+          end
           dv_fields.reject{|fld| dv_fields_omit_update.include?(fld) }.each{|fld| 
+            
             updfld = rr>>fld
             if updfld!=data_value[fld]
               if !dryrun
                 provenance << fld+'='+data_value[fld].to_s
-                data_value[fld] = updfld
+                new_data_value[fld] = updfld
               end
               dv[fld] = updfld
             end
@@ -286,15 +307,16 @@ class Voeis::DataValuesController < Voeis::BaseController
           if date_time.to_i!=data_value.local_date_time.to_i
             if !dryrun
               provenance << 'local_date_time='+data_value.local_date_time.to_s
-              data_value.local_date_time = date_time
+              new_data_value['local_date_time'] = date_time
               #data_value.date_time_utc = DateTime.parse(rr>>'format(date_time_utc,"%Y-%m-%d %H:%M:%S")')
-              data_value.date_time_utc = date_time-data_value.utc_offset.hours
+              new_data_value['date_time_utc'] = date_time-data_value.utc_offset.hours
             end
             dv['local_date_time'] = date_time_str
           end
           if !dryrun
-            data_value.provenance_comment = 'SCRIPTED FROM: '+provenance.join('; ')
-            if err.blank? && !data_value.save
+            script_show = ''
+            new_data_value['provenance_comment'] = 'SCRIPTED FROM: '+provenance.join('; ')+' --VIA: '+script_show
+            if err.blank? && !new_data_value.save
               err = '*** SAVE ERROR!'
             end
           end
