@@ -137,7 +137,7 @@ class Voeis::Variable
                                         :variable_units_id => var_to_store.variable_units_id,
                                         :sample_medium => var_to_store.sample_medium,
                                         :value_type => var_to_store.value_type,
-                                        :is_regular => var_to_store.is_regular? 1 : 0,
+                                        :is_regular => var_to_store.is_regular ? 1 : 0,
                                         :time_support => var_to_store.time_support,
                                         :time_units_id => var_to_store.time_units_id,
                                         :data_type => var_to_store.data_type,
@@ -152,6 +152,7 @@ class Voeis::Variable
   end
   
   def his_valid?
+    
     #check speciation
     #check sample_medium
     #check value_type
