@@ -43,12 +43,15 @@ authorization requirements, 2) static data model support, and 3) import and expo
 data sources.
 <!--
 <input type="button" data-dojo-type="dijit.form.Button" disabled="true" intermediateChanges="false" label="Download VOEIS User Manual" iconClass="dijitNoIcon" style="float:right; font-weight:bold; margin:2em;"></input>
+
+<div id="DocTabs" data-dojo-type="dijit.layout.TabContainer" style="width:100%; height:500px;" 
+		region="center" tabStrip="true" controllerWidget="dijit.layout.TabController">
 -->
 </div></div>
 <br/>
 
-<div id="DocTabs" data-dojo-type="dijit.layout.TabContainer" style="width:100%; height:700px!important;" 
-		controllerWidget="dijit.layout.TabController">
+<div id="DocTabs" data-dojo-type="dijit.layout.TabContainer" style="width:100%; height:500px;" 
+		region="center" tabStrip="true">
 
 <div data-dojo-type="dijit.layout.ContentPane" title="Goals and Vision" selected="selected">
 <br/>
@@ -364,27 +367,31 @@ custom applications and user interfaces to interact with the VOEIS Data Hub.
 </div> <!-- END TabContainer -->
 
 <script type="text/javascript">
+//<!--
 function doOnLoad() {
 	console.log('doOnLoad: Documentation');
 	var tab_titles = [
-	'Goals and Vision',
-	'Workflows and Use Cases',
-	'Design Specifications',
-	'Versions',
-	'HIS Publication Gateway',
-	'For Developers...'];
+		'Goals and Vision',
+		'Workflows and Use Cases',
+		'Design Specifications',
+		'Versions',
+		'HIS Publication Gateway',
+		'For Developers...'];
 	var tabs = dijit.byId('DocTabs');
-	$(tabs.domNode).css('height','460px');
-	$(tabs.domNode).css('width','100%');
-	$(tabs.domNode).css('overflow','auto');
+	//$(tabs.domNode).css('width','90%');
+	//$(tabs.domNode).css('height','460px');
+	$(tabs.domNode).css('height','500px');
+	//$(tabs.domNode).css('overflow','scroll');
 	var tabs_to = tabs.getChildren();
 	for(var i=0; i<tab_titles.length; i++) {
 		tabs_to[i].set('title',tab_titles[i]);
+		$(tabs_to[i].domNode).css('height','440px');
 		$(tabs_to[i].domNode).css('overflow','auto');
-		//$(tabs_to[i].domNode).css('height','400px');
 	};
+	tabs.resize();
 	
 }
+//-->
 </script>
 
 </div>
