@@ -6,7 +6,7 @@ class Voeis::CVType
   property :name,     String, :required => true, :length => 512, :index => true
   
   has n, :data_type_cvs, :model=>"Voeis::DataTypeCV", :through=>Resource
-  has n, :general_catergory_cvs, :model=>"Voeis::GeneralCategoryCV", :through=>Resource
+  has n, :general_category_cvs, :model=>"Voeis::GeneralCategoryCV", :through=>Resource
   has n, :logger_type_cvs, :model=>"Voeis::LoggerTypeCV", :through=>Resource
   has n, :quality_control_levels, :model=>"Voeis::QualityControlLevel", :through=>Resource
   has n, :sample_medium_cvs, :model=>"Voeis::SampleMediumCV", :through=>Resource
