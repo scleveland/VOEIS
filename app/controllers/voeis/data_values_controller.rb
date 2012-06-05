@@ -111,6 +111,7 @@ class Voeis::DataValuesController < Voeis::BaseController
   
   #def create
   #end
+  
   def meta_tags
     @data_value = @project.managed_repository{Voeis::DataValue.get(params[:id].to_i)}
   end
@@ -202,7 +203,7 @@ class Voeis::DataValuesController < Voeis::BaseController
   # @params['script'] = string - R-script to execute on DataValues (optional, or 'rollback')
   # @params['dryrun'] = don't save any DataValues if TRUE
   # @params['rollback'] = TRUE = ROLLBACK VERSION on batch (optional, or 'script')
-  # @params['target'] = variable_id -OR- target type: 'CSV' / etc.  (optional, or update self)
+  # @params['target'] = variable_id ###-OR- target type: 'CSV' / etc.  (optional, or update self)
   ##def query_script_update
   def batch_update
     parent.managed_repository{
@@ -235,7 +236,6 @@ class Voeis::DataValuesController < Voeis::BaseController
       else
         rr = ::Rserve::Simpler.new
         data_values = data_values.all(:limit=>20) if dryrun
-        rscript0 = params['script']
         dv_fields = ['data_value',
                       'string_value',
                       'utc_offset',
@@ -250,9 +250,12 @@ class Voeis::DataValuesController < Voeis::BaseController
         dv_fields_omit_update = []
         #CLEAN RSCRIPT!
         #HERE! - remove 'System' calls - etc
+        rscript0 = params['script']
         rscript = ""
+        script_show = ""
         rscript0.split(/\r\n|\n|\r/).each{|ln|
           rscript += ln+"\n" unless ln=~/system/i
+          script_show += ln+"; " unless script_show.length>150
         }
         data_values.each{|data_value|
           #LOAD DV FIELDS
@@ -275,26 +278,36 @@ class Voeis::DataValuesController < Voeis::BaseController
             updated << dv
             break
           end
-          #SAVE DV FIELDS
+          ###SAVE DV FIELDS
+          #DEFAULT TARGET: UPDATE SELF
+          new_data_value = data_value
           if target
             if target_var
-              #NEW DATA_VALUE AT TARGET_VAR
-              
-            end
-            if target=='CSV'
+              #NEW_DATA_VALUE AT TARGET_VAR
+              begin
+                new_data_var = Voeis::Variable.get(:id=>target_var)
+              rescue Exception => e
+                ###BAD TARGET VARIABLE
+                err = '*** UNDEFINED TARGED VARIABLE!'
+                dv['error'] = err
+                updated << dv
+                break
+              end
+              new_data_value = Voeis::DataValue.new(:variable_id=>target_var.to_i)
+            elseif target=='CSV'
               #EXPORT TO CSV
+              #new_data_value =
               
-            else
-              dryrun = true
+            elseif target=='XXX'
+              #EXPORT TO XXX?
+              #new_data_value =
+              
             end
-          else
-            #NO TARGET: UPDATE SELF
-            new_data_value = data_value
           end
           dv_fields.reject{|fld| dv_fields_omit_update.include?(fld) }.each{|fld| 
-            
+            #FIELD from R script
             updfld = rr>>fld
-            if updfld!=data_value[fld]
+            if updfld!=data_value[fld] && (!target_var || fld!='variable_id')
               if !dryrun
                 provenance << fld+'='+data_value[fld].to_s
                 new_data_value[fld] = updfld
@@ -314,8 +327,11 @@ class Voeis::DataValuesController < Voeis::BaseController
             dv['local_date_time'] = date_time_str
           end
           if !dryrun
-            script_show = ''
-            new_data_value['provenance_comment'] = 'SCRIPTED FROM: '+provenance.join('; ')+' --VIA: '+script_show
+            prov_comm = rr>>'provenance_comment'
+            if prov_comm.blank? 
+              prov_comm = 'VIA>> '+script_show
+            end
+            new_data_value['provenance_comment'] = 'SCRIPTED FROM: '+provenance.join('; ')+' -- '+prov_comm
             if err.blank? && !new_data_value.save
               err = '*** SAVE ERROR!'
             end

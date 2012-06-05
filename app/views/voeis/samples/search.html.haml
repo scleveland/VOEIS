@@ -244,14 +244,12 @@
         %br
         %br
         %em
-          -#ENTER R-SCRIPT HERE
-          ENTER R-SCRIPT HERE &nbsp; &mdash; &nbsp; 
-          -#LOAD/SAVE: 
+          ENTER R-SCRIPT HERE &nbsp; &mdash; &nbsp; LOAD/SAVE: 
         - opts02 = "<option value='-'>- select -</option>\n"
         - opts02 += "<option value='SAVE'>SAVE SCRIPT</option>\n"
-        - opts02 += "<option value='12'>LOAD: Script-1</option>\n<option value='13'>LOAD: Script-2</option>\n"
-        - opts02 += "<option value='14'>LOAD: Script-3</option>\n<option value='15'>LOAD: Script-4</option>\n"
-        -#= select_tag("#{@tabId}_script_load_select", (opts02).html_safe)
+        - opts02 += "<option value='SAVEAS'>SAVE SCRIPT AS</option>\n"
+        - opts02 += @scripts_options
+        = select_tag("#{@tabId}_script_load_select", (opts02).html_safe)
         %br
         %input(name="script" dojoType="dijit.form.SimpleTextarea" id="#{@tabId}_query_script_text" rows="21" 
               style="width:600px!important;line-height:16px!important;float:left;")
@@ -268,25 +266,19 @@
                         'end_vertical_offset',
                         'published',
                         'variable_id'].join("<br/>\n").html_safe
-        - dv_fields0 = ['data_value, string_value,',
-                        'date_time, utc_offset,',
-                        'datatype, value_accuracy,',
-                        'quality_control_level, replicate,',
-                        'vertical_offset, end_vertical_offset',
-                        'published,',
-                        'variable_id'].join("<br/>\n").html_safe
         - dv_fields1 = ['data_value',
                         'date_time',
                         'datatype',
                         'quality_control_level',
                         'vertical_offset',
-                        'published'].join("<br/>\n").html_safe
+                        'published',
+                        'provenance_comment'].join("<br/>\n").html_safe
         - dv_fields2 = ['string_value',
                         'utc_offset',
                         'value_accuracy',
                         'replicate',
                         'end_vertical_offset',
-                        'variable_id'].join("<br/>\n").html_safe
+                        'variable_id','&nbsp;'].join("<br/>\n").html_safe
         %div(style="width:350px;margin-left:10px;float:left;")
           %strong
             FIELDS:
@@ -306,14 +298,14 @@
           = select_tag("#{@tabId}_script_source_select", (opts00+@data_set_options).html_safe)
           %br
           %br
-          -#%strong
-          -#  TARGET:
-          -#%br
+          %strong
+            TARGET (SELF or VARIABLE):
+          %br
           - opts01 =  "<option value='SELF'>UPDATE SELF</option>\n"
-          - opts01 += "<option value='DISP'>POPULATE DISPLAY GRID</option>\n"
-          - opts01 += "<option value='CSV'>EXPORT CSV FILE</option>\n"
+          -# opts01 += "<option value='DISP'>POPULATE DISPLAY GRID</option>\n"
+          -# opts01 += "<option value='CSV'>EXPORT CSV FILE</option>\n"
           - opts01 += @variables_options
-          -#= select_tag("#{@tabId}_script_target_select", opts01.html_safe)
+          = select_tag("#{@tabId}_script_target_select", opts01.html_safe)
           %br
           %br
           %input(name="dryrun" dojoType="dijit.form.CheckBox" id="#{@tabId}_query_script_dryrun" checked)
@@ -329,6 +321,7 @@
                   dijit.byId('loading_dialog').show();
                   var start_time = new Date().valueOf();
                   var textarea = dijit.byId("#{@tabId}_query_script_text");
+                  var datatarget = $('##{@tabId}_script_target_select').val();
                   var data_vals = [];
                   var script = '';
                   var formdata = {
@@ -357,6 +350,10 @@
                     return;
                   };
                   formdata['script'] = script;
+                  //SET TARGET VARIABLE (or SELF)
+                  if(datatarget!='SELF')
+                    formdata['target'] = datatarget;
+                  
                   $.post("#{project_path(@project)}/data_values/batch_update#{current_user.nil? ? '' : '?api_key='+current_user.api_key}",
                     formdata,
                     function(data) {
@@ -430,6 +427,9 @@
    
     var #{dataId}_str = #{@meta_tags.to_json}.toString();
     var #{dataId} = {};
+    #{dataId}.script_id = 0;
+    #{dataId}.script_name = '';
+    #{dataId}.script_description = '';
     #{dataId}.value_data = #{@data_structs.sql_to_json};
     for(var i=0;i<#{dataId}.value_data.length;i++) 
       #{dataId}.value_data[i]['selected'] = 0;
@@ -1255,14 +1255,118 @@
        console.log('DATA-SET-SELECT:',$("##{@tabId}_data_set_select")[0]);
        
        $("##{@tabId}_data_set_select").change(function(e){
-         console.log('CHANGE!');
+         console.log('DATA-SET-SELECT-CHANGE!');
          if(this.value!='NEW') return;
          //OPEN DIALOG
          $("##{@tabId}_data_set_select").val('-');
-         new_data_set.setup("#{@tabId}_data_set_select");
+         //new_data_set.setup("#{@tabId}_data_set_select");
+         //NEW name_entry_dialog--
+         name_entry_dialog.pop('Create New Data Set',{
+           SAVE: 'Create Data Set',
+           FIELD1: 'Type:',
+           FIELD3: 'Description:'
+         },function(results){
+           var vardata = {name: results.name, description: results.description, type: results.type};
+           console.log('CREATE DATASET:',vardata);
+           $.post("#{project_path(@project)}/apivs/create_project_data_set.json?api_key=#{User.current.api_key}",
+             vardata,
+             function(data) {
+               $('##{@tabId}_data_set_select').append($("<option></option>").attr("value",data['id']).text(results.name));
+               $('##{@tabId}_data_set_select').val(data['id']);
+               //$('#data_set_select').append($("<option></option>").attr("value",data['id']).text(els.name.value)); 
+               //$('#data_set_select').val(data['id']);
+           });
+         });
+       });
+       
+       $("##{@tabId}_script_load_select").change(function(e){
+         //console.log('CHANGE!');
+         if(this.value=='-') return;
+         if(this.value.slice(0,4)=='SAVE') {
+           //###SAVE
+           console.log('CHANGE SCRIPT: SAVE-',this.value);
+           $("##{@tabId}_script_load_select").val('-');
+           var script = dijit.byId('#{@tabId}_query_script_text').get('value');
+           if(!script.match(/\s*\S+\s*/g)) return;
+           var ttl = 'SAVE SCRIPT'
+           var post_data = {
+             id: #{dataId}.script_id,
+             name: #{dataId}.script_name,
+             description: #{dataId}.script_description,
+             script_body: dijit.byId('#{@tabId}_query_script_text').get('value')
+           };
+           if(#{dataId}.script_id==0 || this.value=='SAVEAS') {
+             //NEW- POST
+             delete post_data.id;
+             if(#{dataId}.script_id) ttl = 'SAVE SCRIPT AS'
+             //OPEN SAVE SCRIPT DIALOG
+             name_entry_dialog.pop(ttl,{
+               SAVE: 'Save Script',
+               FIELD3: 'Description:'
+             },function(results){
+               console.log('SAVE SCRIPT RESULTS:',results);
+               post_data.name = results.name;
+               post_data.description = results.description;
+               //POST save script
+               $.ajax({
+                 type: 'POST',
+                 url: '#{project_path(@project)}/scripts.json?api_key=#{User.current.api_key}',
+                 data: {script: post_data},
+                 success: function(data){
+                   console.log('SCRIPT-POST:',data);
+                   $('##{@tabId}_script_load_select').append($("<option></option>").attr("value",data.id).text('>> '+results.name));
+                   $('##{@tabId}_script_load_select').val(data.id);
+                   //$('#data_set_select').append($("<option></option>").attr("value",data['id']).text(els.name.value)); 
+                   //$('#data_set_select').val(data['id']);
+                   #{dataId}.script_id = parseInt(data.id);
+                   #{dataId}.script_name = data.name;
+                   #{dataId}.script_description = data.description;
+                 },
+                 dataType: 'json'
+               });
+               
+             });
+           } else {
+             //PUT update script
+             $.ajax({
+               type: 'PUT',
+               url: '#{project_path(@project)}/scripts/'+post_data.id+'.json?api_key=#{User.current.api_key}',
+               data: {script: post_data},
+               success: function(data){
+                 console.log('SCRIPT-POST:',data);
+                 $('##{@tabId}_script_load_select').append($("<option></option>").attr("value",data.id).text(results.name));
+                 $('##{@tabId}_script_load_select').val(data.id);
+                 //$('#data_set_select').append($("<option></option>").attr("value",data['id']).text(els.name.value)); 
+                 //$('#data_set_select').val(data['id']);
+                 #{dataId}.script_id = parseInt(data.id);
+                 #{dataId}.script_name = data.name;
+                 #{dataId}.script_description = data.description;
+               },
+               dataType: 'json'
+             });
+           };
+           
+         } else {
+           //###LOAD
+           console.log('CHANGE SCRIPT: LOAD-',this.value);
+           #{dataId}.script_id = parseInt(this.value);
+           $.ajax({
+             type: 'GET',
+             url: '#{project_path(@project)}/scripts/'+this.value+'.json?api_key=#{User.current.api_key}',
+             success: function(data){
+               #{dataId}.script_id = parseInt(data.id);
+               #{dataId}.script_name = data.name;
+               #{dataId}.script_description = data.description;
+               dijit.byId('#{@tabId}_query_script_text').set('value',data.script_body);
+               console.log('SCRIPT-LOAD:',data);
+             },
+             dataType: 'json'
+           });
+           
+         };
          
        });
-
+       
        console.log('initPage: DONE');
      };
      

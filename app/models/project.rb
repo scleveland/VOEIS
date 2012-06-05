@@ -92,6 +92,7 @@ class Project
                           "voeis/apiv$retrieve",
                           "voeis/jobs$retrieve",
                           "voeis/search$retrieve",
+                          "voeis/script$retrieve",
                           "voeis/data_value$retrieve"] unless self.is_private?
       return base_permission if user.nil?
       (super + base_permission + user.memberships(:project_id => self.id).roles.map{|r| r.actions }).flatten.uniq

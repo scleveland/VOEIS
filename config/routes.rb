@@ -51,46 +51,55 @@ Yogo::Application.routes.draw do
       end
       resources :vertical_datum_c_vs do
         collection do
+          get :list
           get :versions
         end
       end
       resources :spatial_references do
         collection do
+          get :list
           get :versions
         end
       end
       resources :variable_name_c_vs do
         collection do
+          get :list
           get :versions
         end
       end
       resources :quality_control_levels do
         collection do
+          get :list
           get :versions
         end
       end
       resources :sample_type_c_vs do
         collection do
+          get :list
           get :versions
         end
       end
       resources :value_type_c_vs do
         collection do
+          get :list
           get :versions
         end
       end
       resources :data_type_c_vs do
         collection do
+          get :list
           get :versions
         end
       end
       resources :sample_medium_c_vs do
         collection do
+          get :list
           get :versions
         end
       end
       resources :variables do
         collection do
+          get :list
           get :versions
         end
       end
@@ -98,6 +107,12 @@ Yogo::Application.routes.draw do
       resources :data_sets do
         collection do
           get :proto
+        end
+      end
+      resources :scripts do
+        collection do
+          get :list
+          get :versions
         end
       end
       resources :spatial_offsets

@@ -253,6 +253,12 @@ class Voeis::SamplesController < Voeis::BaseController
         @graph_data << Array[data_val.local_date_time.to_datetime.to_i*1000, data_val.data_value]
         #@meta_tag_hash[data_val.id] = @meta_tags.map{|m| m.data_value_id == data_val.id}.to_a
       end
+      @scripts = parent.managed_repository{Voeis::Script.all}
+      @scripts_opts_array = Array.new
+      @scripts.all(:order=>[:name.asc]).each do |scr|
+        @scripts_opts_array << ['>> '+scr.name, scr.id.to_s]
+      end
+      @scripts_options = opts_for_select(@scripts_opts_array)
       respond_to do |format|
         format.js if format.json
         format.html if format.html
