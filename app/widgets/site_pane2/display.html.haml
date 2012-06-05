@@ -105,7 +105,7 @@
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show-site00').hide();$('#edit-site00').show();")
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('DELETE', 'javascript:', :class=>'icon icon-delete', :onclick=>"if(confirm('Are you sure you want to delete this Site?'))delete_site($$$id$$$);")
+    = link_to('DELETE', 'javascript:', :class=>'icon icon-delete', :onclick=>"delete_site($$$id$$$);")
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
 
@@ -630,13 +630,19 @@
           dojo.publish('voeis/project/site/close',[0]);
         };
         function delete_site(site_id){
-          $.ajax({
+          confirmDialog(
+            'DELETE SITE?',
+            'Are you sure you want to <br/>DELETE this site (ID: '+site_id+')?',
+            function(yes) {
+              if(yes) {
+                $.ajax({
                   url: '#{project_path(@project)}/sites/'+site_id.toString(),
                   type: "DELETE",
-                  dataType: "json"}).done(function (data){
+                  dataType: "json"}).done(
+                  function (data){
                     alert(data["msg"]);    
-                  });
-                
+                  })}},
+            {buttonOk:'YES!'});
         }
       
 
