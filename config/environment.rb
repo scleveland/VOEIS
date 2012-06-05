@@ -36,6 +36,14 @@ class Array
   end
 end
 
+class String
+  def valid_float?
+    # The double negation turns this into an actual boolean true - if you're 
+    # okay with "truthy" values (like 0.0), you can remove it.
+    !!Float(self) rescue false
+  end
+end
+
 module DataMapper
   def self.raw_select(dm_query)
     statement, bind_vars = repository.adapter.send(:select_statement, dm_query.query)

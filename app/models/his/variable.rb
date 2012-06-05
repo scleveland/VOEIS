@@ -60,13 +60,13 @@ class His::Variable
   property :general_category,   String, :required => true, :default => 'Unknown'
   property :no_data_value,      Float,  :required => true, :default => -9999
 
-  has n,     :Categories,           :model => "His::Category"
-  belongs_to :units,                :model => "His::Unit",              :child_key => [:time_units_id, :variable_units_id] #will this work?
-  belongs_to :data_type_cv,         :model => "His::DataTypeCV",        :child_key => [:data_type]
-  belongs_to :general_category_cv,  :model => "His::GeneralCategoryCV", :child_key => [:general_category]
-  belongs_to :sample_medium_cv,     :model => "His::SampleMediumCV",    :child_key => [:sample_medium]
-  belongs_to :value_type_cv,        :model => "His::ValueTypeCV",       :child_key => [:value_type]
-  belongs_to :variable_name_cv,     :model => "His::VariableNameCV",    :child_key => [:variable_name]
-  belongs_to :speciation_cv,        :model => "His::SpeciationCV",      :child_key => [:speciation]
-  belongs_to :data_values,          :model => "His::DataValue",         :child_key => [:varialbe_id]
+  # has n,     :Categories,           :model => "His::Category"
+  # belongs_to :units,                :model => "His::Unit",              :child_key => [:time_units_id, :variable_units_id] #will this work?
+  # belongs_to :data_type_cv,         :model => "His::DataTypeCV",        :child_key => [:data_type]
+  # belongs_to :general_category_cv,  :model => "His::GeneralCategoryCV", :child_key => [:general_category]
+  # belongs_to :sample_medium_cv,     :model => "His::SampleMediumCV",    :child_key => [:sample_medium]
+  # belongs_to :value_type_cv,        :model => "His::ValueTypeCV",       :child_key => [:value_type]
+  # belongs_to :variable_name_cv,     :model => "His::VariableNameCV",    :child_key => [:variable_name]
+  # belongs_to :speciation_cv,        :model => "His::SpeciationCV",      :child_key => [:speciation]
+  # belongs_to :data_values,          :model => "His::DataValue",         :child_key => [:variable_id]
 end

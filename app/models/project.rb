@@ -29,7 +29,7 @@ class Project
   has n, :roles, :through => :memberships
 
   after :create, :give_current_user_membership
-  after :create,  :upgrade_global_models
+  #after :create,  :upgrade_global_models
   after :create, :create_data_value_indexes
 
   before :destroy, :destroy_cleanup
@@ -120,30 +120,15 @@ class Project
                                            :comments  => "comment")
         # Push to HIS
         his_site = system_site.store_to_his
-        site.sensor_types.each do |sensor_type|
-          if sensor_type.name != "Timestamp"
-            variable = sensor_type.variables.first
+        site.variables.each do |site_variable|
+          if site_variable.name != "Timestamp"
             system_variable = Voeis::Variable.first(:variable_code => variable.variable_code, :variable_name => variable.variable_name)
             his_variable = system_variable.store_to_his
-            sensor_type.sensor_values.all(:published => false, :order => [:timestamp.asc]).each do |val|
-              his_val = His::DataValue.first_or_create(:data_value => val.value,
-                                                        :value_accuracy => 1.0,
-                                                        :local_date_time => val.timestamp,
-                                                        :utc_offset => 7,
-                                                        :date_time_utc => val.timestamp,
-                                                        :site_id => system_site.his_id,
-                                                        :variable_id => system_variable.his_id,
-                                                        :offset_value => 0,
-                                                        :offset_type_id => 1,
-                                                        :censor_code => 'nc',
-                                                        :qualifier_id => 1,
-                                                        :method_id => 0,
-                                                        :source_id => 1,
-                                                        :sample_id => 3,
-                                                        #:derived_from_id => 1,
-                                                        :quality_control_level_id => 0)
-              val.published = true
-              val.save
+            data_values = Voeis::DataValue.all(:published => false, :order => [:timestamp.asc])
+            sources = data_values.sources.all(:fields=>[:id], :unique=>true).uniq
+            sources.each{|src| src.store_to_his}
+            data_values.each do |val|
+              val.store_to_his(his_site.id, his_variable.id, val.source.his_id)
             end #val
           end #if
         end # sensor_type
@@ -222,16 +207,34 @@ class Project
       begin
         sql = "CREATE INDEX data_value_idx ON voeis_data_values (datatype, local_date_time, site_id, variable_id)"
         repository.adapter.execute(sql)
+      rescue
+      end
+      begin
         sql = "CREATE INDEX data_value_idx_var ON voeis_data_values (variable_id)"
         repository.adapter.execute(sql)
+      rescue
+      end
+      begin
         sql = "CREATE INDEX data_value_idx_site ON voeis_data_values (site_id)"
         repository.adapter.execute(sql)
+      rescue
+      end
+      begin
         sql = "CREATE INDEX data_value_idx_site_var ON voeis_data_values (site_id, variable_id)"
         repository.adapter.execute(sql)
+      rescue
+      end
+      begin
         sql = "CREATE INDEX data_value_idx_time ON voeis_data_values (local_date_time)"
         repository.adapter.execute(sql)
+      rescue
+      end
+      begin
         sql = "CREATE INDEX data_value_idx_site_var_time ON voeis_data_values (local_date_time, site_id, variable_id)"
         repository.adapter.execute(sql)
+      rescue
+      end
+      begin
         sql = "CREATE INDEX data_value_idx_type ON voeis_data_values (datatype)"
         repository.adapter.execute(sql)
       rescue

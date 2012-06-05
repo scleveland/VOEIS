@@ -124,30 +124,40 @@ class Voeis::Variable
     end
   end
 
-  def store_to_his(u_id)
-    var_to_store = self.first(:id => u_id)
-    if var_to_store.is_regular == true
-      reg = 1
-    else
-      reg =0
-    end
+  def store_to_his
+    var_to_store = self
+    #check speciation
+    #check sample_medium
+    #check value_type
+    #check data_type
+    #check general_category
     new_his_var = His::Variable.new(:variable_name => var_to_store.variable_name,
                                         :variable_code => var_to_store.variable_code,
                                         :speciation => var_to_store.speciation,
                                         :variable_units_id => var_to_store.variable_units_id,
                                         :sample_medium => var_to_store.sample_medium,
                                         :value_type => var_to_store.value_type,
-                                        :is_regular => reg,
+                                        :is_regular => var_to_store.is_regular ? 1 : 0,
                                         :time_support => var_to_store.time_support,
                                         :time_units_id => var_to_store.time_units_id,
                                         :data_type => var_to_store.data_type,
                                         :general_category => var_to_store.general_category,
-                                        :no_data_value => var_to_store.no_data_value)
-    new_his_var.save
+                                        :no_data_value => var_to_store.no_data_value.valid_float? ? var_to_store.no_data_value.to_f : -9999.0)
+    new_his_var.valid?
     puts new_his_var.errors.inspect
+    new_his_var.save
     var_to_store.his_id = new_his_var.id
     var_to_store.save
     new_his_var
+  end
+  
+  def his_valid?
+    
+    #check speciation
+    #check sample_medium
+    #check value_type
+    #check data_type
+    #check general_category
   end
   
   def self.last_five_site_values(site_id)

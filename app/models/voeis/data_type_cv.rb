@@ -11,11 +11,12 @@ class Voeis::DataTypeCV
   property :id,         Serial
   property :term,       String, :required => true, :key => true, :format => /[^\t|\n|\r]/
   property :definition, Text
-
+  
   yogo_versioned
 
   has n,   :variables, :model => "Voeis::Variable", :through => Resource
-
+  has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
+  
   def self.load_from_his
     his_data_types = His::DataTypeCV.all
 

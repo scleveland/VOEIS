@@ -15,5 +15,5 @@ class Voeis::QualityControlLevel
   #timestamps :at
   
   #is_versioned :on => :updated_at
-
+   has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
 end

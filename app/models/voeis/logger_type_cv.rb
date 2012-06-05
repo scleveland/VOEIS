@@ -9,4 +9,5 @@ class Voeis::LoggerTypeCV
   
   yogo_versioned
 
+  has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
 end

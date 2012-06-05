@@ -15,6 +15,7 @@ class Voeis::VariableNameCV
   yogo_versioned
   
   has n, :variables, :model => "Voeis::Variable", :through => Resource
+  has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
   
   def self.load_from_his
     his_variable_names = His::VariableNameCV.all
