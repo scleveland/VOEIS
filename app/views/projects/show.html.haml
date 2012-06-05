@@ -319,6 +319,12 @@
       google.maps.event.addListenerOnce(pmap, 'bounds_changed', function(){
         console.log('MAP LOADED')
         if(window.on_map_load) on_map_load();
+        //
+        //var winH = $(window).height();
+        //var gridH = (winH-168)+'px';
+        //$(grid).css('height',gridH);
+        //OverviewGrid.set('height',gridH);
+        //OverviewGrid.resize();
       });
       pmap_refresh(true);
     };
@@ -327,6 +333,11 @@
     function on_map_load() {
       if('#{@tab}'=='newsite')
         dojo.publish('voeis/project/site/new');
+      //
+      //var gridW = parseInt($('#project_sites').css('width'));
+      //$('#project_sites').css('width',(gridW-50)+'px');
+      //$('#project_sites').css('width',gridW+'px');
+      //OverviewGrid.resize();
     };
 
     dojo.addOnLoad(function(){
@@ -404,8 +415,50 @@
         window[title2+'_exec'].cv_datum_new();
     }
     
+    //### Dynamically Adjust TabContainer size
+    function setTabSize() {
+      var tabs = dijit.byId('tab_browser');
+      var winH = $(window).height();
+      var winW = $(window).width();
+      var map = document.getElementById('#{@project.id.to_s}');
+      var mapGrid = $('#map-grid table');
+      var gridW = parseInt($('#project_sites').css('width'));
+      //OverviewGrid
+      //console.log('ScreenH: '+winH);
+      var tabsH = (winH-130)+'px';
+      var tabsW = (winW-50)+'px';
+      var mapW = (winW-255)+'px';
+      var gridH = (winH-168)+'px';
+      $(tabs.domNode).css('height',tabsH);
+      $(tabs.domNode).css('width',tabsW);
+      tabs.resize();
+      $(map).css('width',mapW);
+      setTimeout(function(){
+        setSiteListSize();
+        //console.log('SiteGridW:',gridW);
+      },1500);
+    };
+    function setSiteListSize() {
+      var winH = $(window).height();
+      var winW = $(window).width();
+      var gridW = parseInt($('#project_sites').css('width'));
+      var gridH = (winH-168)+'px';
+      $('#project_sites').css('height',gridH);
+      OverviewGrid.set('height',gridH);
+      $('#project_sites').css('width',(gridW-50)+'px');
+      OverviewGrid.resize();
+      $('#project_sites').css('width',gridW+'px');
+      OverviewGrid.resize();
+      //console.log('SiteGridW:',gridW);
+    };
+
+    $(window).resize(function() {
+      setTabSize();
+    });
+
     $(window).ready(function(){ 
       console.log('DONE LOADING!!');
+      setTabSize();
       pmap_init();
       //HAVE SITES?
       if(site_data.length==0) {
