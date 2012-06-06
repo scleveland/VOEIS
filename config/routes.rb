@@ -107,7 +107,9 @@ Yogo::Application.routes.draw do
       resources :data_sets do
         collection do
           get :proto
+          
         end
+        get :export
       end
       resources :scripts do
         collection do

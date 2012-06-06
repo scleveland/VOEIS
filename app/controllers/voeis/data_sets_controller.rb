@@ -44,6 +44,15 @@ class Voeis::DataSetsController < Voeis::BaseController
     @data_set.variables.map{|v| @variables = @variables.merge({v.id => v.variable_name})}
     
   end
+  
+  def export
+    @data_set = parent.managed_repository{Voeis::DataSet.get(params[:data_set_id].to_i)}
+    data_values = parent.managed_repository{DataMapper.raw_select(Voeis::DataSet.get(params[:data_set_id].to_i).data_values)}
+    filename =@data_set.name + ".csv"
+    send_data(data_values.sql_to_csv,
+      :type => 'text/csv; charset=utf-8; header=present',
+      :filename => filename) 
+  end
 
   def proto
     @data_set = parent.managed_repository{Voeis::DataSet.get(7)}#params[:id].to_i)}
