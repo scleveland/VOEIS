@@ -1282,10 +1282,11 @@
        $("##{@tabId}_script_load_select").change(function(e){
          //console.log('CHANGE!');
          if(this.value=='-') return;
-         if(this.value.slice(0,4)=='SAVE') {
+         var save = this.value;
+         $("##{@tabId}_script_load_select").val('-');
+         if(save.slice(0,4)=='SAVE') {
            //###SAVE
-           console.log('CHANGE SCRIPT: SAVE-',this.value);
-           $("##{@tabId}_script_load_select").val('-');
+           console.log('CHANGE SCRIPT: SAVE-',save);
            var script = dijit.byId('#{@tabId}_query_script_text').get('value');
            if(!script.match(/\s*\S+\s*/g)) return;
            var ttl = 'SAVE SCRIPT'
@@ -1295,7 +1296,7 @@
              description: #{dataId}.script_description,
              script_body: dijit.byId('#{@tabId}_query_script_text').get('value')
            };
-           if(#{dataId}.script_id==0 || this.value=='SAVEAS') {
+           if(#{dataId}.script_id==0 || save=='SAVEAS') {
              //NEW- POST
              delete post_data.id;
              if(#{dataId}.script_id) ttl = 'SAVE SCRIPT AS'
@@ -1328,19 +1329,17 @@
              });
            } else {
              //PUT update script
+             console.log('CHANGE SCRIPT: UPDATE-',save);
              $.ajax({
                type: 'PUT',
                url: '#{project_path(@project)}/scripts/'+post_data.id+'.json?api_key=#{User.current.api_key}',
                data: {script: post_data},
                success: function(data){
-                 console.log('SCRIPT-POST:',data);
-                 $('##{@tabId}_script_load_select').append($("<option></option>").attr("value",data.id).text(results.name));
-                 $('##{@tabId}_script_load_select').val(data.id);
-                 //$('#data_set_select').append($("<option></option>").attr("value",data['id']).text(els.name.value)); 
-                 //$('#data_set_select').val(data['id']);
+                 console.log('SCRIPT-PUT:',data);
                  #{dataId}.script_id = parseInt(data.id);
                  #{dataId}.script_name = data.name;
                  #{dataId}.script_description = data.description;
+                 $('##{@tabId}_script_load_select').val(data.id);
                },
                dataType: 'json'
              });
@@ -1348,16 +1347,17 @@
            
          } else {
            //###LOAD
-           console.log('CHANGE SCRIPT: LOAD-',this.value);
-           #{dataId}.script_id = parseInt(this.value);
+           console.log('CHANGE SCRIPT: LOAD-',save);
+           #{dataId}.script_id = parseInt(save);
            $.ajax({
              type: 'GET',
-             url: '#{project_path(@project)}/scripts/'+this.value+'.json?api_key=#{User.current.api_key}',
+             url: '#{project_path(@project)}/scripts/'+save+'.json?api_key=#{User.current.api_key}',
              success: function(data){
                #{dataId}.script_id = parseInt(data.id);
                #{dataId}.script_name = data.name;
                #{dataId}.script_description = data.description;
                dijit.byId('#{@tabId}_query_script_text').set('value',data.script_body);
+               $('##{@tabId}_script_load_select').val(data.id);
                console.log('SCRIPT-LOAD:',data);
              },
              dataType: 'json'
