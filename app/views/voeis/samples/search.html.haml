@@ -692,7 +692,7 @@
         if (#{dataId}_str.match(item.id.toString()))
           
           //return '<a href="#", onClick="'+ "$('#data_value_show').attr('href','#{root_url.chop}#{project_data_values_path(@project)}/" + item.id.toString() + "')" + ";dijit.byId('data_value_show').show()" + '">View</a>';
-          return '<button onClick="'+"dijit.byId('#{@tabId}_data_value_show').set('href','#{root_url.chop}#{project_data_values_path(@project)}/"+item.id.toString()+"')"+".show();"+'" type="button">View</button>';
+          return '<button onClick="'+"dijit.byId('#{@tabId}_data_value_show').set('href','#{root_url.chop}#{project_data_values_path(@project)}/"+item.id.toString()+"');"+"dijit.byId('#{@tabId}_data_value_show').show();"+'" type="button">View</button>';
         else
           return "None"
         end
