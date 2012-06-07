@@ -200,26 +200,36 @@ class Voeis::Variable
   def recent_values(site,outcount=12)
     # LAST 12 VALUES / 24 HOURS -or- LAST 12 VALUES
     dresults = Voeis::DataValue.all(:site_id=>site.id, :variable_id=>self.id, :order=>[:local_date_time.desc], :limit=>400)
-    results = dresults.all(:local_date_time.gt=>dresults[0][:local_date_time]-24.hours)
-    if results.length<outcount
-      results = dresults[0,outcount]
-    else
-      inc = results.length/outcount.to_f
-      results = results.values_at(*(0..outcount-1).map{|x|(x*inc).round})
+    unless dresults.empty?
+      results = dresults.all(:local_date_time.gt=>dresults[0][:local_date_time]-24.hours)
+      if results.length<outcount
+        results = dresults[0,outcount]
+      else
+        inc = results.length/outcount.to_f
+        results = results.values_at(*(0..outcount-1).map{|x|(x*inc).round})
+      end
+      return results
     end
-    return results
   end
   
   def last_days_values(site,outcount=12)
     # LAST 12 VALUES / 24 HOURS -or- LAST 12 VALUES
     dresults = self.recent_values(site,outcount)
-    dresults.map{|dv| [dv[:local_date_time].to_datetime, dv[:data_value]]}
+    unless dresults.nil?
+      dresults.map{|dv| [dv[:local_date_time].to_datetime, dv[:data_value]]}
+    else
+      dresults
+    end
   end  
   
   def last_days_values_graph(site,outcount=12)
     # LAST 12 VALUES / 24 HOURS -or- LAST 12 VALUES
     dresults = self.recent_values(site,outcount)
-    dresults.map{|dv| [dv[:local_date_time].to_datetime.to_i*1000, dv[:data_value]]}
+    unless dresults.nil?
+      dresults.map{|dv| [dv[:local_date_time].to_datetime.to_i*1000, dv[:data_value]]}
+    else
+      dresults
+    end
   end
   
 end

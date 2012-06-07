@@ -154,47 +154,48 @@
       -# COLLECTED DATA STATS
       -# COMMENTED OUT because lack of SITE ID to select
       - var_stats = @site_variable_stats.first(:variable_id=>@variable.id)
-      %table{:id => "var-stats-table", :style=>'float:left;margin-left:5px;width:45%'}
-        %tr{:class=>"row#{cycle('0','1')}"}
-          %td{:colspan=>"2"}
-            %h4{:style=>"margin:0 0 5px 0;"}
-              Collected Data
-        %tr{:class=>"row-gr"}
-          %td
-            %b
-              &nbsp;&nbsp; Count
-          %td
-            = var_stats.record_number
-        %tr{:class=>""}
-          %td
-            %b
-              &nbsp;&nbsp; Starting
-          %td
-            = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
-        %tr{:class=>"row-gr"}
-          %td
-            %b
-              &nbsp;&nbsp; Ending
-          %td
-            = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
-        %tr
-          %td{:colspan=>"2"}
-            %h4{:style=>"margin:20px 0 5px 0;"}
-              Recent Data Values
-        %tr{:class=>"row-gr"}
-          %th
-            Timestamp
-          %th
-            Value   
-        -if !@data.nil?
-          -@data.each do |dv|
-            %tr{:class=>"row-lt#{cycle('0','1')} smfont",:style=>""}
-              %td{:style=>"text-align:center;"}
-                = dv[0].strftime('%Y-%m-%d %H:%M:%S')
-              %td
-                %strong
-                  = dv[1].to_s+' '
-                &nbsp;#{@units[:units_abbreviation]} (#{@units[:units_type]})
+      -unless var_stats.nil?
+        %table{:id => "var-stats-table", :style=>'float:left;margin-left:5px;width:45%'}
+          %tr{:class=>"row#{cycle('0','1')}"}
+            %td{:colspan=>"2"}
+              %h4{:style=>"margin:0 0 5px 0;"}
+                Collected Data
+          %tr{:class=>"row-gr"}
+            %td
+              %b
+                &nbsp;&nbsp; Count
+            %td
+              = var_stats.record_number
+          %tr{:class=>""}
+            %td
+              %b
+                &nbsp;&nbsp; Starting
+            %td
+              = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
+          %tr{:class=>"row-gr"}
+            %td
+              %b
+                &nbsp;&nbsp; Ending
+            %td
+              = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
+          %tr
+            %td{:colspan=>"2"}
+              %h4{:style=>"margin:20px 0 5px 0;"}
+                Recent Data Values
+          %tr{:class=>"row-gr"}
+            %th
+              Timestamp
+            %th
+              Value   
+          -if !@data.nil?
+            -@data.each do |dv|
+              %tr{:class=>"row-lt#{cycle('0','1')} smfont",:style=>""}
+                %td{:style=>"text-align:center;"}
+                  = dv[0].strftime('%Y-%m-%d %H:%M:%S')
+                %td
+                  %strong
+                    = dv[1].to_s+' '
+                  &nbsp;#{@units[:units_abbreviation]} (#{@units[:units_type]})
   
 
       :javascript
