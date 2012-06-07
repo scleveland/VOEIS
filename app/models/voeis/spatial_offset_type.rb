@@ -10,5 +10,5 @@ class Voeis::SpatialOffsetType
   yogo_versioned
  
   has n, :spatial_offsets, :model => "Voeis::SpatialOffset", :through => Resource
-
+  has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
 end

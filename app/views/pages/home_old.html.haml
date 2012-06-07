@@ -1,0 +1,92 @@
+:javascript
+  dojo.require("dijit.layout.ContentPane");
+:css
+  #head {
+    background-color: #69C;
+    //margin-left: 1em;
+    margin-top: 10px;
+    width: 100%;
+    font-size: 20pt;
+    font-family: 'Arial Black', Gadget, sans-serif;
+    font-weight: bold;
+    //font-style: italic;
+    //color: #1767a7; //#3A4491;
+  }
+  #head-voeis {
+    font-size: 16pt;
+    font-weight: normal;
+    font-family: Georgia, serif;
+    font-style: italic;
+  }
+  #content { margin:0px 20px}
+  #wrapper {
+    //background-color: #69C;//#ccb;
+    padding-top: 1px;
+  }
+  #login-image img { margin-right:20px; }
+  #login-description { margin-right:30px; }
+  #links {
+    margin-left: 0;
+    list-style-type: none;
+    list-style-position: outside;
+    
+    
+  }
+  #links li {
+    list-style-position: inside;
+    margin-left: 0;
+    margin-bottom: 20px;
+    font-size: 12pt;
+    font-weight: bold;
+    
+  }
+  
+  #title{
+    min-height:10em;
+    display:table-cell;
+    vertical-align:top;
+    padding-top: 10px;
+  }
+
+#content
+  #wrapper
+    #head 
+      #logo{:style=>"display:table;"}
+        =image_tag("voeis_logo-90.png") 
+        #title
+          VOEIS &nbsp; 
+          #head-voeis
+            The Virtual Observatory and Ecological Informatics System
+    
+    = form_for(:user_session, :url => user_session_path, :builder => YogoFormBuilder) do |f|
+      %table{:style=>'width:1100px;padding-left:0px;padding-right:0px;margin-left:0px;margin-right:0px;'}
+        %tr
+          %td{:style =>'width:550px', :valign=>"top"}
+            -#login-image
+            = image_tag("Flathead.jpg", :alt => "Flathead Lake at sunset.", :align => "left",:width=>"550px")
+          %td{:style =>'width:550px', :valign=>"top"}
+            -#login-description
+            %br
+            %p{:style=>"font-size:10pt;text-align:justify;"} 
+              The Virtual Observatory and Ecological Informatics System (VOEIS, pronounced like VOICE) provides a framework 
+              for data acquisition, analysis, model integration, and display of data products from completed workflows including 
+              geospatially explicit models, graphs from statistical analyses, GIS displays of classified ecological attributes 
+              on the landscape, and 3-D visualization models of waterscape and landscape processes.
+            %br
+            %ul{:id=>"links", :style=>""}
+              %li
+                %span{:class => "icon datahub-icon-25"}
+                  =link_to("Browse Public Projects in VOEIS", projects_path($project), :style=>"margin-left:10px;")
+              %li
+                %span{:class => "icon datahub-icon-25"}
+                  =link_to("More about VOEIS", page_url(:about),:style=>"margin-left:10px;")
+              %li
+                %span{:class => "icon datahub-icon-25"}
+                  =link_to("VOEIS data live at BlueWaterTaskForce.org", page_url(:bluewater),:style=>"margin-left:10px;")
+              %li
+                %span{:class => "icon datahub-icon-25"}
+                  =link_to("New Help and Tutorials!", page_url(:help),:style=>"margin-left:10px;")
+              %li
+                %span{:class => "icon datahub-icon-25"}
+                  =link_to("New Video Tutorials!", page_url(:video_tutorials),:style=>"margin-left:10px;")
+

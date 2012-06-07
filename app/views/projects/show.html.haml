@@ -32,7 +32,7 @@
   = stylesheet_link_tag("/javascripts/dojox/grid/enhanced/resources/EnhancedGrid.css")
   = stylesheet_link_tag("/javascripts/dojox/grid/enhanced/resources/claro/EnhancedGrid.css")
 
-= javascript_include_tag("http://maps.google.com/maps/api/js?sensor=false")
+= javascript_include_tag("https://maps.google.com/maps/api/js?sensor=false")
 = javascript_include_tag("jquery.flot.js")
 
 - content_for(:javascripts) do
@@ -91,8 +91,8 @@
     //MAP GLOBALS
     var pmap;
     var pmarkers = [];
-    var icon_red = 'http://www.google.com/intl/en_us/mapfiles/ms/icons/red-dot.png';
-    var icon_blue = 'http://www.google.com/intl/en_us/mapfiles/ms/icons/blue-dot.png';
+    var icon_red = 'https://www.google.com/intl/en_us/mapfiles/ms/icons/red-dot.png';
+    var icon_blue = 'https://www.google.com/intl/en_us/mapfiles/ms/icons/blue-dot.png';
     var icon_default = icon_red;
     var icon_pop = icon_blue;
     var site_data = [
@@ -319,6 +319,12 @@
       google.maps.event.addListenerOnce(pmap, 'bounds_changed', function(){
         console.log('MAP LOADED')
         if(window.on_map_load) on_map_load();
+        //
+        //var winH = $(window).height();
+        //var gridH = (winH-168)+'px';
+        //$(grid).css('height',gridH);
+        //OverviewGrid.set('height',gridH);
+        //OverviewGrid.resize();
       });
       pmap_refresh(true);
     };
@@ -327,6 +333,11 @@
     function on_map_load() {
       if('#{@tab}'=='newsite')
         dojo.publish('voeis/project/site/new');
+      //
+      //var gridW = parseInt($('#project_sites').css('width'));
+      //$('#project_sites').css('width',(gridW-50)+'px');
+      //$('#project_sites').css('width',gridW+'px');
+      //OverviewGrid.resize();
     };
 
     dojo.addOnLoad(function(){
@@ -404,8 +415,50 @@
         window[title2+'_exec'].cv_datum_new();
     }
     
+    //### Dynamically Adjust TabContainer size
+    function setTabSize() {
+      var tabs = dijit.byId('tab_browser');
+      var winH = $(window).height();
+      var winW = $(window).width();
+      var map = document.getElementById('#{@project.id.to_s}');
+      var mapGrid = $('#map-grid table');
+      var gridW = parseInt($('#project_sites').css('width'));
+      //OverviewGrid
+      //console.log('ScreenH: '+winH);
+      var tabsH = (winH-130)+'px';
+      var tabsW = (winW-50)+'px';
+      var mapW = (winW-255)+'px';
+      var gridH = (winH-168)+'px';
+      $(tabs.domNode).css('height',tabsH);
+      $(tabs.domNode).css('width',tabsW);
+      tabs.resize();
+      $(map).css('width',mapW);
+      setTimeout(function(){
+        setSiteListSize();
+        //console.log('SiteGridW:',gridW);
+      },1500);
+    };
+    function setSiteListSize() {
+      var winH = $(window).height();
+      var winW = $(window).width();
+      var gridW = parseInt($('#project_sites').css('width'));
+      var gridH = (winH-168)+'px';
+      $('#project_sites').css('height',gridH);
+      OverviewGrid.set('height',gridH);
+      $('#project_sites').css('width',(gridW-50)+'px');
+      OverviewGrid.resize();
+      $('#project_sites').css('width',gridW+'px');
+      OverviewGrid.resize();
+      //console.log('SiteGridW:',gridW);
+    };
+
+    $(window).resize(function() {
+      setTabSize();
+    });
+
     $(window).ready(function(){ 
       console.log('DONE LOADING!!');
+      setTabSize();
       pmap_init();
       //HAVE SITES?
       if(site_data.length==0) {
@@ -484,6 +537,8 @@
           //dijit.byId('DV_quality_control_level').set('value', item['quality_control_level'].toString());
           $('#DV_quality_control_level_sel').val(item['quality_control_level'].toString());
           if(item['published'][0]) dijit.byId('DV_published').set('checked', true);
+          $('#DV_variable_sel').val(item['variable_id'][0]);
+          
           dijit.byId('DV_local_date').set('value', item['local_date_time'].toString());
           dijit.byId('DV_local_time').set('value', item['local_date_time'].toString());
           dijit.byId('DV_utc_offset').set('value', item['utc_offset'].toString());
@@ -701,16 +756,30 @@
                                           :user=>current_user,
                                           :root_url=>root_url
 
+
+-#site_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"psites", :data=>"psites_json"}
+-#site_store{:dojoType=>"dojo.data.ItemFileWriteStore", :jsId=>"psites", :data=>"psites_json"}
+
+#site_new_test{:dojoType=>"dijit.Dialog", :jsId=>"site_new_test", :title=>"NEW Testing!", :style=>"width:400px;"}
+  %h3 TESTING
+  %h4 This is a test...
+  %br
+  %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', 
+    :onClick=>"confirmDialog('CLOSE DIALOG','Are you sure?',function(yes){if(yes)site_new_test.hide()},{buttonOk:'YES!'});return false;"} CLOSE
+  %br
+
 #error_dialog{:dojoType=>"dijit.Dialog", :title=>"ERROR", :style=>"width:500px;", :jsId=>"error_dialog"}
   %script{:type=>"dojo/method", :event=>"startup"}
     :plain
-      error_dialog.pop = function(msg,dly){
-        var delay = dly || 3000;
-        $('#error_dialog .error_message').text(msg);
+      error_dialog.pop = function(msg,dly,ttl){
+        var delay = dly==null ? 3000 : dly;
+        if(ttl) error_dialog.set('title',ttl);
+        $('#error_dialog .error_message').html(msg);
         error_dialog.show();
-        setTimeout(function(){
-          error_dialog.hide();
-        },delay);
+        if(delay>0)
+          setTimeout(function(){
+            error_dialog.hide();
+          },delay);
       };
   %div.error_message{:style=>"color:#8A1F11;text-align:center;font-weight:bold;"}
     %strong{:style=>"color:#8A1F11;text-align:center;font-weight:bold;"}
@@ -741,6 +810,120 @@
         //WAS OPEN SITE DETAIL (no longer needed)
         //var item = this.getItem(evt.rowIndex);
         //window.location += '/sites/'+item.id;
+
+-## general purpose Name & Description Dialog -- .pop(ttl,opts,callback)
+-##      ttl = Dialog Title, 
+-##      options = object of field options {field0:NameLabel, field1:fld1Label, field2:fld2Label, field3:..., field4:...}, 
+-##      callback = results callback(results_object)
+-### WAS >>> Create New Data Set
+#name_entry_dialog{:dojoType=>"dijit.Dialog", :title=>"ENTER NAME", :jsId=>"name_entry_dialog"}
+  %form(id="name_entry_form" dojoType="dijit.form.Form" method="post" style="overflow:visible;")
+    %label#name_entry_label0 Name:
+    =clear_break    
+    %input{:type=>"text", :name=>"name", :id=>"name_entry_name", :dojoType=>"dijit.form.ValidationTextBox", 
+          :size=>30, :style=>"width:32em", :required=>"true", :invalidMessage=>"A DataSet Name is required."}
+    =clear_break      
+    =clear_break 
+    %span#name_entry_span1
+      %label#name_entry_label1 FIELD1:
+      %br
+      -#=f.text_area :description, :cols=> 30, :rows => 3
+      %input{:type=>"text",:dojoType=>"dijit.form.TextBox", :name=>"field1", :id=>"name_entry_field1", 
+            :size=>30, :style=>"width:32em"}
+      =clear_break
+      =clear_break
+    %span#name_entry_span2
+      %label#name_entry_label2 FIELD2:
+      %br
+      %input{:type=>"text",:dojoType=>"dijit.form.TextBox", :name=>"field2", :id=>"name_entry_field2", 
+            :size=>30, :style=>"width:32em"}
+      =clear_break
+      =clear_break 
+    %span#name_entry_span3
+      %label#name_entry_label3 FIELD3:
+      %br
+      %input(name="field3" dojoType="dijit.form.SimpleTextarea" id="name_entry_field3" rows="3" 
+            style="width:32em!important;line-height:16px!important;")
+      =clear_break
+      =clear_break 
+    %span#name_entry_span4
+      %label#name_entry_label4 FIELD4:
+      %br
+      %input(name="field4" dojoType="dijit.form.SimpleTextarea" id="name_entry_field4" rows="3" 
+            style="width:32em!important;line-height:16px!important;")
+      =clear_break
+      =clear_break 
+    %br
+    %button#name_entry_save{:dojoType=>"dijit.form.Button", :title=>'Create'}
+      Save
+      %script{:type=>"dojo/method", :event=>"startup"}
+        :plain
+          name_entry_dialog.callback = false;
+          name_entry_dialog.options = {};
+          name_entry_dialog.results = {};
+          name_entry_dialog.pop = function(ttl,opts,callback){
+            name_entry_dialog.set('title',ttl);
+            if(callback) name_entry_dialog.callback = callback;
+            if(opts) name_entry_dialog.options = opts;
+            name_entry_dialog.show();
+            //name_entry_dialog.setup();
+          };
+          name_entry_dialog.setup = function() {
+            $('#name_entry_label0').text('Name:');
+            $('#name_entry_save').text('Save');
+            $('#name_entry_span1').hide();
+            $('#name_entry_span2').hide();
+            $('#name_entry_span3').hide();
+            $('#name_entry_span4').hide();
+            for(opt in name_entry_dialog.options) {
+              if(opt.match(/^field[01234]$/i)) {
+                var fldno = opt.slice(-1);
+                if(fldno=='0') 
+                  $('#name_entry_label0').text(name_entry_dialog.options[opt]);
+                else {
+                  $('#name_entry_span'+fldno).show();
+                  $('#name_entry_label'+fldno).text(name_entry_dialog.options[opt]);
+                };
+              };
+              if(opt.match(/^value[01234]$/i)) {
+                var fldno = opt.slice(-1);
+                if(fldno=='0') 
+                  dijit.byId('name_entry_name').set('value',name_entry_dialog.options[opt]);
+                else
+                  dijit.byId('name_entry_field'+fldno).set('value',name_entry_dialog.options[opt]);
+              };
+              if(opt==='SAVE')
+                $('#name_entry_save').text(name_entry_dialog.options['SAVE']);
+            };
+          };
+          var form = dijit.byId("name_entry_form");
+          //### set initial state
+          this.attr("disabled", !form.isValid());
+          this.connect(form, "onValidStateChange", function(state){
+            this.attr("disabled", !state);
+          });
+          //### ON-SHOW
+          name_entry_dialog.connect(name_entry_dialog, "onShow", function(state){
+            form.reset();
+            name_entry_dialog.setup();
+          });
+          //### ON-CLICK: SAVE
+          this.connect(this, "onClick", function(){
+            var els = dojo.byId("name_entry_form").elements;
+            name_entry_dialog.results = {name: dijit.byId('name_entry_name').get('value')};
+            for(opt in name_entry_dialog.options) {
+              if(opt.match(/^field[1234]$/i)) {
+                var fldno = opt.slice(-1);
+                var fldname = name_entry_dialog.options[opt];
+                name_entry_dialog.results[fldname] = dijit.byId('name_entry_field'+fldno).get('value');
+              };
+            };
+            
+            if(name_entry_dialog.callback) name_entry_dialog.callback(name_entry_dialog.results);
+            name_entry_dialog.hide();
+          });
+    &nbsp;&nbsp;
+    %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"name_entry_dialog.hide();return false;"} Cancel
 
 
 -if !current_user.nil? && current_user.projects.include?(@project)
@@ -893,12 +1076,17 @@
           %br
           -#%input(name="quality_control_level" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'##########'}" 
           -#      id="DV_quality_control_level" style="width:70px!important;" required="true")
-          %select(name="var_qcval" id="DV_quality_control_level_sel" class="quality_control_level_select")
-            = options_for_select(@cv_qcvalues.all.map{|v| ["%s: %s"%[v.quality_control_level_code,v.definition[0..20]], v.quality_control_level_code]})
-          &nbsp;&nbsp;&nbsp;
-          &nbsp;&nbsp;&nbsp;
+          %select(name="qcval" id="DV_quality_control_level_sel" class="quality_control_level_select")
+            = options_for_select(@cv_qcvalues.all.map{|v| ["%s: %s"%[v.quality_control_level_code,v.definition[0..16]], v.quality_control_level_code]})
+          &nbsp;&nbsp;&nbsp;&nbsp;
           %input(name="published" dojoType="dijit.form.CheckBox" id="DV_published") 
           Published
+      %tr
+        %td{:colspan=>"2"}
+          %label Variable
+          %br
+          %select(name="variable" id="DV_variable_sel" class="quality_control_level_select")
+            = options_for_select(@vars.map{|v| ["%s[%s] | %s (%s)"%[v[:variable_name],v[:id],v[:var_units_abbr],v[:data_type]], v[:id]]})
       %tr
         %td{:colspan=>"2"}
           %label Provenance Comment
@@ -937,19 +1125,6 @@
     %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"data_value_edit.hide();return false;"} Cancel
     %br{:style=>'float:none; clear:both;'}
 
-
--#site_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"psites", :data=>"psites_json"}
--#site_store{:dojoType=>"dojo.data.ItemFileWriteStore", :jsId=>"psites", :data=>"psites_json"}
-
-
-#site_new_test{:dojoType=>"dijit.Dialog", :jsId=>"site_new_test", :title=>"NEW Testing!", :style=>"width:400px;"}
-  %h3 TESTING
-  %h4 This is a test...
-  %br
-  %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', 
-    :onClick=>"confirmDialog('CLOSE DIALOG','Are you sure?',function(yes){if(yes)site_new_test.hide()},{buttonOk:'YES!'});return false;"} CLOSE
-  %br
-  
 
 -if @auth
   #site_lat_long_picker{:dojoType=>"dijit.Dialog", :jsId=>"site_lat_long_picker", :title=>"Select location for Latitude/Longitude v1 (click/shift-click to zoom in/out)", 

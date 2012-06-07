@@ -188,10 +188,13 @@
 -if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
   %button(dojoType="dijit.form.Button" name="remove_data_button" id="remove_data_button" onclick="RemoveSelectedFromDataSet();") 
     Remove Selected Data from Data Set
-
+%button(dojoType="dijit.form.Button" name="export_data_set_button" id="export_data_set_button" onclick="ExportDataSet();") 
+  Download Data Set
 :javascript
   var dataSet = {}
-  
+  function ExportDataSet(){
+   window.location= '#{root_url}projects/#{@project.id}/data_sets/#{@data_set.id}/export';
+  }
   function RemoveSelectedFromDataSet(){
     //get the data values
     var data_value_ids_string = ""

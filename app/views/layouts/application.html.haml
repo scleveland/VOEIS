@@ -6,7 +6,7 @@
 
     = stylesheet_link_tag 'compiled/screen.css', :media => 'screen, projection'
     -#= stylesheet_link_tag 'compiled/print.css', :media => 'print'
-    = stylesheet_link_tag 'http://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/claro/claro.css'
+    = stylesheet_link_tag 'https://ajax.googleapis.com/ajax/libs/dojo/1.5/dijit/themes/claro/claro.css'
     
     -#/[if IE]
     -#  = stylesheet_link_tag 'compiled/ie.css', :media => 'screen, projection'
@@ -30,6 +30,7 @@
       dojo.require("dojo.parser");
       dojo.require("dijit.layout.BorderContainer");
       dojo.require("dijit.layout.ContentPane");
+      dojo.require("dijit.layout.AccordionContainer");
       dojo.require("dijit.Toolbar");    
       dojo.require("dijit.form.DropDownButton");
       dojo.require("dijit.Menu");
@@ -83,27 +84,66 @@
       #border_container { width:100%; height:100% }
       #main_container
       
+      /*
       .datahub-icon-25 { 
         background-image: url('/images/datahub_icon_25.png');
         background-repeat: no-repeat;
+      .project-icon-25 { 
+        background-image: url('/images/project_icon_25.png');
+        background-repeat: no-repeat;
+      .user-icon-25 { 
+        background-image: url('/images/user_icon_25.png');
+        background-repeat: no-repeat;
+      */
+      
+      .datahub-icon-25 { 
         width: 25px;
         height: 25px;
         text-align: center;
       }
       .project-icon-25 { 
-        background-image: url('/images/project_icon_25.png');
-        background-repeat: no-repeat;
         width: 25px;
         height: 25px;
         text-align: center;
       }
       .user-icon-25 { 
-        background-image: url('/images/user_icon_25.png');
-        background-repeat: no-repeat;
         width: 25px;
         height: 25px;
         text-align: center;
       }
+      
+      ###2.0 stuff
+      .footerIcon {
+          margin-right : 1em;
+          margin-left : 1em;
+          height : 30px;
+      }
+      
+      .splashElement {
+          text-align : left;
+          font-weight : normal;
+          font-size : 12pt;
+      }
+      
+      .startButton {
+          cursor : pointer;
+          color : white !important;
+          font-size : 24px !important;
+          font-weight : bold !important;
+          font-family : Helvetica !important;
+          border-radius : 6px !important;
+          padding : 0.5em !important;
+          background-image : background-image: -webkit-gradient(linear, left top, left bottom, from(gray), to(black)) background-image: -o-linear-gradient(white, black);
+          background-image : -ms-linear-gradient(gray, black);
+          background-image : -moz-linear-gradient(gray, black);
+          background-image : -webkit-linear-gradient(gray, black);
+          background-image : linear-gradient(gray, black) !important;
+      }
+      
+      .startButton:hover {
+          color : #7eaeec !important;
+      }
+      
 
     
   %body.typography.claro
@@ -119,9 +159,9 @@
         %b{:class=> "notice"}
           = flash[:notice]  
     #border_container{:dojoType => "dijit.layout.BorderContainer", :gutters => 'false'}
-      #top{:dojoType => "dijit.Toolbar", :region => "top"}
+      #top{:dojoType=>"dijit.Toolbar", :region=>"top", :style=>"background-color:black;"}
         #datahubButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "datahub-icon-25"}
-          %span{:style => "font-weight:bold"}
+          %span
             DataHub
           %div{:dojoType => "dijit.Menu"}
             = link_to("Home", '/', :dojoType => "yogo.ui.MenuLink")
@@ -142,7 +182,7 @@
                   = link_to("Settings", "/settings", :dojoType => "yogo.ui.MenuLink")
             
         #projectsButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
-          %span{:style => "font-weight:bold"}
+          %span
             Projects
           %div{:dojoType => "dijit.Menu"}
             = link_to("Browse", projects_path, :dojoType => "yogo.ui.MenuLink")
@@ -179,7 +219,7 @@
 
         - if !@project.nil?
           #projectButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
-            %span 
+            %span
               = @project.name
             %div{:dojoType => "dijit.Menu"}
               - if @project.id.to_s == request.fullpath.gsub(/(\?.*$)/,'')[-(@project.id.to_s.length)..-1]
@@ -251,7 +291,7 @@
           - if !request.url.include?("projects/new")
             - if !@project.sites.nil? && @project.sites.count > 0
               #dataButton{:dojoType => "dijit.form.DropDownButton"}
-                %span{:style => "font-weight:bold"}
+                %span
                   Project Data
                 %div{:dojoType => "dijit.Menu"}
                   -#= link_to("Browse", campaigns_path, :dojoType => "yogo.ui.MenuLink")
@@ -297,7 +337,7 @@
 
         #loginButton{:dojoType => "dijit.form.DropDownButton", :style => "float:right", :iconClass => "user-icon-25"}
           - if logged_in?
-            %span
+            %span{:style => "font-weight:bold !important; color:#fff !important;"}
               = current_user.login
             %ul{:dojoType => "dijit.Menu"}
               = link_to("Account Settings", edit_user_path(current_user.id), :dojoType => "yogo.ui.MenuLink")
@@ -322,22 +362,34 @@
       #bottom.claro{:dojoType => "dijit.layout.ContentPane", :region => "bottom", :gutters => "false", :style => "padding:0"}
         #footer{:style=>"padding-top:6px; border-top: 1px #6F97CB solid;"}
           #yogo-brand{:style=>"display:inline;"}
-            = link_to(image_tag("partners/uky.nobox.png", :alt => "University of Kentucky logo", :title => "University of Kentucky"), 'http://www.uky.edu') 
-            = link_to(image_tag("partners/umt.black.gif", :alt => "The University of Montana logo", :title => "The University of Montana"), 'http://www.umt.edu') 
-            = link_to(image_tag("partners/FLBS.png", :alt => "Flathead Lake Biological Station logo", :title => "Flathead Lake Biological Station"), 'http://www.umt.edu/FLBS/') 
-            = link_to(image_tag("partners/hbfs.png", :alt => "Hancock Biological Field Station logo", :title => "Hancock Biological Field Station"), 'http://www.murraystate.edu/qacd/cos/hbs/hbs.htm') 
-            = link_to(image_tag("partners/eku.png", :alt => "Eastern Kentucky University logo", :title => "Eastern Kentucky University"), 'http://www.eku.edu') 
-            = link_to(image_tag("partners/msu.png", :alt => "Montana State University logo", :title => "Montana State University"), 'http://www.montana.edu') 
-            = link_to(image_tag("partners/ul.png", :alt => "University of Louisville logo", :title => "University of Louisville"), 'http://www.louisville.edu') 
-            = link_to(image_tag("partners/murray.png", :alt => "Murray State University logo", :title => "Murray State University"), 'http://www.murraystate.edu') 
-            = link_to(image_tag("partners/yerc.png", :alt => "Yellowstone Ecological Research Center logo", :title => "Yellowstone Ecological Research Center"), 'http://www.yellowstoneresearch.org')
-            = link_to(image_tag("partners/yogo.png", :alt => "The Yogo Data Management Toolkit logo", :title => "The Yogo Data Management Toolkit"), 'http://yogo.msu.montana.edu/')
-          #supported-browsers{:style=>"display:inline;float:right;"}
-            Supported browsers:
-            %br
-            = link_to(image_tag("browser-icons/browsers-icon-firefox-30.jpg", :alt => "FireFox browser logo", :align => "left", :title=>"FireFox browser"), 'http://www.mozilla.com', {:target=>'_blank'})
-            = link_to(image_tag("browser-icons/browsers-icon-chrome-30.jpg", :alt => "Chrome browser logo", :align => "left", :title=>"Chrome browser"), 'http://www.google.com/chrome/', {:target=>'_blank'})
-            = link_to(image_tag("browser-icons/browsers-icon-safari-30.jpg", :alt => "Safari browser logo", :align => "left", :title=>"Safari browser"), 'http://www.apple.com/safari/download/', {:target=>'_blank'})
-            = link_to(image_tag("browser-icons/browsers-icon-opera-30.jpg", :alt => "Opera browser logo", :align => "left", :title=>"Opera browser"), 'http://www.opera.com/download/', {:target=>'_blank'})
-            %br
+            = link_to(image_tag("partners/FLBS_24.png", :alt=>"Flathead Lake Biological Station logo", :title => "Flathead Lake Biological Station"), 'http://www.umt.edu/FLBS/') 
+            = link_to(image_tag("partners/HBS_30.png", :alt=>"Hancock Biological Field Station logo", :title => "Hancock Biological Field Station"), 'http://www.murraystate.edu/qacd/cos/hbs/hbs.htm') 
+            = link_to(image_tag("partners/EKU_30.png", :alt=>"Eastern Kentucky University logo", :title => "Eastern Kentucky University"), 'http://www.eku.edu') 
+            = link_to(image_tag("partners/MSU_30.png", :alt=>"Montana State University logo", :title => "Montana State University"), 'http://www.montana.edu') 
+            = link_to(image_tag("partners/murray30.png", :alt=>"Murray State University logo", :title => "Murray State University"), 'http://www.murraystate.edu') 
+            = link_to(image_tag("partners/UK_24.png", :alt=>"University of Kentucky logo", :title => "University of Kentucky"), 'http://www.uky.edu') 
+            = link_to(image_tag("partners/UL_25.png", :alt=>"University of Louisville logo", :title => "University of Louisville"), 'http://www.louisville.edu') 
+            = link_to(image_tag("partners/UM.jpg", :alt=>"The University of Montana logo", :title => "University of Montana"), 'http://www.umt.edu') 
+            = link_to(image_tag("partners/YERC_logo30.jpg", :alt=>"Yellowstone Ecological Research Center logo", :title => "Yellowstone Ecological Research Center"), 'http://www.yellowstoneresearch.org')
+            = link_to(image_tag("partners/YOGO_30.png", :alt=>"The Yogo Data Management Toolkit logo", :title => "The Yogo Data Management Toolkit"), 'http://yogo.msu.montana.edu/')
+            
+            -#= link_to(image_tag("partners/uky.nobox.png", :alt=>"University of Kentucky logo", :title => "University of Kentucky"), 'http://www.uky.edu') 
+            -#= link_to(image_tag("partners/umt.black.gif", :alt=>"The University of Montana logo", :title => "The University of Montana"), 'http://www.umt.edu') 
+            -#= link_to(image_tag("partners/FLBS.png", :alt=>"Flathead Lake Biological Station logo", :title => "Flathead Lake Biological Station"), 'http://www.umt.edu/FLBS/') 
+            -#= link_to(image_tag("partners/hbfs.png", :alt=>"Hancock Biological Field Station logo", :title => "Hancock Biological Field Station"), 'http://www.murraystate.edu/qacd/cos/hbs/hbs.htm') 
+            -#= link_to(image_tag("partners/eku.png", :alt=>"Eastern Kentucky University logo", :title => "Eastern Kentucky University"), 'http://www.eku.edu') 
+            -#= link_to(image_tag("partners/msu.png", :alt=>"Montana State University logo", :title => "Montana State University"), 'http://www.montana.edu') 
+            -#= link_to(image_tag("partners/ul.png", :alt=>"University of Louisville logo", :title => "University of Louisville"), 'http://www.louisville.edu') 
+            -#= link_to(image_tag("partners/murray.png", :alt=>"Murray State University logo", :title => "Murray State University"), 'http://www.murraystate.edu') 
+            -#= link_to(image_tag("partners/yerc.png", :alt=>"Yellowstone Ecological Research Center logo", :title => "Yellowstone Ecological Research Center"), 'http://www.yellowstoneresearch.org')
+            -#= link_to(image_tag("partners/yogo.png", :alt=>"The Yogo Data Management Toolkit logo", :title => "The Yogo Data Management Toolkit"), 'http://yogo.msu.montana.edu/')
+            
+          #supported-browsers{:style=>"display:inline;float:right;text-align:left;width:200px;height:40px;"}
+            Supported:
+            -#%br
+            %div{:style=>"display:inline;float:right;"}
+              = link_to(image_tag("browser-icons/browsers-icon-firefox-30.jpg", :alt=>"FireFox browser logo", :align=>"left", :title=>"FireFox browser"), 'http://www.mozilla.com', {:target=>'_blank'})
+              = link_to(image_tag("browser-icons/browsers-icon-chrome-30.jpg", :alt=>"Chrome browser logo", :align=>"left", :title=>"Chrome browser"), 'http://www.google.com/chrome/', {:target=>'_blank'})
+              = link_to(image_tag("browser-icons/browsers-icon-safari-30.jpg", :alt=>"Safari browser logo", :align=>"left", :title=>"Safari browser"), 'http://www.apple.com/safari/download/', {:target=>'_blank'})
+              = link_to(image_tag("browser-icons/browsers-icon-opera-30.jpg", :alt=>"Opera browser logo", :align=>"left", :title=>"Opera browser"), 'http://www.opera.com/download/', {:target=>'_blank'})
             

@@ -12,9 +12,5 @@ class Voeis::SpatialReference
   yogo_versioned
 
   has n, :sites,             :model => "Voeis::Site",         :through => Resource, :required=>false
-
-  def versions_array
-    self.versions.to_a
-  end
-
+  has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
 end

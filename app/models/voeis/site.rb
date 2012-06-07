@@ -76,7 +76,7 @@ class Voeis::Site
   alias :site_code= :code=
 
   before :save, :update_associations
-  
+  after :destroy, :remove_site_data_catalog_entries
   #
   #  @returns[:Nokogiri:XML::Builder] :xml a nokogiri xml document
   def self.wml_header
@@ -178,10 +178,6 @@ class Voeis::Site
       end
     end
   end
-
-  def versions_array
-    self.versions.to_a
-  end
   
   def fetch_time_zone_offset
     require "geonames"
@@ -220,19 +216,28 @@ class Voeis::Site
   end
 
   def store_to_his
-    new_his_site = His::Site.first_or_create(:site_code => site_code, :site_name  => site_name,
-                                              :latitude  => latitude,  :longitude  => longitude,
-                                              :lat_long_datum_id => lat_long_datum_id,
-                                              :elevation_m   => elevation_m,
-                                              :vertical_datum  => vertical_datum,
-                                              :local_x  => local_x,    :local_y  => local_y,
-                                              :local_projection_id  => local_projection_id,
-                                              :pos_accuracy_m  => pos_accuracy_m,
-                                              :state  => state,        :county  => county,
-                                              :comments  => comments)
-    his_id = new_his_site.id
-    save
-    new_his_site
+    if self.his_id.nil?
+      new_his_site = His::Site.new(:site_code => site_code, :site_name  => site_name,
+                                  :latitude  => latitude,  :longitude  => longitude,
+                                  :lat_long_datum_id => lat_long_datum_id,
+                                  :elevation_m   => elevation_m,
+                                  :vertical_datum  => vertical_datum,
+                                  :local_x  => local_x,    :local_y  => local_y,
+                                  :local_projection_id  => local_projection_id,
+                                  :pos_accuracy_m  => pos_accuracy_m,
+                                  :state  => state,        :county  => county,
+                                  :comments  => comments)
+      new_his_site.save
+      self.his_id = new_his_site.id
+      self.save
+      new_his_site
+    else
+      His::Site.get(self.his_id)
+    end
+  end
+  
+  def remove_site_data_catalog_entries
+    Voeis::SiteDataCatalog.all(:site_id=>self.id).destroy
   end
   
   def update_site_data_catalog

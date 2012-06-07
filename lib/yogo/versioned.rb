@@ -59,9 +59,36 @@ module Yogo
         end
         
         def to_hash
-          hash = {}; self.attributes.each { |k,v| hash[k] = v }
-              return hash
+          hash = {}; self.attributes.each{ |k,v| hash[k] = v }
+          return hash
         end
+        
+        def versions_array
+          self.versions.to_a
+        end
+        
+        ### ROLLBACK to version <rollback_to>
+        # versions: 1,2,3 ... -3,-2,-1
+        # version 1 = oldest ... version -1 = newest
+        def rollback_version(rollback_to=-1)
+          ##DEFAULT TO LAST (NEWEST)
+          #debugger
+          vers = self.versions.to_a.reverse
+          return false if vers.empty?
+          rollback_to = -1 if rollback_to==0 or rollback_to>vers.length
+          rollback_to = 0 if rollback_to<-vers.length
+          rollback_to -= 1 if rollback_to>0
+          new_ver = vers[rollback_to]
+          ver_no = rollback_to+1
+          ver_no = vers.length+ver_no if ver_no<=0
+          #debugger
+          props = self.attributes.keys-[:id,:created_at,:deleted_at,:updated_at,:updated_by,:updated_comment,:provenance_comment]
+          props.each{|p|
+            self[p] = new_ver[p] }
+          self.provenance_comment = 'ROLLBACK VERSION '+ver_no.to_s
+          return self.save
+        end
+      	
       end # Resource
     end # DataMapper
   end # Versioned

@@ -101,9 +101,6 @@ class Voeis::Variable
   has n, :spatial_offsets,      :model => "Voeis::SpatialOffset",    :through => Resource
   has n, :instruments, :model => "Voeis::Instrument",    :through => Resource
   
-  def versions_array
-    self.versions.to_a
-  end
   
   def self.load_from_his
     his_variables = repository(:his){ His::Variable.all }
@@ -127,30 +124,49 @@ class Voeis::Variable
     end
   end
 
-  def store_to_his(u_id)
-    var_to_store = self.first(:id => u_id)
-    if var_to_store.is_regular == true
-      reg = 1
+  def store_to_his
+    var_to_store = self
+    if var_to_store.his_valid?
+      if var_to_store.his_id.nil?
+        new_his_var = His::Variable.new(:variable_name => var_to_store.variable_name,
+                                            :variable_code => var_to_store.variable_code,
+                                            :speciation => var_to_store.speciation,
+                                            :variable_units_id => var_to_store.variable_units_id,
+                                            :sample_medium => var_to_store.sample_medium,
+                                            :value_type => var_to_store.value_type,
+                                            :is_regular => var_to_store.is_regular ? 1 : 0,
+                                            :time_support => var_to_store.time_support,
+                                            :time_units_id => var_to_store.time_units_id,
+                                            :data_type => var_to_store.data_type,
+                                            :general_category => var_to_store.general_category,
+                                            :no_data_value => var_to_store.no_data_value.valid_float? ? var_to_store.no_data_value.to_f : -9999.0)
+        new_his_var.valid?
+        puts new_his_var.errors.inspect
+        new_his_var.save
+        var_to_store.his_id = new_his_var.id
+        var_to_store.save
+        new_his_var
+      else
+        His::Variable.get(var_to_store.his_id)
+      end
     else
-      reg =0
+      return nil
     end
-    new_his_var = His::Variable.new(:variable_name => var_to_store.variable_name,
-                                        :variable_code => var_to_store.variable_code,
-                                        :speciation => var_to_store.speciation,
-                                        :variable_units_id => var_to_store.variable_units_id,
-                                        :sample_medium => var_to_store.sample_medium,
-                                        :value_type => var_to_store.value_type,
-                                        :is_regular => reg,
-                                        :time_support => var_to_store.time_support,
-                                        :time_units_id => var_to_store.time_units_id,
-                                        :data_type => var_to_store.data_type,
-                                        :general_category => var_to_store.general_category,
-                                        :no_data_value => var_to_store.no_data_value)
-    new_his_var.save
-    puts new_his_var.errors.inspect
-    var_to_store.his_id = new_his_var.id
-    var_to_store.save
-    new_his_var
+  end
+  
+  def his_valid?
+    #if 
+    Voeis::SpeciationCV.first(:term=>self.speciation).cv_types.first(:name => "CUAHSI HIS")
+      Voeis::VariableNameCV.first(:term=>self.variable_name).cv_types.first(:name => "CUAHSI HIS") #&& 
+       Voeis::SampleMediumCV.first(:term=>self.sample_medium).cv_types.first(:name => "CUAHSI HIS") #&&
+       Voeis::ValueTypeCV.first(:term=>self.value_type).cv_types.first(:name => "CUAHSI HIS") #&&
+       Voeis::DataTypeCV.first(:term=>self.data_type).cv_types.first(:name => "CUAHSI HIS") #&&
+       Voeis::GeneralCategoryCV.first(:term=>self.general_category).cv_types.first(:name => "CUAHSI HIS")# &&
+       !Voeis::Unit.get(self.variable_units_id).his_id.nil?
+    #   return true
+    # else
+    #   return false
+    # end
   end
   
   def self.last_five_site_values(site_id)
@@ -184,7 +200,7 @@ class Voeis::Variable
   def recent_values(site,outcount=12)
     # LAST 12 VALUES / 24 HOURS -or- LAST 12 VALUES
     dresults = Voeis::DataValue.all(:site_id=>site.id, :variable_id=>self.id, :order=>[:local_date_time.desc], :limit=>400)
-    if dresults.length > 0
+    unless dresults.empty?
       results = dresults.all(:local_date_time.gt=>dresults[0][:local_date_time]-24.hours)
       if results.length<outcount
         results = dresults[0,outcount]
@@ -192,8 +208,8 @@ class Voeis::Variable
         inc = results.length/outcount.to_f
         results = results.values_at(*(0..outcount-1).map{|x|(x*inc).round})
       end
+      return results
     end
-    return results
   end
   
   def values(site,outcount=12)
@@ -203,7 +219,11 @@ class Voeis::Variable
   def last_days_values(site,outcount=12)
     # LAST 12 VALUES / 24 HOURS -or- LAST 12 VALUES
     dresults = self.recent_values(site,outcount)
-    dresults.map{|dv| [dv[:local_date_time].to_datetime, dv[:data_value]]}
+    unless dresults.nil?
+      dresults.map{|dv| [dv[:local_date_time].to_datetime, dv[:data_value]]}
+    else
+      dresults
+    end
   end  
   
   def last_days_values_graph(site,outcount=12)
@@ -212,7 +232,7 @@ class Voeis::Variable
     unless dresults.nil?
       dresults.map{|dv| [dv[:local_date_time].to_datetime.to_i*1000, dv[:data_value]]}
     else
-      return {}
+      dresults
     end
   end
   
@@ -222,7 +242,7 @@ class Voeis::Variable
     unless dresults.nil?
       dresults.map{|dv| [dv[:local_date_time].to_datetime.to_i*1000, dv[:data_value]]}
     else
-      return {}
+      dresults
     end
   end
   

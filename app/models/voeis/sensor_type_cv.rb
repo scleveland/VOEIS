@@ -8,5 +8,5 @@ class Voeis::SensorTypeCV
   property :description, Text
   
   yogo_versioned
-
+  has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
 end

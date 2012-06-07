@@ -24,7 +24,7 @@ dojo.provide("yogo.maps.google");
             
             var script = document.createElement("script");
             script.type = "text/javascript";
-            script.src = "http://maps.google.com/maps/api/js?sensor=" + useSensor + "&callback=" + globalCallbackName;
+            script.src = "https://maps.google.com/maps/api/js?sensor=" + useSensor + "&callback=" + globalCallbackName;
             
             dojo.addOnLoad(function() {
                 document.body.appendChild(script);

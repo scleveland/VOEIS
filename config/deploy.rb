@@ -1,79 +1,39 @@
 $:.unshift(File.expand_path('./lib', ENV['rvm_path']))
-require "rvm/capistrano"
+require "rvm/capistrano" 
 require "bundler/capistrano"
+
+set :application, "voeis"
+set :rvm_ruby_string, 'ruby-1.9.2-p180@passenger'
+set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p180/bin/bundle"
+set :scm, :git
+set :repository,  "git://github.com/yogo/VOEIS.git"
+set :shell, "/bin/bash"
+set :use_sudo,    false
+set :deploy_via, :remote_cache
+set :copy_exclude, [".git"]
+set :user, "rails"
+set :deploy_to, "/var/rails"
 
 desc "Setup Development Settings"
 task :development do
-  set :rvm_ruby_string, '1.9.2'
-  
-  set :application, "voeis"
-  set :use_sudo,    false
-  
-  set :scm, :git
-  set :repository,  "git://github.com/yogo/VOEIS.git"
-  set :shell, "/bin/bash"
-  
   set :branch, "master"
-  set :deploy_via, :remote_cache
-  set :copy_exclude, [".git"]
-  
-  set  :user, "voeis-demo"
-  role :web, "153.90.178.140"
-  role :app, "153.90.178.140"
-  set  :deploy_to, "/home/#{user}/voeis"
-  
-  default_run_options[:pty] = false
-end
-
-desc "Setup NEW Development Settings"
-task :development2 do
-  set :rvm_ruby_string, 'ruby-1.9.2-p180@passenger'
-  
-  set :application, "voeis"
-  set :use_sudo,    false
-  
-  set :scm, :git
-  set :repository,  "git://github.com/yogo/VOEIS.git"
-  set :shell, "/bin/bash"
-  
-  set :branch, "master"
-  set :deploy_via, :remote_cache
-  set :copy_exclude, [".git"]
-  
-  set  :user, "rails"
   role :web, "voeis-dev.rcg.montana.edu"
   role :app, "voeis-dev.rcg.montana.edu"
-  set  :deploy_to, "/var/rails"
-  set :deploy_via, :remote_cache
-
-  default_run_options[:pty] = false
+  role :db,  "voeis-dev.rcg.montana.edu", :primary => true
 end
-
 
 desc "Setup Production Settings"
 task :production do
-  set :rvm_ruby_string, '1.9.2'
-  
-  set :application, "voeis"
-  set :use_sudo,    false
-  
-  set :scm, :git
-  set :repository,  "git://github.com/yogo/VOEIS.git"
-  set :shell, "/bin/bash"
-  
-  set :branch, "production"
-  set :deploy_via, :remote_cache
-  set :copy_exclude, [".git"]
-  
-  set  :user, "voeis-demo"
-  role :web, "klank.msu.montana.edu"
-  role :app, "klank.msu.montana.edu"
-  set  :deploy_to, "/home/#{user}/voeis"
 
-  default_run_options[:pty] = false
+  set :branch, "master"
+  role :web, "voeis.rcg.montana.edu"
+  role :app, "voeis.rcg.montana.edu"
+  role :db,  "voeis.rcg.montana.edu", :primary => true
+
 end
 
 namespace :deploy do
+
   task :start, :roles => :app do
     run "touch #{current_release}/tmp/restart.txt"
   end
@@ -159,14 +119,9 @@ namespace :jobs do
 end
 
 # These are one time setup steps
-#after "deploy:setup",       "db:setup"
 after "deploy:setup",       "assets:setup"
 
 # This happens every deploy
 after "deploy:update_code", "db:symlink"
 after "deploy:update_code", "assets:symlink"
-#after "deploy:update_code", "docs:generate"
 after "deploy:update_code", "docs:publish"
-#after "deploy:update_code", "db:auto_upgrade"
-#before "deploy:update_code", "jobs:stop"
-#after  "deploy:symlink",     "jobs:start"

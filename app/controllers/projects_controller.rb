@@ -40,6 +40,23 @@ class ProjectsController < InheritedResources::Base
     end
   end
   
+  def create
+    @project = Project.new(params[:project])    
+    respond_to do |format|
+      if @project.save
+        format.json do
+         render :json => @project.as_json, :callback => params[:jsoncallback]
+        end
+        format.xml do
+         render :xml =>@project.to_xml
+        end
+        format.html do
+          redirect_to project_url(@project)
+        end
+      end
+    end
+  end
+  
   def index
     ### PUBLIC & USER PROJECTS ###
     @projects = Project.all(:is_private=>false)
@@ -227,6 +244,21 @@ class ProjectsController < InheritedResources::Base
     #@cv_qcvalues = @project.managed_repository{ Voeis::QualityControlLevel.all(:order => [:quality_control_level_code.asc]) }
     @cv_data_types = Voeis::DataTypeCV.all(:order => [:term.asc])
     @cv_qcvalues = Voeis::QualityControlLevel.all(:order => [:quality_control_level_code.asc])
+    #@variables = Voeis::Variable.all(:order => [:variable_name.asc])
+    @project.managed_repository{ 
+      @variables = Voeis::Variable.all(:order => [:variable_name.asc])
+      @vars = []
+      @variables.each{|var| 
+        @vars << var.to_hash.merge(var.variable_units.nil? ? {
+                :var_units_id=>0, 
+                :var_units_name=>'-', 
+                :var_units_abbr=>'-'} : {
+                :var_units_id=>var.variable_units.id, 
+                :var_units_name=>var.variable_units.units_name, 
+                :var_units_abbr=>var.variable_units.units_abbreviation, 
+                :var_units_type=>var.variable_units.units_type})
+      }
+    }
     
     # @current_data = Array.new
     #     @items = Array.new

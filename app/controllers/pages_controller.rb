@@ -10,6 +10,7 @@ class PagesController < ApplicationController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
   def show
+    @server = `hostname -f`
     render params[:id]
   end
 

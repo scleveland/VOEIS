@@ -313,7 +313,30 @@ class Voeis::SitesController < Voeis::BaseController
     #  success.html { redirect_to project_url(parent) }
     #end
   end
-
+  
+  def destroy
+    parent.managed_repository do
+      site = Voeis::Site.get(params[:id])
+        respond_to do |format|
+          if site.destroy
+            format.html{
+              flash[:notice] = "Site was deleted."
+            }
+            format.json{
+              render :json => {:msg => "Site was deleted."}, :callback => params[:jsoncallback]
+            }
+          else
+            format.html{
+              flash[:notice] = "Site could not be deleted."
+            }
+            format.json{
+              render :json => {:msg => site.errors.inspect()}, :callback => params[:jsoncallback]
+            }
+          end #end if
+        end #end respond
+    end #end repo
+  end
+  
   def add_site
     @sites = Voeis::Site.all
   end

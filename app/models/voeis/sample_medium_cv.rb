@@ -15,7 +15,7 @@ class Voeis::SampleMediumCV
   property :definition, Text
 
   yogo_versioned
-  
+  has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
   def self.load_from_his
     his_sample_mediums = His::SampleMediumCV.all
 

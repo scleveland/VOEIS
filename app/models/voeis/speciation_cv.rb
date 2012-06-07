@@ -17,6 +17,7 @@ class Voeis::SpeciationCV
   yogo_versioned
 
   has n, :variables, :model => "Voeis::Variable", :through => Resource
+  has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
   
   def self.load_from_his
     his_speciations = His::SpeciationCV.all
