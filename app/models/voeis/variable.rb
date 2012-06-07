@@ -126,38 +126,47 @@ class Voeis::Variable
 
   def store_to_his
     var_to_store = self
-    #check speciation
-    #check sample_medium
-    #check value_type
-    #check data_type
-    #check general_category
-    new_his_var = His::Variable.new(:variable_name => var_to_store.variable_name,
-                                        :variable_code => var_to_store.variable_code,
-                                        :speciation => var_to_store.speciation,
-                                        :variable_units_id => var_to_store.variable_units_id,
-                                        :sample_medium => var_to_store.sample_medium,
-                                        :value_type => var_to_store.value_type,
-                                        :is_regular => var_to_store.is_regular ? 1 : 0,
-                                        :time_support => var_to_store.time_support,
-                                        :time_units_id => var_to_store.time_units_id,
-                                        :data_type => var_to_store.data_type,
-                                        :general_category => var_to_store.general_category,
-                                        :no_data_value => var_to_store.no_data_value.valid_float? ? var_to_store.no_data_value.to_f : -9999.0)
-    new_his_var.valid?
-    puts new_his_var.errors.inspect
-    new_his_var.save
-    var_to_store.his_id = new_his_var.id
-    var_to_store.save
-    new_his_var
+    if var_to_store.his_valid?
+      if var_to_store.his_id.nil?
+        new_his_var = His::Variable.new(:variable_name => var_to_store.variable_name,
+                                            :variable_code => var_to_store.variable_code,
+                                            :speciation => var_to_store.speciation,
+                                            :variable_units_id => var_to_store.variable_units_id,
+                                            :sample_medium => var_to_store.sample_medium,
+                                            :value_type => var_to_store.value_type,
+                                            :is_regular => var_to_store.is_regular ? 1 : 0,
+                                            :time_support => var_to_store.time_support,
+                                            :time_units_id => var_to_store.time_units_id,
+                                            :data_type => var_to_store.data_type,
+                                            :general_category => var_to_store.general_category,
+                                            :no_data_value => var_to_store.no_data_value.valid_float? ? var_to_store.no_data_value.to_f : -9999.0)
+        new_his_var.valid?
+        puts new_his_var.errors.inspect
+        new_his_var.save
+        var_to_store.his_id = new_his_var.id
+        var_to_store.save
+        new_his_var
+      else
+        His::Variable.get(var_to_store.his_id)
+      end
+    else
+      return nil
+    end
   end
   
   def his_valid?
-    
-    #check speciation
-    #check sample_medium
-    #check value_type
-    #check data_type
-    #check general_category
+    #if 
+    Voeis::SpeciationCV.first(:term=>self.speciation).cv_types.first(:name => "CUAHSI HIS")
+      Voeis::VariableNameCV.first(:term=>self.variable_name).cv_types.first(:name => "CUAHSI HIS") #&& 
+       Voeis::SampleMediumCV.first(:term=>self.sample_medium).cv_types.first(:name => "CUAHSI HIS") #&&
+       Voeis::ValueTypeCV.first(:term=>self.value_type).cv_types.first(:name => "CUAHSI HIS") #&&
+       Voeis::DataTypeCV.first(:term=>self.data_type).cv_types.first(:name => "CUAHSI HIS") #&&
+       Voeis::GeneralCategoryCV.first(:term=>self.general_category).cv_types.first(:name => "CUAHSI HIS")# &&
+       !Voeis::Unit.get(self.variable_units_id).his_id.nil?
+    #   return true
+    # else
+    #   return false
+    # end
   end
   
   def self.last_five_site_values(site_id)

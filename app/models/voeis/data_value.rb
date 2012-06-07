@@ -20,6 +20,7 @@ class Voeis::DataValue
   property :site_id,                    Integer,  :index => true
   property :variable_id,                Integer, :index => true
   property :filename,                   String, :required => true, :length => 512, :default=>"unknown"
+  property :his_id,                     Integer, :required => false
   yogo_versioned
   #timestamps :at
   
@@ -53,6 +54,37 @@ class Voeis::DataValue
     # DateTime.new(*d) 
     @date_time_utc.to_datetime.change(:offset => "+00:00")
   end
+  
+  def store_to_his(his_site_id, his_var_id, his_src_id)
+    if self.his_id.nil?
+      his_val = His::DataValue.first_or_create(:data_value => self.data_value,
+                                              :value_accuracy => self.value_accuracy,
+                                              :local_date_time => self.timestamp,
+                                              :utc_offset => self.utc_offset,
+                                              :date_time_utc => self.timestamp,
+                                              :site_id => his_site_id,
+                                              :variable_id => his_var_id,
+                                              :offset_value => self.vertical_offset,
+                                              :offset_type_id => 1,
+                                              :censor_code => 'nc',
+                                              :qualifier_id => 1,
+                                              :method_id => 0,
+                                              :source_id => his_src_id,
+                                              #:sample_id => 3,
+                                              #:derived_from_id => 1,
+                                              :quality_control_level_id => self.quality_control_level)
+       his_val.valid?                      
+       puts his_val.errors.inspect
+       his_val.save
+       self.his_id = his_val.id
+       self.published =true
+       self.save
+       his_val
+     else
+       His::DataValue.get(self.his_id)
+     end
+  end
+  
   
   # Parses a csv file using an existing data_column template
   # column values are stored in data_values

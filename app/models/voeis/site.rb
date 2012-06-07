@@ -216,19 +216,24 @@ class Voeis::Site
   end
 
   def store_to_his
-    new_his_site = His::Site.first_or_create(:site_code => site_code, :site_name  => site_name,
-                                              :latitude  => latitude,  :longitude  => longitude,
-                                              :lat_long_datum_id => lat_long_datum_id,
-                                              :elevation_m   => elevation_m,
-                                              :vertical_datum  => vertical_datum,
-                                              :local_x  => local_x,    :local_y  => local_y,
-                                              :local_projection_id  => local_projection_id,
-                                              :pos_accuracy_m  => pos_accuracy_m,
-                                              :state  => state,        :county  => county,
-                                              :comments  => comments)
-    his_id = new_his_site.id
-    save
-    new_his_site
+    if self.his_id.nil?
+      new_his_site = His::Site.new(:site_code => site_code, :site_name  => site_name,
+                                  :latitude  => latitude,  :longitude  => longitude,
+                                  :lat_long_datum_id => lat_long_datum_id,
+                                  :elevation_m   => elevation_m,
+                                  :vertical_datum  => vertical_datum,
+                                  :local_x  => local_x,    :local_y  => local_y,
+                                  :local_projection_id  => local_projection_id,
+                                  :pos_accuracy_m  => pos_accuracy_m,
+                                  :state  => state,        :county  => county,
+                                  :comments  => comments)
+      new_his_site.save
+      self.his_id = new_his_site.id
+      self.save
+      new_his_site
+    else
+      His::Site.get(self.his_id)
+    end
   end
   
   def remove_site_data_catalog_entries
