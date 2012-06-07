@@ -25,7 +25,7 @@ end
 desc "Setup Production Settings"
 task :production do
 
-  set :branch, "master"
+  set :branch, "production"
   role :web, "voeis.rcg.montana.edu"
   role :app, "voeis.rcg.montana.edu"
   role :db,  "voeis.rcg.montana.edu", :primary => true
