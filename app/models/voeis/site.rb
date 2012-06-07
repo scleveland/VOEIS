@@ -244,7 +244,7 @@ class Voeis::Site
     self.variables.each do |var|
       #entry = Voeis::SiteDataCatalog.first_or_create(:site_id => self.id, :variable_id => var.id)
       #sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{var.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{self.id}"
-      sql = "SELECT data_value_id FROM voeis_data_values WHERE variable_id = #{var.id} AND site_id = #{self.id}"
+      sql = "SELECT id FROM voeis_data_values WHERE variable_id = #{var.id} AND site_id = #{self.id}"
       results = repository.adapter.select(sql)
       if results.length > 0
         entry = Voeis::SiteDataCatalog.first_or_create(:site_id => self.id, :variable_id => var.id)
@@ -265,7 +265,7 @@ class Voeis::Site
     variables.each do |var|
       #entry = Voeis::SiteDataCatalog.first_or_create(:site_id => self.id, :variable_id => var.id)
       #sql = "SELECT data_value_id FROM voeis_data_value_variables WHERE variable_id = #{var.id} INTERSECT SELECT data_value_id FROM voeis_data_value_sites WHERE site_id = #{self.id}"
-      sql = "SELECT data_value_id FROM voeis_data_values WHERE variable_id = #{var.id} AND site_id = #{self.id}"
+      sql = "SELECT id FROM voeis_data_values WHERE variable_id = #{var.id} AND site_id = #{self.id}"
       results = repository.adapter.select(sql)
       if results.length > 0
         entry = Voeis::SiteDataCatalog.first_or_create(:site_id => self.id, :variable_id => var.id)
