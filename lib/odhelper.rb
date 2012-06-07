@@ -733,6 +733,41 @@ module Odhelper
     sql ="ALTER TABLE voeis_variables ALTER COLUMN no_data_value TYPE varchar(512)"
     repository.adapter.execute(sql)
   end
+  
+  def set_cv_types
+    voeis_cv = Voeis::CVType.first(:name=>"VOEIS")
+    Voeis::VariableNameCV.all.each do |vn|
+      if vn.cv_types.empty?
+        vn.cv_types << voeis_cv
+        vn.save
+      end
+    end
+    Voeis::SampleMediumCV.all.each do |sm|
+      if sm.cv_types.empty?
+        sm.cv_types << voeis_cv
+        sm.save
+      end
+    end
+    Voeis::ValueTypeCV.all.each do |sm|
+      if sm.cv_types.empty?
+        sm.cv_types << voeis_cv
+        sm.save
+      end
+    end
+    Voeis::DataTypeCV.all.each do |sm|
+     if sm.cv_types.empty?
+       sm.cv_types << voeis_cv
+       sm.save
+     end
+    end
+    Voeis::GeneralCategoryCV.all.each do |sm|
+     if sm.cv_types.empty?
+       sm.cv_types << voeis_cv
+       sm.save
+     end
+    end
+  end
+  
   def set_variable_quality_control(project)
     puts project.name
     project.managed_repository do
