@@ -32,7 +32,7 @@
   = stylesheet_link_tag("/javascripts/dojox/grid/enhanced/resources/EnhancedGrid.css")
   = stylesheet_link_tag("/javascripts/dojox/grid/enhanced/resources/claro/EnhancedGrid.css")
 
-= javascript_include_tag("http://maps.google.com/maps/api/js?sensor=false")
+= javascript_include_tag("https://maps.google.com/maps/api/js?sensor=false")
 = javascript_include_tag("jquery.flot.js")
 
 - content_for(:javascripts) do
@@ -91,8 +91,8 @@
     //MAP GLOBALS
     var pmap;
     var pmarkers = [];
-    var icon_red = 'http://www.google.com/intl/en_us/mapfiles/ms/icons/red-dot.png';
-    var icon_blue = 'http://www.google.com/intl/en_us/mapfiles/ms/icons/blue-dot.png';
+    var icon_red = 'https://www.google.com/intl/en_us/mapfiles/ms/icons/red-dot.png';
+    var icon_blue = 'https://www.google.com/intl/en_us/mapfiles/ms/icons/blue-dot.png';
     var icon_default = icon_red;
     var icon_pop = icon_blue;
     var site_data = [
