@@ -293,7 +293,7 @@ class Voeis::DataValuesController < Voeis::BaseController
                 updated << dv
                 break
               end
-              new_data_value = Voeis::DataValue.new(:variable_id=>target_var.to_i)
+              new_data_value = Voeis::DataValue.new(:variable_id=>target_var.id.to_i)
             elseif target=='CSV'
               #EXPORT TO CSV
               #new_data_value =
@@ -307,6 +307,9 @@ class Voeis::DataValuesController < Voeis::BaseController
           dv_fields.reject{|fld| dv_fields_omit_update.include?(fld) }.each{|fld| 
             #FIELD from R script
             updfld = rr>>fld
+            #VALIDATION of fields
+            updfld = updfld.nil? ? nil : ('%.8f' % updfld).to_f if fld=='data_value'
+            updfld = updfld.nil? ? nil : ('%.6f' % updfld).to_f if ['value_accuracy','vertical_offset','end_vertical_offset'].include?(fld)
             if updfld!=data_value[fld] && (!target_var || fld!='variable_id')
               if !dryrun
                 provenance << fld+'='+data_value[fld].to_s
@@ -327,8 +330,10 @@ class Voeis::DataValuesController < Voeis::BaseController
             dv['local_date_time'] = date_time_str
           end
           if !dryrun
-            prov_comm = rr>>'provenance_comment'
-            if prov_comm.blank? 
+            begin
+              prov_comm = rr>>'provenance_comment'
+            rescue Exception => e
+              ### provenance_comment does not exist!
               prov_comm = 'VIA>> '+script_show
             end
             new_data_value['provenance_comment'] = 'SCRIPTED FROM: '+provenance.join('; ')+' -- '+prov_comm

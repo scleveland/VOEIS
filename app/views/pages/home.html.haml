@@ -3,15 +3,15 @@
     
   $(window).ready(function(){ 
     console.log('DONE LOADING!!');
-    setTabSize();
+    //setTabSize();
     
     //parsedWidgets = dojo.parser.parse();
     
   });
   
-  $(window).resize(function() {
-    setTabSize();
-  });
+  //$(window).resize(function() {
+  //  setTabSize();
+  //});
   
   function setTabSize() {
     var tabs = dijit.byId('HomeTabs');
@@ -156,8 +156,8 @@
         Start Browsing Public Data
 
   -#= form_for(:user_session, :url => user_session_path, :builder => YogoFormBuilder) do |f|
-  #HomeTabs(dojoType="dijit.layout.TabContainer" style="font-size:12pt; text-align:right; font-weight:bold; width:100%; height:520px;" 
-        controllerWidget="dijit.layout.TabController")
+  #HomeTabs(dojoType="dijit.layout.TabContainer" style="font-size:12pt; text-align:right; font-weight:bold; width:100%;" 
+        controllerWidget="dijit.layout.TabController" doLayout="false")
 
     #Home(dojoType="dojox.layout.ContentPane" selected="selected" title="Home" class="splashElement" href="/static/v2pages/Home.html" 
         style=" background-color: #f5f6f8;")
