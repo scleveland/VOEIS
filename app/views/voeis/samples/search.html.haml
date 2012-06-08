@@ -299,14 +299,14 @@
           = select_tag("#{@tabId}_script_source_select", (opts00+@data_set_options).html_safe)
           %br
           %br
-          %strong
-            TARGET (SELF or VARIABLE):
-          %br
-          - opts01 =  "<option value='SELF'>UPDATE SELF</option>\n"
-          -# opts01 += "<option value='DISP'>POPULATE DISPLAY GRID</option>\n"
-          -# opts01 += "<option value='CSV'>EXPORT CSV FILE</option>\n"
-          - opts01 += @variables_options
-          = select_tag("#{@tabId}_script_target_select", opts01.html_safe)
+          -#%strong
+          -#  TARGET (SELF or VARIABLE):
+          -#%br
+          -#- opts01 =  "<option value='SELF'>UPDATE SELF</option>\n"
+          -#-# opts01 += "<option value='DISP'>POPULATE DISPLAY GRID</option>\n"
+          -#-# opts01 += "<option value='CSV'>EXPORT CSV FILE</option>\n"
+          -#- opts01 += @variables_options
+          -#= select_tag("#{@tabId}_script_target_select", opts01.html_safe)
           %br
           %br
           %input(name="dryrun" dojoType="dijit.form.CheckBox" id="#{@tabId}_query_script_dryrun" checked)
