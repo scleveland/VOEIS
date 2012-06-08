@@ -17,7 +17,7 @@ class VersionsWidget < Apotomo::Widget
     #@root_url = options[:root_url]
     #@id = UUIDTools::UUID.timestamp_create
     ####
-    #@project = parent
+    @project = options[:project]
     #@site =  parent.managed_repository{Voeis::Site.get(params[:id])}
     #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
     ####
