@@ -559,7 +559,6 @@
           // set initial state
           saveBtn.set("disabled", !form.isValid());
         },
-        dateChanged: false,
         dateChange: function(newVal) {
           //if(this.dateChanged) return;
           //this.dateChanged = true;
@@ -571,12 +570,12 @@
           var tz = this.getTz(utcval);
           console.log('DATE-CHANGE:',newVal);
           console.log('DATE-CHANGE:',dt+'T'+tm+tz);
-          item['utc_offset'] = [parseFloat(utcval)];
-          item['local_date_time'] = [dt+'T'+tm+tz];
+          //item['utc_offset'] = [parseFloat(utcval)];
+          //item['local_date_time'] = [dt+'T'+tm+tz];
           var d = new Date(dt+'T'+tm+tz);
-          item['date_time_utc'] = [d.format('UTC:'+dateFormat.masks.isoDateTime)];
+          //item['date_time_utc'] = [d.format('UTC:'+dateFormat.masks.isoDateTime)];
           $('#utc_datetime').text(d.format('UTC:m/d/yyyy HH:MM:ss')+' UTC');
-          this.item = item;
+          //this.item = item;
           //this.dateChanged = false;
         },
         getTz: function(tzString) {
@@ -925,8 +924,8 @@
     &nbsp;&nbsp;
     %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"name_entry_dialog.hide();return false;"} Cancel
 
-
--if !current_user.nil? && current_user.projects.include?(@project)
+-# ADDED: false && -- NO LONGER NEEDED?
+-if false && !current_user.nil? && current_user.projects.include?(@project)
   -#= render(:partial => "data_set", :locals =>{:project_uid=>@project.id})
   -#%h3{:style=>"margin-top:0px;"} Create a new Data Set:
   #new_data_set{:dojoType=>"dijit.Dialog", :title=>"Create New Data Set", :jsId=>"new_data_set"}
