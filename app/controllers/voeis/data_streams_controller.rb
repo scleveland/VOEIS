@@ -797,4 +797,20 @@ class Voeis::DataStreamsController < Voeis::BaseController
      csv_data[row-1]
    end
    
+   def show
+     @data_stream_columns=""
+     @variables = []
+     @meta_tag = []
+     parent.managed_repository do
+       @data_stream = Voeis::DataStream.get(params[:id].to_i)
+       @data_stream_columns = @data_stream.data_stream_columns
+       @data_stream_columns.each do |dc|
+         @variables[dc.column_number] = Voeis::Variable.first(:variable_code => dc.name)
+         @meta_tag[dc.column_number] = dc.meta_tag
+       end
+     end
+     @units = {}
+     Voeis::Unit.all.each{|u| @units[u.id.to_s] = u.units_name}
+     render :layout=>'data_value'
+   end
 end

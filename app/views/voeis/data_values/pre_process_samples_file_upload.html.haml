@@ -23,6 +23,10 @@
         dijit.byId("upload_button").set("disabled", false);
       }
     }
+    function set_template_view(){
+       dijit.byId('#data_template_show').set('href','#{root_url.chop}#{project_data_streams_path(@project)}/'+$('#data_template_id').val().toString());
+       dijit.byId('#data_template_show').show();
+     }
 #upload
   %h2 Sample And Data Upload Wizard: Step 1
   
@@ -70,6 +74,9 @@
     - @data_templates.each do |template|
       - template_string = template_string + "<option value="+template.id.to_s+">"+template.name+"</option>"
     = select_tag("data_template_id", template_string.html_safe)
+    %button{:id=>"view_data_stream_template", :dojoType=>"dijit.form.Button",:onClick => onClick="set_template_view()"}
+      Preview Template
+    %div{:id=>"#data_template_show", :dojoType=>"dijit.Dialog", :title=>"Data Template", :href=>"", :style=>"overflow:auto; width: 600px; height: 500px;"}
     =clear_break
     %button{:id=> 'upload_button',:dojoType=>"dijit.form.Button", :title=>'Upload', :disabled=>true, :type=>"submit", :onClick => 'dijit.byId("uploading_dialog").show();'}
       Upload File
