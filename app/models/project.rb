@@ -100,6 +100,8 @@ class Project
   end
 
   def publish_his
+    errors = []
+    success []
     if self.publish_to_his
       sites = self.managed_repository{ Voeis::Site.all }
       sites.each do |site|
@@ -120,20 +122,33 @@ class Project
                                            :comments  => "comment")
         # Push to HIS
         his_site = system_site.store_to_his
-        site.variables.each do |site_variable|
-          if site_variable.name != "Timestamp"
-            system_variable = Voeis::Variable.first(:variable_code => variable.variable_code, :variable_name => variable.variable_name)
-            his_variable = system_variable.store_to_his
-            data_values = Voeis::DataValue.all(:published => false, :order => [:timestamp.asc])
-            sources = data_values.sources.all(:fields=>[:id], :unique=>true).uniq
-            sources.each{|src| src.store_to_his}
-            data_values.each do |val|
-              val.store_to_his(his_site.id, his_variable.id, val.source.his_id)
-            end #val
-          end #if
-        end # sensor_type
+        if his_site
+          success << "Site ID:#{system_site.id}, Name: #{system_site.name} successfully save to HIS."
+          site.variables.each do |site_variable|
+            if site_variable.name != "Timestamp"
+              system_variable = Voeis::Variable.first(:variable_code => variable.variable_code, :variable_name => variable.variable_name)
+              his_variable = system_variable.store_to_his
+              unless his_variable.nil?
+                success<< "Varialble ID:#{site_variable.id}, Code: #{site_variable.variable_code}, Name: #{site_variable.variable_name} successfully saved to HIS."
+                data_values = Voeis::DataValue.all(:published => false, :order => [:timestamp.asc])
+                sources = data_values.sources.all(:fields=>[:id], :unique=>true).uniq
+                sources.each{|src| src.store_to_his}
+                data_values.each do |val|
+                  val.store_to_his(his_site.id, his_variable.id, val.source.his_id)
+                end #val
+              else
+                errors << "Varialble ID:#{site_variable.id}, Code: #{site_variable.variable_code}, Name: #{site_variable.variable_name} was not compatible with HIS confirm that controlled vocabularies are of the CUAHSI HIS type."
+              end
+            end #if
+          end # sensor_type
+        else
+          errors << "Site ID:#{system_site.id} was not compatible with HIS."
+        end# if his_site
       end #site
+      email_string= "Your project attempted to publish to HIS"
+      puts VoeisMailer.email_user(user.email, "From VOEIS:: Your Project:#{parent.name} HIS publication Notification:", results.to_s)
     end
+    
   end
 
   def self.store_site_to_system(u_id)
