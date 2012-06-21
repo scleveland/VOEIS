@@ -269,17 +269,16 @@
                         'variable_id'].join("<br/>\n").html_safe
         - dv_fields1 = ['data_value',
                         'date_time',
-                        'datatype',
                         'quality_control_level',
                         'vertical_offset',
                         'published',
-                        'provenance_comment'].join("<br/>\n").html_safe
+                        'variable_id'].join("<br/>\n").html_safe
         - dv_fields2 = ['string_value',
                         'utc_offset',
                         'value_accuracy',
-                        'replicate',
                         'end_vertical_offset',
-                        'variable_id','&nbsp;'].join("<br/>\n").html_safe
+                        'replicate',
+                        'provenance_comment'].join("<br/>\n").html_safe
         %div(style="width:350px;margin-left:10px;float:left;")
           %strong
             FIELDS:
@@ -638,9 +637,14 @@
         tz += tz0.length>1 ? (tz0[1]*6).toString().slice(0,2) : '00';
         //var d0 = new Date(item.date_time_utc.toString());
         //var d = new Date(d0.format("UTC:yyyy-mm-dd'T'HH:MM:ss"+tz));
-        var d = new Date(item.local_date_time.toString());
+        //var d = new Date(item.local_date_time.toString());
+        //var dt = item.local_date_time.toString().slice(0,10);
+        //var tm = item.local_date_time.toString().slice(11,19);
+        var dt = item.local_date_time.toString().match(/\d\d\d\d-\d\d-\d\d/).toString();
+        var tm = item.local_date_time.toString().match(/\d\d:\d\d:\d\d/).toString();
         //console.log('GRID-DATE:',item.date_time_utc.toString(),item.local_date_time.toString(),item.utc_offset.toString());
-        return d.format("yyyy-mm-dd HH:MM:ss "+tz);
+        //return d.format("yyyy-mm-dd HH:MM:ss "+tz);
+        return dt+' '+tm+' '+tz;
       },
       trueFalse: function(value) {
         var checked_img = '<img src="/images/true.png" />';
@@ -837,8 +841,11 @@
          //### Update Graph
          //data['selected'] = item.selected;
          //### Update Plot
-         var dateval = new Date(data.local_date_time.toString());
+         //var dateval = val_grid_formatter.dataDateTime(data);
+         var dateval = data.local_date_time;
+         dateval = new Date(dateval).valueOf();
          dateval = parseInt(dateval/1000)*1000;
+         console.log('PLOT dateval: '+dateval);
          #{dataId}.data[item._0] = [dateval,data.data_value]
          var data_upd = #{dataId}.plot.getData();
          #{dataId}.plot.setData(data_upd);

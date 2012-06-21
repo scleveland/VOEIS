@@ -177,7 +177,7 @@ class Voeis::DataValuesController < Voeis::BaseController
       {:label=>"Date/Time", :name=>"datetime_string", :contains=>["local_date_time","date_time_utc","utc_offset"]},
       {:label=>"Data Value", :name=>"data_value"},
       {:label=>"String Value", :name=>"string_value"},
-      {:label=>"Data Type", :name=>"datatype"},
+      {:label=>"Data Origin", :name=>"datatype"},
       {:label=>"Value Accuracy", :name=>"value_accuracy"},
 #      {:label=>"Date/Time", :name=>"datetime_local"},
 #      {:label=>"UTC offset", :name=>"utc_offset"},
@@ -1464,8 +1464,11 @@ class Voeis::DataValuesController < Voeis::BaseController
              @general_categories = Voeis::GeneralCategoryCV.all
              @batch = Voeis::MetaTag.first_or_create(:name => "Batch", :category =>"Chemistry")
     
-             @label_array = Array["Variable Name","Variable Code","Unit Name","Speciation","Sample Medium","Value Type","Is Regular","Time Support","Time Unit ID","Data Type","General Cateogry"]
-             @current_variables = Array.new     
+             @label_array = Array["Variable Name", "Variable Code", "Unit Name", 
+                                  "Speciation", "Sample Medium", "Value Type",
+                                  "Is Regular", "Time Support", "Time Unit ID", 
+                                  "Data Type", "General Cateogry"]
+             @current_variables = Array.new 
              @variables.all(:order => [:variable_name.asc]).each do |var|
                @temp_array =Array[var.variable_name, var.variable_code,@units.get(var.variable_units_id).units_name, var.speciation,var.sample_medium, var.value_type, var.is_regular.to_s, var.time_support.to_s, var.time_units_id.to_s, var.data_type, var.general_category]
                @current_variables << @temp_array

@@ -527,8 +527,8 @@
           var data_val = item.data_value.toString();
           console.log('data_value:',data_val);
           dijit.byId('DV_data_value').set('value', data_val);
-          //dijit.byId('DV_data_type').set('value', item['datatype'].toString());
-          $('#DV_data_type_sel').val(item['datatype'].toString());
+          dijit.byId('DV_data_type').set('value', item['datatype'].toString());
+          //$('#DV_data_type_sel').val(item['datatype'].toString());
           dijit.byId('DV_string_value').set('value', item['string_value'].toString());
           dijit.byId('DV_value_accuracy').set('value', item['value_accuracy'].toString());
           dijit.byId('DV_replicate').set('value', item['replicate'].toString());
@@ -560,14 +560,13 @@
           saveBtn.set("disabled", !form.isValid());
         },
         dateChange: function(newVal) {
-          //if(this.dateChanged) return;
-          //this.dateChanged = true;
           var item = this.item;
           if(!item) return;
-          var utcval = dijit.byId('DV_utc_offset').get('value');
-          var dt = dijit.byId('DV_local_date').get('value').format('isoDate');
-          var tm = dijit.byId('DV_local_time').get('value').format('isoTime');
-          var tz = this.getTz(utcval);
+          var date_time = this.getDateTimeTz();
+          var utcval = date_time.tzoff;
+          var dt = date_time.date;
+          var tm = date_time.time;
+          var tz = date_time.tz;
           console.log('DATE-CHANGE:',newVal);
           console.log('DATE-CHANGE:',dt+'T'+tm+tz);
           //item['utc_offset'] = [parseFloat(utcval)];
@@ -577,6 +576,17 @@
           $('#utc_datetime').text(d.format('UTC:m/d/yyyy HH:MM:ss')+' UTC');
           //this.item = item;
           //this.dateChanged = false;
+        },
+        getDateTimeTz: function(tzString) {
+          var utcval = dijit.byId('DV_utc_offset').get('value');
+          var dt = dijit.byId('DV_local_date').get('value').format('isoDate');
+          var tm = dijit.byId('DV_local_time').get('value').format('isoTime');
+          var tz = this.getTz(utcval);
+          return {
+            date: dt,
+            time: tm,
+            tzoff: utcval,
+            tz: tz};
         },
         getTz: function(tzString) {
           //###FORMAT utc offset value: -7.5 = "-07:30" // 3.75 = "+03:45"
@@ -651,15 +661,17 @@
             //var site = window[siteN+'ref'];
             console.log('SAVE-BUTTON!');
             var id = data_value_edit.item.id.toString();
-            var utcval = dijit.byId('DV_utc_offset').get('value');
-            var dt = dijit.byId('DV_local_date').get('value').format('isoDate');
-            var tm = dijit.byId('DV_local_time').get('value').format('isoTime');
-            var tz = data_value_edit.getTz(utcval);
-            //var diso = dt+'T'+tm+tz;
+            var date_time = data_value_edit.getDateTimeTz();
+            var utcval = date_time.tzoff;
+            var dt = date_time.date;
+            var tm = date_time.time;
+            var tz = date_time.tz;
+            var diso = dt+'T'+tm+tz;
+            console.log('LOCAL-DATE-TIME: '+diso);
             var data = {data_value: {
               data_value: dijit.byId('DV_data_value').get('value'),
-              //datatype: dijit.byId('DV_data_type').get('value'),
-              datatype: $('#DV_data_type_sel').val().toString(),
+              datatype: dijit.byId('DV_data_type').get('value'),
+              //datatype: $('#DV_data_type_sel').val().toString(),
               string_value: dijit.byId('DV_string_value').get('value'),
               value_accuracy: dijit.byId('DV_value_accuracy').get('value'),
               replicate: dijit.byId('DV_replicate').get('value'),
@@ -680,6 +692,7 @@
               dataType: 'json',
               success: function(dat){
                 console.log('DataValue- SAVE THIS:',data_value_edit);
+                console.log('DataValue- RETURNED:',dat);
                 if(data_value_edit.saved_callback) data_value_edit.saved_callback(dat);
                 data_value_edit.hide();
               }
@@ -1014,11 +1027,11 @@
               id="DV_data_value" style="width:200px;" required="true")
             %span{:class=>'label'}
         %td
-          %label Data Type
+          %label Data Origin
           %br
-          -#%input(name="data_type" dojoType="dijit.form.ValidationTextBox" id="DV_data_type" required="true" style="width:200px;")
-          %select(name="data_type" id="DV_data_type_sel" class="data_type_select")
-            = options_for_select(@cv_data_types.all.map{|v| [v.term, v.term]})
+          %input(name="data_type" dojoType="dijit.form.ValidationTextBox" id="DV_data_type" required="true" style="width:200px;")
+          -#%select(name="data_type" id="DV_data_type_sel" class="data_type_select")
+          -#  = options_for_select(@cv_data_types.all.map{|v| [v.term, v.term]})
       %tr
         -#%td{:colspan=>"2"}
         %td
