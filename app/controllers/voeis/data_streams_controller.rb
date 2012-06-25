@@ -16,6 +16,29 @@ class Voeis::DataStreamsController < Voeis::BaseController
       format.html
     end
   end
+  
+  def destroy
+    parent.managed_repository do
+      data_stream = Voeis::DataStream.get(params[:id])
+        respond_to do |format|
+          if data_stream.destroy
+            format.html{
+              flash[:notice] = "Data Stream was deleted."
+            }
+            format.json{
+              render :json => {:msg => "Data Stream was deleted."}, :callback => params[:jsoncallback]
+            }
+          else
+            format.html{
+              flash[:notice] = "Date Stream could not be deleted."
+            }
+            format.json{
+              render :json => {:msg => data_stream.errors.inspect()}, :callback => params[:jsoncallback]
+            }
+          end #end if
+        end #end respond
+    end #end repo
+  end
 
   # alows us to upload csv file to be processed into data
   # this requires that a datastream has already been created
@@ -643,83 +666,83 @@ class Voeis::DataStreamsController < Voeis::BaseController
      redirect_to project_path(params[:project_id])
   end
 
-  def index
-    @project_array = Array.new
-    parent.managed_repository do
-      @sites = Voeis::Site.all
-      @project_hash = Hash.new
-      @site_data = Hash.new
-      num_hash = Hash.new
-      site_count=-1
-      @sites.each do |site|
-        site_count +=1
-        @plot_data = "{"
-        senscount = 0
-        @site_hash = Hash.new
-        @sensor_types = site.sensor_types
-        @sensor_types.each do |s_type|
-          if !s_type.sensor_values.empty?
-          if senscount != 0 &&
-           @plot_data +=  ","
-          end
-          senscount+=1
-          count = 0
-
-          @plot_data += '"' + s_type.name + "-" + site.code + '"' + ": {data:["
-          @sensor_hash = Hash.new
-          num = 24
-          cur_date = s_type.sensor_values.first(:order => [:timestamp.desc]).timestamp
-          begin_date = (cur_date.to_time - num.hours).to_datetime
-          tmp_data = ""
-          sense_data = s_type.sensor_values(:timestamp.gt => begin_date, :timestamp.lt => cur_date)
-          sense_data.each do |val|
-            tmp_data = tmp_data + ",[" + (val.timestamp.to_time.to_i*1000).to_s + ","                        + val.value.to_s + "]"
-          end
-          tmp_data = tmp_data.slice(1..tmp_data.length)
-          array_data = Array.new()
-          puts value_results = s_type.sensor_values(:timestamp.gt => begin_date, :timestamp.lt => cur_date).collect{
-          |val|
-             temp_array= Array.new()
-             if params[:hourly].nil?
-               temp_array.push(val.timestamp.to_time.to_i*1000, val.value)
-               array_data.push(temp_array)
-             else
-               if val.timestamp.min == 0
-                 temp_array.push(val.timestamp.to_time.localtime.to_i*1000, val.value)
-                 array_data.push(temp_array)
-               end
-             end
-           }
-           if !tmp_data.nil?
-             @plot_data += tmp_data
-           end
-           @sensor_hash["data"] = array_data
-           @sensor_hash["label"] = s_type.variables.first.variable_name
-           @thelabel = s_type.variables.first.variable_name
-           if !s_type.sensor_values.last.units.nil?
-             @sensor_hash["units"] = s_type.sensor_values.last.units
-           else
-             @sensor_hash["units"] = "nil"
-           end
-           @site_hash[s_type.name] = @sensor_hash
-           @plot_data += "] , label: \"#{@thelabel}\" }"
-          end
-        end #end sensor_type
-        @plot_data += "}"
-        temp_hash = Hash.new
-        temp_hash["sitecode"]=site.code
-        temp_hash["sitename"]=site.name
-        temp_hash["sensors"]=@site_hash
-        @project_array.push(temp_hash)
-        num_hash[site.code] = site_count
-        @site_data[site.code] = @plot_data
-      end  #site
-      @project_hash["sites"] = @project_array
-    end
-    respond_to do |format|
-      format.html
-    end
-  end
+  # def index
+  #   @project_array = Array.new
+  #   parent.managed_repository do
+  #     @sites = Voeis::Site.all
+  #     @project_hash = Hash.new
+  #     @site_data = Hash.new
+  #     num_hash = Hash.new
+  #     site_count=-1
+  #     @sites.each do |site|
+  #       site_count +=1
+  #       @plot_data = "{"
+  #       senscount = 0
+  #       @site_hash = Hash.new
+  #       @sensor_types = site.sensor_types
+  #       @sensor_types.each do |s_type|
+  #         if !s_type.sensor_values.empty?
+  #         if senscount != 0 &&
+  #          @plot_data +=  ","
+  #         end
+  #         senscount+=1
+  #         count = 0
+  # 
+  #         @plot_data += '"' + s_type.name + "-" + site.code + '"' + ": {data:["
+  #         @sensor_hash = Hash.new
+  #         num = 24
+  #         cur_date = s_type.sensor_values.first(:order => [:timestamp.desc]).timestamp
+  #         begin_date = (cur_date.to_time - num.hours).to_datetime
+  #         tmp_data = ""
+  #         sense_data = s_type.sensor_values(:timestamp.gt => begin_date, :timestamp.lt => cur_date)
+  #         sense_data.each do |val|
+  #           tmp_data = tmp_data + ",[" + (val.timestamp.to_time.to_i*1000).to_s + ","                        + val.value.to_s + "]"
+  #         end
+  #         tmp_data = tmp_data.slice(1..tmp_data.length)
+  #         array_data = Array.new()
+  #         puts value_results = s_type.sensor_values(:timestamp.gt => begin_date, :timestamp.lt => cur_date).collect{
+  #         |val|
+  #            temp_array= Array.new()
+  #            if params[:hourly].nil?
+  #              temp_array.push(val.timestamp.to_time.to_i*1000, val.value)
+  #              array_data.push(temp_array)
+  #            else
+  #              if val.timestamp.min == 0
+  #                temp_array.push(val.timestamp.to_time.localtime.to_i*1000, val.value)
+  #                array_data.push(temp_array)
+  #              end
+  #            end
+  #          }
+  #          if !tmp_data.nil?
+  #            @plot_data += tmp_data
+  #          end
+  #          @sensor_hash["data"] = array_data
+  #          @sensor_hash["label"] = s_type.variables.first.variable_name
+  #          @thelabel = s_type.variables.first.variable_name
+  #          if !s_type.sensor_values.last.units.nil?
+  #            @sensor_hash["units"] = s_type.sensor_values.last.units
+  #          else
+  #            @sensor_hash["units"] = "nil"
+  #          end
+  #          @site_hash[s_type.name] = @sensor_hash
+  #          @plot_data += "] , label: \"#{@thelabel}\" }"
+  #         end
+  #       end #end sensor_type
+  #       @plot_data += "}"
+  #       temp_hash = Hash.new
+  #       temp_hash["sitecode"]=site.code
+  #       temp_hash["sitename"]=site.name
+  #       temp_hash["sensors"]=@site_hash
+  #       @project_array.push(temp_hash)
+  #       num_hash[site.code] = site_count
+  #       @site_data[site.code] = @plot_data
+  #     end  #site
+  #     @project_hash["sites"] = @project_array
+  #   end
+  #   respond_to do |format|
+  #     format.html
+  #   end
+  # end
 
 
    # parse the header of a logger file
@@ -774,4 +797,20 @@ class Voeis::DataStreamsController < Voeis::BaseController
      csv_data[row-1]
    end
    
+   def show
+     @data_stream_columns=""
+     @variables = []
+     @meta_tag = []
+     parent.managed_repository do
+       @data_stream = Voeis::DataStream.get(params[:id].to_i)
+       @data_stream_columns = @data_stream.data_stream_columns
+       @data_stream_columns.each do |dc|
+         @variables[dc.column_number] = Voeis::Variable.first(:variable_code => dc.name)
+         @meta_tag[dc.column_number] = dc.meta_tag
+       end
+     end
+     @units = {}
+     Voeis::Unit.all.each{|u| @units[u.id.to_s] = u.units_name}
+     render :layout=>'data_value'
+   end
 end

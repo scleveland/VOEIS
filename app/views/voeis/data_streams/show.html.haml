@@ -1,0 +1,46 @@
+%h3
+  Data Parsing Template: #{@data_stream.name}
+%table(border="1")
+  %tr
+    %td Column Number
+    - @data_stream_columns.all(:order=>[:column_number]).each do |col|
+      %td
+        =col.column_number+1
+  %tr
+    %td Column Type
+    - @data_stream_columns.all(:order=>[:column_number]).each do |col|
+      %td
+        =col.name
+  %tr
+    %td Meta-Data
+    - @data_stream_columns.all(:order=>[:column_number]).each do |col|
+      %td
+        -if @variables[col.column_number]
+          %b Name:
+          =@variables[col.column_number].variable_name
+          %br
+          %b Units:
+          =@units[@variables[col.column_number].variable_units_id.to_s] 
+          %br
+          %b Medium: 
+          =@variables[col.column_number].sample_medium
+          %br
+          %b Cateogry:
+          =@variables[col.column_number].general_category
+          %br
+          %b Data Type:
+          =@variables[col.column_number].data_type
+          %br
+          %b Value Type:
+          =@variables[col.column_number].value_type
+          %br
+        -elsif @meta_tag[col.column_number]
+          %b Name:
+          =@meta_tag[col.column_number].name
+          %br
+          %b Category:
+          =@meta_tag[col.column_number].category
+          %br
+        -else
+          NA
+  
