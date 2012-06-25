@@ -40,22 +40,22 @@ class ProjectsController < InheritedResources::Base
     end
   end
   
-  def create
-    @project = Project.new(params[:project])    
-    respond_to do |format|
-      if @project.save
-        format.json do
-         render :json => @project.as_json, :callback => params[:jsoncallback]
-        end
-        format.xml do
-         render :xml =>@project.to_xml
-        end
-        format.html do
-          redirect_to project_url(@project)
-        end
-      end
-    end
-  end
+  # def create
+  #   @project = Project.new(params[:project])    
+  #   respond_to do |format|
+  #     if @project.save
+  #       format.json do
+  #        render :json => @project.as_json, :callback => params[:jsoncallback]
+  #       end
+  #       format.xml do
+  #        render :xml =>@project.to_xml
+  #       end
+  #       format.html do
+  #         redirect_to project_url(@project)
+  #       end
+  #     end
+  #   end
+  # end
   
   def index
     ### PUBLIC & USER PROJECTS ###
