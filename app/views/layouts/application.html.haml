@@ -309,7 +309,8 @@
                     %div{:dojoType=>"dijit.Menu", :id=>"datasetSubMenu"}
                       - if @project.managed_repository{Voeis::DataSet.all}.count > 0 
                         - @project.managed_repository{Voeis::DataSet.all}.each do |dataset|
-                          = link_to(dataset.name, project_data_set_path(@project, dataset), :dojoType => "yogo.ui.MenuLink")
+                          -#= link_to(dataset.name, project_data_set_path(@project, dataset), :dojoType => "yogo.ui.MenuLink")
+                          = link_to(dataset.name, "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataset', [#{dataset.id.to_s},'#{dataset.name}']); return false;")
                       - else
                         None
 

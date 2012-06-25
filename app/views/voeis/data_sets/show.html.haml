@@ -176,32 +176,54 @@
   dojo.require("dojo.data.ItemFileReadStore");
   dojo.require("dojo.data.ItemFileWriteStore");
   dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
-  var variables = #{@variables.to_json}
+  var variables = #{@variables.to_json};
 
   
+- tabId = "dataSet" + @data_set.id.to_s
 - dataSetGrid = "dataSet" + @data_set.id.to_s + "_grid"
 - dataSetStore ="dataSet" + @data_set.id.to_s + "_store"
-%h3{:style=>"margin:5px 0;"}
-  Data Set: #{@data_set.name}
+-#%h3{:style=>"margin:5px 0;"}
+%h3{:style=>"margin-top:0;"}
+  #{@data_set.name}
 
-#dataSetGrid{:style=>"width:900px;height:475px;"}
+%strong DATA SET DETAILS
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 -if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
-  %button(dojoType="dijit.form.Button" name="remove_data_button" id="remove_data_button" onclick="RemoveSelectedFromDataSet();") 
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  = link_to('REMOVE SELECTED DATA FROM DATA SET', 'javascript:', :class=>'icon icon-cancel', :onclick=>"RemoveSelectedFromDataSet(#{@data_set.id},#{dataSetGrid});return false;") 
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+= link_to('EXPORT DATA SET', 'javascript:', :class=>'icon icon-proj', :onclick=>"ExportDataSet(#{@data_set.id});return false;") 
+
+%br
+%br
+
+%div{:id=>"#{dataSetGrid}", :style=>"width:900px;height:475px;"}
+%br
+-if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
+  %button(dojoType="dijit.form.Button" name="remove_data_button" onclick="RemoveSelectedFromDataSet(#{@data_set.id},#{dataSetGrid});") 
     Remove Selected Data from Data Set
-%button(dojoType="dijit.form.Button" name="export_data_set_button" id="export_data_set_button" onclick="ExportDataSet();") 
-  Download Data Set
+%button(dojoType="dijit.form.Button" name="export_data_set_button" onclick="ExportDataSet(#{@data_set.id});") 
+  Export Data Set
+
+%br
+%br
+
 :javascript
-  var dataSet = {}
-  function ExportDataSet(){
-   window.location= '#{root_url}projects/#{@project.id}/data_sets/#{@data_set.id}/export';
+  var dataSet#{@data_set.id} = {};
+
+  function ExportDataSet(setId){
+    window.location= '#{root_url}projects/#{@project.id}/data_sets/'+setId+'/export';
   }
-  function RemoveSelectedFromDataSet(){
+  
+  function RemoveSelectedFromDataSet(setId,grid){
     //get the data values
     var data_value_ids_string = ""
-    data_array = #{dataSetGrid}.selection.getSelected();
+    var data_array = grid.selection.getSelected();
     for (i=0; i<data_array.length; i=i+1)
     {
-      data_value_ids_string= data_value_ids_string + "&data_value_ids[]=" + data_array[i].id.toString();
+      data_value_ids_string += "&data_value_ids[]=" + data_array[i].id.toString();
     }
     //form has a hidden data_set_id
     $.post('#{root_url}projects/#{@project.id}/apivs/remove_data_from_project_data_set.json?data_set_id=#{@data_set.id}' + data_value_ids_string,
@@ -221,10 +243,10 @@
               } // end if
       dijit.byId(#{dataSetGrid}).selection.clear();
   } $.get("#{root_url}projects/#{@project_uid}/apivs/get_project_data_set_data.json?data_set_id=#{@data_set.id}",
-  function(data) {
-    dataSet.values= data["data"]
+    function(data) {
+      dataSet#{@data_set.id}.values= data["data"]
     
-  }
+    }
   );
   
   
@@ -234,33 +256,33 @@
   
   //formatter: 'val_grid_formatter.dateTime',
   // grid formatters
-  var val_grid_formatter = {};
-  val_grid_formatter.dateTime = function(value) {
-    if(value==null || value=='') return '-';
-    // Format DateTime string
-    var d = new Date(value);
-    //var fmt = d.getMonth()+'/'+d.getFullYear()
-    return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+  var set_grid_formatter = {
+    dateTime: function(value) {
+      if(value==null || value=='') return '-';
+      // Format DateTime string
+      var d = new Date(value);
+      //var fmt = d.getMonth()+'/'+d.getFullYear()
+      return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+    },
+    selectItem: function(item) {
+      //var checked_img = '<img src="/images/notice.png" alt="SELCT" />';
+      var selected_img = '<img src="/images/1abu007.gif" alt="SELCT" />';
+      var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
+  
+      //if(#{dataSetGrid}.value_selected(item)) 
+      //  return selected_img;
+      return blank_img;
+    },
+    variable_name: function(value){
+      return variables[value]
+    }
   };
-  val_grid_formatter.selectItem = function(item) {
-    //var checked_img = '<img src="/images/notice.png" alt="SELCT" />';
-    var selected_img = '<img src="/images/1abu007.gif" alt="SELCT" />';
-    var blank_img = '<img src="/images/blank.gif" width="16" height="16" />';
   
-    //if(#{dataSetGrid}.value_selected(item)) 
-    //  return selected_img;
-    return blank_img;
-  };
-  
-  val_grid_formatter.variable_name = function(value){
-    return variables[value]
-  }
-  
-  var val_layout = [
+  var set_grid_layout = [
   {
      field: '_item',
      name: '-',
-     formatter: val_grid_formatter.selectItem,
+     formatter: set_grid_formatter.selectItem,
      width: '24px'
   },
   {
@@ -271,7 +293,7 @@
   {
      field: 'local_date_time',
      name: 'Timestamp',
-     formatter: val_grid_formatter.dateTime,
+     formatter: set_grid_formatter.dateTime,
      width: '185px'
   },
   {
@@ -297,7 +319,7 @@
   {
      field: 'variable_id',
      name: 'Variable',
-     formatter: val_grid_formatter.variable_name,
+     formatter: set_grid_formatter.variable_name,
      width: 'auto'
   },
   {
@@ -312,18 +334,18 @@
   },
   ];
   
-  var data_json = {
+  var #{tabId}_data_json = {
     identifier: 'id',
     items: #{@data_set.data_values.to_json} };
-  var #{dataSetStore} = new dojo.data.ItemFileWriteStore({data: data_json });
+  var #{dataSetStore} = new dojo.data.ItemFileWriteStore({data: #{tabId}_data_json });
   // create a new grid:
-  #{dataSetGrid} = new dojox.grid.EnhancedGrid({
+  var #{dataSetGrid} = new dojox.grid.EnhancedGrid({
      store: #{dataSetStore},
      grid_click: true,
      clientSort: true,
      selectMode: "extended",
-     rowSelector: '20px',
-     structure: val_layout,
+     rowSelector: '0',
+     structure: set_grid_layout,
      style: 'width:95%;',
      plugins: {filter:true, indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"}},
       onClick: function(ev) {
@@ -334,7 +356,7 @@
 
 
   // append the new grid to the div " ":
-  $('#dataSetGrid').append(#{dataSetGrid}.domNode);
+  $('##{dataSetGrid}').append(#{dataSetGrid}.domNode);
   #{dataSetGrid}.startup();
   
   //protovis
@@ -346,4 +368,3 @@
   //}
   
 
-  

@@ -2150,6 +2150,19 @@
       openSearchResultTab(tabs, projectId, searchURL);
     });
     
+    dojo.subscribe("voeis/project/dataset", function(setId,setName) {
+      console.log('DATASET',arguments);
+      var projectId = "#{@project.id}";
+      var tabs = dijit.byId('tab_browser');
+      var tabHref = '#{project_path(@project)}/data_sets/'+setId;
+      tabHref += '#{current_user.nil? ? "" : "&api_key="+current_user.api_key}';
+      var tabId = '#{@project.id}-dataset'+setId;
+      var tabTitle = 'Data Set: '+setName;
+      var tabCallback = function() {
+      };
+      openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
+    });
+    
     dojo.subscribe("voeis/project/openTab", function(tabHref,tabId,tabTitle,load_callback) {
       console.log('OPEN-TAB',arguments);
       var projectId = "#{@project.id}";
