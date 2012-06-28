@@ -109,7 +109,7 @@
             //DataValue DELETE
             $.ajax({
               type: 'DELETE',
-              url: '/projects/#{@project.id}/data_values/'+id+'?#{url_api_key}',
+              url: '/projects/#{@project.id}/data_values/'+id+'#{url_api_key}',
               data: {},
               dataType: 'json',
               success: function(result){
