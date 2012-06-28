@@ -1,5 +1,6 @@
 - dataId = @tabId+'_data'
 - edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project))
+- url_api_key = current_user.nil? || current_user.api_key.blank? ? "" : "?api_key=#{current_user.api_key}"
 
 -#%h3{:style=>"margin:5px 0;"}
 %h3{:style=>"margin-top:0;"}
@@ -83,7 +84,7 @@
         delete data.data_value.variable_id;
         $.ajax({
           type: 'PUT',
-          url: '/projects/#{@project.id}/data_values/'+id+'.json?api_key=#{current_user.api_key}',
+          url: '/projects/#{@project.id}/data_values/'+id+'.json#{url_api_key}',
           data: data,
           dataType: 'json',
           success: function(dat){
@@ -108,7 +109,7 @@
             //DataValue DELETE
             $.ajax({
               type: 'DELETE',
-              url: '/projects/#{@project.id}/data_values/'+id+'?api_key=#{current_user.api_key}',
+              url: '/projects/#{@project.id}/data_values/'+id+'?#{url_api_key}',
               data: {},
               dataType: 'json',
               success: function(result){
@@ -355,7 +356,7 @@
                   if(datatarget!='SELF')
                     formdata['target'] = datatarget;
                   
-                  $.post("#{project_path(@project)}/data_values/batch_update#{current_user.nil? ? '' : '?api_key='+current_user.api_key}",
+                  $.post("#{project_path(@project)}/data_values/batch_update#{url_api_key}",
                     formdata,
                     function(data) {
                       //QUERY SCRIPT RESULTS
@@ -537,7 +538,7 @@
       var batch = #{dataId}.get_batch()
       if(batch.error) return;
       $.extend(rollbackdata, batch);
-      $.post("#{project_path(@project)}/data_values/batch_update#{current_user.nil? ? '' : '?api_key='+current_user.api_key}",
+      $.post("#{project_path(@project)}/data_values/batch_update#{url_api_key}",
         rollbackdata,
         function(data) {
           //ROLLBACK RESULTS
@@ -1269,7 +1270,7 @@
          },function(results){
            var vardata = {name: results.name, description: results.description, type: results.type};
            console.log('CREATE DATASET:',vardata);
-           $.post("#{project_path(@project)}/apivs/create_project_data_set.json?api_key=#{User.current.api_key}",
+           $.post("#{project_path(@project)}/apivs/create_project_data_set.json#{url_api_key}",
              vardata,
              function(data) {
                $('##{@tabId}_data_set_select').append($("<option></option>").attr("value",data['id']).text(results.name));
@@ -1312,7 +1313,7 @@
                //POST save script
                $.ajax({
                  type: 'POST',
-                 url: '#{project_path(@project)}/scripts.json?api_key=#{User.current.api_key}',
+                 url: '#{project_path(@project)}/scripts.json#{url_api_key}',
                  data: {script: post_data},
                  success: function(data){
                    console.log('SCRIPT-POST:',data);
@@ -1333,7 +1334,7 @@
              console.log('CHANGE SCRIPT: UPDATE-',save);
              $.ajax({
                type: 'PUT',
-               url: '#{project_path(@project)}/scripts/'+post_data.id+'.json?api_key=#{User.current.api_key}',
+               url: '#{project_path(@project)}/scripts/'+post_data.id+'.json#{url_api_key}',
                data: {script: post_data},
                success: function(data){
                  console.log('SCRIPT-PUT:',data);
@@ -1352,7 +1353,7 @@
            #{dataId}.script_id = parseInt(save);
            $.ajax({
              type: 'GET',
-             url: '#{project_path(@project)}/scripts/'+save+'.json?api_key=#{User.current.api_key}',
+             url: '#{project_path(@project)}/scripts/'+save+'.json#{url_api_key}',
              success: function(data){
                #{dataId}.script_id = parseInt(data.id);
                #{dataId}.script_name = data.name;
