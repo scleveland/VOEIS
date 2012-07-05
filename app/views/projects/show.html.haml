@@ -539,13 +539,13 @@
           if(item['published'][0]) dijit.byId('DV_published').set('checked', true);
           $('#DV_variable_sel').val(item['variable_id'][0]);
           
-          dijit.byId('DV_local_date').set('value', item['local_date_time'].toString());
-          dijit.byId('DV_local_time').set('value', item['local_date_time'].toString());
+          dijit.byId('DV_local_date').set('value', item['local_date_time'].toString().slice(0,19));
+          dijit.byId('DV_local_time').set('value', item['local_date_time'].toString().slice(0,19));
           dijit.byId('DV_utc_offset').set('value', item['utc_offset'].toString());
 
           //dijit.byId('DV_utc_date').set('value', item['date_time_utc'].toString());
           //dijit.byId('DV_utc_time').set('value', item['date_time_utc'].toString());
-          $('#utc_datetime').text(d0.format('UTC:m/d/yyyy HH:MM:ss')+' UTC');
+          //$('#utc_datetime').text(d0.format('UTC:m/d/yyyy HH:MM:ss')+' UTC');
           if(callback) this.saved_callback = callback;
         },
         pop: function(item,callback) {

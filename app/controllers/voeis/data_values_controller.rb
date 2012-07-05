@@ -69,10 +69,12 @@ class Voeis::DataValuesController < Voeis::BaseController
         datparams[prop] = nil if v=='NaN' || v=='null'
       end
       ###
-      datparams[:local_date_time] = datparams[:local_date_time][0..18]
+      tz = datparams[:local_date_time][19..-1]
       ###
       datparams[:local_date_time] = DateTime.parse(datparams[:local_date_time])
+      datparams[:local_date_time].to_datetime.change(:offset => tz)  ### "#{utc_offset}:00")
       datparams[:date_time_utc] = DateTime.parse(datparams[:date_time_utc])
+      datparams[:date_time_utc].to_datetime.change(:offset => "+00:00")
       [:data_value,:utc_offset].each{|prop| 
         datparams[prop] = datparams[prop].to_f }
       [:value_accuracy,:vertical_offset,:end_vertical_offset].each{|prop| 
