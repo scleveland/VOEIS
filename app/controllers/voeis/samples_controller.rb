@@ -272,7 +272,14 @@ class Voeis::SamplesController < Voeis::BaseController
       end
       @meta_tag_hash=Hash.new
       @data_structs.each do |data_val|
-        @graph_data << Array[data_val.local_date_time.to_datetime.to_i*1000, data_val.data_value]
+        tz0 = data_val.utc_offset.to_s.split('.')
+        tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+tz0[0].to_i.abs.to_s)[-2,2]+':'
+        tz += tz0.count>1 ? ('0'+((('.'+tz0[1]).to_f*100).to_i*0.6).to_i.to_s)[-2,2] : '00'
+        data_val.local_date_time = data_val.local_date_time.to_s[0..18]+tz
+        data_val.date_time_utc = data_val.date_time_utc.to_s[0..18]+"+00:00"
+        dateval = DateTime.parse(data_val.date_time_utc).to_i*1000
+        #@graph_data << Array[data_val.date_time_utc.to_datetime.to_i*1000, data_val.data_value]
+        @graph_data << Array[dateval, data_val.data_value]
         #@meta_tag_hash[data_val.id] = @meta_tags.map{|m| m.data_value_id == data_val.id}.to_a
       end
       @scripts = parent.managed_repository{Voeis::Script.all}

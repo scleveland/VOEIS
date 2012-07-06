@@ -165,7 +165,6 @@
           -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
           -#= link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.pop_query_script();return false;") 
           = link_to('BATCH QA/QC', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.show_scripting(true);return false;")
-
         
         -#=hidden_field_tag('column_array', @column_array.to_json)
         -#=hidden_field_tag('row_array', @row_array.to_json)
@@ -185,6 +184,10 @@
         -#=submit_tag("Export Results")
         = link_to('EXPORT RESULTS', 'javascript:', :class=>'icon icon-proj', 
               :onclick=>"$('##{@tabId}_query_results form')[0].submit();return false;") 
+
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      = link_to('REFRESH', 'javascript:', :class=>'icon icon-proj', :onclick=>"refreshTab('#{@tabId}');") 
+      -#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"refresh_history(#{@cv_item.id});return false;")
     
     =clear_break
     -#simplechart{:style=>"width: 250px; height: 150px;"}
@@ -270,17 +273,16 @@
                         'variable_id'].join("<br/>\n").html_safe
         - dv_fields1 = ['data_value',
                         'date_time',
-                        'datatype',
                         'quality_control_level',
                         'vertical_offset',
                         'published',
-                        'provenance_comment'].join("<br/>\n").html_safe
+                        'variable_id'].join("<br/>\n").html_safe
         - dv_fields2 = ['string_value',
                         'utc_offset',
                         'value_accuracy',
-                        'replicate',
                         'end_vertical_offset',
-                        'variable_id','&nbsp;'].join("<br/>\n").html_safe
+                        'replicate',
+                        'provenance_comment'].join("<br/>\n").html_safe
         %div(style="width:350px;margin-left:10px;float:left;")
           %strong
             FIELDS:
@@ -433,8 +435,8 @@
     #{dataId}.script_name = '';
     #{dataId}.script_description = '';
     #{dataId}.value_data = #{@data_structs.sql_to_json};
-    for(var i=0;i<#{dataId}.value_data.length;i++) 
-      #{dataId}.value_data[i]['selected'] = 0;
+    //for(var i=0;i<#{dataId}.value_data.length;i++) 
+    //  #{dataId}.value_data[i]['selected'] = 0;
     #{dataId}.data = #{@graph_data.as_json};
 
     #{dataId}.val_store = new dojo.data.ItemFileWriteStore({data: {identifier: 'id', items: #{dataId}.value_data }});
@@ -639,9 +641,14 @@
         tz += tz0.length>1 ? (tz0[1]*6).toString().slice(0,2) : '00';
         //var d0 = new Date(item.date_time_utc.toString());
         //var d = new Date(d0.format("UTC:yyyy-mm-dd'T'HH:MM:ss"+tz));
-        var d = new Date(item.local_date_time.toString());
+        //var d = new Date(item.local_date_time.toString());
+        //var dt = item.local_date_time.toString().slice(0,10);
+        //var tm = item.local_date_time.toString().slice(11,19);
+        var dt = item.local_date_time.toString().match(/\d\d\d\d-\d\d-\d\d/).toString();
+        var tm = item.local_date_time.toString().match(/\d\d:\d\d:\d\d/).toString();
         //console.log('GRID-DATE:',item.date_time_utc.toString(),item.local_date_time.toString(),item.utc_offset.toString());
-        return d.format("yyyy-mm-dd HH:MM:ss "+tz);
+        //return d.format("yyyy-mm-dd HH:MM:ss "+tz);
+        return dt+' '+tm+' '+tz;
       },
       trueFalse: function(value) {
         var checked_img = '<img src="/images/true.png" />';
@@ -801,27 +808,6 @@
        val_plot.unhighlight();
        plotutils.highlightItems(this.selection.getSelected(),0,val_plot);
       },
-      xonClick: function(ev) {
-       this.select_click = ev;
-       console.log('GRID-CLICK:',ev);
-       //var select_col = this.select_focus.cell.index;
-       return;
-       if(this.select_focus.cell==null) return;
-       if(this.select_item){
-         if(this.select_focus.cell.index!=0){
-           this.selection.deselect(this.select_item);
-           return;
-         };
-         this.select_item = false;
-       };
-       if(this.deselect_item){
-         if(this.select_focus.cell.index!=0){
-           this.selection.addToSelection(this.select_item);
-           return;
-         };
-         this.deselect_item = false;
-       };
-      },
       popEdit: function(id) {
        //var item = this.getItem(idx);
        //var item = #{dataId}.value_data[idx];
@@ -838,8 +824,11 @@
          //### Update Graph
          //data['selected'] = item.selected;
          //### Update Plot
-         var dateval = new Date(data.local_date_time.toString());
+         //var dateval = val_grid_formatter.dataDateTime(data);
+         var dateval = data.date_time_utc;
+         dateval = new Date(dateval).valueOf();
          dateval = parseInt(dateval/1000)*1000;
+         console.log('PLOT dateval: '+dateval);
          #{dataId}.data[item._0] = [dateval,data.data_value]
          var data_upd = #{dataId}.plot.getData();
          #{dataId}.plot.setData(data_upd);
@@ -919,7 +908,7 @@
            },
            xaxis: { mode: "time" },
            pan:   { interactive: true },
-           zoom: {interative: true}
+           zoom: { interative: true }
     });
 
     // ADD ZOOM in/out button 
@@ -1110,40 +1099,7 @@
            #{dataId}.previousPoint = null;            
        };
        //console.log('PLOT-HOVER =',#{dataId}.plotHover);
-       return;
        
-       //$("#tooltip").remove();
-       //window.clearTimeout(hoverDelay);
-       
-       //if(#{dataId}.hoverDelay) return;
-       //
-       //var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
-       //var dDate = new Date();
-       //dDate.setTime(mEpoch);
-       //$("#x").text(dDate.toLocaleString());
-       //$("#y").text(pos.y);
-       
-       /****
-       if (item) {
-         if (#{dataId}.previousPoint != item.datapoint) {
-           #{dataId}.previousPoint = item.datapoint;
-           $("#tooltip").remove();
-           var x = item.datapoint[0].toFixed(2),
-               y = item.datapoint[1].toFixed(2);
-           var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
-           dDate = new Date();
-           dDate.setTime(mEpoch);
-           var msg = val_grid_formatter.dateTime(dDate) + " = " + y + "  #{@var_name}|#{@units}";
-           #{dataId}.hoverDelay = window.setTimeout(function(){
-             showTooltip(item.pageX, item.pageY, msg);
-             #{dataId}.hoverDelay = 0;
-           },1);
-         };
-       } else {
-         $("#tooltip").remove();
-         #{dataId}.previousPoint = null;            
-       };
-       ****/
      });
      
      function showPlotTooltip(event,pos,item) {
@@ -1161,12 +1117,14 @@
          var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
          var ttip_help = "&nbsp; &bull; CLICK/SHIFT-CLICK to select";
          if(edit_auth) ttip_help += "<br/>&nbsp; &bull; ALT-CLICK to edit DataValue";
-         dDate = new Date();
+         var dDate = new Date();
          dDate.setTime(mEpoch);
+         //var dString = val_grid_formatter.dateTime(dDate);
+         var dString = dDate.format('UTC:yyyy-mm-dd HH:MM:ss')+' UTC';
          showTooltip(item.pageX, item.pageY,
            //*****You will need to change the sensor name here to the appropriate one selected above
                     //dDate.toLocaleString() + " = " + y + " " + "#{@variable}|#{@units}" ();
-                    val_grid_formatter.dateTime(dDate) + " = " + y + " " + "#{@var_name}|#{@units}<br/>"
+                    dString + " = " + y + " " + "#{@var_name}|#{@units}<br/>"
                     +ttip_help);
        };
        
