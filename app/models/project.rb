@@ -93,7 +93,7 @@ class Project
 
   def publish_his
     errors = []
-    success []
+    success = []
     if self.publish_to_his
       sites = self.managed_repository{ Voeis::Site.all }
       sites.each do |site|
