@@ -164,10 +164,10 @@
       %td
         $$$site-variable-data$$$
 
-  -#%br{:style=>'float:none; clear:both;'}
-  -#%div
-  -#  %h4{:style=>"margin-top:0;"}
-  -#    Existing Samples
+  %br{:style=>'float:none; clear:both;'}
+  %div
+    %h4{:style=>"margin-top:0;"}
+      Existing Samples
 
   -##all_variables-site00{:style=>"$$$export-style$$$"}
   -#  = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
@@ -178,15 +178,15 @@
   -#  %br
   -#  %br
 
-  -#%table{:id=>"site00-sample-table", :style=>"width:45%;"} 
-  -#  %tr{:class=>"row-gr"}
-  -#    - @sample_properties.each do |prop|
-  -#      %th{:style=>"width:20%;align:center;"}
-  -#        %strong
-  -#          = prop[:label]
-  -#  %tr
-  -#    %td{:style=>"width:23%;align:center;"}
-  -#      $$$site-sample-data$$$
+  %table{:id=>"site00-sample-table", :style=>"width:45%;"} 
+    %tr{:class=>"row-gr"}
+      - @sample_properties.each do |prop|
+        %th{:style=>"width:20%;align:center;"}
+          %strong
+            = prop[:label]
+    %tr
+      %td{:style=>"width:23%;align:center;"}
+        $$$site-sample-data$$$
       
       
   -##testing-site00{:dojoType=>"dijit.form.Button"}

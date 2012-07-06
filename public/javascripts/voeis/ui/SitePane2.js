@@ -125,7 +125,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			sitePaneContent = sitePaneContent.replace(/\$\$\$export-style\$\$\$/, '');
 			for(var i=0;i<this.site_samps.length;i++) {
 				data += '<a href="javascript:" onclick="dojo.publish(\'voeis/project/sample\', [';
-				data += this.site_samps[i][0]+',\'Sample: '+this.site_samps[i][1]+'\']);">';
+				data += this.site_samps[i][0]+',\'Sample: '+this.site_samps[i][1]+'\','+sitename +']);">';
 				data += '<strong>'+this.site_samps[i][1]+'</strong></a></td><td>\n';
 				data += this.site_samps[i][2]+'</td><td>\n';
 				data += this.site_samps[i][3]+'</td><td class="time">\n';
