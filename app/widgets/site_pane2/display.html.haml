@@ -244,8 +244,37 @@
     %input(name="end_date" dojoType="dijit.form.DateTextBox" value="$$$site-date-end$$$" style="width:200px!important;")
     %br{:style=>'float:none; clear:both;'}
     %br
+    You can Specify some value restrictions:
     %br
-
+    Value:
+    %select{:name =>"first_value_select"}
+      %option{:value=>"blank"}
+      %option{:value=>"eql"}
+        Is equal to
+      %option{:value=>"lte"}
+        Is less than or equal to
+      %option{:value=>"gte"}
+        Is greater than or equal to
+    %input{:type=>"text", :name =>"first_value_text"}
+    %select{:name =>"and_or_select"}
+      %option{:value=>"and"}
+        And
+      %option{:value=>"or"}
+        Or
+    %br
+    Value:
+    %select{:name =>"second_value_select"}
+      %option{:value=>"blank"}
+      %option{:value=>"eql"}
+        Is equal to
+      %option{:value=>"lte"}
+        Is less than or equal to
+      %option{:value=>"gte"}
+        Is greater than or equal to
+    %input{:type=>"text", :name =>"second_value_text"}
+    
+    %br
+    %br
     -#  (<span id="vars_count">#{@variable_opts_array.count}</span>):
     -#= f.submit('Search', :onclick => "dijit.byId('loading_dialog').show();")
     -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 

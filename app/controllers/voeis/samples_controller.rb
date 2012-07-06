@@ -245,7 +245,29 @@ class Voeis::SamplesController < Voeis::BaseController
        # q = repository.adapter.send(:select_statement, Voeis::DataValue.all(:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date, :order=>[:local_date_time.asc],:fields=>[:id,:data_value,:local_date_time,:string_value,:datatype, :vertical_offset,:quality_control_level, :published, :date_time_utc, :site_id,:variable_id,:utc_offset,:end_vertical_offset, :value_accuracy,:replicate]).query)
         #sql = q[0].gsub!("?").each_with_index{|v,i| "\'#{q[1][i]}\'" }
         #@data_structs = repository.adapter.select(sql)
-        @data_structs = DataMapper.raw_select(Voeis::DataValue.all(:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date, :order=>[:local_date_time.asc],:fields=>[:id,:data_value,:local_date_time,:string_value,:datatype, :vertical_offset,:quality_control_level, :published, :date_time_utc, :site_id,:variable_id,:utc_offset,:end_vertical_offset, :value_accuracy,:replicate]))
+        standard_query = {:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date, :order=>[:local_date_time.asc],:fields=>[:id,:data_value,:local_date_time,:string_value,:datatype, :vertical_offset,:quality_control_level, :published, :date_time_utc, :site_id,:variable_id,:utc_offset,:end_vertical_offset, :value_accuracy,:replicate]}
+        
+        if params[:first_value_select] != "blank"
+            temp_query1 = build_value_query_stmt(params[:first_value_select], params[:first_value_text])
+          if params[:second_value_select] != "blank"
+            temp_query2 = build_value_query_stmt(params[:second_value_select], params[:second_value_text])
+            if params[:and_or_select] == "and"
+              @data_structs = DataMapper.raw_select(Voeis::DataValue.all(standard_query) & (Voeis::DataValue.all(temp_query1) & Voeis::DataValue.all(temp_query2)))
+              debugger
+            else
+              debugger
+              @data_structs = DataMapper.raw_select(Voeis::DataValue.all(standard_query) & (Voeis::DataValue.all(temp_query1) | Voeis::DataValue.all(temp_query2)))
+              
+            end
+          else
+            @data_structs = DataMapper.raw_select(Voeis::DataValue.all(standard_query) & Voeis::DataValue.all(temp_query1))
+          end
+        else
+          @data_structs = DataMapper.raw_select(Voeis::DataValue.all(standard_query))
+        end
+        
+        
+        
         @meta_tags = DataMapper.raw_select(Voeis::DataValueMetaTag.all(:data_value_id=>@data_structs.map{|d| d.id}))
       end
       @meta_tag_hash=Hash.new
@@ -330,5 +352,15 @@ class Voeis::SamplesController < Voeis::BaseController
     send_data(csv_string,
       :type => 'text/csv; charset=utf-8; header=present',
       :filename => filename)
+  end
+  
+  private
+  
+  def build_value_query_stmt(operation_name, value)
+    result = case operation_name
+      when "eql" then {:data_value=>value.to_f}
+      when "gte" then {:data_value.gte=>value.to_f}
+      when "lte" then {:data_value.lte=>value.to_f}
+    end
   end
 end
