@@ -62,11 +62,10 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 -#= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/cv_datum/new');")
-= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"cv_datum_new();")
-- if !@copy_data.nil?
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  = link_to('COPY GLOBAL', 'javascript:', :class=>'icon icon-copy', :onclick=>"copy_dialog_box.show();")
-
+-#= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"cv_datum_new();")
+-# if !@copy_data.nil?
+-#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#  = link_to('COPY GLOBAL', 'javascript:', :class=>'icon icon-copy', :onclick=>"copy_dialog_box.show();")
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 = link_to('REFRESH', 'javascript:', :class=>'icon icon-copy', :onclick=>"refreshTab('#{tabId}');") 
   
