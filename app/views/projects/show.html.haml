@@ -107,8 +107,11 @@
     var site_var_data = [
       #{@site_var_stats.map{|site| "        "+site.to_json}.join(",\n")}
     ];
+    //var site_samp_data = [
+    //  #{@site_samps.map{|site| "        "+site.to_json}.join(",\n")}
+    //];
     var site_samp_data = [
-      #{@site_samps.map{|site| "        "+site.to_json}.join(",\n")}
+      #{@site_samp_totals.map{|site| "        "+site.to_json}.join(",\n")}
     ];
     var site_properties = [
       #{@site_properties.map{|prop| "       "+prop.to_json}.join(",\n")}
@@ -120,6 +123,9 @@
       site_data[i]['data_count'] = site_stat_data[i].count;
       site_data[i]['data_start'] = site_stat_data[i].first;
       site_data[i]['data_end'] = site_stat_data[i].last;
+      site_data[i]['samp_count'] = site_samp_data[i][0];
+      site_data[i]['samp_start'] = site_samp_data[i][1];
+      site_data[i]['samp_end'] = site_samp_data[i][2];
       //site_data[i]['lat_long_datum'] = '-unknow-';
       for(prop in site_ref_data[i])
         site_data[i][prop] = site_ref_data[i][prop];
@@ -2072,14 +2078,7 @@
       };
     });
 
-    dojo.subscribe("voeis/project/samples", function(siteId) {
-      console.log('SAMPLES',arguments);
-      var projectId = "#{@project.id}";
-      var tabs = dijit.byId('tab_browser');
-      openSampTab(tabs, projectId, sampId, sampName);
-    });
-
-    dojo.subscribe("voeis/project/sample", function(sampId,sampName, siteId) {
+    dojo.subscribe("voeis/project/sample", function(sampId,sampName,siteId) {
       console.log('SAMPLE',arguments);
       var projectId = "#{@project.id}";
       var tabs = dijit.byId('tab_browser');
@@ -2155,10 +2154,25 @@
       var projectId = "#{@project.id}";
       var tabs = dijit.byId('tab_browser');
       var tabHref = '#{project_path(@project)}/data_sets/'+setId;
-      tabHref += '#{current_user.nil? ? "" : "&api_key="+current_user.api_key}';
+      tabHref += '#{current_user.nil? ? "" : "?api_key="+current_user.api_key}';
       var tabId = '#{@project.id}-dataset'+setId;
       var tabTitle = 'Data Set: '+setName;
       var tabCallback = function() {
+      };
+      openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
+    });
+    
+    dojo.subscribe("voeis/project/samples", function(siteId) {
+      console.log('SAMPLES',arguments);
+      var projectId = "#{@project.id}";
+      var tabs = dijit.byId('tab_browser');
+      var tabHref = '#{project_path(@project)}/samples';
+      if(siteId) tabHref += '/?site_id='+siteId;
+      tabHref += '#{current_user.nil? ? "" : "&api_key="+current_user.api_key}';
+      var tabId = 'site'+siteId+'_samples';
+      var tabTitle = 'Site-'+siteId+': Samples';
+      var tabCallback = function() {
+        //pageInit();
       };
       openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
     });

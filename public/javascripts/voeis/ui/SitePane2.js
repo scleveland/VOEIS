@@ -120,6 +120,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		sitePaneContent = sitePaneContent.replace(/\$\$\$site-variable-data\$\$\$/, data);
 		
 		//SHOW SAMPLE STUFF
+		/***
 		data = '';
 		if(this.site_samps.length>0) {
 			sitePaneContent = sitePaneContent.replace(/\$\$\$export-style\$\$\$/, '');
@@ -142,6 +143,10 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		var json_samps = dojo.toJson(this.site_samps).replace(/"/g, '&quot;');
 		sitePaneContent = sitePaneContent.replace(/\$\$\$site-samps\$\$\$/, json_samps);
 		//console.log(json_samps);
+		***/
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-sample-count\$\$\$/, this.site_samps[0]);
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-sample-start\$\$\$/, this.site_samps[1]);
+		sitePaneContent = sitePaneContent.replace(/\$\$\$site-sample-stop\$\$\$/, this.site_samps[2]);
 		
 		//DATA QUERY FORM STUFF
 		sitePaneContent = sitePaneContent.replace(/\$\$\$site-variable-count\$\$\$/, this.site_var_stats.length.toString());
@@ -265,6 +270,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 
 			if(site_stat_data[this.siteIdx]) this.site_stats = site_stat_data[this.siteIdx];
 			if(site_var_data[this.siteIdx]) this.site_var_stats = site_var_data[this.siteIdx];
+			//if(site_samp_data[this.siteIdx]) this.site_samps = site_samp_data[this.siteIdx];
 			if(site_samp_data[this.siteIdx]) this.site_samps = site_samp_data[this.siteIdx];
 		};
 		

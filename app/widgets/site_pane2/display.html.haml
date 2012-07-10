@@ -147,6 +147,27 @@
   -#%br
 
   %h4{:style=>"margin-top:0;"}
+    Sample Data
+  
+  %table{:id=>"site00-sample-table", :style=>"width:48%;"} 
+    %tr{:class=>"row-gr"}
+      %th{:width=>"34%", :align=>"left"} &nbsp;
+      %th{:width=>"14%"} Count
+      %th{:width=>"14%"} Start
+      %th{:width=>"14%"} Stop
+    %tr
+      %td{:style=>"width:34%;align:left;", :align=>"left"}
+        %strong
+          = link_to('Sample Details', 'javascript:', :onclick=>"dojo.publish('voeis/project/samples', [$$$id$$$]);")
+      %td{:style=>"width:14%;align:left;"}
+        $$$site-sample-count$$$
+      %td{:style=>"width:14%;align:center;"}
+        $$$site-sample-start$$$
+      %td{:style=>"width:14%;align:center;"}
+        $$$site-sample-stop$$$
+  %br
+
+  %h4{:style=>"margin-top:0;"}
     Variable Data
     -if @auth
       %span{:style=>"font-size:11px;"}
@@ -164,10 +185,10 @@
       %td
         $$$site-variable-data$$$
 
-  %br{:style=>'float:none; clear:both;'}
-  %div
-    %h4{:style=>"margin-top:0;"}
-      Existing Samples
+  -#%br{:style=>'float:none; clear:both;'}
+  -#%div
+  -#  %h4{:style=>"margin-top:0;"}
+  -#    Existing Samples
 
   -##all_variables-site00{:style=>"$$$export-style$$$"}
   -#  = form_for("export", :url=> {:controller=>'/projects', :action=>'export'}) do 
@@ -178,23 +199,15 @@
   -#  %br
   -#  %br
 
-  %table{:id=>"site00-sample-table", :style=>"width:45%;"} 
-    %tr{:class=>"row-gr"}
-      - @sample_properties.each do |prop|
-        %th{:style=>"width:20%;align:center;"}
-          %strong
-            = prop[:label]
-    %tr
-      %td{:style=>"width:23%;align:center;"}
-        $$$site-sample-data$$$
-      
-      
-  -##testing-site00{:dojoType=>"dijit.form.Button"}
-  -#  TESTING
-  -#  %script{:type=>"dojo/method", :event=>"onClick", :args=>"evt"}
-  -#    //var form = dijit.byId("site00_local_projection_form");
-  -#    console.log('TEST BUTTON: CLICK!!');
-  -#    alert('TEST BUTTON: CLICK!!');
+  -#%table{:id=>"site00-sample-table", :style=>"width:45%;"} 
+  -#  %tr{:class=>"row-gr"}
+  -#    - @sample_properties.each do |prop|
+  -#      %th{:style=>"width:20%;align:center;"}
+  -#        %strong
+  -#          = prop[:label]
+  -#  %tr
+  -#    %td{:style=>"width:23%;align:center;"}
+  -#      $$$site-sample-data$$$
     
 
 #query-site00{:style=>"margin-top:0;padding-top:0;display:none;"}

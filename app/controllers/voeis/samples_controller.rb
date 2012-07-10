@@ -12,8 +12,18 @@ class Voeis::SamplesController < Voeis::BaseController
   end
 
   def index
-    @samples =  parent.managed_repository{Voeis::Sample.all(:order=>[:created_at.desc], :limit=>100)}
     @project = parent
+    site_id = params[:site_id]
+    @site = @project.managed_repository{Voeis::Site.first(:id=>site_id)} if site_id
+    #Voeis::Site.get(params[:site_id]) if site_id
+    if site_id && @site
+      #@samples =  @site.samples.all(:order=>[:local_date_time.desc], :limit=>100)
+      @samples =  @site.samples.all(:limit=>100)
+    else
+      #@samples =  parent.managed_repository{Voeis::Sample.all(:order=>[:local_date_time.desc], :limit=>100)}
+      @samples =  parent.managed_repository{Voeis::Sample.all(:limit=>100)}
+    end
+    @site_id = site_id
   end
 
   def show
@@ -25,7 +35,7 @@ class Voeis::SamplesController < Voeis::BaseController
       @sample = Voeis::Sample.get(params[:id].to_i)
     }
     if !@sample.nil? 
-      @site = @sample.sites[0]
+      @site = @sample.sites.first
     end
     @sample_properties = [
       {:label=>"Sample ID", :name=>"id"},
@@ -36,7 +46,7 @@ class Voeis::SamplesController < Voeis::BaseController
       {:label=>"Updated By", :name=>"updated_by"},
       {:label=>"Update Comment", :name=>"updated_comment"},
       {:label=>"Created", :name=>"created_at"}
-      ]
+    ]
     
     #@project.managed_repository{
     #  @sample = Voeis::Sample.get(params[:id].to_i)
