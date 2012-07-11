@@ -18,10 +18,10 @@ class Voeis::SamplesController < Voeis::BaseController
     #Voeis::Site.get(params[:site_id]) if site_id
     if site_id && @site
       #@samples =  @site.samples.all(:order=>[:local_date_time.desc], :limit=>100)
-      @samples =  @site.samples.all(:limit=>100)
+      @samples =  @site.samples.all(:limit=>500)
     else
       #@samples =  parent.managed_repository{Voeis::Sample.all(:order=>[:local_date_time.desc], :limit=>100)}
-      @samples =  parent.managed_repository{Voeis::Sample.all(:limit=>100)}
+      @samples =  parent.managed_repository{Voeis::Sample.all(:limit=>500)}
     end
     @site_id = site_id
   end
