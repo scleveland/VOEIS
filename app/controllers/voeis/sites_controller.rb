@@ -185,13 +185,17 @@ class Voeis::SitesController < Voeis::BaseController
     parent.managed_repository{
       site = Voeis::Site.get(params[:site][:id])
       
+      [:lat_long_datum_id,:local_projection_id,:vertical_datum_id].each{|key|
+        params[:site][key] = ["NaN","null",""].include?(params[:site][key]) ? 0 : params[:site][key].to_i
+      }
+      
       params[:site].each do |key, value|
         site[key] = value.blank? ? nil : value
       end
       site.updated_at = Time.now
-      site.lat_long_datum_id = params[:site][:lat_long_datum_id] == "NaN" ? nil : params[:site][:lat_long_datum_id].to_i
-      site.vertical_datum_id = params[:site][:vertical_datum_id] == "NaN" ? nil : params[:site][:vertical_datum_id].to_i
-      site.local_projection_id = params[:site][:local_projection_id] == "NaN" ? nil : params[:site][:local_projection_id].to_i
+      #site.lat_long_datum_id = params[:site][:lat_long_datum_id] == "NaN" ? nil : params[:site][:lat_long_datum_id].to_i
+      #site.vertical_datum_id = params[:site][:vertical_datum_id] == "NaN" ? nil : params[:site][:vertical_datum_id].to_i
+      #site.local_projection_id = params[:site][:local_projection_id] == "NaN" ? nil : params[:site][:local_projection_id].to_i
       puts site.valid?
       puts site.errors.inspect
       
