@@ -1,9 +1,40 @@
+- content_for(:javascripts) do
+  :javascript
+    dojo.require("dijit.dijit");
+    dojo.require("dijit.Dialog");
+    
+    //
+    
+
+#perm_dialog{:dojoType=>"dijit.Dialog", :title=>"ROLE DESCRIPTION", :style=>"width:500px;", :jsId=>"perm_dialog"}
+  %script{:type=>"dojo/method", :event=>"startup"}
+    :plain
+      //LITERALS
+      perm_dialog.role_descriptions = {
+        #{Role.all.map{|r| '"'+r.name+'": "'+r.description+'"' }.join(",\n")}
+        };
+      perm_dialog.role_permissions = {
+        #{Role.all.map{|r| '"'+r.name+'": "'+(r.primary_actions_nice.join("<br/>"))+'"' }.join(",\n")}
+        };
+      perm_dialog.pop = function(role_name){
+        $('#role-name').text(role_name);
+        $('#role-desc').html(perm_dialog.role_descriptions[role_name]);
+        $('#role-perms').html(perm_dialog.role_permissions[role_name]);
+        perm_dialog.show();
+      };
+  %h4{:id=>"role-name", :style=>"margin:0 0 7px 0;"} 
+    role-name
+  %div{:id=>"role-desc", :style=>"margin-bottom:7px;text-align:left;font-style:italic;"}
+    role-description
+  %div{:id=>"role-perms", :style=>"margin-left:16px;text-align:left;font-weight:bold;"}
+    role-permissions
+
 #content-sidebar-right
   - if User.count > @project.users.count
     = form_for(:membership, :url => project_memberships_path(@project)) do |f|
       = field_set_tag("Add Users") do
         .scrollable-users
-          - for user in User.all do
+          - for user in User.all(:order=>'last_name') do
             - unless @project.users.include?(user)
               .field-item
                 = check_box_tag("memberships[users][]", user.id, false, :class => "memberships_users_#{user.id}", :id => "memberships_users_#{user.id}")
@@ -12,7 +43,10 @@
         - for role in Role.all do
           .field-item
             = check_box_tag("memberships[roles][]", role.id, false, :class => "memberships_#{role.id}", :id => "memberships_#{role.id}")
+            -#= link_to(label_tag("memberships_#{role.id}", role.name), "javascript:", :onclick=>"perm_dialog.pop(#{role.name});return false;")
             = label_tag("memberships_#{role.id}", role.name)
+            &nbsp;&nbsp;&nbsp;
+            = link_to("help", "javascript:", :class => 'icon icon-help', :onclick=>"perm_dialog.pop('#{role.name}');return false;")
         = f.submit('Update', :class => 'icon icon-save')
 #main-with-sidebar-right
   #content-actions

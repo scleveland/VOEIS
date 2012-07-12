@@ -12,6 +12,14 @@ class Role
   include DataMapper::Resource
   include Facet::DataMapper::Resource
 
+  ## For NICE display of Role permissions
+  NICE_PERMS = {"project"=>"Project",
+                "voeis/site"=>"Site",
+                "voeis/data_stream"=>"Uploaded Data",
+                "voeis/data_value"=>"Data Value",
+                "voeis/sample"=>"Sample",
+                "voeis/variable"=>"Variable"}
+
   #because this is depricated we are doing this AWESOME aliasing
   alias :update_attributes :update
   property :id, Serial
@@ -76,6 +84,31 @@ class Role
 
   def has_permission?(permission)
     actions.include?(permission)
+  end
+
+  def primary_actions
+    perms = {"Project"=>"project",
+              "Site"=>"voeis/site",
+              "DataValue"=>"voeis/data_value",
+              "Variable"=>"voeis/variable"}
+    //
+    perms0 = NICE_PERMS.keys
+    perms = {}
+    perms0.each{|perm|
+      acts = actions.map{|p| p.match(/^#{Regexp.quote(perm)}\$/) }.compact
+      perms.update(perm => acts.map{|p| p.string.split('$')[1] })
+    }
+    return perms
+  end
+
+  def primary_actions_nice
+    perms0 = NICE_PERMS
+    perms = primary_actions
+    nice_perms = []
+    perms.each{|k,v|
+      nice_perms << perms0[k]+": "+(v.join(','))
+    }
+    return nice_perms
   end
 
 end
