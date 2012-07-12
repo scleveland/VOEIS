@@ -1829,7 +1829,7 @@
       var tabTitle = 'NEW VARIABLE';
       if(parseInt(varId)) tabTitle = 'Site-'+siteId+': '+varName;
       //var varPane = new voeis.ui.VariablePane();
-      var projVarId = '#{@project.id}-site'+siteId+'-var'+varId;
+      var projVarId = 'site'+siteId+'_var'+varId;
       var projVarHref = "/projects/#{@project.id}/variables/"+varId+".html?&site_id="+siteId;
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
