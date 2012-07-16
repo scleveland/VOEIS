@@ -227,7 +227,6 @@
         //var gdata = #{@variable.last_ten_values_graph(@site).to_json};
         var #{varId}_gdata = #{@graph_data.to_json};
         #{varId}_gdata = #{varId}_gdata || {};
-        //gdata = {};
 
         //graphInit();
         var graphInit = function(siteId,varId,varName,gdata) {
@@ -341,7 +340,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %a{:href=>"#{project_path(@project)}/variable_name_c_vs", :onclick=>"cv_pop('Variable Name','variable_name',this.href,'#{varId}_var_qcval_sel');return false;"}
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Variable Name','variable_name','#{project_path(@project)}/variable_name_c_vs','#{varId}_var_qcval_sel');return false;"}
                   %label{:for=>"var_name", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Variable Name *
               -#%input(name="var_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.variable_name}" required="true")
@@ -380,7 +379,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %a{:href=>"#{project_path(@project)}/value_type_c_vs", :onclick=>"cv_pop('Value Type','value_type',this.href,'#{varId}_var_vtype_sel');return false;"}
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Value Type','value_type','#{project_path(@project)}/value_type_c_vs','#{varId}_var_vtype_sel');return false;"}
                   %label{:for=>"var_vtype", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Value Type *
               -#%input(name="var_vtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.value_type}" required="true")
@@ -398,7 +397,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %a{:href=>"#{project_path(@project)}/data_type_c_vs", :onclick=>"cv_pop('Data Type','data_type',this.href,'#{varId}_var_dtype_sel');return false;"}
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Data Type','data_type','#{project_path(@project)}/data_type_c_vs','#{varId}_var_dtype_sel');return false;"}
                   %label{:for=>"var_dtype", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Data Type *
               -#%input(name="var_dtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.data_type}" required="true")
@@ -408,7 +407,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %a{:href=>"#{project_path(@project)}/quality_control_levels", :onclick=>"cv_pop('Quality Control Level','quality_control_level',this.href,'#{varId}_var_qcval_sel');return false;"}
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Quality Control Level','quality_control_level','#{project_path(@project)}/quality_control_levels','#{varId}_var_qcval_sel');return false;"}
                   %label{:for=>"var_qcval", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Quality Control *
               -#%input(name="var_qcval" class="TextBox_half" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########'}" type="text" value="#{@variable.quality_control}" required="true")
@@ -612,8 +611,8 @@
                     };
                   };
                   this_pane.connect(this_pane, "onShow", function(state){
-                    //if(parseInt(#{@var_id})) 
-                    graphInit(site_id,variable.id,variable.name,#{varId}_gdata);
+                    if(parseInt(#{@var_id})) 
+                      graphInit(site_id,variable.id,variable.name,#{varId}_gdata);
                   });
                   var form0 = form.domNode;
                   //var pane = dijit.byNode(dojo.byId('site00'));

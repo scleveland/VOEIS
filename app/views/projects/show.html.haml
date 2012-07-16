@@ -427,13 +427,17 @@
     function cv_pop_new(title,title2,href,updElemID) {
       var tabs = dijit.byId('tab_browser');
       var mytab = tabs.selectedChildWidget;
+      var loading = dijit.byId('loading_dialog');
       cv_pop(title,title2,href,updElemID,function(){
+        loading.hide()
         window[title2+'_exec'].cv_datum_new();
       });
       tabs.selectChild(mytab);
       //var newtab = dijit.byId(title2);
       if(window[title2+'_exec'] && window[title2+'_exec'].cv_datum_new)
         window[title2+'_exec'].cv_datum_new();
+      else
+        loading.show()
     }
     
     //### Create DataSet dialog
