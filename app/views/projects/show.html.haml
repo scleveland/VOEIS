@@ -312,6 +312,14 @@
       //OverviewGrid.set('store', 'psites');
     }
     
+    //***
+    //** GOOGLE MAP REDRAW
+    //** google.maps.event.trigger(map, 'resize');
+    //***
+    function pmap_redraw() {
+      google.maps.event.trigger(pmap, 'resize');
+    }
+    
     function pmap_init() {
       var map_opts = {
         scaleControl: true, 
@@ -382,6 +390,13 @@
         wid = dijit.byId(this.id);
         if(wid) wid.destroyRecursive();
       });
+      console.log('#### POST-PARSE!');
+      //SETUP ONSHOW ON PROJECT OVERVIEW TAB
+      overviewTab.connect(overviewTab, 'onShow', function(){
+        console.log('overviewTab:onSHOW!')
+        pmap_redraw();
+        OverviewGrid.setQuery({id: '*'});
+      });
     };
     
     ////###############################
@@ -419,6 +434,26 @@
       //var newtab = dijit.byId(title2);
       if(window[title2+'_exec'] && window[title2+'_exec'].cv_datum_new)
         window[title2+'_exec'].cv_datum_new();
+    }
+    
+    //### Create DataSet dialog
+    function createDataSet() {
+      name_entry_dialog.pop('Create New Data Set',{
+        SAVE: 'Create Data Set',
+        FIELD1: 'Type:',
+        FIELD3: 'Description:'
+      },function(results){
+        var vardata = {name: results.name, description: results.description, type: results.type};
+        console.log('CREATE DATASET:',vardata);
+        $.post("#{project_path(@project)}/apivs/create_project_data_set.json#{current_user.nil? ? "" : "?api_key="+current_user.api_key.to_s}",
+          vardata,
+          function(data) {
+            $('##{@tabId}_data_set_select').append($("<option></option>").attr("value",data['id']).text(results.name));
+            $('##{@tabId}_data_set_select').val(data['id']);
+            //$('#data_set_select').append($("<option></option>").attr("value",data['id']).text(els.name.value)); 
+            //$('#data_set_select').val(data['id']);
+        });
+      });
     }
     
     //### Dynamically Adjust TabContainer size
@@ -502,6 +537,11 @@
       */
 
     });
+    //%script{:type=>"dojo/method", :event=>"onShow"}
+    //  :plain
+    //    pmap_redraw();
+    //    OverviewGrid.setQuery({id: '*'});
+    
     
 - if edit_auth
   :javascript
@@ -1600,14 +1640,15 @@
 
 -#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width:905px;height:540px;margin-top:0;padding-top:0;"}
 #tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width-min:920px;width:1100px;height-min:480px;height:540px;margin-top:0;padding-top:0;"}
-  #overview{:dojoType=>"dijit.layout.ContentPane", :title=>"Project", :style=>"margin:0;padding:0;float:left;", :selected=>true}
+  #overview{:dojoType=>"dijit.layout.ContentPane", :title=>"Project", :style=>"margin:0;padding:0;float:left;", :selected=>true, :jsId=>"overviewTab"}
     .show-map{:style=>"float:left;width:700px;height:100%;margin:0;padding:0;", :id=>@project.id}
     -#.show-map{:style=>"float:left;width:700px;height:500px;margin:0;padding:0;", :id=>@project.id}
     -#= render(:partial => 'overview_map', :locals => { :project => @project,
     -#                                                  :sites => @sites,
     -#                                                  :class_name => 'show-map' } )
     #map-grid{:style=>"margin:0;padding:0;"}
-      %table{:id=>'project_sites', :dojoType=>"dojox.grid.EnhancedGrid", 
+      %table{:id=>'project_sites', 
+              :dojoType=>"dojox.grid.EnhancedGrid", 
               :jsId=>"OverviewGrid", 
               :store=>"psites", 
               :autoWidth=>"false",
