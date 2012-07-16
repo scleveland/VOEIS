@@ -1221,6 +1221,8 @@
          $("##{@tabId}_data_set_select").val('-');
          //new_data_set.setup("#{@tabId}_data_set_select");
          //NEW name_entry_dialog--
+         createDataSet();
+         /*** OK to axe?
          name_entry_dialog.pop('Create New Data Set',{
            SAVE: 'Create Data Set',
            FIELD1: 'Type:',
@@ -1237,6 +1239,7 @@
                //$('#data_set_select').val(data['id']);
            });
          });
+         ***/
        });
        
        $("##{@tabId}_script_load_select").change(function(e){
