@@ -877,8 +877,8 @@
             -#%textarea( name="site_description" id="site00_description" rows="5")
             -#site00-description(name="site_description" dojoType="dijit.form.Textarea")
             -#%textarea( name="site_description" id="site00_description" rows="5")
-            %input(name="site_description" dojoType="dijit.form.Textarea" id="site00_description" 
-                  style="width:490px!important;line-height:16px!important;" value="$$$description$$$")
+            %input(name="site_description" dojoType="dijit.form.SimpleTextarea" id="site00_description" 
+                  style="width:490px!important;line-height:16px!important;" rows="3" value="$$$description$$$")
         %tr
           %td{:colspan=>"2"}
             .from-element
@@ -888,8 +888,8 @@
             -#%textarea( name="site_comments" id="site00_comments" rows="5")
             -#site00-comments(name="site_comments" dojoType="dijit.form.Textarea")
             -#%textarea( name="site_comments" id="site00_comments" rows="5")
-            %input(name="site_comments" dojoType="dijit.form.Textarea" id="site00_comments" 
-                  style="width:490px!important;line-height:16px!important;" value="$$$comments$$$")
+            %input(name="site_comments" dojoType="dijit.form.SimpleTextarea" id="site00_comments" 
+                  style="width:490px!important;line-height:16px!important;" rows="3" value="$$$comments$$$")
         %tr{:id=>"site00-provenance-row"}
           %td{:colspan=>"2"}
             .from-element

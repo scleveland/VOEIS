@@ -372,13 +372,6 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_gcat"} General Category *
-              %input(name="var_gcat" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.general_category}" required="true")
-      
-        %tr
-          %td
-            .from-element
-              %span{:class=>'label'}
                 %a{:href=>"javascript:", :onclick=>"cv_pop_new('Value Type','value_type','#{project_path(@project)}/value_type_c_vs','#{varId}_var_vtype_sel');return false;"}
                   %label{:for=>"var_vtype", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Value Type *
@@ -390,9 +383,9 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_spec"} Speciation *
-              %input(name="var_spec" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.speciation}" required="true")
-      
+                %label{:for=>"var_gcat"} General Category *
+              %input(name="var_gcat" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.general_category}" required="true")
+
         %tr
           %td
             .from-element
@@ -407,6 +400,13 @@
           %td
             .from-element
               %span{:class=>'label'}
+                %label{:for=>"var_spec"} Speciation *
+              %input(name="var_spec" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.speciation}" required="true")
+
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
                 %a{:href=>"javascript:", :onclick=>"cv_pop_new('Quality Control Level','quality_control_level','#{project_path(@project)}/quality_control_levels','#{varId}_var_qcval_sel');return false;"}
                   %label{:for=>"var_qcval", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Quality Control *
@@ -415,22 +415,25 @@
               %select(name="var_qcval" class="quality_control_level_select" id="#{varId}_var_qcval_sel")
                 = options_for_select(@var_qcvalues.all.map{|v| ["%s: %s"%[v.quality_control_level_code,v.definition[0..30]], 
                         v.quality_control_level_code.to_i]}, selected=@variable.quality_control.to_i)
-      
-        %tr
+
+        %tr{:style=>"height:70px; background-color:#eee;"}
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_time_support"} Time Support *
+                %label{:for=>"var_time_support"}
+                  %strong Time Support
+                  %br
+                  Interval (0 for none) *
               %input(name="var_time_support" class="TextBox_half" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'#######.####'}" type="text" value="#{@variable.time_support}" required="true")
               &nbsp;&nbsp;&nbsp;
               -#%input(name="var_reg" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.is_regular}" required="true")
               %input(name="var_regular" dojoType="dijit.form.CheckBox" checked="#{@variable.is_regular}")
-              Regular Interval
+              Regular
       
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_time_units"} Time Units *
+                %label{:for=>"var_time_units"} Interval Units
             %select(name="var_time_units")
               = options_for_select(@units_all.all(:units_type=>'Time').map{|u| [u.units_name,u.id]}, selected=@variable.time_units_id)
             -#- @units_all.all(:units_type=>'Time').each do |item|
