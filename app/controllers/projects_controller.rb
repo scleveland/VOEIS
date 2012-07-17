@@ -406,6 +406,7 @@ class ProjectsController < InheritedResources::Base
       q = Project.all(:is_private => false)
       q =  (q | current_user.projects ) unless current_user.nil?
       q.access_as(current_user)
+      #q.all(:order => [:name.asc])
     end
   end
 

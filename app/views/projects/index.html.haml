@@ -65,6 +65,7 @@
 #tab_browser{:dojoType=>"dijit.layout.TabContainer"}
   %table{:id=>'projects_table', :title=>"Projects", :dojoType=>"dojox.grid.EnhancedGrid", 
           :store=>"projectsDataStore", 
+          :sortInfo=>"1",
           :plugins=>"{indirectSelection: true}"}
     -#    :clientSort=>true,
     -#    :sortInfo=>"-2",
