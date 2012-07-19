@@ -170,7 +170,7 @@
             = link_to("Video Tutorials", page_url(:video_tutorials), :dojoType => "yogo.ui.MenuLink")  
             = link_to("Development Activity", page_url(:activity), :dojoType => "yogo.ui.MenuLink")
             = link_to("Development Roadmap", page_url(:roadmap), :dojoType => "yogo.ui.MenuLink")
-            = link_to("Developers", "/doc/yard/", :dojoType => "yogo.ui.MenuLinkBlankTarget") 
+            = link_to("Developers", "https://voeis.msu.montana.edu/doc/yard/_index.html", :dojoType => "yogo.ui.MenuLinkBlankTarget") 
             -if !current_user.nil? && current_user.system_role.name=='Administrator'
               %div{:dojoType=>"dijit.MenuSeparator"}
               %div{:dojoType=>"dijit.PopupMenuItem"}
