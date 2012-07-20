@@ -55,7 +55,7 @@
       This will the Units associated with this measurement.
     -unit_options = Array.new
     -units.all(:order => [:units_name.asc]).each do |unit|
-      -unit_options <<[unit.units_name+':'+unit.units_type, unit.id.to_s]
+      -unit_options <<[unit.units_name+':'+unit.units_abbreviation, unit.id.to_s]
     = f.select('variable_units_id',  options_for_select(unit_options), :class=>"variable_units_id")
     =clear_break
   
