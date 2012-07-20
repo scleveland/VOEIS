@@ -207,6 +207,7 @@ class Voeis::DataValuesController < Voeis::BaseController
   # @params['script'] = string - R-script to execute on DataValues (optional, or 'rollback')
   # @params['dryrun'] = don't save any DataValues if TRUE
   # @params['rollback'] = TRUE = ROLLBACK VERSION on batch (optional, or 'script')
+  # @params['delete'] = TRUE = DELETE batch (optional, or 'script')
   # @params['target'] = variable_id ###-OR- target type: 'CSV' / etc.  (optional, or update self)
   ##def query_script_update
   def batch_update
@@ -215,9 +216,9 @@ class Voeis::DataValuesController < Voeis::BaseController
       data_val_ids = params['data_vals']
       dryrun = params['dryrun'].nil? || params['dryrun'] =~ /(false|f|no|0)/i || blank? ? false : true
       rollback = params['rollback'].nil? || params['rollback'] =~ /(false|f|no|0)/i || blank? ? false : true
+      deletes = params['delete'].nil? || params['delete'] =~ /(false|f|no|0)/i || blank? ? false : true
       target = params['target']
       if(!target.nil?)
-        
         target_var = target.to_i==0 ? false : target.to_i
         target_var = Voeis::Variable.get(target_var) if target_var
       end
@@ -227,7 +228,18 @@ class Voeis::DataValuesController < Voeis::BaseController
       else
         data_values = Voeis::DataValue.all(:id=>data_val_ids)
       end
-      if rollback
+      if deletes
+        data_values.each{|data_value|
+          dv = {:id=>data_value.id}
+          if !data_value.destroy
+            dv[:error] = 'ERROR: DELETE FAILED'
+          else
+            dv[:deleted] = 'DELETED!'
+          end
+          updated << dv
+        }
+        
+      elsif rollback
         data_values.each{|data_value|
           dv = {:id=>data_value.id}
           if !data_value.rollback_version

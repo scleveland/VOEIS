@@ -59,12 +59,13 @@ class ProjectsController < InheritedResources::Base
   
   def index
     ### PUBLIC & USER PROJECTS ###
+    #@projects = Project.all(:is_private=>false, :order=>[:name.asc])
+    #@projects |= current_user.projects.all(:is_private=>true, :order=>[:name.asc]) unless current_user.nil?
     @projects = Project.all(:is_private=>false)
-    if !current_user.nil?
-      user_projects = current_user.projects.all(:is_private=>true)
-      #current_user.projects.all(:is_private=>true, :fields=>[:id, :name, :description]).map {|project| @user_projects << {"id" => project.id.to_s, "name" => project.name, "description" => project.description} }
-      @projects += user_projects
-    end
+    @projects |= current_user.projects.all(:is_private=>true) unless current_user.nil?
+    #current_user.projects.all(:is_private=>true, :fields=>[:id, :name, :description]).map {|project| @user_projects << {"id" => project.id.to_s, "name" => project.name, "description" => project.description} }
+    #@projects += user_projects
+    
     index! do
       logger.debug(request.env['QUERY_STRING'])
     end
@@ -403,10 +404,9 @@ class ProjectsController < InheritedResources::Base
 
   def resource_class
     @initial_query ||= begin
-      q = Project.all(:is_private => false)
-      q =  (q | current_user.projects ) unless current_user.nil?
+      q = Project.all(:is_private=>false, :order=>[:name.asc])
+      q |=  current_user.projects.all(:order=>[:name.asc]) unless current_user.nil?
       q.access_as(current_user)
-      #q.all(:order => [:name.asc])
     end
   end
 
