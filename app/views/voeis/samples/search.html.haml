@@ -903,16 +903,19 @@
       },
       batchUpdate: function(data) {
        //UPDATE GRID/PLOT
-       errs = []
-       for(var i=0; i<data.length; i++) {
-         var item = datastore.get(data[i].id,#{dataId}.val_store);
+       console.log('GRID-UPDATE:',data);
+       errs = [];
+       for(var i=data.length-1; i>=0; i--) {
+         var item0 = datastore.get_raw(data[i].id,#{dataId}.val_store);
+         var item = datastore.item(item0);
          var dateval = new Date(item.local_date_time.toString());
          if(data[i].error) {
            var val_string = ' -- ['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
            errs.push(data[i].error+val_string);
          } else if(data[i].deleted) {
+           //console.log('DELETE-PLOT:',item._0);
            #{dataId}.data.splice(item._0,1);
-           datastore.delete(item,#{dataId}.val_store);
+           datastore.delete(item0,#{dataId}.val_store);
          } else {
            datastore.update(data[i],#{dataId}.val_store);
            if(data[i].hasOwnProperty('data_value')) {
