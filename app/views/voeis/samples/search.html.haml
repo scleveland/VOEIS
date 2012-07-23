@@ -98,36 +98,43 @@
         #{dataId}.val_grid.update();
         //#{dataId}.plot.update();
       };
-      function dv_item_delete(id){
+      function dv_item_confirm_delete(id,callback){
         //var item = #{dataId}.val_grid.getItem(idx);
         var item = datastore.get_raw(id,#{dataId}.val_store);
-        confirmDialog('Confirm Rollback &mdash;',
+        confirmDialog('Confirm Delete &mdash;',
           'ARE YOU SURE?\n<br/>DELETE DATA VALUE: \n<br/>'+item.data_value,
           function(yes){
             console.log('CONFIRM:',yes);
             if(!yes) return;
             //DataValue DELETE
-            $.ajax({
-              type: 'DELETE',
-              url: '/projects/#{@project.id}/data_values/'+id+'#{url_api_key}',
-              data: {},
-              dataType: 'json',
-              success: function(result){
-                var errs = result.errors;
-                if(errs && errs.length) {
-                  console.log('FAILED ERRORS:\n'+errs.join('/n'));
-                } else {
-                  //NOW UPDATE STORE
-                  console.log('UPDATE GRID:',item,result)
-                  datastore.delete(item,#{dataId}.val_store);
-                  //### Refresh
-                  #{dataId}.val_grid.update();
-                  //#{dataId}.plot.update();
-                };
-              }
-            });
+            dv_item_delete(item,callback);
           }, 
           { buttonOk:'YES', buttonCancel:'Cancel' });
+      };
+      function dv_item_delete(item,callback){
+        var id = item.id.toString();
+        //DataValue DELETE
+        $.ajax({
+          type: 'DELETE',
+          url: '/projects/#{@project.id}/data_values/'+id+'#{url_api_key}',
+          data: {},
+          dataType: 'json',
+          success: function(result){
+            var errs = result.errors;
+            if(errs && errs.length) {
+              console.log('FAILED ERRORS:\n'+errs.join('/n'));
+            } else {
+              //NOW UPDATE STORE
+              console.log('UPDATE GRID:',item,result);
+              #{dataId}.data.splice(item._0,1);
+              datastore.delete(item,#{dataId}.val_store);
+              //### Refresh
+              #{dataId}.val_grid.update();
+              //#{dataId}.plot.update();
+            };
+            if(callback) callback();
+          }
+        });
       };
 
   -else
@@ -150,7 +157,8 @@
             = @start_date.to_date.strftime('%b %d, %Y')
             &ndash;
             = @end_date.to_date.strftime('%b %d, %Y')
-            (#{@graph_data.length} Points)
+            (<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)
+            -#= "(<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)".html_safe
         -else
           ERROR - invalid date entry
       
@@ -203,12 +211,15 @@
         -#  %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
         -#    %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
         -#      Data Set:
-        %button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet('#{@tabId}');") 
-          Add Selection &gt;&gt;
-        - opts0 = "<option value='-'>- Select Data Set -</option>\n<option value='NEW'>NEW DATA SET</option>\n"
-        = select_tag("#{@tabId}_data_set_select", (opts0+@data_set_options).html_safe)
-        -#%button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet();") 
-        -#  &lt;&lt; with Data Set
+        -##%button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet('#{@tabId}');") 
+        -##  Add Selection &gt;&gt;
+        -## opts0 = "<option value='-'>- Select Data Set -</option>\n<option value='NEW'>NEW DATA SET</option>\n"
+        
+        - opts0 = "<option value='-'>- with selected data -</option>\n"
+        - opts0 += "<option value='CLR'>CLEAR SELECTED</option>\n<option value='ALL'>SELECT ALL</option>\n"
+        - opts0 += "<option value='DEL'>DELETE SELECTED</option>\n<option value='NEW'>NEW DATA SET</option>\n"
+        - @data_set_array.each{|ds| opts0+="<option value='%s'>Add to Data Set: %s</option>\n" %ds }
+        = select_tag("#{@tabId}_data_set_select", opts0.html_safe)
     
     =clear_break
     -# #pagination-links
@@ -298,8 +309,9 @@
           %strong
             SOURCE:
           %br
-          - opts00 = "<option value='SEL'>SELECTED DATA</option>\n<option value='ALL'>ALL DATA (#{@graph_data.length} Points)</option>\n"
-          = select_tag("#{@tabId}_script_source_select", (opts00+@data_set_options).html_safe)
+          - opts00 = "<option value='SEL'>SELECTED DATA</option>\n<option value='ALL'>ALL DATA (<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)</option>\n"
+          - @data_set_array.each{|ds| opts00+="<option value='%s'>%s (Data Set)</option>\n" %ds }
+          = select_tag("#{@tabId}_script_source_select", opts00.html_safe)
           %br
           %br
           -#%strong
@@ -463,30 +475,48 @@
         $('##{@tabId}_toggle_view_id').text('VIEW GRAPH');
         $('##{@tabId}_plot_view').hide();
         $('##{@tabId}_grid_view').show();
-        //val_grid.render();
-        //val_grid.update();
-        val_grid.resize();
+        #{dataId}.update_views();
         var grid_sel = val_grid.selection.getSelected()
         if(grid_sel.length) {
           console.log('SCROLL-TO:',grid_sel[0]._0);
           val_grid.scrollTo(0);
           val_grid.scrollToRow(grid_sel[0]._0);
           val_grid.scrollToRow(grid_sel[0]._0);
-          //setTimeout(function(){
-          //  val_grid.scrollTo(0);
-          //  val_grid.scrollToRow(grid_sel[0]._0);
-          //  val_grid.scrollToRow(grid_sel[0]._0);
-          //},500);
         };
         
       } else {
         $('##{@tabId}_toggle_view_id').text('VIEW TABLE');
         $('##{@tabId}_grid_view').hide();
         $('##{@tabId}_plot_view').show();
-        val_plot.unhighlight();
-        plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
+        #{dataId}.update_views();
+        //val_plot.unhighlight();
+        //plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
       };
     };
+    //######################################
+    //*** UPDATE PLOT / GRID / etc.
+    #{dataId}.update_views = function() {
+      var val_grid = #{dataId}.val_grid;
+      var val_plot = #{dataId}.plot;
+      $('span.#{@tabId}_datacount').text(#{dataId}.data.length);
+      $("#tooltip").remove();
+      if($('##{@tabId}_toggle_view_id').text()=='VIEW TABLE') {
+        //### UPDATE PLOT
+        var data_upd = #{dataId}.plot.getData();
+        #{dataId}.plot.setData(data_upd);
+        #{dataId}.plot.draw();
+        #{dataId}.plot.unhighlight();
+        var val_selected = #{dataId}.val_grid.selection.getSelected();
+        plotutils.highlightItems(val_selected,0,#{dataId}.plot);
+      } else {
+        //### UPDATE GRID
+        //val_grid.render();
+        //val_grid.update();
+        val_grid.resize();
+        //val_grid.setQuery({id: '*'});
+      };
+    };
+    
     
     //################################### BATCH-STUFF
     //*** SHOW/HIDE BATCH-SCRIPT DIV
@@ -502,13 +532,13 @@
     };
     
     //*** GET BATCH DATA (for BATCH OPS)
-    #{dataId}.get_batch = function() {
+    #{dataId}.get_batch = function(getSelected) {
       console.log('>>>GET_BATCH...');
       var batch = {};
       var valdata = [];
       var data_vals = [];
       var datasource = $('##{@tabId}_script_source_select').val();
-      if(datasource=='SEL') {
+      if(getSelected || datasource=='SEL') {
         console.log('>>>SEL');
         valdata = #{dataId}.val_grid.selection.getSelected();
         for(var i=0; i<valdata.length; i++) 
@@ -535,9 +565,9 @@
     }
     
     //*** ROLLBACK BATCH
-    #{dataId}.rollback_batch = function() {
+    #{dataId}.rollback_batch = function(getSelected,callback) {
       var rollbackdata = {rollback:true};
-      var batch = #{dataId}.get_batch()
+      var batch = #{dataId}.get_batch(getSelected);
       if(batch.error) return;
       $.extend(rollbackdata, batch);
       $.post("#{project_path(@project)}/data_values/batch_update#{url_api_key}",
@@ -549,9 +579,36 @@
             var rollback_msg = errs.length.toString()+' ROLLBACK ERRORS of '+data.length+' DataValues rolled back:\n<br/><br/>';
             rollback_msg += errs.join('\n<br/>');
           } else {
+            //do CALLBACK if success
+            if(callback) callback(data);
             var rollback_msg = 'ROLLBACK SUCCESSFUL: '+data.length+' DataValues';
           };
           error_dialog.pop(rollback_msg,0,'ROLLBACK COMPLETE');
+        });
+      //
+    };
+    
+    //*** DELETE BATCH
+    #{dataId}.delete_batch = function(getSelected,callback) {
+      var deletedata = {delete:true};
+      var batch = #{dataId}.get_batch(getSelected);
+      if(batch.error) return;
+      $.extend(deletedata, batch);
+      $.post("#{project_path(@project)}/data_values/batch_update#{url_api_key}",
+        deletedata,
+        function(data) {
+          //DELETE RESULTS
+          #{dataId}.val_grid.selection.deselectAll();
+          var errs = #{dataId}.val_grid.batchUpdate(data);
+          if(errs){
+            var delete_msg = errs.length.toString()+' DELETE ERRORS of '+data.length+' DataValues:\n<br/><br/>';
+            delete_msg += errs.join('\n<br/>');
+          } else {
+            //do CALLBACK if success
+            if(callback) callback(data);
+            var delete_msg = 'DELETE SUCCESSFUL: '+data.length+' DataValues Deleted';
+          };
+          error_dialog.pop(delete_msg,0,'DELETE COMPLETE');
         });
       //
     };
@@ -592,11 +649,12 @@
     
     function getProperDate(local_date_time, rowIndex){
       return local_date_time.slice(0,local_date_time.length-6);
-    }
-    function addSelectedToDataSet(tab_id){
+    };
+    function addSelectedToDataSet(tab_id,dataset_id){
+      if(!dataset_id) 
+        var dataset_id = $('#'+tab_id+'_data_set_select').val();
       var tab_data = window[tab_id+'_data'];
-      var dataset_id = $('#'+tab_id+'_data_set_select').val();
-      console.log('ADD-TO-DATASET:',tab_id,dataset_id,tab_data);
+      console.log('ADD-TO-DATASET:',tab_id,dataset_id);
       //abort if NO DataSet selected
       if(!(parseInt(dataset_id)||0)) return;
       //get the data values
@@ -615,8 +673,7 @@
           //$('.result').html(data);
           dijit.byId('loading_dialog').hide();
         });
-    }
-    
+    };
 
     
     //######################################
@@ -689,7 +746,7 @@
         //var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
         var hist_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/data/history\', ['+id+',\''+item.data_value.toString()+'\','+item.variable_id.toString()+',\'#{@var_name}\','+item.site_id+',\'#{@tabId}\']);return false;">'+hist_icon+'</a>\n';
         var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit('+id+');return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
-        var delete_link = '<a href="javascript:" onclick="dv_item_delete('+id+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
+        var delete_link = '<a href="javascript:" onclick="dv_item_confirm_delete('+id+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
         var spaces = '&nbsp;';
         //if(item.used[0]) return spaces+hist_link;
         //return spaces+hist_link+spaces+delete_link;
@@ -797,13 +854,13 @@
       },
     
       onSelected: function(idx) {
-       console.log('SELECT:',idx);
+       //console.log('SELECT:',idx);
        var val_plot = #{dataId}.plot;
        val_plot.unhighlight();
        plotutils.highlightItems(this.selection.getSelected(),0,val_plot);
       },
       onDeselected: function(idx) {
-       console.log('DESELECT:',idx);
+       //console.log('DESELECT:',idx);
        var val_plot = #{dataId}.plot;
        val_plot.unhighlight();
        plotutils.highlightItems(this.selection.getSelected(),0,val_plot);
@@ -830,26 +887,35 @@
          dateval = parseInt(dateval/1000)*1000;
          console.log('PLOT dateval: '+dateval);
          #{dataId}.data[item._0] = [dateval,data.data_value]
-         var data_upd = #{dataId}.plot.getData();
-         #{dataId}.plot.setData(data_upd);
-         #{dataId}.plot.draw();
-         #{dataId}.plot.unhighlight();
-         var val_selected = #{dataId}.val_grid.selection.getSelected();
-         plotutils.highlightItems(val_selected,0,#{dataId}.plot);
+         
+         //var data_upd = #{dataId}.plot.getData();
+         //#{dataId}.plot.setData(data_upd);
+         //#{dataId}.plot.draw();
+         //#{dataId}.plot.unhighlight();
+         //var val_selected = #{dataId}.val_grid.selection.getSelected();
+         //plotutils.highlightItems(val_selected,0,#{dataId}.plot);
+         
          //### Update Grid
          datastore.update(data,#{dataId}.val_store);
          #{dataId}.val_grid.update();
+         #{dataId}.update_views();
        });
       },
       batchUpdate: function(data) {
        //UPDATE GRID/PLOT
-       errs = []
-       for(var i=0; i<data.length; i++) {
-         var item = datastore.get(data[i].id,#{dataId}.val_store);
+       console.log('GRID-UPDATE:',data);
+       errs = [];
+       for(var i=data.length-1; i>=0; i--) {
+         var item0 = datastore.get_raw(data[i].id,#{dataId}.val_store);
+         var item = datastore.item(item0);
          var dateval = new Date(item.local_date_time.toString());
          if(data[i].error) {
            var val_string = ' -- ['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
            errs.push(data[i].error+val_string);
+         } else if(data[i].deleted) {
+           //console.log('DELETE-PLOT:',item._0);
+           #{dataId}.data.splice(item._0,1);
+           datastore.delete(item0,#{dataId}.val_store);
          } else {
            datastore.update(data[i],#{dataId}.val_store);
            if(data[i].hasOwnProperty('data_value')) {
@@ -858,13 +924,14 @@
            };
          };
        };
-       var data_upd = #{dataId}.plot.getData();
-       #{dataId}.plot.setData(data_upd);
-       #{dataId}.plot.draw();
-       #{dataId}.plot.unhighlight();
-       var val_selected = #{dataId}.val_grid.selection.getSelected();
-       plotutils.highlightItems(val_selected,0,#{dataId}.plot);
-       #{dataId}.val_grid.update();
+       //var data_upd = #{dataId}.plot.getData();
+       //#{dataId}.plot.setData(data_upd);
+       //#{dataId}.plot.draw();
+       //#{dataId}.plot.unhighlight();
+       //var val_selected = #{dataId}.val_grid.selection.getSelected();
+       //plotutils.highlightItems(val_selected,0,#{dataId}.plot);
+       //#{dataId}.val_grid.update();
+       #{dataId}.update_views();
        return errs;
       },
       onFetchError: function(err) {
@@ -1210,37 +1277,116 @@
 
      //ON-TAB-LOAD!
      function initPage() {
-       console.log('initPage: NOW');
-       console.log('DATA-QUERY TABID: #{@tabId}');
-       console.log('DATA-SET-SELECT:',$("##{@tabId}_data_set_select")[0]);
-       
-       $("##{@tabId}_data_set_select").change(function(e){
-         console.log('DATA-SET-SELECT-CHANGE!');
-         if(this.value!='NEW') return;
-         //OPEN DIALOG
-         $("##{@tabId}_data_set_select").val('-');
-         //new_data_set.setup("#{@tabId}_data_set_select");
-         //NEW name_entry_dialog--
-         createDataSet();
-         /*** OK to axe?
-         name_entry_dialog.pop('Create New Data Set',{
-           SAVE: 'Create Data Set',
-           FIELD1: 'Type:',
-           FIELD3: 'Description:'
-         },function(results){
-           var vardata = {name: results.name, description: results.description, type: results.type};
-           console.log('CREATE DATASET:',vardata);
-           $.post("#{project_path(@project)}/apivs/create_project_data_set.json#{url_api_key}",
-             vardata,
-             function(data) {
-               $('##{@tabId}_data_set_select').append($("<option></option>").attr("value",data['id']).text(results.name));
-               $('##{@tabId}_data_set_select').val(data['id']);
-               //$('#data_set_select').append($("<option></option>").attr("value",data['id']).text(els.name.value)); 
-               //$('#data_set_select').val(data['id']);
-           });
-         });
-         ***/
-       });
+        console.log('initPage: NOW');
+        console.log('DATA-QUERY TABID: #{@tabId}');
+        //console.log('DATA-SET-SELECT:',$("##{@tabId}_data_set_select")[0]);
+        
+        $("##{@tabId}_data_set_select").change(function(e){
+          console.log('DATA-SET-SELECT-CHANGE!');
+          if(this.value=='-') return;
+          //if('CLR/ALL/DEL/NEW'.search(this.value)==-1) return;
+          var sel_val = this.value;
+          var sel_text = $("##{@tabId}_data_set_select>option:selected").text();
+          var val_grid = #{dataId}.val_grid;
+          var val_plot = #{dataId}.plot;
+          var val_data = #{dataId}.value_data;
+          var sel_data_len = val_grid.selection.getSelected().length;
+          $("##{@tabId}_data_set_select").val('-');
+          switch(sel_val){
+            case 'CLR':
+              //CLEAR SELECTION
+              val_plot.unhighlight();
+              val_grid.selection.deselectAll();
+              return;
+            case 'ALL':
+              //SELECT ALL
+              val_grid.selection.selectRange(0,val_data.length-1);
+              plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
+              return;
+            case 'DEL':
+              //OPEN CONFIRM: DELETE ALL SELECTED??!
+              if(sel_data_len==0) return;
+              confirmDialog('Confirm Delete &mdash;',
+                'ARE YOU SURE?\n<br/>DELETE ALL '+sel_data_len+' SELECTED\n<br/>DATA VALUES\n',
+                function(yes){
+                  console.log('CONFIRM:',yes);
+                  if(!yes) return;
+                  //DELETE SELECTED DataValues
+                  #{dataId}.delete_batch(true,function(){
+                    #{dataId}.val_grid.selection.deselectAll();
+                    //#{dataId}.plot.setData(mydata);
+                    //#{dataId}.plot.draw();
+                    //#{dataId}.plot.unhighlight();
+                    //### Update Grid
+                    //#{dataId}.val_grid.update();
+                    ////#{dataId}.val_grid.setQuery({id: '*'});
+                    #{dataId}.update_views();
+                  });
+                  /*** REPLACED above
+                  var selected = val_grid.selection.getSelected();
+                  for(var i=0;i<selected.length;i++) {
+                    var id = selected[i].id;
+                    var item = datastore.get_raw(id,#{dataId}.val_store);
+                    dv_item_delete(item,function(){
+                      console.log('DELETE SELECTED CALLBACK00!-->',i,selected.length);
+                      if(i==selected.length){
+                        console.log('DELETE SELECTED CALLBACK!');
+                        //UPDATE plot/grid
+                        var mydata = #{dataId}.plot.getData();
+                        #{dataId}.val_grid.selection.deselectAll();
+                        //#{dataId}.plot.setData(mydata);
+                        //#{dataId}.plot.draw();
+                        //#{dataId}.plot.unhighlight();
+                        //### Update Grid
+                        //#{dataId}.val_grid.update();
+                        ////#{dataId}.val_grid.setQuery({id: '*'});
+                        #{dataId}.update_views();
+                      };
+                    });
+                  };
+                  ***/
+                }, 
+                { buttonOk:'YES', buttonCancel:'Cancel' });
+                return;
+            case 'NEW':
+              //OPEN NEW DATASET DIALOG
+              //new_data_set.setup("#{@tabId}_data_set_select");
+              //NEW name_entry_dialog--
+              if(sel_data_len==0) return;
+              //createDataSet();
+              name_entry_dialog.pop('Create New Data Set',{
+                SAVE: 'Create Data Set',
+                FIELD1: 'Type:',
+                FIELD3: 'Description:'
+              },function(results){
+                var vardata = {name: results.name, description: results.description, type: results.type};
+                console.log('CREATE DATASET:',vardata);
+                $.post("#{project_path(@project)}/apivs/create_project_data_set.json#{url_api_key}",
+                  vardata,
+                  function(data) {
+                    $('##{@tabId}_data_set_select').append($("<option></option>").attr("value",data['id']).text('Add to Data Set: '+results.name.toUpperCase()));
+                    $('##{@tabId}_data_set_select').val(data['id']);
+                    //$('#data_set_select').append($("<option></option>").attr("value",data['id']).text(els.name.value)); 
+                    //$('#data_set_select').val(data['id']);
+                });
+              });
+              return;
+            default:
+              //ADD SELECTED TO DATASET: OPEN CONFIRM
+              if(sel_data_len==0) return;
+              var datasetname = sel_text.split(': ')[1];
+              console.log('ADD SELECTED TO DATASET:',datasetname);
+              confirmDialog('Confirm: Add To Data Set &mdash;',
+                'ARE YOU SURE?\n<br/>ADD '+sel_data_len+' DATA VALUES TO: \n<br/>'+datasetname,
+                function(yes){
+                  console.log('CONFIRM:',yes);
+                  if(!yes) return;
+                  //ADD SELECTED DATA####
+                  addSelectedToDataSet('#{@tabId}',parseInt(sel_val));
+                }, 
+                { buttonOk:'YES', buttonCancel:'Cancel' });
+          };
+        });
        
        $("##{@tabId}_script_load_select").change(function(e){
          //console.log('CHANGE!');

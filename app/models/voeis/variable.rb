@@ -217,9 +217,10 @@ class Voeis::Variable
   
   def last_days_values(site,outcount=12)
     # LAST 12 VALUES / 24 HOURS -or- LAST 12 VALUES
+    # as ARRAY [ timestamp, data_value, string_value ]
     dresults = self.recent_values(site,outcount)
     unless dresults.nil?
-      dresults.map{|dv| [dv[:local_date_time].to_datetime, dv[:data_value]]}
+      dresults.map{|dv| [dv[:local_date_time].to_datetime, dv[:data_value], dv[:string_value]]}
     else
       dresults
     end
