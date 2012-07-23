@@ -1300,7 +1300,9 @@
               return;
             case 'ALL':
               //SELECT ALL
+              val_grid.selection.deselectAll();
               val_grid.selection.selectRange(0,val_data.length-1);
+              val_plot.unhighlight();
               plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
               return;
             case 'DEL':
