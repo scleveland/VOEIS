@@ -21,6 +21,7 @@ class Voeis::DataValue
   property :variable_id,                Integer, :index => true
   property :filename,                   String, :required => true, :length => 512, :default=>"unknown"
   property :his_id,                     Integer, :required => false
+  property :sample_id,                  Integer, :index => true, :default => -1
   yogo_versioned
   #timestamps :at
   
@@ -57,29 +58,33 @@ class Voeis::DataValue
   
   def store_to_his(his_site_id, his_var_id, his_src_id)
     if self.his_id.nil?
-      his_val = His::DataValue.first_or_create(:data_value => self.data_value,
-                                              :value_accuracy => self.value_accuracy,
-                                              :local_date_time => self.timestamp,
-                                              :utc_offset => self.utc_offset,
-                                              :date_time_utc => self.timestamp,
-                                              :site_id => his_site_id,
-                                              :variable_id => his_var_id,
-                                              :offset_value => self.vertical_offset,
-                                              :offset_type_id => 1,
-                                              :censor_code => 'nc',
-                                              :qualifier_id => 1,
-                                              :method_id => 0,
-                                              :source_id => his_src_id,
-                                              #:sample_id => 3,
-                                              #:derived_from_id => 1,
-                                              :quality_control_level_id => self.quality_control_level)
-       his_val.valid?                      
-       puts his_val.errors.inspect
-       his_val.save
-       self.his_id = his_val.id
-       self.published =true
-       self.save
-       his_val
+      begin
+        his_val = His::DataValue.first_or_create(:data_value => self.data_value,
+                                                :value_accuracy => self.value_accuracy,
+                                                :local_date_time => self.timestamp,
+                                                :utc_offset => self.utc_offset,
+                                                :date_time_utc => self.timestamp,
+                                                :site_id => his_site_id,
+                                                :variable_id => his_var_id,
+                                                :offset_value => self.vertical_offset,
+                                                :offset_type_id => 1,
+                                                :censor_code => 'nc',
+                                                :qualifier_id => 1,
+                                                :method_id => 0,
+                                                :source_id => his_src_id,
+                                                #:sample_id => 3,
+                                                #:derived_from_id => 1,
+                                                :quality_control_level_id => self.quality_control_level)
+         his_val.valid?                      
+         puts his_val.errors.inspect
+         his_val.save
+         self.his_id = his_val.id
+         self.published =true
+         self.save
+         his_val
+       rescue
+          "DataValue ID:#{self.id} did not store to HIS."
+       end
      else
        His::DataValue.get(self.his_id)
      end
@@ -273,16 +278,25 @@ class Voeis::DataValue
     #if t = Date.parse(timestamp) rescue nil?
     #if (Voeis::DataValue.first(:local_date_time => timestamp) & 
     
-    if Voeis::DataValue.first(:datatype=>data_stream.type, :local_date_time=>timestamp, :site_id=> site_id, :variable_id => data_col_array[variable_cols[0]][variable].id).nil?
+    if Voeis::DataValue.first(:datatype=>data_stream.type, :local_date_time=>timestamp, :site_id=> site_id, :variable_id => data_col_array[variable_cols[0]][variable].id).nil? || sample_id != -1
           puts "INSIDE For Insert ********************************"
           created_at = updated_at = Time.now.strftime("%Y-%m-%dT%H:%M:%S%z")
           create_comment = "Created at #{created_at} by #{user.first_name} #{user.last_name} [#{user.login}]"
           row_values = []
           meta_values =[] 
+          newsample_id = -1
+          if sample_id != -1
+            sample_value=[]
+            sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\") VALUES "
+            sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}','#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}')"
+            #sql << sample_value.join(',')
+            sql << " RETURNING \"id\""
+            newsample_id = repository.adapter.execute(sql)
+          end
           (0..row.size-1).each do |i|
             if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "MetaTag"
                 cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
-                row_values << "(#{cv.to_s}, '#{timestamp.to_s}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc.to_s}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id},  '#{filename}' )"
+                row_values << "(#{cv.to_s}, '#{timestamp.to_s}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc.to_s}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id},  '#{filename}', #{newsample_id.insert_id} )"
             elsif data_col_array[i][name] == "MetaTag"
               meta_values << "('#{row[i].to_s}', '#{meta_tag_hash[i.to_s].name}', '#{meta_tag_hash[i.to_s].category}', '#{updated_at}', '#{created_at}', #{user.id}, '#{create_comment}')"
               puts "INSIDE META VALUES ********************************"
@@ -290,7 +304,7 @@ class Voeis::DataValue
           end #end loop
           if !row_values.empty?
             puts "INSERTING DATA VALUES ********************************"
-            sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\", \"site_id\", \"variable_id\", \"filename\") VALUES "
+            sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\", \"site_id\", \"variable_id\", \"filename\", \"sample_id\") VALUES "
             sql << row_values.join(',')
             sql << " RETURNING \"id\""
             result_ids = repository.adapter.select(sql)
@@ -346,12 +360,6 @@ class Voeis::DataValue
               puts "AFTER META-TAG ASSOC ********************************"
             end
             if sample_id != -1
-              sample_value=[]
-              sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\") VALUES "
-              sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}','#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}')"
-              #sql << sample_value.join(',')
-              sql << " RETURNING \"id\""
-              newsample_id = repository.adapter.execute(sql)
               sql = "INSERT INTO \"voeis_data_value_samples\" (\"data_value_id\",\"sample_id\") VALUES "
               sql << (0..result_ids.length-1).collect{|i|
                 "(#{result_ids[i]},#{newsample_id.insert_id})"
@@ -504,18 +512,28 @@ class Voeis::DataValue
      #if t = Date.parse(timestamp) rescue nil?
      #if (Voeis::DataValue.first(:local_date_time => timestamp) & 
 
-     if Voeis::DataValue.first(:datatype=>data_stream.type, :local_date_time=>timestamp, :site_id=> site_id, :variable_id => data_col_array[variable_cols[0]][variable].id).nil?
+     if Voeis::DataValue.first(:datatype=>data_stream.type, :local_date_time=>timestamp, :site_id=> site_id, :variable_id => data_col_array[variable_cols[0]][variable].id).nil? || sample_id != -1
            created_at = updated_at = Time.now.strftime("%Y-%m-%dT%H:%M:%S%z")
            create_comment = "Created at #{created_at} by #{user.first_name} #{user.last_name} [#{user.login}]"
            row_values = []
+           newsample_id = -1
+            if sample_id != -1
+               sample_value=[]
+               sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\") VALUES "
+               sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}','#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}')"
+               #sql << sample_value.join(',')
+               sql << " RETURNING \"id\""
+               newsample_id = repository.adapter.execute(sql)
+            end
            (0..row.size-1).each do |i|
              if  data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore"
                  cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
-                 row_values << "(#{cv.to_s}, '#{timestamp.to_s}', 0,FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}', 0,'#{timestamp.utc.to_s}','false',0,#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id},  '#{filename}' )"
+                 row_values << "(#{cv.to_s}, '#{timestamp.to_s}', 0,FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}', 0,'#{timestamp.utc.to_s}','false',0,#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id},  '#{filename}', #{newsample_id} )"
                end #end if
            end #end loop
+           
            if !row_values.empty?
-             sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\", \"site_id\", \"variable_id\", \"filename\") VALUES "
+             sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\", \"site_id\", \"variable_id\", \"filename\", \"sample_id\") VALUES "
              sql << row_values.join(',')
              sql << " RETURNING \"id\""
              result_ids = repository.adapter.select(sql)
@@ -542,13 +560,7 @@ class Voeis::DataValue
              sql << source_sql.join(',')
              repository.adapter.execute(sql)
 
-             if sample_id != -1
-               sample_value=[]
-               sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\") VALUES "
-               sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}','#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}')"
-               #sql << sample_value.join(',')
-               sql << " RETURNING \"id\""
-               newsample_id = repository.adapter.execute(sql)
+             if newsample_id != -1
                sql = "INSERT INTO \"voeis_data_value_samples\" (\"data_value_id\",\"sample_id\") VALUES "
                sql << (0..result_ids.length-1).collect{|i|
                  "(#{result_ids[i]},#{newsample_id.insert_id})"
