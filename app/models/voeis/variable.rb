@@ -155,18 +155,17 @@ class Voeis::Variable
   end
   
   def his_valid?
-    #if 
-    Voeis::SpeciationCV.first(:term=>self.speciation).cv_types.first(:name => "CUAHSI HIS")
+    if Voeis::SpeciationCV.first(:term=>self.speciation).cv_types.first(:name => "CUAHSI HIS")
       Voeis::VariableNameCV.first(:term=>self.variable_name).cv_types.first(:name => "CUAHSI HIS") #&& 
        Voeis::SampleMediumCV.first(:term=>self.sample_medium).cv_types.first(:name => "CUAHSI HIS") #&&
        Voeis::ValueTypeCV.first(:term=>self.value_type).cv_types.first(:name => "CUAHSI HIS") #&&
        Voeis::DataTypeCV.first(:term=>self.data_type).cv_types.first(:name => "CUAHSI HIS") #&&
        Voeis::GeneralCategoryCV.first(:term=>self.general_category).cv_types.first(:name => "CUAHSI HIS")# &&
        !Voeis::Unit.get(self.variable_units_id).his_id.nil?
-    #   return true
-    # else
-    #   return false
-    # end
+      return true
+    else
+       return false
+    end
   end
   
   def self.last_five_site_values(site_id)
