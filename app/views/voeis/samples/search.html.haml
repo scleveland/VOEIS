@@ -690,6 +690,7 @@
       },
       dataDateTime: function(item) {
         if(item==null || item=='') return '-';
+        return datastore.formats.dataDateTime(item);
         // FORMAT LocalDateTime string for DataValue item
         //###FORMAT utc offset value: -7.5 = "-07:30" // 3.75 = "+03:45"
         var tzstr = item.utc_offset.toString();
