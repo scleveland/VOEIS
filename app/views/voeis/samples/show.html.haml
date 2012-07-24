@@ -58,7 +58,7 @@
       UNKNOWN
 
   %strong
-    SHOW SAMPLE DETAILS
+    SAMPLE DETAILS
   %br
   %br
 
@@ -89,14 +89,14 @@
             #{@sample.nil? ? '-NONE-' : @sample[prop[:name]]}
 
 
-    #data_values{:style=>"float:left;width:360px;"}
+    #data_values{:style=>"float:left;width:400px;"}
       %h4{:style=>"margin-top:0;"}
         Data Values
   
       %table{:id => "data-table", :style=>'float:left;'}
         - @sample.data_values.each do |value|
           %tr{:class=>"row-gr"}
-            %td{:colspan=>"3"}
+            %td{:colspan=>"2"}
               %strong
                 #{value.variable.variable_name}
                 [#{value.variable.sample_medium}]
@@ -104,14 +104,14 @@
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               (#{value.variable.variable_code.to_s})
           %tr{:class=>"smfont"}
-            %td
-              = value.created_at.strftime('%Y-%m-%d %H:%M:%S')
-            %td{:style=>"text-align:right;"}
+            %td{:style=>"width:150px;"}
+              = value.local_date_time.iso8601.sub('T',' ')   ###strftime('%Y-%m-%d %H:%M:%S')
+            %td{:style=>"text-align:left;"}
               %strong
-                = value.string_value
-            %td
+                = value.data_value
               #{value.variable.variable_units.units_abbreviation}
               (#{value.variable.variable_units.units_type})
+              [#{value.string_value}]
         
   
   
