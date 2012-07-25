@@ -6,18 +6,42 @@ class UsersController < InheritedResources::Base
            :instance_name => 'user'
 
   def update
-    # Remove these if they were sent.
-    # 
-    if params[:user].empty?
-      params[:user].delete(:password)
-      params[:user].delete(:password_confirmation)
+    if current_user.id == params[:id].to_i || current_user.admin?
+      # Remove these if they were sent.
+      if params[:user].empty?
+        params[:user].delete(:password)
+        params[:user].delete(:password_confirmation)
+      end
+      if !current_user.admin?
+        params[:user].delete(:system_role)
+      end
+      user= User.get(params[:id].to_i)      
+      respond_to do |format|
+        if user.update(params[:user])
+         format.html do
+           flash[:notice] = "User has been updated!"
+           redirect_to(:back)
+         end
+        else
+          format.html do
+             flash[:alert] = "User could not be updated:" + user.errors.inspect()
+             redirect_to(:back)
+           end
+        end
+      end
+    else
+      respond_to do |format|
+         format.html do
+           flash[:alert] = "You don't have permission to modify this user!"
+           redirect_to(:back)
+         end
+      end
     end
-    update!
-    # respond_to do |format|
-    #   format.html do
-    #     redirect_to(:back)
-    #   end
-    # end
+  end
+  
+  def edit
+    
+    edit!
   end
   
   def forgot_password
@@ -46,17 +70,26 @@ class UsersController < InheritedResources::Base
   end
   
   def change_password
-    user = User.get(params[:id])
-    code = {:message => "Password Change Failed"}
-    if params[:password] == params[:confirmation]
-      user.password = params[:password]
-      user.password_confirmation = params[:confirmation]
-      user.save
-      code = {:message =>"Password Change Was Successful"}
-    end
-    respond_to do |format|
-      format.json do
-        render :json => code.as_json, :callback => params[:jsoncallback]
+    if current_user.id == params[:id].to_i || current_user.admin?
+      user = User.get(params[:id])
+      code = {:message => "Password Change Failed"}
+      if params[:password] == params[:confirmation]
+        user.password = params[:password]
+        user.password_confirmation = params[:confirmation]
+        user.save
+        code = {:message =>"Password Change Was Successful"}
+      end
+      respond_to do |format|
+        format.json do
+          render :json => code.as_json, :callback => params[:jsoncallback]
+        end
+      end
+    else
+      respond_to do |format|
+         format.html do
+           flash[:alert] = "You don't have permission to modify this user!"
+           redirect_to(:back)
+         end
       end
     end
   end
@@ -72,16 +105,25 @@ class UsersController < InheritedResources::Base
   end
 
   def api_key_update
-    @user = resource_class.get(params[:id])
-    if @user.generate_new_api_key!
-      flash[:notice] = "Updated API Key"
+    if current_user.id == params[:id].to_i || current_user.admin?
+      @user = resource_class.get(params[:id])
+      if @user.generate_new_api_key!
+        flash[:notice] = "Updated API Key"
+      else
+        flash[:error] = "Failed to update API Key"
+      end
+      respond_to do |format|
+        format.js
+        format.html do
+          redirect_to(:back)
+        end
+      end
     else
-      flash[:error] = "Failed to update API Key"
-    end
-    respond_to do |format|
-      format.js
-      format.html do
-        redirect_to(:back)
+      respond_to do |format|
+         format.html do
+           flash[:alert] = "You don't have permission to modify this user!"
+           redirect_to(:back)
+         end
       end
     end
   end

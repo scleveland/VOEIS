@@ -10,11 +10,15 @@
   #valid{:dojoType=>"dojox.form.PasswordValidator", :name=>"password"}
     %label
       Password:
+    =clear_break
     %input{:id=>"new_password",:type=>"password", :pwType=>"new"}
+    =clear_break
     =clear_break
     %label>
       Validate:
+    =clear_break
     %input{:id=>"confirm", :type=>"password", :pwType=>"verify"}
+    =clear_break
     =clear_break
     %button{:onClick=>"changePassword();"}
       Change Password
@@ -50,54 +54,61 @@
 
 #main-with-sidebar-right
   #content-actions
-    - if @user.admin?
-      = link_to("Delete", project_path(@project), :method => :delete, :class => 'icon icon-delete', 
-              :confirm => "Do you want to delete the #{@user.name}?\nContinue?" )
-
-    %button{:id => "password_button", :dojoType=> "dijit.form.Button", :type=>"button", :onClick=>'dijit.byId("pass").show();'}Change Password
-
+    
+    
   #content-title
     = @user.name
-    #subtitle User Settings
+    %button{:id => "password_button", :dojoType=> "dijit.form.Button", :type=>"button", :onClick=>'dijit.byId("pass").show();'}Change Password
+    
+    #subtitle 
+      User Settings
+      - if @user.admin?
+        = link_to("Delete", project_path(@project), :method => :delete, :class => 'icon icon-delete', 
+                :confirm => "Do you want to delete the #{@user.name}?\nContinue?" )
   %br{:style=>"clear:left;"}/
-  =form_for(:api_key, :url => {:controller => 'users', :action=>'api_key_update'}, :remote => true) do |f|
-    %strong API Key:
-    %label{:id=> 'api_key'}
-      = @user.api_key
-    = hidden_field_tag 'id', @user.id
-    = f.submit('Generate new API Key', :class => 'icon icon-save', :onclick=>"$('#loader').toggle();")
-  =form_for(@user, :builder => YogoFormBuilder) do |f|
-    = f.text_field(:login, :label => "Login:" )
-    = f.text_field(:first_name, :label => "First Name:")
-    = f.text_field(:last_name, :label => "Last Name:")
-    = f.text_field(:email, :label => "Email:")
+  #user_settings{:style=>"border:2px solid;border-radius:15px;-moz-border-radius:15px;padding:5px 5px 5px 5px;"}
+    =form_for(:api_key, :url => {:controller => 'users', :action=>'api_key_update'}, :remote => true) do |f|
+      %strong API Key:
+      %label{:id=> 'api_key'}
+        = @user.api_key
+      = hidden_field_tag 'id', @user.id
+      = f.submit('Generate new API Key', :class => 'icon icon-save', :onclick=>"$('#loader').toggle();")
+    =form_for(@user, :builder => YogoFormBuilder) do |f|
+      = f.text_field(:login, :label => "Login:" )
+      = f.text_field(:first_name, :label => "First Name:")
+      = f.text_field(:last_name, :label => "Last Name:")
+      = f.text_field(:email, :label => "Email:")
 
-    - if @user.new?
-      = f.password_field(:password, :label => "Password: ")
-      = f.password_field(:password_confirmation, :label => "Password Confirmation: ")
-    - if current_user.admin?  
-      = f.select(:system_role_id, SystemRole.all.map{|sr| [sr.name, sr.id]}, :label => 'System Role:')
-    %br/
-    %strong Projects
-    %table
-      %thead
-        %th Project
-        %th Roles
-        %th
-      %tbody
-        - unless @user.roles.empty? 
-          - @user.roles.projects.each do |project|
-            %tr
-              %td= link_to(project.name, project_path(project))
-              %td= @user.roles.select{|role| role.projects.include?(project) }.map{|role| role.name }.join(', ')     
-              %td 
-                #operation-links
-                  #edit-link
-                    = link_to("Edit", edit_user_membership_path(@user, project), :class => 'edit-link')
-                  #delete-link
-                    = link_to("Delete", user_membership_path(@user, project), :method => :delete, :class => 'icon icon-delete', :confirm => "Do you want to remove #{@user.first_name} #{@user.last_name} from the #{project.name} project?")
-    = f.submit('Save', :class => 'icon icon-save')
-    = link_to('Cancel', user_path(@user), :class => 'icon icon-cancel')
+      - if @user.new?
+        = f.password_field(:password, :label => "Password: ")
+        = f.password_field(:password_confirmation, :label => "Password Confirmation: ")
+      - if current_user.admin?  
+        = f.select(:system_role_id, SystemRole.all.map{|sr| [sr.name, sr.id]}, :label => 'System Role:')
+      %br/
+      = f.submit('Save', :class => 'icon icon-save')
+      = link_to('Cancel', user_path(@user), :class => 'icon icon-cancel')
+  %br/
+  %h2 Projects
+  %table{:style=>"border: 1px solid black;"}
+    %thead
+      %th Project
+      %th Roles
+      %th
+    %tbody{:style=>"background:white;"}
+      - unless @user.roles.empty? 
+        -# @user.memberships.projects.each do |project|
+        - Project.all.memberships.all(:user_id => @user.id).map{|m| m.project_id}.uniq.each do |project_id|
+          - project = Project.get(project_id)
+          %tr
+            %td= link_to(project.name, project_path(project))
+            %td= @user.roles.select{|role| role.projects.include?(project) }.map{|role| role.name }.join(', ')     
+            %td 
+              #operation-links
+                #edit-link
+                  = link_to("Edit", edit_user_membership_path(@user, project), :class => 'edit-link')
+                #delete-link
+                  = link_to("Delete", user_membership_path(@user, project), :method => :delete, :class => 'icon icon-delete', :confirm => "Do you want to remove #{@user.first_name} #{@user.last_name} from the #{project.name} project?")
+
 = clear_break
 
 
