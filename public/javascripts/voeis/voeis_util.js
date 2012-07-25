@@ -288,9 +288,14 @@ var datastore = {
       tz += tz0.length>1 ? (tz0[1]*6).toString().slice(0,2) : '00';
       //var d0 = new Date(item.date_time_utc.toString());
       //var d = new Date(d0.format("UTC:yyyy-mm-dd'T'HH:MM:ss"+tz));
-      var d = new Date(item.local_date_time.toString());
+      //var d = new Date(item.local_date_time.toString());
+      //var dt = item.local_date_time.toString().slice(0,10);
+      //var tm = item.local_date_time.toString().slice(11,19);
+      var dt = item.local_date_time.toString().match(/\d\d\d\d-\d\d-\d\d/).toString();
+      var tm = item.local_date_time.toString().match(/\d\d:\d\d:\d\d/).toString();
       //console.log('GRID-DATE:',item.date_time_utc.toString(),item.local_date_time.toString(),item.utc_offset.toString());
-      return d.format("yyyy-mm-dd HH:MM:ss "+tz);
+      //return d.format("yyyy-mm-dd HH:MM:ss "+tz);
+      return dt+' '+tm+' '+tz;
     },
     trueFalse: function(value) {
       var checked_img = '<img src="/images/true.png" />';

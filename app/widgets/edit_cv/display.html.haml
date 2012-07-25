@@ -566,8 +566,23 @@
   %strong.icon.icon-warning
     %em NO #{@cv_title.upcase}S EXIST!
 
+-##### MAIN CONTENT PANE (TAB)
 %div{:id=>"#{@tabId}_cv_management", :dojoType=>"dijit.layout.ContentPane", :title=>"#{@cv_title}", 
   :jsId=>"#{@tabId}_cv_management", :style=>"width:860px;height:350px;margin-top:10px;display:#{@cv_data.empty? ? 'none' : 'block'}"}
+  %script{:type=>"dojo/method", :event=>"startup"}
+    :plain
+      //CLOSE PANE
+      this.connect(this, "onClose", function(){
+        //var this_pane = this;
+        //this_pane.
+        #{@tabId}_cv_management.destroyRecursive(false);
+        #{@tabId}_cv_dialog_box.destroyRecursive(false);
+        #{@tabId}_copy_dialog_box.destroyRecursive(false);
+        delete #{@tabId}_data;
+        delete #{@tabId}_exec;
+      });
+      
+      var item = this.getItem(idx);
   -#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=>"{filter:true}",  :store=>"cv_store", :selected=>true, 
   -#    :style=>"width:90%;margin:0;padding:2px;", :jsId=>"cv_management_grid", :id=>"cv_management_grid"}
   -#  :style=>"width:90%;margin:0;", :rowSelector=>"20px", :jsId=>"VersionDisplayGrid", :id=>"VersionDisplayGrid"}

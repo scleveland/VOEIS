@@ -129,7 +129,9 @@
               #{dataId}.data.splice(item._0,1);
               datastore.delete(item,#{dataId}.val_store);
               //### Refresh
-              #{dataId}.val_grid.update();
+              #{dataId}.val_grid.selection.deselectAll();
+              #{dataId}.update_views();
+              //#{dataId}.val_grid.update();
               //#{dataId}.plot.update();
             };
             if(callback) callback();
@@ -191,7 +193,7 @@
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         -#=submit_tag("Export Results")
         = link_to('EXPORT RESULTS', 'javascript:', :class=>'icon icon-proj', 
-              :onclick=>"$('##{@tabId}_query_results form')[0].submit();return false;") 
+              :onclick=>"#{dataId}.export_data();return false;") 
 
       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       = link_to('REFRESH', 'javascript:', :class=>'icon icon-proj', :onclick=>"refreshTab('#{@tabId}');") 
@@ -531,6 +533,20 @@
       };
     };
     
+    //*** EXPORT DATA
+    #{dataId}.export_data = function() {
+      var data_len = #{dataId}.value_data.length;
+      confirmDialog('Confirm: Export Data &mdash;',
+        'ARE YOU SURE?\n<br/>EXPORT ALL '+data_len+'\n<br/>DATA VALUES AS CSV\n',
+        function(yes){
+          console.log('CONFIRM:',yes);
+          if(!yes) return;
+          //EXPORT DATA SUBMIT####
+          $('##{@tabId}_query_results form')[0].submit();
+        }, 
+        { buttonOk:'YES', buttonCancel:'Cancel' });
+    };
+    
     //*** GET BATCH DATA (for BATCH OPS)
     #{dataId}.get_batch = function(getSelected) {
       console.log('>>>GET_BATCH...');
@@ -560,6 +576,7 @@
       if(!valdata.length && !parseInt(datasource)) {
         //textarea.set('value','###NO DATA TO EXECUTE ON!\r\n'+textarea.value);
         batch['error'] = '### NO DATA TO EXECUTE ON ###';
+        error_dialog.pop(batch['error'],0,'BATCH ERROR');
       };
       return batch;
     }
@@ -569,22 +586,31 @@
       var rollbackdata = {rollback:true};
       var batch = #{dataId}.get_batch(getSelected);
       if(batch.error) return;
+      var data_len = batch.data_vals.length;
       $.extend(rollbackdata, batch);
-      $.post("#{project_path(@project)}/data_values/batch_update#{url_api_key}",
-        rollbackdata,
-        function(data) {
-          //ROLLBACK RESULTS
-          var errs = #{dataId}.val_grid.batchUpdate(data);
-          if(errs){
-            var rollback_msg = errs.length.toString()+' ROLLBACK ERRORS of '+data.length+' DataValues rolled back:\n<br/><br/>';
-            rollback_msg += errs.join('\n<br/>');
-          } else {
-            //do CALLBACK if success
-            if(callback) callback(data);
-            var rollback_msg = 'ROLLBACK SUCCESSFUL: '+data.length+' DataValues';
-          };
-          error_dialog.pop(rollback_msg,0,'ROLLBACK COMPLETE');
-        });
+      confirmDialog('Confirm: Rollback Batch &mdash;',
+        'ARE YOU SURE?\n<br/>ROLLBACK BATCH OF '+data_len+'\n<br/>DATA VALUES\n',
+        function(yes){
+          console.log('CONFIRM:',yes);
+          if(!yes) return;
+          //ROLLBACK BATCH NOW####
+          $.post("#{project_path(@project)}/data_values/batch_update#{url_api_key}",
+            rollbackdata,
+            function(data) {
+              //ROLLBACK RESULTS
+              var errs = #{dataId}.val_grid.batchUpdate(data);
+              if(errs){
+                var rollback_msg = errs.length.toString()+' ROLLBACK ERRORS of '+data.length+' DataValues rolled back:\n<br/><br/>';
+                rollback_msg += errs.join('\n<br/>');
+              } else {
+                //do CALLBACK if success
+                if(callback) callback(data);
+                var rollback_msg = 'ROLLBACK SUCCESSFUL: '+data.length+' DataValues';
+              };
+              error_dialog.pop(rollback_msg,0,'ROLLBACK COMPLETE');
+            });
+        }, 
+        { buttonOk:'YES', buttonCancel:'Cancel' });
       //
     };
     
@@ -594,22 +620,31 @@
       var batch = #{dataId}.get_batch(getSelected);
       if(batch.error) return;
       $.extend(deletedata, batch);
-      $.post("#{project_path(@project)}/data_values/batch_update#{url_api_key}",
-        deletedata,
-        function(data) {
-          //DELETE RESULTS
-          #{dataId}.val_grid.selection.deselectAll();
-          var errs = #{dataId}.val_grid.batchUpdate(data);
-          if(errs){
-            var delete_msg = errs.length.toString()+' DELETE ERRORS of '+data.length+' DataValues:\n<br/><br/>';
-            delete_msg += errs.join('\n<br/>');
-          } else {
-            //do CALLBACK if success
-            if(callback) callback(data);
-            var delete_msg = 'DELETE SUCCESSFUL: '+data.length+' DataValues Deleted';
-          };
-          error_dialog.pop(delete_msg,0,'DELETE COMPLETE');
-        });
+      var data_len = batch.data_vals.length;
+      confirmDialog('Confirm: Delete Data &mdash;',
+        'ARE YOU SURE?\n<br/>DELETE ALL '+data_len+' SELECTED\n<br/>DATA VALUES\n',
+        function(yes){
+          console.log('CONFIRM:',yes);
+          if(!yes) return;
+          //DELETE BATCH DataValues
+          $.post("#{project_path(@project)}/data_values/batch_update#{url_api_key}",
+            deletedata,
+            function(data) {
+              //DELETE RESULTS
+              #{dataId}.val_grid.selection.deselectAll();
+              var errs = #{dataId}.val_grid.batchUpdate(data);
+              if(errs){
+                var delete_msg = errs.length.toString()+' DELETE ERRORS of '+data.length+' DataValues:\n<br/><br/>';
+                delete_msg += errs.join('\n<br/>');
+              } else {
+                //do CALLBACK if success
+                if(callback) callback(data);
+                var delete_msg = 'DELETE SUCCESSFUL: '+data.length+' DataValues Deleted';
+              };
+              error_dialog.pop(delete_msg,0,'DELETE COMPLETE');
+            });
+        }, 
+        { buttonOk:'YES', buttonCancel:'Cancel' });
       //
     };
     
@@ -690,6 +725,7 @@
       },
       dataDateTime: function(item) {
         if(item==null || item=='') return '-';
+        return datastore.formats.dataDateTime(item);
         // FORMAT LocalDateTime string for DataValue item
         //###FORMAT utc offset value: -7.5 = "-07:30" // 3.75 = "+03:45"
         var tzstr = item.utc_offset.toString();
@@ -913,15 +949,17 @@
            var val_string = ' -- ['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
            errs.push(data[i].error+val_string);
          } else if(data[i].deleted) {
+           datastore.delete(item0,#{dataId}.val_store);
            //console.log('DELETE-PLOT:',item._0);
            #{dataId}.data.splice(item._0,1);
-           datastore.delete(item0,#{dataId}.val_store);
          } else {
-           datastore.update(data[i],#{dataId}.val_store);
-           if(data[i].hasOwnProperty('data_value')) {
-             dateval = parseInt(dateval/1000)*1000;
-             #{dataId}.data[item._0] = [dateval,data[i].data_value]
-           };
+           datastore.update(item0,#{dataId}.val_store);
+           dateval = parseInt(dateval/1000)*1000;
+           #{dataId}.data[item._0] = [dateval,item.data_value]
+           //if(data[i].hasOwnProperty('data_value')) {
+           //  dateval = parseInt(dateval/1000)*1000;
+           //  #{dataId}.data[item._0] = [dateval,data[i].data_value]
+           //};
          };
        };
        //var data_upd = #{dataId}.plot.getData();
@@ -1300,19 +1338,37 @@
               return;
             case 'ALL':
               //SELECT ALL
+              val_grid.selection.deselectAll();
               val_grid.selection.selectRange(0,val_data.length-1);
+              val_plot.unhighlight();
               plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
               return;
             case 'DEL':
               //OPEN CONFIRM: DELETE ALL SELECTED??!
               if(sel_data_len==0) return;
-              confirmDialog('Confirm Delete &mdash;',
-                'ARE YOU SURE?\n<br/>DELETE ALL '+sel_data_len+' SELECTED\n<br/>DATA VALUES\n',
-                function(yes){
-                  console.log('CONFIRM:',yes);
-                  if(!yes) return;
-                  //DELETE SELECTED DataValues
-                  #{dataId}.delete_batch(true,function(){
+              //DELETE SELECTED DataValues
+              #{dataId}.delete_batch(true,function(){
+                #{dataId}.val_grid.selection.deselectAll();
+                //#{dataId}.plot.setData(mydata);
+                //#{dataId}.plot.draw();
+                //#{dataId}.plot.unhighlight();
+                //### Update Grid
+                //#{dataId}.val_grid.update();
+                ////#{dataId}.val_grid.setQuery({id: '*'});
+                #{dataId}.update_views();
+              });
+              return;
+              /*** REPLACED above
+              var selected = val_grid.selection.getSelected();
+              for(var i=0;i<selected.length;i++) {
+                var id = selected[i].id;
+                var item = datastore.get_raw(id,#{dataId}.val_store);
+                dv_item_delete(item,function(){
+                  console.log('DELETE SELECTED CALLBACK00!-->',i,selected.length);
+                  if(i==selected.length){
+                    console.log('DELETE SELECTED CALLBACK!');
+                    //UPDATE plot/grid
+                    var mydata = #{dataId}.plot.getData();
                     #{dataId}.val_grid.selection.deselectAll();
                     //#{dataId}.plot.setData(mydata);
                     //#{dataId}.plot.draw();
@@ -1321,33 +1377,10 @@
                     //#{dataId}.val_grid.update();
                     ////#{dataId}.val_grid.setQuery({id: '*'});
                     #{dataId}.update_views();
-                  });
-                  /*** REPLACED above
-                  var selected = val_grid.selection.getSelected();
-                  for(var i=0;i<selected.length;i++) {
-                    var id = selected[i].id;
-                    var item = datastore.get_raw(id,#{dataId}.val_store);
-                    dv_item_delete(item,function(){
-                      console.log('DELETE SELECTED CALLBACK00!-->',i,selected.length);
-                      if(i==selected.length){
-                        console.log('DELETE SELECTED CALLBACK!');
-                        //UPDATE plot/grid
-                        var mydata = #{dataId}.plot.getData();
-                        #{dataId}.val_grid.selection.deselectAll();
-                        //#{dataId}.plot.setData(mydata);
-                        //#{dataId}.plot.draw();
-                        //#{dataId}.plot.unhighlight();
-                        //### Update Grid
-                        //#{dataId}.val_grid.update();
-                        ////#{dataId}.val_grid.setQuery({id: '*'});
-                        #{dataId}.update_views();
-                      };
-                    });
                   };
-                  ***/
-                }, 
-                { buttonOk:'YES', buttonCancel:'Cancel' });
-                return;
+                });
+              };
+              ***/
             case 'NEW':
               //OPEN NEW DATASET DIALOG
               //new_data_set.setup("#{@tabId}_data_set_select");
