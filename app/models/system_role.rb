@@ -17,7 +17,7 @@ class SystemRole
   is :list
 
   def self.permission_sources
-    [Project, Role, User, SystemRole]
+    [Project, Role, User, SystemRole, Membership]
   end
 
   def self.available_permissions
