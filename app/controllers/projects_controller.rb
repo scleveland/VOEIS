@@ -18,25 +18,56 @@ class ProjectsController < InheritedResources::Base
     end
   end
   
+  
+  def admin
+    respond_to do |format|
+      if current_user.admin?
+        @projects = Project.all(:order=>[:name])
+        format.html do
+          render :admin
+        end
+      else
+        format.html do
+           flash[:alert] = "You don't have permission to view that page!"
+           redirect_to(:back)
+        end
+      end
+    end
+  end
+  
+  def edit
+    @project = Project.get(params[:id])
+    if current_user.admin? || current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project)
+      edit!
+    else
+      flash[:alert] = "You don't have permission to view that page!"
+      redirect_to(:back)
+    end
+  end
   def update
     @project = Project.get(params[:id])
-    @project.is_private = params[:project][:is_private].to_i
-    @project.description = params[:project][:description]
-    @project.publish_to_his = params[:project][:publish_to_his].to_i
-    respond_to do |format|
-      if @project.save
-        flash[:notice] = 'Project was successfully updated.'
-        format.json {
-          render :json => @project.as_json, :callback => params[:jsoncallback]
-        }
-        format.html {
-          #render :action => "edit"
-          redirect_to(project_path(@project))
-        }
-      else
-        flash[:error] = 'Project was NOT updated.'
-        format.html { render :action => "edit" }
+    if current_user.admin? || current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project)
+      @project.is_private = params[:project][:is_private].to_i
+      @project.description = params[:project][:description]
+      @project.publish_to_his = params[:project][:publish_to_his].to_i
+      respond_to do |format|
+        if @project.save
+          flash[:notice] = 'Project was successfully updated.'
+          format.json {
+            render :json => @project.as_json, :callback => params[:jsoncallback]
+          }
+          format.html {
+            #render :action => "edit"
+            redirect_to(project_path(@project))
+          }
+        else
+          flash[:error] = 'Project was NOT updated.'
+          format.html { render :action => "edit" }
+        end
       end
+    else
+      flash[:alert] = "You don't have permission to view that page!"
+      redirect_to(:back)
     end
   end
   
@@ -100,7 +131,7 @@ class ProjectsController < InheritedResources::Base
     #                  ]
     @project = Project.get(params[:id])
     @auth = !current_user.nil? && current_user.projects.include?(@project)
-    @edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project))
+    @edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project) || current_user.admin?)
     @api_key = current_user.nil? ? '' : current_user.api_key
     
     if resource.nil?
