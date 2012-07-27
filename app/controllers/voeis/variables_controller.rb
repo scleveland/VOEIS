@@ -22,6 +22,7 @@ class Voeis::VariablesController < Voeis::BaseController
     @variable = Voeis::Variable.new
     @variable.id = 0
     @variable_ref = {}
+    @graph_data = []
     if @var_id>0
       @project.managed_repository{
         @variable = Voeis::Variable.get(@var_id)

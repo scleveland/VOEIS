@@ -155,18 +155,17 @@ class Voeis::Variable
   end
   
   def his_valid?
-    #if 
-    Voeis::SpeciationCV.first(:term=>self.speciation).cv_types.first(:name => "CUAHSI HIS")
+    if Voeis::SpeciationCV.first(:term=>self.speciation).cv_types.first(:name => "CUAHSI HIS")
       Voeis::VariableNameCV.first(:term=>self.variable_name).cv_types.first(:name => "CUAHSI HIS") #&& 
        Voeis::SampleMediumCV.first(:term=>self.sample_medium).cv_types.first(:name => "CUAHSI HIS") #&&
        Voeis::ValueTypeCV.first(:term=>self.value_type).cv_types.first(:name => "CUAHSI HIS") #&&
        Voeis::DataTypeCV.first(:term=>self.data_type).cv_types.first(:name => "CUAHSI HIS") #&&
        Voeis::GeneralCategoryCV.first(:term=>self.general_category).cv_types.first(:name => "CUAHSI HIS")# &&
        !Voeis::Unit.get(self.variable_units_id).his_id.nil?
-    #   return true
-    # else
-    #   return false
-    # end
+      return true
+    else
+       return false
+    end
   end
   
   def self.last_five_site_values(site_id)
@@ -218,9 +217,10 @@ class Voeis::Variable
   
   def last_days_values(site,outcount=12)
     # LAST 12 VALUES / 24 HOURS -or- LAST 12 VALUES
+    # as ARRAY [ timestamp, data_value, string_value ]
     dresults = self.recent_values(site,outcount)
     unless dresults.nil?
-      dresults.map{|dv| [dv[:local_date_time].to_datetime, dv[:data_value]]}
+      dresults.map{|dv| [dv[:local_date_time].to_datetime, dv[:data_value], dv[:string_value]]}
     else
       dresults
     end

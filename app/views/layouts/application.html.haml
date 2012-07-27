@@ -179,7 +179,7 @@
             = link_to("Video Tutorials", page_url(:video_tutorials), :dojoType => "yogo.ui.MenuLink")  
             = link_to("Development Activity", page_url(:activity), :dojoType => "yogo.ui.MenuLink")
             = link_to("Development Roadmap", page_url(:roadmap), :dojoType => "yogo.ui.MenuLink")
-            = link_to("Developers", "/doc/yard/", :dojoType => "yogo.ui.MenuLinkBlankTarget") 
+            = link_to("Developers", "https://voeis.msu.montana.edu/doc/yard/_index.html", :dojoType => "yogo.ui.MenuLinkBlankTarget") 
             -if !current_user.nil? && current_user.system_role.name=='Administrator'
               %div{:dojoType=>"dijit.MenuSeparator"}
               %div{:dojoType=>"dijit.PopupMenuItem"}
@@ -188,6 +188,7 @@
                   -#= link_to("MAIN", "/pages/admin", :dojoType => "yogo.ui.MenuLink")
                   = link_to("Users", "/users", :dojoType => "yogo.ui.MenuLink")
                   = link_to("Roles & Permissions", "/roles", :dojoType => "yogo.ui.MenuLink")
+                  = link_to("Projects", "/projects/admin", :dojoType => "yogo.ui.MenuLink")
                   = link_to("Settings", "/settings", :dojoType => "yogo.ui.MenuLink")
             
         #projectsButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
@@ -248,7 +249,7 @@
                   -#= link_to('Add Variable', project_path(@project)+'?tab=newvar', :dojoType=>"yogo.ui.MenuLink")
                 
                 = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_sample_menu")
-                = link_to("Add Logger Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")
+                = link_to("Add Field Observation Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")
 
                 - if !@cv_list.nil?
                   %div{:dojoType=>"dijit.PopupMenuItem"}
@@ -316,6 +317,7 @@
                   %div{:dojoType=>"dijit.PopupMenuItem"}
                     %span Data Sets
                     %div{:dojoType=>"dijit.Menu", :id=>"datasetSubMenu"}
+                      = link_to('NEW DATA SET', "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"createDataSet(); return false;")
                       - if @project.managed_repository{Voeis::DataSet.all}.count > 0 
                         - @project.managed_repository{Voeis::DataSet.all}.each do |dataset|
                           -#= link_to(dataset.name, project_data_set_path(@project, dataset), :dojoType => "yogo.ui.MenuLink")

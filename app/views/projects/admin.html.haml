@@ -1,0 +1,24 @@
+%h1 Project Administration 
+
+%table{:style=>"background:white;border: 1px solid black;"}
+  %tr
+    %th Project Name
+    %th Edit
+    %th View
+    %th Description
+    %th Security
+  -@projects.each do |project|
+    %tr{:style=>"border-width:1px 0;border-style:solid;border-color:black;"}
+      %td
+        %h3
+          = project.name
+      %td
+        %h2
+          =link_to "", edit_project_path(project.id), :class=>"icon-settings"
+      %td
+        %h2
+          =link_to "", project_path(project.id), :class=>"icon-project"
+      %td
+        =project.description
+      %td
+        =project.is_private == true ? "Private" : "Public"

@@ -19,6 +19,7 @@ Yogo::Application.routes.draw do
       post :export
       post :publish_his
       get  :get_user_projects
+      get  :admin
     end
     resources :memberships
     #Voeis Project Models scope

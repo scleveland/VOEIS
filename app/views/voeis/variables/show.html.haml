@@ -196,6 +196,7 @@
                   %strong
                     = dv[1].to_s+' '
                   &nbsp;#{@units[:units_abbreviation]} (#{@units[:units_type]})
+                  = "["+dv[2]+"]"
   
 
       :javascript
@@ -224,33 +225,9 @@
           console.log('initPage: DONE');
         };
         
-        function cancel_edit(varID) {
-          console.log('CANCEL!',varID);
-          var var_id = parseInt(#{@var_id});
-          var site_id = parseInt(#{@site.nil? ? 0 : @site.id});
-          var this_pane_id = '#{@project.id}-site'+site_id+'-var'+var_id;
-          var this_pane = dojo.byId(this_pane_id);
-          if(this_pane) this_pane = dijit.byNode(this_pane);
-          console.log('CANCEL_THIS_PANE:',this_pane);
-          //###SCROLL TO TOP
-          //window.scrollTo(0,0);
-          $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
-          $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
-          if(parseInt(#{@var_id})) {
-            $('#'+varID+'_edit').hide();
-            $('#'+varID+'_show').show();
-          } else {
-            var tabs = dijit.byId('tab_browser');
-            tabs.removeChild(this_pane);
-            this_pane.onClose();
-            this_pane.destroyRecursive();  
-          };
-        };
-        
         //var gdata = #{@variable.last_ten_values_graph(@site).to_json};
         var #{varId}_gdata = #{@graph_data.to_json};
         #{varId}_gdata = #{varId}_gdata || {};
-        //gdata = {};
 
         //graphInit();
         var graphInit = function(siteId,varId,varName,gdata) {
@@ -352,7 +329,7 @@
     &nbsp;&nbsp;&nbsp; (* Required)
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"cancel_edit('#{varId}');")
+    = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"dijit.byId('#{varId}').cancel_edit('#{varId}');")
     %br
     %br
   
@@ -364,7 +341,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %a{:href=>"#{project_path(@project)}/variable_name_c_vs", :onclick=>"cv_pop('Variable Name','variable_name',this.href,'#{varId}_var_qcval_sel');return false;"}
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Variable Name','variable_name','#{project_path(@project)}/variable_name_c_vs','#{varId}_var_qcval_sel');return false;"}
                   %label{:for=>"var_name", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Variable Name *
               -#%input(name="var_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.variable_name}" required="true")
@@ -396,14 +373,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_gcat"} General Category *
-              %input(name="var_gcat" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.general_category}" required="true")
-      
-        %tr
-          %td
-            .from-element
-              %span{:class=>'label'}
-                %a{:href=>"#{project_path(@project)}/value_type_c_vs", :onclick=>"cv_pop('Value Type','value_type',this.href,'#{varId}_var_vtype_sel');return false;"}
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Value Type','value_type','#{project_path(@project)}/value_type_c_vs','#{varId}_var_vtype_sel');return false;"}
                   %label{:for=>"var_vtype", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Value Type *
               -#%input(name="var_vtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.value_type}" required="true")
@@ -414,14 +384,14 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_spec"} Speciation *
-              %input(name="var_spec" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.speciation}" required="true")
-      
+                %label{:for=>"var_gcat"} General Category *
+              %input(name="var_gcat" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.general_category}" required="true")
+
         %tr
           %td
             .from-element
               %span{:class=>'label'}
-                %a{:href=>"#{project_path(@project)}/data_type_c_vs", :onclick=>"cv_pop('Data Type','data_type',this.href,'#{varId}_var_dtype_sel');return false;"}
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Data Type','data_type','#{project_path(@project)}/data_type_c_vs','#{varId}_var_dtype_sel');return false;"}
                   %label{:for=>"var_dtype", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Data Type *
               -#%input(name="var_dtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.data_type}" required="true")
@@ -431,7 +401,14 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %a{:href=>"#{project_path(@project)}/quality_control_levels", :onclick=>"cv_pop('Quality Control Level','quality_control_level',this.href,'#{varId}_var_qcval_sel');return false;"}
+                %label{:for=>"var_spec"} Speciation *
+              %input(name="var_spec" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.speciation}" required="true")
+
+        %tr
+          %td
+            .from-element
+              %span{:class=>'label'}
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Quality Control Level','quality_control_level','#{project_path(@project)}/quality_control_levels','#{varId}_var_qcval_sel');return false;"}
                   %label{:for=>"var_qcval", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Quality Control *
               -#%input(name="var_qcval" class="TextBox_half" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########'}" type="text" value="#{@variable.quality_control}" required="true")
@@ -439,22 +416,25 @@
               %select(name="var_qcval" class="quality_control_level_select" id="#{varId}_var_qcval_sel")
                 = options_for_select(@var_qcvalues.all.map{|v| ["%s: %s"%[v.quality_control_level_code,v.definition[0..30]], 
                         v.quality_control_level_code.to_i]}, selected=@variable.quality_control.to_i)
-      
-        %tr
+
+        %tr{:style=>"height:70px; background-color:#eee;"}
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_time_support"} Time Support *
+                %label{:for=>"var_time_support"}
+                  %strong Time Support
+                  %br
+                  Interval (0 for none) *
               %input(name="var_time_support" class="TextBox_half" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'#######.####'}" type="text" value="#{@variable.time_support}" required="true")
               &nbsp;&nbsp;&nbsp;
               -#%input(name="var_reg" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.is_regular}" required="true")
               %input(name="var_regular" dojoType="dijit.form.CheckBox" checked="#{@variable.is_regular}")
-              Regular Interval
+              Regular
       
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_time_units"} Time Units *
+                %label{:for=>"var_time_units"} Interval Units
             %select(name="var_time_units")
               = options_for_select(@units_all.all(:units_type=>'Time').map{|u| [u.units_name,u.id]}, selected=@variable.time_units_id)
             -#- @units_all.all(:units_type=>'Time').each do |item|
@@ -593,7 +573,7 @@
                     var button_div = $('##{varId}_buttons');
                     button_div.hide();
                   } else {
-                    this_pane_id = '#{@project.id}-site'+site_id+'-var'+var_id;
+                    this_pane_id = 'site'+site_id+'_var'+var_id;
                     this_pane = dojo.byId(this_pane_id);
                     if(this_pane) this_pane = dijit.byNode(this_pane);
                   };
@@ -607,9 +587,10 @@
                   console.log('@var_id=#{@var_id}');
                   //if(parseInt(#{@var_id})) graphInit(variable.id,variable.name,#{varId}_gdata);
                   //else $('##{varId}-provenance-row').hide();
-                  function cancel_edit(varID) {
+                  this_pane.var_id = var_id;
+                  this_pane.cancel_edit = function(varID) {
                     console.log('CANCEL!',varID);
-                    var this_pane = this_pane;
+                    var this_pane = dijit.byId(varID);
                     console.log('CANCEL_THIS_PANE:',this_pane);
                     //###SCROLL TO TOP
                     //window.scrollTo(0,0);
@@ -628,13 +609,14 @@
                     } else {
                       var tabs = dijit.byId('tab_browser');
                       tabs.removeChild(this_pane);
-                      this_pane.onClose();
-                      this_pane.destroyRecursive();  
+                      //this_pane.onClose();
+                      console.log('close-pane:',this_pane);
+                      this_pane.destroyRecursive(false);
                     };
                   };
                   this_pane.connect(this_pane, "onShow", function(state){
-                    //if(parseInt(#{@var_id})) 
-                    graphInit(site_id,variable.id,variable.name,#{varId}_gdata);
+                    if(parseInt(#{@var_id})) 
+                      graphInit(site_id,variable.id,variable.name,#{varId}_gdata);
                   });
                   var form0 = form.domNode;
                   //var pane = dijit.byNode(dojo.byId('site00'));
@@ -723,7 +705,7 @@
                         var site_pane = window['#{siteId}ref'];
                         if(site_pane) site_pane.siteUpdate();
                         //#{varId}_cancel_edit();
-                        cancel_edit('#{varId}');
+                        dijit.byId('#{varId}').cancel_edit('#{varId}');
                       },
                       dataType: 'json'
                     });
@@ -731,7 +713,7 @@
                   });
             
             &nbsp;&nbsp;
-            %button(dojoType="dijit.form.Button" value="Cancel" onclick="cancel_edit('#{varId}');") Cancel
+            %button(dojoType="dijit.form.Button" value="Cancel" onclick="dijit.byId('#{varId}').cancel_edit('#{varId}');") Cancel
 
 
 %br{:style=>'float:none; clear:both;'}
