@@ -166,7 +166,7 @@ var datastore = {
   },
   // CONVERT DATASTORE VALUE TO PLAIN VALUE
   value: function(val) {
-    if(typeof val=='object' && val.hasOwnProperty(0))
+    if(val!=null && typeof val=='object' && val.hasOwnProperty(0))
       return val[0];
     return val;
   },
