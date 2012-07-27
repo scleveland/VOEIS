@@ -291,12 +291,13 @@ class Voeis::DataValue
             sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}','#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}')"
             #sql << sample_value.join(',')
             sql << " RETURNING \"id\""
-            newsample_id = repository.adapter.execute(sql)
+            sample_result = repository.adapter.execute(sql)
+            newsample_id =sample_result.insert_id
           end
           (0..row.size-1).each do |i|
             if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "MetaTag"
                 cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
-                row_values << "(#{cv.to_s}, '#{timestamp.to_s}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc.to_s}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id},  '#{filename}', #{newsample_id.insert_id} )"
+                row_values << "(#{cv.to_s}, '#{timestamp.to_s}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc.to_s}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id},  '#{filename}', #{newsample_id} )"
             elsif data_col_array[i][name] == "MetaTag"
               meta_values << "('#{row[i].to_s}', '#{meta_tag_hash[i.to_s].name}', '#{meta_tag_hash[i.to_s].category}', '#{updated_at}', '#{created_at}', #{user.id}, '#{create_comment}')"
               puts "INSIDE META VALUES ********************************"
@@ -362,15 +363,15 @@ class Voeis::DataValue
             if sample_id != -1
               sql = "INSERT INTO \"voeis_data_value_samples\" (\"data_value_id\",\"sample_id\") VALUES "
               sql << (0..result_ids.length-1).collect{|i|
-                "(#{result_ids[i]},#{newsample_id.insert_id})"
+                "(#{result_ids[i]},#{newsample_id})"
               }.join(',')
               repository.adapter.execute(sql)
               sql = "INSERT INTO \"voeis_sample_sites\" (\"sample_id\",\"site_id\") VALUES "
-              sql << "(#{newsample_id.insert_id},#{site_id})"
+              sql << "(#{newsample_id},#{site_id})"
               repository.adapter.execute(sql)
               sql = "INSERT INTO \"voeis_sample_variables\" (\"sample_id\",\"variable_id\") VALUES "
               sql << (0..result_ids.length-1).collect{|i|
-                "(#{newsample_id.insert_id},#{data_col_array[variable_cols[i]][variable].id})"
+                "(#{newsample_id},#{data_col_array[variable_cols[i]][variable].id})"
               }.join(',')
               repository.adapter.execute(sql)
               puts "AFTER SAMPLE ASSOC ********************************"
@@ -523,7 +524,8 @@ class Voeis::DataValue
                sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}','#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}')"
                #sql << sample_value.join(',')
                sql << " RETURNING \"id\""
-               newsample_id = repository.adapter.execute(sql)
+               sample_result = repository.adapter.execute(sql)
+               newsample_id = sample_result.insert_id
             end
            (0..row.size-1).each do |i|
              if  data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore"
@@ -563,15 +565,15 @@ class Voeis::DataValue
              if newsample_id != -1
                sql = "INSERT INTO \"voeis_data_value_samples\" (\"data_value_id\",\"sample_id\") VALUES "
                sql << (0..result_ids.length-1).collect{|i|
-                 "(#{result_ids[i]},#{newsample_id.insert_id})"
+                 "(#{result_ids[i]},#{newsample_id})"
                }.join(',')
                repository.adapter.execute(sql)
                sql = "INSERT INTO \"voeis_sample_sites\" (\"sample_id\",\"site_id\") VALUES "
-               sql << "(#{newsample_id.insert_id},#{site_id})"
+               sql << "(#{newsample_id},#{site_id})"
                repository.adapter.execute(sql)
                sql = "INSERT INTO \"voeis_sample_variables\" (\"sample_id\",\"variable_id\") VALUES "
                sql << (0..result_ids.length-1).collect{|i|
-                 "(#{newsample_id.insert_id},#{data_col_array[variable_cols[i]][variable].id})"
+                 "(#{newsample_id},#{data_col_array[variable_cols[i]][variable].id})"
                }.join(',')
                repository.adapter.execute(sql)
              else
