@@ -54,7 +54,7 @@ gem 'rql', ">= 0.0.1",        :git => "git://github.com/yogo/rql-ruby.git", :bra
 
 # Rserve client -for 'R' interface
 gem 'rserve-simpler',         :require => 'rserve/simpler'
-
+gem "test-unit", "~> 1.2.1"  #this is apparently required so it is going here so rack works
 platforms(:ruby_19) {
   gem "therubyracer", :require => "v8"
 }
