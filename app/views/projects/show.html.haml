@@ -628,10 +628,13 @@
           //this.dateChanged = false;
         },
         getDateTimeTz: function(tzString) {
+          //###FORMAT local date-time string ISO
           var utcval = dijit.byId('DV_utc_offset').get('value');
           var dt = dijit.byId('DV_local_date').get('value').format('isoDate');
           var tm = dijit.byId('DV_local_time').get('value').format('isoTime');
           var tz = this.getTz(utcval);
+          var itemtime = this.item.local_date_time.toString().slice(11,19);
+          if(itemtime.slice(0,5)==tm.slice(0,5)) tm = itemtime;
           return {
             date: dt,
             time: tm,
@@ -741,7 +744,7 @@
               data: data,
               dataType: 'json',
               success: function(dat){
-                console.log('DataValue- SAVE THIS:',data_value_edit);
+                //console.log('DataValue- SAVE THIS:',data_value_edit);
                 console.log('DataValue- RETURNED:',dat);
                 if(data_value_edit.saved_callback) data_value_edit.saved_callback(dat);
                 data_value_edit.hide();

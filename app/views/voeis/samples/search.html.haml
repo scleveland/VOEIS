@@ -477,48 +477,32 @@
         $('##{@tabId}_toggle_view_id').text('VIEW GRAPH');
         $('##{@tabId}_plot_view').hide();
         $('##{@tabId}_grid_view').show();
-        #{dataId}.update_views();
-        var grid_sel = val_grid.selection.getSelected()
-        if(grid_sel.length) {
-          console.log('SCROLL-TO:',grid_sel[0]._0);
-          val_grid.scrollTo(0);
-          val_grid.scrollToRow(grid_sel[0]._0);
-          val_grid.scrollToRow(grid_sel[0]._0);
-        };
-        
       } else {
         $('##{@tabId}_toggle_view_id').text('VIEW TABLE');
         $('##{@tabId}_grid_view').hide();
         $('##{@tabId}_plot_view').show();
-        #{dataId}.update_views();
         //val_plot.unhighlight();
         //plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
       };
+      #{dataId}.update_views();
     };
     //######################################
     //*** UPDATE PLOT / GRID / etc.
-    #{dataId}.update_views = function(item0) {
+    #{dataId}.update_views = function(item) {
       var val_grid = #{dataId}.val_grid;
       var val_plot = #{dataId}.plot;
-      if(item0) {
+      if(item) {
+        //### Update Grid
+        var upd = datastore.update(item,#{dataId}.val_store);
         //### Update Plot
         //var dateval = val_grid_formatter.dataDateTime(data);
         //var item_id = parseInt(item0.id.toString());
-        var item = datastore.item(item0);
-        var dateval = item.date_time_utc;
+        //var dateval = datastore.value(item.date_time_utc);
+        var dateval = item.date_time_utc.toString();
         dateval = new Date(dateval).valueOf();
         dateval = parseInt(dateval/1000)*1000;
-        console.log('UPDATE_VIEWS:',item,dateval);
-        #{dataId}.data[item._0] = [dateval,item.data_value];
-        //var data_upd = #{dataId}.plot.getData();
-        //#{dataId}.plot.setData(data_upd);
-        //#{dataId}.plot.draw();
-        //#{dataId}.plot.unhighlight();
-        //var val_selected = #{dataId}.val_grid.selection.getSelected();
-        //plotutils.highlightItems(val_selected,0,#{dataId}.plot);
-        //
-        //### Update Grid
-        datastore.update(item,#{dataId}.val_store);
+        console.log('UPDATE_VIEWS:',item,upd,dateval);
+        #{dataId}.data[upd._0] = [dateval,item.data_value];
       };
       $('span.#{@tabId}_datacount').text(#{dataId}.data.length);
       $("#tooltip").remove();
@@ -537,6 +521,13 @@
         #{dataId}.val_grid.update();
         val_grid.resize();
         //val_grid.setQuery({id: '*'});
+        var grid_sel = val_grid.selection.getSelected()
+        if(grid_sel.length) {
+          console.log('SCROLL-TO:',grid_sel[0]._0);
+          val_grid.scrollTo(0);
+          val_grid.scrollToRow(grid_sel[0]._0);
+          val_grid.scrollToRow(grid_sel[0]._0);
+        };
       };
     };
     
@@ -935,8 +926,8 @@
        console.log('EDIT DV:',item);
        data_value_edit.pop(item, function(data) {
          console.log('EDIT RETURNED:',data);
-         var item = data_value_edit.item;
-         #{dataId}.update_views(item);
+         //var item = data_value_edit.item;
+         #{dataId}.update_views(data);
          
          //### Update Graph
          //data['selected'] = item.selected;
@@ -1343,6 +1334,12 @@
         console.log('initPage: NOW');
         console.log('DATA-QUERY TABID: #{@tabId}');
         //console.log('DATA-SET-SELECT:',$("##{@tabId}_data_set_select")[0]);
+        //SETUP ONSHOW
+        var this_pane = dijit.byId('#{@tabId}');
+        this_pane.connect(this_pane, 'onShow', function(){
+          console.log('#{@tabId} TAB:onSHOW!');
+          #{dataId}.update_views();
+        });
         
         $("##{@tabId}_data_set_select").change(function(e){
           console.log('DATA-SET-SELECT-CHANGE!');

@@ -217,10 +217,12 @@ var datastore = {
       console.log('STORE ERROR: '+e.message+' -- args:', e.arguments);
     };
     this.saveDirty('SAVED',store);
+    return item;
   },
   // UPDATE DOJO STORE FROM NEW_ITEM (MUST HAVE ID)
   update: function(new_item, item_store) {
     var store = item_store || this.store_default;
+    var upd_item;
     d = new Date();
     new_item['updated_at'] = d.format(this.date_format);
     //item['updated_at'] = dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ssZ"});
@@ -232,23 +234,25 @@ var datastore = {
           if(item.hasOwnProperty(prop) && prop!='id')
             if(new_item[prop]==null) store.setValue(item, prop, null);
             else store.setValue(item, prop, datastore.value(new_item[prop]));
+        upd_item = item;
       },
       onError: function(error,request) {
         console.log('ITEM UPDATE ERROR:',error);
       }
     });
     this.saveDirty('UPDATED',store);
+    return upd_item;
   },
   // NEW OR UPDATE ITEM IN DOJO STORE
   new_upd: function(item, item_store) {
     var store = item_store || this.store_default;
-		var id = parseInt(item.id.toString());
+    var id = parseInt(item.id.toString());
     console.log('NEW-UPD:',item, store);
-		if(store._itemsByIdentity && store._itemsByIdentity[id])
-			this.update(item, store);
-		else
-			this.new(item, store);
-	},
+    if(store._itemsByIdentity && store._itemsByIdentity[id])
+      return this.update(item, store);
+    else
+      return this.new(item, store);
+  },
   // DELETE ITEM IN DOJO STORE
   delete: function(item, item_store) {
     var store = item_store || this.store_default;
