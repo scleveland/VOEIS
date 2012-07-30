@@ -1,8 +1,12 @@
 -# DATA VALUE VERSIONS PANE
 
+-## REFERRING TAB
 - tabId = @tabId
 - dataId = tabId+'_data'
 - projId = @project.nil? ? '' : @project.id.to_s
+
+-## THIS TAB
+- thisTabId = @project.id.to_s+'--datavalue'+@data_value.id.to_s+'-history'
 
 :javascript
   //dojoConfig = { parseOnLoad: false };
@@ -69,21 +73,13 @@
       data: data,
       dataType: 'json',
       success: function(dat){
-        //### Update Plot
-        var item0 = datastore.get(id,#{dataId}.val_store);
-        var dateval = new Date(item.local_date_time.toString());
-        dateval = parseInt(dateval/1000)*1000;
-        #{dataId}.data[item0._0] = [dateval,item.data_value]
-        var data_upd = #{dataId}.plot.getData();
-        #{dataId}.plot.setData(data_upd);
-        #{dataId}.plot.draw();
-        #{dataId}.plot.unhighlight();
-        var val_selected = #{dataId}.val_grid.selection.getSelected();
-        plotutils.highlightItems(val_selected,0,#{dataId}.plot);
-        //### Update Grid
-        datastore.update(item,#{dataId}.val_store);
-        #{dataId}.val_grid.update();
-        dojo.publish('voeis/project/data/history/update',[item.id,#{@site.id}]);
+        //### Update Plot/Grid (reload query tab)
+        //refreshTab('#{tabId}');
+        #{dataId}.update_views(dat);
+        //### reload tab
+        //var thisTabId = '#{@project.id}--datavalue'+id+'-history';
+        refreshTab('#{thisTabId}');
+        //dojo.publish('voeis/project/data/history/update',[item.id,#{@site.id}]);
       }
     });
   };
@@ -149,8 +145,9 @@
   SHOW DATA VALUE VERSIONS
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-//= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/data/history/update', [#{@data_value.id}]);")
+-#= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
+-#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/data/history/update', [#{@data_value.id}]);")
+= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"refreshTab('#{thisTabId}');")
 %br
 
 

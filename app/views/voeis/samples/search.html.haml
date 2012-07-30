@@ -497,9 +497,29 @@
     };
     //######################################
     //*** UPDATE PLOT / GRID / etc.
-    #{dataId}.update_views = function() {
+    #{dataId}.update_views = function(item0) {
       var val_grid = #{dataId}.val_grid;
       var val_plot = #{dataId}.plot;
+      if(item0) {
+        //### Update Plot
+        //var dateval = val_grid_formatter.dataDateTime(data);
+        //var item_id = parseInt(item0.id.toString());
+        var item = datastore.item(item0);
+        var dateval = item.date_time_utc;
+        dateval = new Date(dateval).valueOf();
+        dateval = parseInt(dateval/1000)*1000;
+        console.log('UPDATE_VIEWS:',item,dateval);
+        #{dataId}.data[item._0] = [dateval,item.data_value];
+        //var data_upd = #{dataId}.plot.getData();
+        //#{dataId}.plot.setData(data_upd);
+        //#{dataId}.plot.draw();
+        //#{dataId}.plot.unhighlight();
+        //var val_selected = #{dataId}.val_grid.selection.getSelected();
+        //plotutils.highlightItems(val_selected,0,#{dataId}.plot);
+        //
+        //### Update Grid
+        datastore.update(item,#{dataId}.val_store);
+      };
       $('span.#{@tabId}_datacount').text(#{dataId}.data.length);
       $("#tooltip").remove();
       if($('##{@tabId}_toggle_view_id').text()=='VIEW TABLE') {
@@ -514,6 +534,7 @@
         //### UPDATE GRID
         //val_grid.render();
         //val_grid.update();
+        #{dataId}.val_grid.update();
         val_grid.resize();
         //val_grid.setQuery({id: '*'});
       };
@@ -905,24 +926,28 @@
        //var item = this.getItem(idx);
        //var item = #{dataId}.value_data[idx];
        var item = datastore.get_raw(id,#{dataId}.val_store);
-       if(!item){
+       if(!item._0){
          console.log('NO ITEM!');
          return;
        };
        var point = #{dataId}.data[item._0];
        //EDIT datavalue
-       console.log('EDIT ITEM:',item);
+       console.log('EDIT DV:',item);
        data_value_edit.pop(item, function(data) {
+         console.log('EDIT RETURNED:',data);
          var item = data_value_edit.item;
+         #{dataId}.update_views(item);
+         
          //### Update Graph
          //data['selected'] = item.selected;
          //### Update Plot
          //var dateval = val_grid_formatter.dataDateTime(data);
-         var dateval = data.date_time_utc;
-         dateval = new Date(dateval).valueOf();
-         dateval = parseInt(dateval/1000)*1000;
-         console.log('PLOT dateval: '+dateval);
-         #{dataId}.data[item._0] = [dateval,data.data_value]
+         
+         //var dateval = data.date_time_utc;
+         //dateval = new Date(dateval).valueOf();
+         //dateval = parseInt(dateval/1000)*1000;
+         //console.log('PLOT dateval: '+dateval);
+         //#{dataId}.data[item._0] = [dateval,data.data_value]
          
          //var data_upd = #{dataId}.plot.getData();
          //#{dataId}.plot.setData(data_upd);
@@ -932,9 +957,9 @@
          //plotutils.highlightItems(val_selected,0,#{dataId}.plot);
          
          //### Update Grid
-         datastore.update(data,#{dataId}.val_store);
-         #{dataId}.val_grid.update();
-         #{dataId}.update_views();
+         //datastore.update(data,#{dataId}.val_store);
+         //#{dataId}.val_grid.update();
+         //#{dataId}.update_views();
        });
       },
       batchUpdate: function(data) {
