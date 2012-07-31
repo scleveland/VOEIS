@@ -20,7 +20,7 @@ class Project
   property :name,             String,     :required => true
   property :description,      Text
 
-  property :is_private,       Boolean,    :required => true, :default => false
+  property :is_private,       Boolean,    :required => true, :default => true
   property :publish_to_his,   Boolean,    :required => false, :default => false
   property :deleted_at,       ParanoidDateTime
 

@@ -4,13 +4,14 @@
 .small-centered
   .rbox.dashed
     %br
-    = form_for(:project, @project, :url => projects_path, :builder => YogoFormBuilder) do |f|
+    = form_for(:project, @project, :url=>projects_path, :builder=>YogoFormBuilder) do |f|
       = f.text_field :name, :dojoType=> "dijit.form.ValidationTextBox", :required=>true, :onChange=>"checkNameField();"
       = f.text_area(:description)
-      %button{:dojoType=>"dijit.form.Button",:value=>"Save", :title=>"Save", :type=>"submit", :disabled=>true, :id=>"save_project_button"}
+      %button{:dojoType=>"dijit.form.Button",:value=>"Save", :title=>"Save", :type=>"submit", :disabled=>true, 
+        :id=>"save_project_button", :onclick=>"this.set('disabled', true);document.forms[0].submit();"}
         Save
         
-      = link_to('Cancel', root_path, :class => 'icon icon-cancel') 
+      = link_to('Cancel', 'javascript:', :class => 'icon icon-cancel') 
 
 :javascript
   dojo.require("dijit.form.Button");
