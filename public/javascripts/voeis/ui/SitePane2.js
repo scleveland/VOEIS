@@ -254,6 +254,15 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 										data_end:'NA'
 										};
 				this.set('id', 'site0');
+				var this_site = this.site;
+				psites.fetch({sort:[{attribute:'id',descending:true}],onComplete:function(items,request){
+					if(items.length) {
+						//console.log('LAST SITE:',items[0].name.toString());
+						this_site.latitude = items[0].latitude.toString();
+						this_site.longitude = items[0].longitude.toString();
+					};
+				}});
+				
 			};
 		} else {
 			if(site && site.id && site.code && site.idx)
