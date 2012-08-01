@@ -1220,6 +1220,8 @@
           var site = window[siteN+'ref'];
           var form = window[siteN+'_edit_form'];
           var me = site_lat_long_picker;
+          var mylat = dijit.byId(siteN+'_latitude').value;
+          var mylong = dijit.byId(siteN+'_longitude').value;
           //var me = dijit.byId('site_lat_long_picker')
           me.lat_long = {};
           var site_lat_long = {};
@@ -1232,8 +1234,10 @@
           var crosshairImg = '/images/cross-hairs.gif';
           var map_center = new google.maps.LatLng(39.707187,-96.152344);
           var map_zoom = 3;
-          if(!site.newSite) {
-            map_center = new google.maps.LatLng(parseFloat(site.site.latitude),parseFloat(site.site.longitude));
+          //if(!site.newSite) {
+          //  map_center = new google.maps.LatLng(parseFloat(site.site.latitude),parseFloat(site.site.longitude));
+          if(mylat && mylong) {
+            map_center = new google.maps.LatLng(parseFloat(mylat),parseFloat(mylong));
             map_zoom = 15;
             console.log('EDIT SITE MAP:',map_center);
           };
