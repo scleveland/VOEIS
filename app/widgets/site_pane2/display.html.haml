@@ -172,7 +172,8 @@
     -if @auth
       %span{:style=>"font-size:11px;"}
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        = link_to('NEW VARIABLE', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/project/variable', [0,'',$$$id$$$]);")
+        -#= link_to('NEW VARIABLE', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/project/variable', [0,'',$$$id$$$]);")
+        = link_to('MANAGE VARIABLES', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/project/variables');")
     
   %table{:id=>"site00-variable-table", :style=>"width:48%;foat:left;"}
     %tr{:class=>"row-gr"}

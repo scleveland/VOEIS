@@ -89,7 +89,7 @@
     console.log('ROLLBACK:',item);
     var var_id = item.id;
     var varPane = window['site'+item.id+'ref'];
-    var varPaneId = '#{@project.id}-site#{@site.id}-var'+var_id;
+    var varPaneId = 'site#{@site.id}_var'+var_id;
     var varPane = dojo.byId(varPaneId);
     
     var data = {variable:item};

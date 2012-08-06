@@ -1,4 +1,7 @@
 -# VARIABLE VERSIONS PANE
+
+- site_id = @site.nil? ? 'site0' : 'site'+@site.id.to_s
+
 :javascript
   dojo.require("dojox.grid.EnhancedGrid");
   dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
@@ -12,7 +15,7 @@
     console.log('ROLLBACK:',item);
     var var_id = item.id;
     var varPane = window['site'+item.id+'ref'];
-    var varPaneId = '#{@project.id}-site#{@site.id}-var'+var_id;
+    var varPaneId = '#{site_id}_var'+var_id;
     var varPane = dojo.byId(varPaneId);
     
     var data = {variable:item};
@@ -49,7 +52,7 @@
           varPane = dijit.byNode(varPane);
           varPane.refresh();
         };
-        dojo.publish('voeis/project/variable/history/update',[item.id,#{@site.id}]);
+        dojo.publish('voeis/project/variable/history/update',[item.id,#{@site.nil? ? 0 : @site.id}]);
       },
       dataType: 'json'
     });
@@ -59,13 +62,16 @@
 %h3{:style=>"margin-top:0;"}
   %span.small{:style=>"font-size:14px;"}
     HISTORY: 
-  = '%s [site-%s]'%[@variable.variable_name,@site.id]
+  - if @site.nil?
+    = @variable.variable_name
+  - else
+    = '%s [site-%s]'%[@variable.variable_name,@site.id]
 
 %strong
-  SHOW VARIABLE VERSIONS
+  VARIABLE VERSIONS
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history/update', [#{@variable.id},#{@site.id}]);")
+= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history/update', [#{@variable.id},#{@site.nil? ? 0 : @site.id}]);")
 %br
 
 
@@ -73,8 +79,8 @@
 #cv-versions
   = render_widget :versions, :display, :item=>@variable,
                                         :versions=>@versions,
-                                        :unique_id=>"%s_site%s_var%s"%[projId,@site.id,@variable.id],
-                                        :unique_jsid=>"%s_site%s_var%s"%[projId.tr('-','$'),@site.id,@variable.id],
+                                        :unique_id=>"%s_%s_var%s"%[projId,site_id,@variable.id],
+                                        :unique_jsid=>"%s_%s_var%s"%[projId.tr('-','$'),site_id,@variable.id],
                                         :item_refs=>@var_refs,
                                         :properties=>@ver_properties,
                                         :restore_callback=>"item_restore",

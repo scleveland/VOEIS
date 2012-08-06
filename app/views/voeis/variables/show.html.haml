@@ -55,33 +55,6 @@
     });
     
 
-    
--# content_for(:toolbar) do
-  -##projectButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
-  -#  %span 
-  -#    = @project.name
-  -#  %div{:dojoType => "dijit.Menu"}                    
-  -#    -#-if !current_user.nil? && current_user.projects.include?(@project)
-  -#    -#  = link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
-  -#    - if @sites.count > 0
-  -#      -#= link_to("Add Variable", new_project_variable_path(@project), :dojoType => "yogo.ui.MenuLink")
-  -#      -#= link_to("Add Unit", new_project_unit_path(@project), :dojoType => "yogo.ui.MenuLink")
-  -#      = link_to("Add Sample", new_project_sample_path(@project), :dojoType => "yogo.ui.MenuLink")
-  -#      -#= link_to("Upload Sample Data", @project.id.to_s+"/data_values/pre_process_sample_file_upload", :dojoType => "yogo.ui.MenuLink")
-  -#      = link_to("Add Data Stream", new_project_data_stream_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
-  -#
-  -#    - if @project.managed_repository { Voeis::Sample.all.count } > 0
-  -#      = link_to("Add Sample Data", pre_process_project_data_values_path(@project), :dojoType => "yogo.ui.MenuLink")
-  -#      = link_to("Add Field Data", new_field_measurement_project_sensor_values_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
-  -#    - if @project.managed_repository { Voeis::DataStream.all.count } > 0
-  -#      = link_to("Add Data", add_project_data_streams_path(@project), :params => {:project_id => @project.id}, :dojoType => "yogo.ui.MenuLink")
-  -#    = link_to("Settings...", edit_project_path(@project), :dojoType => "yogo.ui.MenuLink")
-  -##siteButton{:dojoType => "dijit.form.DropDownButton", :iconClass => "project-icon-25"}
-  -#  %span Site
-  -#  %div{:dojoType => "dijit.Menu"}                    
-  -#    -if !current_user.nil? && current_user.projects.include?(@project)
-  -#      = link_to("Edit Site", edit_project_site_path(@project,resource.id), :dojoType => "yogo.ui.MenuLink")
-
 
 -#- not_browse = (request.fullpath =~ /\/projects\/?$/).nil?
 - siteId = @site.nil? ? "site0" : "site"+@site.id.to_s
@@ -97,10 +70,10 @@
     NEW VARIABLE
     
 
-- if @var_id>0
+- if @var_id>0 && @site_id>0
   %div{:id=>"#{varId}_show", :style=>"width:900px;"}
       
-    %strong SHOW VARIABLE DETAILS
+    %strong VARIABLE DETAILS
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     -if @auth && @site
@@ -323,7 +296,7 @@
 
 
 -if @auth
-  %div{:id=>"#{varId}_edit", :style=>"width:900px;#{@var_id>0 ? 'display:none;' : ''}"}
+  %div{:id=>"#{varId}_edit", :style=>"width:900px;#{(@var_id>0 && @site_id>0) ? 'display:none;' : ''}"}
 
     %strong EDIT VARIABLE
     &nbsp;&nbsp;&nbsp; (* Required)
@@ -566,7 +539,8 @@
                   var variable = #{@variable.to_json};
                   var var_id = parseInt(variable.id);
                   var site_id = parseInt(#{@site.nil? ? 0 : @site.id});
-                  var this_pane_id = '#{@project.id}-var'+var_id;
+                  //var this_pane_id = '#{@project.id}-var'+var_id;
+                  var this_pane_id = 'site#{@site_id}_var'+var_id;
                   var this_pane = dijit.byId(this_pane_id);
                   if(this_pane) {
                     browse = true
@@ -596,7 +570,7 @@
                     //window.scrollTo(0,0);
                     $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
                     $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
-                    if(parseInt(#{@var_id})) {
+                    if(parseInt(#{@var_id}) && parseInt(#{@site_id})) {
                       var elems = #{varId}_edit_form.domNode.elements;
                       $(elems['var_units']).val(#{@variable.variable_units_id})
                       $(elems['var_time_units']).val(#{@variable.time_units_id})
@@ -608,6 +582,10 @@
                       $('#'+varID+'_show').show();
                     } else {
                       var tabs = dijit.byId('tab_browser');
+                      if(parseInt(#{@site_id})) var pane = dijit.byId('#{@site_id}');
+                      else var pane = dijit.byId('project_variables');
+                      if(pane) tabs.selectChild(pane);
+                      if(parseInt(#{@var_id})) refreshTab('var#{@var_id}-history');
                       tabs.removeChild(this_pane);
                       //this_pane.onClose();
                       console.log('close-pane:',this_pane);
@@ -615,7 +593,7 @@
                     };
                   };
                   this_pane.connect(this_pane, "onShow", function(state){
-                    if(parseInt(#{@var_id})) 
+                    if(parseInt(#{@var_id}) && parseInt(#{@site_id}))
                       graphInit(site_id,variable.id,variable.name,#{varId}_gdata);
                   });
                   var form0 = form.domNode;
@@ -634,7 +612,7 @@
                     //console.log('formStateChange:',state);
                     this.attr("disabled", !state);
                   });
-                  //###ON-SUBMIT
+                  //###ON-SUBMIT: SAVE
                   this.connect(this, "onClick", function(){
                     console.log('CREATE VAR: '+variable.id);
                     //###SCROLL TO TOP
@@ -688,22 +666,24 @@
                       data: data,
                       success: function(newValue){
                         //callback
-                        if(var_id) {
-                          //###EDIT VAR
-                          this_pane.refresh();
-                          return;
+                        if(site_id) {
+                          if(var_id) {
+                            //###EDIT VAR
+                            this_pane.refresh();
+                            return;
+                          };
+                          data.variable['id'] = parseInt(newValue.id);
+                          var var_data = {
+                            varname: data.variable.variable_name,
+                            varid: data.variable.id,
+                            varunits: data.variable.variable_units.untis_abbreviation+' ('+data.variable.data_type+')',
+                            count: 0,
+                            first: 'NA',
+                            last: 'NA'};
+                          site_var_data[site_id-1].append(var_data);
+                          var site_pane = window['#{siteId}ref'];
+                          if(site_pane) site_pane.siteUpdate();
                         };
-                        data.variable['id'] = parseInt(newValue.id);
-                        var var_data = {
-                          varname: data.variable.variable_name,
-                          varid: data.variable.id,
-                          varunits: data.variable.variable_units.untis_abbreviation+' ('+data.variable.data_type+')',
-                          count: 0,
-                          first: 'NA',
-                          last: 'NA'};
-                        site_var_data[site_id-1].append(var_data);
-                        var site_pane = window['#{siteId}ref'];
-                        if(site_pane) site_pane.siteUpdate();
                         //#{varId}_cancel_edit();
                         dijit.byId('#{varId}').cancel_edit('#{varId}');
                       },

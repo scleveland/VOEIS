@@ -214,9 +214,9 @@ class ProjectsController < InheritedResources::Base
     #@site_var_stats = @project.managed_repository{Voeis::SiteDataCatalog.all(:order=>site.id)}
     @sites.each{ |site| 
       @temp_array = []
-      site.variables.map{ |var|
+      site.variables.all(:order => [:variable_name.asc]).map{ |var|
         stats = @project.managed_repository{Voeis::SiteDataCatalog.first(:site_id=>site.id, :variable_id=>var.id)}
-        if !stats.nil?
+        if !stats.nil? && stats.record_number>0
           var_stats = [stats.record_number, stats.starting_timestamp, stats.ending_timestamp]
           var_stats.map!{ |x| 
             if x.nil?
@@ -229,10 +229,8 @@ class ProjectsController < InheritedResources::Base
               end
             end
           }
-        else
-          var_stats = ['NA', 'NA', 'NA']
+          @temp_array << {:varname=>var.variable_name, :varid=>var.id, :varunits=>'%s (%s)'%[var.variable_units[:units_abbreviation],var.data_type], :count=>var_stats[0], :first=>var_stats[1], :last=>var_stats[2]}
         end
-        @temp_array << {:varname=>var.variable_name, :varid=>var.id, :varunits=>'%s (%s)'%[var.variable_units[:units_abbreviation],var.data_type], :count=>var_stats[0], :first=>var_stats[1], :last=>var_stats[2]}
       }
       @site_var_stats << @temp_array
     }

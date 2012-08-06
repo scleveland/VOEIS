@@ -317,6 +317,8 @@ var refreshTab = function(tabId) {
   if(pane) {
     pane = dijit.byNode(pane);
     pane.refresh();
+    return pane;
   };
+  return false;
 };
 

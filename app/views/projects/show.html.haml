@@ -1879,7 +1879,8 @@
 
     var openVarTab = function(tabs, projectId, varId, varName, siteId) {
       var tabTitle = 'NEW VARIABLE';
-      if(parseInt(varId)) tabTitle = 'Site-'+siteId+': '+varName;
+      if(parseInt(varId)) tabTitle = 'Edit: '+varName;
+        if(parseInt(siteId)) tabTitle = 'Site-'+siteId+': '+varName;
       //var varPane = new voeis.ui.VariablePane();
       var projVarId = 'site'+siteId+'_var'+varId;
       var projVarHref = "/projects/#{@project.id}/variables/"+varId+".html?&site_id="+siteId;
@@ -1940,9 +1941,12 @@
 
     //##### VARIABLE HISTORY TAB
     var openVarHistoryTab = function(tabs, projectId, varId, varName, siteId) {
-      var tabTitle = 'History: Site-'+siteId+': '+varName;
-      var projVarHistHref = "/projects/#{@project.id}/variables/versions?id="+varId+"&site_id="+siteId;
-      var projVarHistId = '#{@project.id}-site'+siteId+'-var'+varId+'-history';
+      siteId = parseInt(siteId);
+      var tabTitle = 'History: '+(siteId? 'Site-'+siteId+': ' : '')+varName;
+      var projVarHistHref = "/projects/#{@project.id}/variables/versions?id="+varId;
+      if(siteId) projVarHistHref += "&site_id="+siteId;
+      //var projVarHistId = '#{@project.id}-site'+siteId+'-var'+varId+'-history';
+      var projVarHistId = 'var'+varId+'-history';
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
       var projVarHistLoad = function(siteId,varName) {
@@ -2214,8 +2218,22 @@
       openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
     });
     
+    dojo.subscribe("voeis/project/variables", function() {
+      console.log('VARIABLES');
+      var projectId = "#{@project.id}";
+      var tabs = dijit.byId('tab_browser');
+      var tabHref = '#{project_path(@project)}/variables';
+      tabHref += '#{current_user.nil? ? "" : "?api_key="+current_user.api_key}';
+      var tabId = 'project_variables';
+      var tabTitle = 'Manage Variables';
+      var tabCallback = function() {
+        //pageInit();
+      };
+      openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
+    });
+    
     dojo.subscribe("voeis/project/samples", function(siteId) {
-      console.log('SAMPLES',arguments);
+      console.log('SAMPLES:',arguments);
       var projectId = "#{@project.id}";
       var tabs = dijit.byId('tab_browser');
       var tabHref = '#{project_path(@project)}/samples';

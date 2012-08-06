@@ -16,40 +16,44 @@ class Voeis::VariablesController < Voeis::BaseController
   
   def show
     @project = parent
-    #@sites = Voeis::Site.all
     @auth = !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
     @var_id = params[:id].to_i
+    if params[:site_id].nil?
+      @site_id = 0
+    else
+      @site_id = params[:site_id].to_i
+    end
     @variable = Voeis::Variable.new
     @variable.id = 0
     @variable_ref = {}
     @graph_data = []
     if @var_id>0
-      @project.managed_repository{
-        @variable = Voeis::Variable.get(@var_id)
-        @sites = Voeis::Site.all
-        if !params[:site_id].nil?
-          @site =  Voeis::Site.get(params[:site_id].to_i)
-          @site_variable_stats = Voeis::SiteDataCatalog.all(:variable_id=>params[:id].to_i, :site_id=>params[:site_id].to_i)
+      @variable = @project.managed_repository{ Voeis::Variable.get(@var_id) }
+      if @site_id>0
+        @project.managed_repository{
+          @sites = Voeis::Site.all
+          @site =  Voeis::Site.get(@site_id)
+          @site_variable_stats = Voeis::SiteDataCatalog.all(:variable_id=>@var_id, :site_id=>@site_id)
           #@graph_data = @variable.last_ten_values_graph(@site)
           #@data = @variable.last_ten_values(@site)
           @graph_data = @variable.last_days_values_graph(@site)
           @data = @variable.last_days_values(@site)
-        end
-      }
-      @variable_ref = {}
-      Voeis::Variable.properties.each{|prop| @variable_ref[prop.name] = @variable[prop.name]}
-      #@units = Voeis::Unit.get(@variable.variable_units_id)
-      #@tunits = Voeis::Unit.get(@variable.time_units_id)
-      @units = @variable.variable_units
-      sunits = @variable.spatial_units
-      @variable_ref[:variable_units] = '%s (%s)'% @units.to_hash.values_at(:units_abbreviation,:units_type)
-      @variable_ref[:time_units] = @variable.time_units[:units_name]
-      @variable_ref[:lab_method] = @variable.lab_method.nil? ? 'NA' : @variable.lab_method.lab_method_name
-      @variable_ref[:lab] = @variable.lab.nil? ? 'NA' : '%s (%s)'%[@variable.lab.lab_name,@variable.lab.lab_organization]
-      @variable_ref[:field_method] = @variable.field_method.nil? ? 'NA' : @variable.field_method.method_name
-      @variable_ref[:spatial_units] = sunits.nil? ? 'NA' : '%s (%s)'% sunits.to_hash.values_at(:units_abbreviation,:units_type)
-      upd_user = User.get(@variable.updated_by)
-      @variable_ref[:updated_user] = upd_user.nil? ? '-' : '%s (%s)'% [upd_user.name,upd_user.login]
+        }
+        @variable_ref = {}
+        Voeis::Variable.properties.each{|prop| @variable_ref[prop.name] = @variable[prop.name]}
+        #@units = Voeis::Unit.get(@variable.variable_units_id)
+        #@tunits = Voeis::Unit.get(@variable.time_units_id)
+        @units = @variable.variable_units
+        sunits = @variable.spatial_units
+        @variable_ref[:variable_units] = '%s (%s)'% @units.to_hash.values_at(:units_abbreviation,:units_type)
+        @variable_ref[:time_units] = @variable.time_units[:units_name]
+        @variable_ref[:lab_method] = @variable.lab_method.nil? ? 'NA' : @variable.lab_method.lab_method_name
+        @variable_ref[:lab] = @variable.lab.nil? ? 'NA' : '%s (%s)'%[@variable.lab.lab_name,@variable.lab.lab_organization]
+        @variable_ref[:field_method] = @variable.field_method.nil? ? 'NA' : @variable.field_method.method_name
+        @variable_ref[:spatial_units] = sunits.nil? ? 'NA' : '%s (%s)'% sunits.to_hash.values_at(:units_abbreviation,:units_type)
+        upd_user = User.get(@variable.updated_by)
+        @variable_ref[:updated_user] = upd_user.nil? ? '-' : '%s (%s)'% [upd_user.name,upd_user.login]
+      end
     end
     @variable_properties = [
       {:label=>"Variable ID", :name=>"id"},
@@ -103,6 +107,45 @@ class Voeis::VariablesController < Voeis::BaseController
     #logger.debug('>>>> data = '+@data.to_s)
     #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
     
+  end
+
+  # GET /variables
+  # Manage Variables
+  def index
+    @project = parent
+    @project.managed_repository{
+      #@variables = Voeis::Variable.all(:order=>[:variable_name.asc], :include=>[:units])
+      #@variables = @project.variables.all(:order=>[:variable_name.asc], :fields=>[
+      #  :id,:variable_name,:variable_code,:general_category,:sample_medium,:value_type,:data_type,:variable_units_id])
+      #@variables = Voeis::Variable.all(:order=>[:variable_name.asc])
+      #@variables = @project.variables.all(:order=>[:variable_name.asc])
+      #@variables = @project.variables.all(:order=>[:variable_name.asc],:variable_units=>{:id.gt=>0})
+      @variables = @project.variables.all(:order=>[:id.asc])
+      @units = Voeis::Unit.all
+      @time_units = Voeis::Unit.all(:units_type.like=>'%Time%')
+      @variable_names = Voeis::VariableNameCV.all
+      @sample_mediums= Voeis::SampleMediumCV.all
+      @value_types= Voeis::ValueTypeCV.all
+      @speciations = Voeis::SpeciationCV.all
+      @data_types = Voeis::DataTypeCV.all
+      @general_categories = Voeis::GeneralCategoryCV.all
+      @label_array = Array["Variable Name","Variable Code","Unit Name","Speciation","Sample Medium","Value Type","Is Regular","Time Support","Time Unit ID","Data Type","General Cateogry", "Detection Limit"]
+      @vars = @variables.map{ |var| var.to_hash.merge!({:variable_units=>var.get_units}) }
+      @current_variables = Array.new     
+      #@vars = @variables.map{ |var| var.to_hash.merge!({:variable_units=>@units.get(var.variable_units_id)}) }
+      #  @temp_array =Array[var.variable_name, var.variable_code,@units.get(var.variable_units_id).units_name, var.speciation,var.sample_medium, var.value_type, var.is_regular.to_s, var.time_support.to_s, var.time_units_id.to_s, var.data_type, var.general_category, var.detection_limit.to_s]
+      #  @current_variables << @temp_array
+      #end         
+    }
+    #@variables = @project.variables.all(:order=>[:variable_name.asc]).variable_units
+    #@vars = @variables.map{ |var| var.to_hash.merge!({:variable_units=>@units.get(var.variable_units_id)}) }
+    
+    respond_to do |format|
+      format.html # new.html.erb
+      format.json do
+        render :json => @variables.as_json, :callback => params[:jsoncallback]
+      end
+    end
   end
 
   # GET /variables/list

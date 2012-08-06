@@ -48,7 +48,7 @@ class Voeis::Variable
   property :variable_code,     String,  :required => true, :length => 512
   property :variable_name,     String,  :required => true, :length => 512
   property :speciation,        String,  :required => true, :default => 'Not Applicable', :length => 512
-  property :variable_units_id, Integer, :required => true
+  property :variable_units_id, Integer, :required => true, :lazy => false
 
   property :sample_medium,     String,  :required => true, :default => 'Unknown', :length => 512
   property :value_type,        String,  :required => true, :default =>'Unknown', :length => 512
@@ -101,6 +101,10 @@ class Voeis::Variable
   has n, :spatial_offsets,      :model => "Voeis::SpatialOffset",    :through => Resource
   has n, :instruments, :model => "Voeis::Instrument",    :through => Resource
   
+  
+  def get_units
+    self.variable_units
+  end
   
   def self.load_from_his
     his_variables = repository(:his){ His::Variable.all }
