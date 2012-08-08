@@ -287,29 +287,39 @@ class Voeis::DataValue
           newsample_id = -1
           if sample_id != -1
             sample_value=[]
-            sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\") VALUES "
-            sql << "('#{sample_type}', '#{sample_medium}','#{row[sample_id]}', '#{timestamp}','#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}')"
+            #Lets create a sample or fetch the one already there.
+            #sql = DataMapper.generate_sql_execute(
+            
+            newsample_id= Voeis::Sample.first_or_create(:sample_type=>sample_type, :material=>sample_medium, :lab_sample_code=>row[sample_id], :local_date_time=>timestamp,:created_at=>created_at, :updated_at=>updated_at, :updated_by=>user.id, :updated_comment=>create_comment).id
+            #sql = "INSERT INTO \"voeis_samples\" (\"sample_type\",\"material\",\"lab_sample_code\",\"local_date_time\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\") VALUES "
+            #sql << "('#{sample_type}', '#{sample_medium}','#{DataMapper.sanitize(row[sample_id])}', '#{timestamp}','#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}')"
             #sql << sample_value.join(',')
-            sql << " RETURNING \"id\""
-            sample_result = repository.adapter.execute(sql)
-            newsample_id =sample_result.insert_id
+            #sql << " RETURNING \"id\""
+            
+            #sample_result = repository.adapter.execute(sql)
+            #newsample_id =sample_result.insert_id
           end
+          sql_array = []
           (0..row.size-1).each do |i|
             if i != data_timestamp_col && i != date_col && i != time_col && i != vertical_offset_col && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "EndingVerticalOffset" && data_col_array[i][name] != "SampleID" && data_col_array[i][name] != "Ignore" && data_col_array[i][name] != "MetaTag"
                 cv = /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(row[i]) ? row[i].to_f : -9999.0
-                row_values << "(#{cv.to_s}, '#{timestamp.to_s}', #{vertical_offset},FALSE, '#{row[i].to_s}', '#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc.to_s}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id},  '#{filename}', #{newsample_id} )"
+                row_values << "(#{cv.to_s}, '#{timestamp.to_s}', #{vertical_offset},FALSE, '#{row[i].to_s.escape_quotes_for_sql}', '#{created_at}', '#{updated_at}', #{user.id},'#{create_comment}', #{data_stream.utc_offset+dst_time},'#{timestamp.utc.to_s}','#{dst}',#{end_vertical_offset},#{data_col_array[i][variable].quality_control.to_f},'#{data_stream.type}', #{site_id},  #{data_col_array[i][variable].id},  '#{filename}', #{newsample_id} )"
+                #sql_array << DataMapper.generate_sql_execute(Voeis::DataValue.create(:data_value=>cv, :local_date_time=>timestamp, :vertical_offset=>vertical_offset, :published=>false, :string_value=>row[i].to_s, :created_at=>created_at, :updated_at=>updated_at,
+                #                             :updated_by=>user.id, :updated_comment=>create_comment, :utc_offset=>data_stream.utc_offset+dst_time, :date_time_utc=>timestamp.utc, :observes_daylight_savings=>dst, 
+               #                              :end_vertical_offset=>end_vertical_offset, :quality_control_level=> data_col_array[i][variable].quality_control.to_f, :datatype=>data_stream.type, :site_id=>site_id, 
+               #                               :variable_id=>data_col_array[i][variable].id, :filename=>filename, :sample_id=>newsample_id))
             elsif data_col_array[i][name] == "MetaTag"
               meta_values << "('#{row[i].to_s}', '#{meta_tag_hash[i.to_s].name}', '#{meta_tag_hash[i.to_s].category}', '#{updated_at}', '#{created_at}', #{user.id}, '#{create_comment}')"
               puts "INSIDE META VALUES ********************************"
             end #end if
           end #end loop
           if !row_values.empty?
-            puts "INSERTING DATA VALUES ********************************"
+            #puts "INSERTING DATA VALUES ********************************"
             sql = "INSERT INTO \"#{self.storage_name}\" (\"data_value\",\"local_date_time\",\"vertical_offset\",\"published\",\"string_value\",\"created_at\",\"updated_at\",\"updated_by\",\"updated_comment\", \"utc_offset\",\"date_time_utc\", \"observes_daylight_savings\", \"end_vertical_offset\", \"quality_control_level\", \"datatype\", \"site_id\", \"variable_id\", \"filename\", \"sample_id\") VALUES "
             sql << row_values.join(',')
             sql << " RETURNING \"id\""
             result_ids = repository.adapter.select(sql)
-            puts "DONE INSERTING DATA VALUES ********************************"
+            #puts "DONE INSERTING DATA VALUES ********************************"
             #insert meta-tags
             unless meta_values.empty?
               sql = "INSERT INTO voeis_meta_tags (value, name, category, updated_at, created_at, updated_by, updated_comment) VALUES "
@@ -323,7 +333,7 @@ class Voeis::DataValue
             sensor_sql = Array.new
             data_stream_sql = Array.new
             source_sql = Array.new
-            puts "PREPPRING ASSOCIATIONS ********************************"
+            #puts "PREPPRING ASSOCIATIONS ********************************"
             (0..result_ids.length-1).each do |i|
               variable_sql << "(#{result_ids[i]},#{data_col_array[variable_cols[i]][variable].id})"
               site_sql << "(#{result_ids[i]},#{site_id})"
@@ -336,29 +346,29 @@ class Voeis::DataValue
                 meta_tag_sql << (0..meta_ids.length-1).map{|m| "(#{result_ids[i]},#{meta_ids[m]})"}.join(',')
               end
             end
-            puts "DONE PREPPRING ASSOCIATIONS ********************************"
+            #puts "DONE PREPPRING ASSOCIATIONS ********************************"
             sql = "INSERT INTO \"voeis_data_value_variables\" (\"data_value_id\",\"variable_id\") VALUES "
             sql << variable_sql.join(',')
             repository.adapter.execute(sql)
-            puts "AFTER VARIABLE ASSOC ********************************"
+            #puts "AFTER VARIABLE ASSOC ********************************"
             sql = "INSERT INTO \"voeis_data_value_sites\" (\"data_value_id\",\"site_id\") VALUES "
             sql << site_sql.join(',')
             repository.adapter.execute(sql)
-            puts "AFTER SITE ASSOC ********************************"
+            #puts "AFTER SITE ASSOC ********************************"
             sql = "INSERT INTO \"voeis_data_stream_data_values\" (\"data_value_id\",\"data_stream_id\") VALUES "
             sql << data_stream_sql.join(',')
             repository.adapter.execute(sql)
-            puts "AFTER DATA-STREAM ASSOC ********************************"
+            #puts "AFTER DATA-STREAM ASSOC ********************************"
             sql = "INSERT INTO \"voeis_data_value_sources\" (\"data_value_id\",\"source_id\") VALUES "
             sql << source_sql.join(',')
             repository.adapter.execute(sql)
-            puts "AFTER SOURCE ASSOC ********************************"
+            #puts "AFTER SOURCE ASSOC ********************************"
             unless meta_values.empty?
-              puts "INERTING META VALUES ********************************"
+              #puts "INERTING META VALUES ********************************"
               sql = "INSERT INTO \"voeis_data_value_meta_tags\" (\"data_value_id\",\"meta_tag_id\") VALUES "
               sql << meta_tag_sql.join(',')
               repository.adapter.execute(sql)
-              puts "AFTER META-TAG ASSOC ********************************"
+              #puts "AFTER META-TAG ASSOC ********************************"
             end
             if sample_id != -1
               sql = "INSERT INTO \"voeis_data_value_samples\" (\"data_value_id\",\"sample_id\") VALUES "
@@ -374,12 +384,12 @@ class Voeis::DataValue
                 "(#{newsample_id},#{data_col_array[variable_cols[i]][variable].id})"
               }.join(',')
               repository.adapter.execute(sql)
-              puts "AFTER SAMPLE ASSOC ********************************"
+              #puts "AFTER SAMPLE ASSOC ********************************"
             else
                sql = "INSERT INTO \"voeis_data_value_sensor_types\" (\"data_value_id\",\"sensor_type_id\") VALUES "
                sql << sensor_sql.join(',')
                repository.adapter.execute(sql)
-               puts "AFTER SENSOR TYPE ASSOC ********************************"
+               #puts "AFTER SENSOR TYPE ASSOC ********************************"
            end
         end#end if
 
