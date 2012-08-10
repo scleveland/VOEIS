@@ -28,7 +28,7 @@ class Voeis::ApivsController < Voeis::BaseController
 
   # pulls data from a data stream
   #
-  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_data_stream_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_stream_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_data_stream_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_stream_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :data_stream_id
@@ -96,23 +96,23 @@ class Voeis::ApivsController < Voeis::BaseController
   #curl -F datafile=@highland-test.csv	 -F data_template_id=10 https://voeis.msu.montana.edu/projects/e2f8e892-1f57-11e0-bbd7-6e9ffb75bc80/apivs/upload_logger_data.json?api_key=e6af8ec25873c1092596e235082e7758ae4cfe6e11e689c5150aa995a4fc89e9
   #curl -F datafile=@CR1000_BigSky_SFork.dat	 -F data_template_id=9 https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_logger_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
    
-  #curl -F datafile=@CR1000_2_BigSky_NFork.csv	 -F data_template_id=2 http://localhost:3000/projects/cfee5aec-c520-11e0-a45c-c82a14fffebf/apivs/upload_logger_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
-  # curl -F datafile=@matt1item.csv -F data_template_id=19 -F start_line=1 -F  api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_logger_data.json?
-  # curl -F datafile=@YB_Hill.csv -F data_template_id=26 http://voeis.msu.montana.edu/projects/a459c38c-f288-11df-b176-6e9ffb75bc80/apivs/upload_logger_data.json?api_key=3b62ef7eda48955abc77a7647b4874e543edd7ffc2bb672a40215c8da51f6d09
+  #curl -F datafile=@CR1000_2_BigSky_NFork.csv	 -F data_template_id=2 https://localhost:3000/projects/cfee5aec-c520-11e0-a45c-c82a14fffebf/apivs/upload_logger_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
+  # curl -F datafile=@matt1item.csv -F data_template_id=19 -F start_line=1 -F  api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_logger_data.json?
+  # curl -F datafile=@YB_Hill.csv -F data_template_id=26 https://voeis.msu.montana.edu/projects/a459c38c-f288-11df-b176-6e9ffb75bc80/apivs/upload_logger_data.json?api_key=3b62ef7eda48955abc77a7647b4874e543edd7ffc2bb672a40215c8da51f6d09
   
   # 3b62ef7eda48955abc77a7647b4874e543edd7ffc2bb672a40215c8da51f6d09
   # 
-  # curl -F datafile=@Next100-sean.csv -F data_template_id=22 -F api_key=3b62ef7eda48955abc77a7647b4874e543edd7ffc2bb672a40215c8da51f6d09 http://voeis.msu.montana.edu/projects/a459c38c-f288-11df-b176-6e9ffb75bc80/apivs/upload_logger_data.json?
+  # curl -F datafile=@Next100-sean.csv -F data_template_id=22 -F api_key=3b62ef7eda48955abc77a7647b4874e543edd7ffc2bb672a40215c8da51f6d09 https://voeis.msu.montana.edu/projects/a459c38c-f288-11df-b176-6e9ffb75bc80/apivs/upload_logger_data.json?
   # 
-  # curl -F datafile=@CR1000_BigSky_Weather_small.dat -F data_template_id=13 -F site_id=19 http://localhost:3000/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_data?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
+  # curl -F datafile=@CR1000_BigSky_Weather_small.dat -F data_template_id=13 -F site_id=19 https://localhost:3000/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/upload_data?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
   
-  # curl -F datafile=@CR1000_BigSky_Weather_small.dat -F data_template_id=1 http://voeis.msu.montana.edu/projects/a4c62666-f26b-11df-b8fe-002500d43ea0/apivs/upload_logger_data?api_key=2ac150bed4cfa21320d6f37cc6f007b807c603b6c8c33b6ba5a7db92ca821f35
+  # curl -F datafile=@CR1000_BigSky_Weather_small.dat -F data_template_id=1 https://voeis.msu.montana.edu/projects/a4c62666-f26b-11df-b8fe-002500d43ea0/apivs/upload_logger_data?api_key=2ac150bed4cfa21320d6f37cc6f007b807c603b6c8c33b6ba5a7db92ca821f35
   
   # alows user to upload csv file to be processed into data
   # this requires that a datastream has already been created
   # to parse this file.  Can return json or xml as specified
   #
-  # @example curl -F site_id=15 -F queue=true -F datafile=@CR1000_2_BigSky_NFork_smallp2.csv -F data_template_id=31 http://localhost:3000/projects/cfee5aec-c520-11e0-a45c-c82a14fffebf/apivs/upload_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
+  # @example curl -F site_id=15 -F queue=true -F datafile=@CR1000_2_BigSky_NFork_smallp2.csv -F data_template_id=31 https://localhost:3000/projects/cfee5aec-c520-11e0-a45c-c82a14fffebf/apivs/upload_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398ca55057adf
   #
   #
   # @param [File] :datafile csv file to store
@@ -240,7 +240,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # this requires that a site and a datastream has already been created
   # to parse this file.  Can return json or xml as specified
   #
-  # @example curl -F datafile=@CR1000_2_BigSky_NFork_small.dat -F data_template_id=1 -F site_id=1 http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
+  # @example curl -F datafile=@CR1000_2_BigSky_NFork_small.dat -F data_template_id=1 -F site_id=1 https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398ca5557adf
   #
   #
   # @param [File] :datafile csv file to store
@@ -267,7 +267,7 @@ class Voeis::ApivsController < Voeis::BaseController
           unless params[:data_template_id].nil?
             first_row = Array.new
             
-          debugger
+  
             @msg = "There was a problem parsing this file."
             name = Time.now.to_s + params[:datafile].original_filename 
             directory = "temp_data"
@@ -381,7 +381,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # get_job_status
   # API for getting the status of a job within a project
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_job_status.json?job_id = 1
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_job_status.json?job_id = 1
   #
   # @param [Integer] :job_id
   #
@@ -412,7 +412,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # get_project_jobs
   # API for getting the jobs within a project -either all or by job status
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_job_status.json?job_id = 1
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_job_status.json?job_id = 1
   #
   # @params[String] :job_status [queued, running, complete, failed, canceled] leaving this blank will fetch all jobs
   #
@@ -440,7 +440,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # get_project_data_summary
   # API for getting a list of the data within a Project
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_data_summary.json?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_data_summary.json?
   #
   #
   # @author Sean Cleveland
@@ -485,7 +485,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # get_project_data_templates
   # API for getting a list of the data_templates within a Project
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_data_templates.json?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_data_templates.json?
   #
   # @param [String] id the id of the site within the project
   #
@@ -506,14 +506,14 @@ class Voeis::ApivsController < Voeis::BaseController
   
   
   
-   # http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_data_stream.json?
+   # https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_data_stream.json?
    # "name=mytest&start_line=1&site_id=1&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7"
    
    
   # create_project_data_stream
   # API for creating a new data stream within a Project
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_data_stream.json?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_data_stream.json?
   #
   # @param [String] name the name of the data stream 
   # @param [Integer] start_line then line in the file the data begins on
@@ -540,14 +540,14 @@ class Voeis::ApivsController < Voeis::BaseController
   end
   
   
-  # http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_data_stream_column.json?
+  # https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_data_stream_column.json?
    # "name=mytestcol&column_number=1&type="Legacy"&unit="None"&original_var="Whatever"&variable_id=20&data_stream_id=8&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7"
   
   
   # create_project_data_stream_column
   # API for creating a new data_stream_column within a Project
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_data_stream_column.json?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_data_stream_column.json?
   #
   # @param [String] name the name of the data stream column - header name usually
   # @param [Integer] column_number the column number to parse with this data_stream_column object
@@ -590,14 +590,14 @@ class Voeis::ApivsController < Voeis::BaseController
      format_response(@data_values, format)
     end
   end
-  # http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_sensor_type.json?
+  # https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_sensor_type.json?
    # "name=mytest_sensor&min=0&max=0&differece=0&data_stream_column_id=92&variable_id=20&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7"
   
   
   # create_project_sensor_type
   # API for creating a sensor_type within a Project
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_sensor_type.json?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_sensor_type.json?
   #
   # @param [String] name the name of the data stream 
   # @param [Integer] min the minimum sensor should read if working correctly
@@ -637,13 +637,13 @@ class Voeis::ApivsController < Voeis::BaseController
   
   #************Sensor Values
   
-  # http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_sensor_value.json?
+  # https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_sensor_value.json?
    # "value=23.2&unit=Whatever&timestamp=Sat Nov 20 13:54:18 -0700 2010&published=false&sensor_type_id=61&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7"
   
   # create_project_sensor_value
   # API for creating a sensor_value within a Project
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_sensor_value.json?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_sensor_value.json?
   #
   # @param [Float] value the value of the sensor measurement
   # @param [String] unit the name of the units
@@ -684,7 +684,7 @@ class Voeis::ApivsController < Voeis::BaseController
   
   # pulls data from a within a project's site
   #
-  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -762,7 +762,7 @@ class Voeis::ApivsController < Voeis::BaseController
   
   # pulls data from a within a project's site
   #
-  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -799,7 +799,7 @@ class Voeis::ApivsController < Voeis::BaseController
   
   # pulls data from a within a project's site for samples only
   #
-  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_data_last_update.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -836,7 +836,7 @@ class Voeis::ApivsController < Voeis::BaseController
   
   # pulls data from a within a project's site
   #
-  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -902,7 +902,7 @@ class Voeis::ApivsController < Voeis::BaseController
   
   # returns the number of data record from a within a project's site for a variable for sensor values
   #
-  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_values_count_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sensor_values_count_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -944,7 +944,7 @@ class Voeis::ApivsController < Voeis::BaseController
   
   # pulls data from a within a project's site for samples only
   #
-  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=7&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_values_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=7&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -1008,7 +1008,7 @@ class Voeis::ApivsController < Voeis::BaseController
   
   # returns the number of data record from a within a project's site for a variable for sample values
   #
-  # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_values_count_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=7&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+  # @example https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_sample_values_count_by_variable.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=7&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
@@ -1049,7 +1049,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # create_project_site
   # API for creating a new site within in a project
   # 
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_site.json?name=example&code=example&latitude=45.232&longitude=-111.234&state=MT 
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_site.json?name=example&code=example&latitude=45.232&longitude=-111.234&state=MT 
   #
   # @param [String] name the name of the site
   # @param [String] code the unique code for identifying the site
@@ -1086,7 +1086,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # update_project_site
   # API for updating a site within in a project
   # 
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/update_project_site.json?id=1&name=example&code=example&latitude=45.232&longitude=-111.234&state=MT 
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/update_project_site.json?id=1&name=example&code=example&latitude=45.232&longitude=-111.234&state=MT 
   #
   # @param [Integer] id the id of the site
   # @param [String] name the name of the site - <optional>
@@ -1126,7 +1126,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # get_project_site
   # API for getting a site within a Project
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_site.json?id=1
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_site.json?id=1
   #
   # @param [String] id the id of the site within the project
   #
@@ -1147,7 +1147,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # API for getting all the sites within in a project
   #
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_sites.json?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_sites.json?
   # 
   # @author Sean Cleveland
   #
@@ -1166,7 +1166,7 @@ class Voeis::ApivsController < Voeis::BaseController
    # API for getting all the sites that are public in the VOEIS system
    #
    #
-   # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_voeis_sites.json?
+   # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_voeis_sites.json?
    # 
    # @author Sean Cleveland
    #
@@ -1182,7 +1182,7 @@ class Voeis::ApivsController < Voeis::BaseController
    
    # pulls data from a within a project's by the variable
    #
-   # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+   # @example https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
    #
    #
    # @param [Integer] :variable_id the id of the variable to pull data for
@@ -1252,14 +1252,30 @@ class Voeis::ApivsController < Voeis::BaseController
       end#end if
     end #end repo
     respond_to do |format|
-      format_response(@data_values, format)
-    end
+      format.csv do
+        data_array = @data_values[:times_series]
+        data_array << @data_values[:sample_data]
+        csv_string = CSV.generate do |csv|
+            csv << data_array.first.keys
+            data_array.each do |obj|
+                csv << obj.values
+            end
+        end
+        render :text => csv_string
+      end
+      format.json do
+         render :json => @data_values.as_json, :callback => params[:jsoncallback]
+      end
+      format.xml do
+        render :xml => @data_values.to_xml
+      end
+     end
    end 
    
    
    # pulls data from a within a project's by the variable and returns the number of records
     #
-    # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+    # @example https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
     #
     #
     # @param [Integer] :variable_id the id of the variable to pull data for
@@ -1302,7 +1318,7 @@ class Voeis::ApivsController < Voeis::BaseController
    
    # pulls data from a within a project's by site and the variable
    #
-   # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+   # @example https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_variable_data.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
    #
    #
    # @param [Integer] :site_id the id for site to pull data for
@@ -1382,13 +1398,38 @@ class Voeis::ApivsController < Voeis::BaseController
       end
     end
     respond_to do |format|
-      format_response(@data_values, format)
+      format.csv do
+        data_array = []
+        data_array = @data_values[:data_values][0]["time_series_data"]
+        unless @data_values[:data_values][0]["sample_data"].empty?
+          data_array << @data_values[:data_values][0]["sample_data"]
+        end
+        data_array.compact!
+        csv_string = CSV.generate do |csv|
+            debugger
+            unless data_array.empty?
+              csv << data_array.first.to_hash.keys
+              data_array.each do |obj|
+                  csv << obj.values
+              end
+            else
+              csv_string = "There are no data values for the given parameters."
+            end
+        end
+        render :text => csv_string
+      end
+      format.json do
+        render :json => @data_values.as_json, :callback => params[:jsoncallback]
+      end
+      format.xml do
+         render :xml => @data_values.to_xml
+      end
     end
    end
    
     # counts the data records from a within a project's by site and the variable
     #
-    # @example http://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_variable_data_count.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
+    # @example https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/get_project_site_variable_data_count.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&site_id=1&variable_id=1&start_datetime=12/1/2010 12:23&end_datetime=12/1/2010 24:00:00
     #
     #
     # @param [Integer] :site_id the id for site to pull data for
@@ -1438,7 +1479,7 @@ class Voeis::ApivsController < Voeis::BaseController
    # create_project_variable
    # API for creating a new variable within in a project
    # 
-   # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_variable.json?variable_name=example&variable_code=example&speciation=unkown&sample_medium=surface water&state=MT 
+   # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_variable.json?variable_name=example&variable_code=example&speciation=unkown&sample_medium=surface water&state=MT 
    #
    # @param [String] variable_name the name of the variable - exists in variable_names_cv
    # @param [String] variable_code the unique code for identifying this variable
@@ -1470,7 +1511,7 @@ class Voeis::ApivsController < Voeis::BaseController
    # get_project_variable
    # API for getting a variable within a Project
    #
-   # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_variable.json?id=1
+   # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_variable.json?id=1
    #
    # @param [String] id the id of the site within the project
    #
@@ -1490,7 +1531,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # API for getting all the sites within in a project
   #
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_variables.json?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_variables.json?
   # 
   # @author Sean Cleveland
   #
@@ -1509,8 +1550,8 @@ class Voeis::ApivsController < Voeis::BaseController
    # API for getting all the variables within in the VOEIS system
    #
    #
-   # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_voeis_variables.json?
-   # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_voeis_variables.xml?
+   # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_voeis_variables.json?
+   # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_voeis_variables.xml?
    # @author Sean Cleveland
    #
    # @api public
@@ -1526,7 +1567,7 @@ class Voeis::ApivsController < Voeis::BaseController
    # update_project_variable
    # API for creating a new variable within in a project
    # 
-   # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_variable.json?variable_name=example&variable_code=example&speciation=unkown&sample_medium=surface water&state=MT 
+   # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/create_project_variable.json?variable_name=example&variable_code=example&speciation=unkown&sample_medium=surface water&state=MT 
    #
    # @param [Integer] id the ID of the project variable - this is required
    # @param [String] variable_name the name of the variable - exists in variable_names_cv
@@ -1592,7 +1633,7 @@ class Voeis::ApivsController < Voeis::BaseController
    # get_project_site_variables
     # API for creating a new variable within in a project
     # 
-    # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_site_variables.json?site_ids[]=1&site_ids[]=5&site_ids[]=7
+    # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_site_variables.json?site_ids[]=1&site_ids[]=5&site_ids[]=7
     #
     # @param [Integer] site_ids the array of IDs of the project site - this is required
     #  
@@ -1614,8 +1655,8 @@ class Voeis::ApivsController < Voeis::BaseController
   # API for getting a variable within in the VOEIS system into the current project
   #
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_voeis_variables.json?
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_voeis_variables.xml?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_voeis_variables.json?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_voeis_variables.xml?
   # 
   # @param [Integer] voeis_variable_id, the id of the Voeis variable to import
   # 
@@ -1680,8 +1721,8 @@ class Voeis::ApivsController < Voeis::BaseController
   # API for getting all the samples within the current project
   #
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_samples.json?
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_samples.xml?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_samples.json?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_samples.xml?
   # @author Sean Cleveland
   #
   # @api public
@@ -1699,8 +1740,8 @@ class Voeis::ApivsController < Voeis::BaseController
   # API for getting a sample within the current project
   #
   #
-  # @example http://voeis.msu.montana.edu/projects/8524239c-e700-11df-8da7-6e9ffb75bc80/apivs/get_project_samples.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_samples.xml?
+  # @example https://voeis.msu.montana.edu/projects/8524239c-e700-11df-8da7-6e9ffb75bc80/apivs/get_project_samples.json?api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_samples.xml?
   # 
   # @param [Integer] id the id of the sample within the project
   #
@@ -1722,8 +1763,8 @@ class Voeis::ApivsController < Voeis::BaseController
   # API for creating a new sample within the current project
   #
   #
-  # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_sample.json?site_id=1&sample_type=Unknown&local_date_time=2010-11-12T12:25:31-07:00&material=insect&lab_sample_code=sampleco0004&lab_method_id=1&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_samples.xml?
+  # @example https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_sample.json?site_id=1&sample_type=Unknown&local_date_time=2010-11-12T12:25:31-07:00&material=insect&lab_sample_code=sampleco0004&lab_method_id=1&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_samples.xml?
   # 
   # @param [Integer] id the id of the sample within the project
   # @param [String] sample_type, this is what type of sample this is example "grab"
@@ -1765,8 +1806,8 @@ class Voeis::ApivsController < Voeis::BaseController
   # API for getting all the samples within the current project
   #
   #
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_samples.json?
-  # @example http://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_samples.xml?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_samples.json?
+  # @example https://voeis.msu.montana.edu/projects/e787bee8-e3ab-11df-b985-002500d43ea0/apivs/get_project_samples.xml?
   # 
   # @param [Integer] sample_id, the id of the sample to fetch measurements for
   #
@@ -1788,8 +1829,8 @@ class Voeis::ApivsController < Voeis::BaseController
   # API for creating a new sample measurement within the current project
   #
   #
-  # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_sample_measurement.json?sample_id=5&variable_id=30&value=10.23423&replicate=3&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
-  # @example curl -d "sample_id=5&variable_id=30&value=10.23423&replicate=3&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7" http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_sample_measurement.json?
+  # @example https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_sample_measurement.json?sample_id=5&variable_id=30&value=10.23423&replicate=3&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
+  # @example curl -d "sample_id=5&variable_id=30&value=10.23423&replicate=3&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7" https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/create_project_sample_measurement.json?
   # 
   # @param [Integer] sample_id the id of the sample within the project
   # @param [Integer] variable_id the id of variable to associate with this measurement
@@ -1847,7 +1888,7 @@ class Voeis::ApivsController < Voeis::BaseController
    # API for creating a new data set object
    #
    #
-   # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/get_project_data_sets&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
+   # @example https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/get_project_data_sets&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
    # 
    # @param [String] :name  -the unique name of this dataset for the project
    # @param [String] :type - specify a data set type to retreive all of. If not specifed the type will be "default"
@@ -1887,7 +1928,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # API for fetching all data sets objects from a project.  NOTE this does not return the data values for a data set
   #
   #
-  # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/get_project_data_sets&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
+  # @example https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/get_project_data_sets&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7
   # 
   # @param [String] :type specify a data set type to retreive all of. OPTIONAL
   #
@@ -1914,7 +1955,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # API for fetching all of a data sets data from a project
   #
   #
-  # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/get_project_data_set_data.json&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_set_id=1
+  # @example https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/get_project_data_set_data.json&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_set_id=1
   # 
   # @param [Integer] :data_set_id
   # @param [Boolean] :small_data if true this will return only local_date_time and the data_values. OPTIONAL
@@ -1953,7 +1994,7 @@ class Voeis::ApivsController < Voeis::BaseController
    # API for adding data values to an existing data set within a project
    #
    #
-   # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/add_data_to__project_data_set.json&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_set_id=1&data_value_ids[]=21&data_value_ids[]=13
+   # @example https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/add_data_to__project_data_set.json&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_set_id=1&data_value_ids[]=21&data_value_ids[]=13
    # 
    # @param [Integer] :data_set_id
    # @param [Array] :data_value_ids - this is an array of the data value ids to add to the data set.
@@ -1993,7 +2034,7 @@ class Voeis::ApivsController < Voeis::BaseController
     # API for removing data values from an existing data set within a project
     #
     #
-    # @example http://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/remove_data_to__project_data_set.json&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_set_id=1&data_value_ids[]=21&data_value_ids[]=13
+    # @example https://voeis.msu.montana.edu/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/apivs/remove_data_to__project_data_set.json&api_key=d7ef0f4fe901e5dfd136c23a4ddb33303da104ee1903929cf3c1d9bd271ed1a7&data_set_id=1&data_value_ids[]=21&data_value_ids[]=13
     # 
     # @param [Integer] :data_set_id
     # @param [Array] :data_value_ids - this is an array of the data value ids to remove from the data set.
@@ -2030,7 +2071,7 @@ class Voeis::ApivsController < Voeis::BaseController
     
     ###### Simulations stuff####
     # 
-    # curl -F datafile=@summaryAF.csv -F site_id=1 -F sim_col=1 http://localhost:3000/projects/168b2812-51a4-11e1-ad78-c82a14fffebf/apivs/upload_simulation.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
+    # curl -F datafile=@summaryAF.csv -F site_id=1 -F sim_col=1 https://localhost:3000/projects/168b2812-51a4-11e1-ad78-c82a14fffebf/apivs/upload_simulation.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398cae057adf
     def upload_simulation
       parent.managed_repository do
         first_row = Array.new
@@ -2113,7 +2154,7 @@ class Voeis::ApivsController < Voeis::BaseController
   private
  
      
-     #'http://glassfish.msu.montana.edu/yogo/projects/Big%20Sky.json?api_key=Red-0bl_n0qxeOIwh4WQ&sitecode=UPGL-GLTNR24--MSU_UPGL-GLTNR24_MF_ESTBSWS&sensors[]=H2OCond_Avg&sensors[]=H2OTemp_Avg&sensors[]=AirTemp_Avg&sensors[]=AirTemp_SMP&hours=48&jsoncallback=?'
+     #'https://glassfish.msu.montana.edu/yogo/projects/Big%20Sky.json?api_key=Red-0bl_n0qxeOIwh4WQ&sitecode=UPGL-GLTNR24--MSU_UPGL-GLTNR24_MF_ESTBSWS&sensors[]=H2OCond_Avg&sensors[]=H2OTemp_Avg&sensors[]=AirTemp_Avg&sensors[]=AirTemp_SMP&hours=48&jsoncallback=?'
      def get_project_data_by_site_and_sensor
       
      end
