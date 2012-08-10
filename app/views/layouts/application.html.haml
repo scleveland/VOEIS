@@ -165,9 +165,9 @@
             DataHub
           %div{:dojoType => "dijit.Menu"}
             = link_to("Home", '/', :dojoType => "yogo.ui.MenuLink")
-            = link_to("About", page_url(:about), :dojoType => "yogo.ui.MenuLink")
+            -#= link_to("About", page_url(:about), :dojoType => "yogo.ui.MenuLink")
             = link_to("Help", "http://yogo.github.com/voeis-docs/index.html",:dojoType => "yogo.ui.MenuLinkBlankTarget") 
-            = link_to("Video Tutorials", page_url(:video_tutorials), :dojoType => "yogo.ui.MenuLink")  
+            -#= link_to("Video Tutorials", page_url(:video_tutorials), :dojoType => "yogo.ui.MenuLink")  
             = link_to("Development Activity", page_url(:activity), :dojoType => "yogo.ui.MenuLink")
             = link_to("Development Roadmap", page_url(:roadmap), :dojoType => "yogo.ui.MenuLink")
             = link_to("Developers", "https://voeis.msu.montana.edu/doc/yard/_index.html", :dojoType => "yogo.ui.MenuLinkBlankTarget") 
@@ -232,6 +232,15 @@
                 
               -if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
                 - if atroot
+                  -#- if !@edit_auth.nil? && @edit_auth
+                  -#  = link_to("Edit", "javascript:", :dojoType=>"yogo.ui.MenuLink", :jsId=>"main_menu_edit", :disabled=>"true", :onclick=>"dojo.publish('voeis/project/variables');")
+                  -#  = link_to("Delete", "javascript:", :dojoType=>"yogo.ui.MenuLink", :jsId=>"main_menu_del", :onclick=>"dojo.publish('voeis/project/variables');")
+                  -#  %div{:dojoType=>"dijit.MenuSeparator"}
+                  
+                  = link_to("Refresh Tab", "javascript:", :dojoType=>"yogo.ui.MenuLink", :jsId=>"main_menu_ref", :disabled=>"true", :onclick=>"refresh_tab();")
+                  -#= link_to("History", "javascript:", :dojoType=>"yogo.ui.MenuLink", :jsId=>"main_menu_hist", :disabled=>"true", :onclick=>"dojo.publish('voeis/project/variables');")
+                  %div{:dojoType=>"dijit.MenuSeparator"}
+                  
                   -#= link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
                   = link_to("Add Site", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/site/new');")
                   = link_to("Manage Variables", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/variables');")
@@ -240,9 +249,6 @@
                   = link_to("Add Site", project_path(@project)+'?tab=newsite', :dojoType => "yogo.ui.MenuLink")
                   -#= link_to('Add Variable', project_path(@project)+'?tab=newvar', :dojoType=>"yogo.ui.MenuLink")
                 
-                = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_sample_menu")
-                = link_to("Add Field Observation Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")
-
                 - if !@cv_list.nil?
                   %div{:dojoType=>"dijit.PopupMenuItem"}
                     %span Controlled Vocabulary
@@ -301,10 +307,14 @@
                   -#= link_to("Simple QA/QC", query_project_samples_path(@project), :dojoType => "yogo.ui.MenuLink") 
                   -#= link_to("Search Data",new_project_search_path(@project), :dojoType => "yogo.ui.MenuLink") 
                   
-                  -#- if !@edit_auth.nil? && @edit_auth
-                  -#  = link_to("Data Query QA/QC", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
-                  -#- else
-                  -#  = link_to("Data Query", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
+                  = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_sample_menu")
+                  = link_to("Add Field Observation Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")
+                  
+                  - if !@edit_auth.nil? && @edit_auth
+                    = link_to("Data Query QA/QC", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
+                  - else
+                    = link_to("Data Query", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
+                  
                   = link_to("Data Search", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/search'); return false;")
                   %div{:dojoType=>"dijit.PopupMenuItem"}
                     %span Data Sets
@@ -317,7 +327,8 @@
                       - else
                         None
 
-                  = link_to("Job Queue", project_jobs_path(@project), :dojoType => "yogo.ui.MenuLink")
+                  -#= link_to("Job Queue", project_jobs_path(@project), :dojoType => "yogo.ui.MenuLink")
+                  = link_to("Job Queue", project_jobs_path(@project), :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/jobs'); return false;")
                   -if !current_user.nil?
                     -#= link_to("Search", campaigns_path, :dojoType => "yogo.ui.MenuLink")
                     %div{:dojoType=>"dijit.MenuSeparator"}

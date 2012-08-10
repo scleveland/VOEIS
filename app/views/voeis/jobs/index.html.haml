@@ -1,31 +1,34 @@
-- content_for(:javascripts) do
-  :javascript
-    dojo.require("dojox.grid.EnhancedGrid");
-    dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
-    dojo.require("dojox.grid.enhanced.plugins.Filter");
-    var jobs_json = {
-      identifier: 'id',
-      label: 'name',
-      items: #{@job_array.to_json} };
+-# content_for(:javascripts) do
 
-    var jobs = new dojo.data.ItemFileWriteStore({
-      data: jobs_json
-    });
+:javascript
+  dojo.require("dojox.grid.EnhancedGrid");
+  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+  dojo.require("dojox.grid.enhanced.plugins.Filter");
+  var proj_jobs_json = {
+    identifier: 'id',
+    label: 'name',
+    items: #{@job_array.to_json} };
 
-%h1
-  Jobs
+  var proj_jobs = new dojo.data.ItemFileWriteStore({
+    data: jobs_json
+  });
 
+%h3{:style=>"margin:0;"}
+  Project Jobs
+
+%br
 
 #job-grid{:style=>"margin:0;padding:0;"}
-  %table{:id=>'project_jobs', :dojoType=>"dojox.grid.EnhancedGrid", 
+  %table{:id=>'project_job_grid', :dojoType=>"dojox.grid.EnhancedGrid", 
     :plugins=> "{nestedSorting:false, filter:true, indirectSelection:false}",  
     :jsId=>"JobsGrid", 
-    :store=>"jobs", 
+    :store=>"proj_jobs", 
     :autoWidth=>"false",
-      :style=>"width:600px;height:500px;float:left;margin:0;padding:0;cursor:pointer;"}
+      :style=>"width:80%;min-height:200px;height:90%;float:left;margin:0;padding:0;cursor:pointer;"}
     %thead
       %tr
-        %th{:field => "id", :width => "auto"} Job ID
+        %th{:field => "id", :width => "50px"} Job ID
+        %th{:field => "name", :width => "auto"} Name
         %th{:field => "job_type", :width => "auto"} Type
         %th{:field => "submitted_at", :width => "auto"} Time Submitted
         %th{:field => "user_name", :width => "auto"} User

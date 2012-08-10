@@ -412,6 +412,17 @@
 
     function data_value_edit_setup(){};
     
+    // REFRESH TAB
+    function refresh_tab() {
+      var tabs = dijit.byId('tab_browser');
+      selected = tabs.selectedChildWidget;
+      console.log('REFRESH:',selected.id);
+      selected.refresh();
+      //if(!selected.id=='overview' && !selected.id=='SiteDisplayGrid')
+      //  refreshTab(selected.id);
+      
+    };
+    
     // OPEN CV MANAGEMENT TAB
     function cv_pop(title,title2,href,updElemID,callback) {
       var cv_url = href;
@@ -2211,7 +2222,7 @@
       var tabs = dijit.byId('tab_browser');
       var tabHref = '#{project_path(@project)}/data_sets/'+setId;
       tabHref += '#{current_user.nil? ? "" : "?api_key="+current_user.api_key}';
-      var tabId = '#{@project.id}-dataset'+setId;
+      var tabId = 'dataset'+setId;
       var tabTitle = 'Data Set: '+setName;
       var tabCallback = function() {
       };
@@ -2220,7 +2231,6 @@
     
     dojo.subscribe("voeis/project/variables", function() {
       console.log('VARIABLES');
-      var projectId = "#{@project.id}";
       var tabs = dijit.byId('tab_browser');
       var tabHref = '#{project_path(@project)}/variables';
       tabHref += '#{current_user.nil? ? "" : "?api_key="+current_user.api_key}';
@@ -2234,13 +2244,25 @@
     
     dojo.subscribe("voeis/project/samples", function(siteId) {
       console.log('SAMPLES:',arguments);
-      var projectId = "#{@project.id}";
       var tabs = dijit.byId('tab_browser');
       var tabHref = '#{project_path(@project)}/samples';
       if(siteId) tabHref += '/?site_id='+siteId;
       tabHref += '#{current_user.nil? ? "" : "&api_key="+current_user.api_key}';
       var tabId = 'site'+siteId+'_samples';
       var tabTitle = 'Site-'+siteId+': Samples';
+      var tabCallback = function() {
+        //pageInit();
+      };
+      openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
+    });
+    
+    dojo.subscribe("voeis/project/jobs", function() {
+      console.log('JOBS');
+      var tabs = dijit.byId('tab_browser');
+      var tabHref = '#{project_path(@project)}/jobs';
+      tabHref += '#{current_user.nil? ? "" : "?api_key="+current_user.api_key}';
+      var tabId = 'project_jobs';
+      var tabTitle = 'Project Jobs';
       var tabCallback = function() {
         //pageInit();
       };
@@ -2254,6 +2276,28 @@
       var loadCallback = load_callback || function() {
       };
       openProjTab(tabs, tabHref, tabId, tabTitle, loadCallback);
+    });
+    
+    dojo.subscribe("tab_browser-selectChild", function(selected){
+        // TAB-IDs
+        // overview - Project
+        // SiteDisplayGrid - Data Summary
+        // site1 --
+        // site1_var17 --
+        // site0_var0 --
+        // site1_dataquery_001
+        // project_variables
+        // site1-history -- NEED TO GET RID OF ProjectID
+        // var37-history --
+        // vertical_datum --
+        // dataset1 -- NEED TO GET RID OF ProjectID
+        var tabs = dijit.byId('tab_browser');
+        if(!selected) selected = tabs.selectedChildWidget;
+        console.log('PANE:',selected.id,selected.title);
+        if(selected.id=='overview' || selected.id=='SiteDisplayGrid')
+          main_menu_ref.set('disabled',true);
+        else main_menu_ref.set('disabled',false);
+        
     });
     
   })();
