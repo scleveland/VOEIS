@@ -42,6 +42,13 @@ class String
     # okay with "truthy" values (like 0.0), you can remove it.
     !!Float(self) rescue false
   end
+  
+  def escape_single_quotes
+    self.gsub(/[']/, '\\\\\'')
+  end
+  def escape_quotes_for_sql
+    self.gsub(/[']/, "''").gsub('"', '\"')
+  end
 end
 
 module DataMapper
@@ -50,6 +57,20 @@ module DataMapper
     sql = repository.adapter.send(:open_connection).create_command(statement).send(:escape_sql, bind_vars)
     repository.adapter.select(sql)
   end
+  
+  def self.generate_sql_select(dm_query)
+    statement, bind_vars = repository.adapter.send(:select_statement, dm_query.query)
+    sql = repository.adapter.send(:open_connection).create_command(statement).send(:escape_sql, bind_vars)
+  end
+  
+  def self.generate_sql_execute(dm_query)
+    statement, bind_vars = repository.adapter.send(:insert_statement, dm_query.query)
+    sql = repository.adapter.send(:open_connection).create_command(statement).send(:escape_sql, bind_vars)
+  end
+  def self.sanitize(value)
+   repository.adapter.send(:quote_name, value)
+  end
+  
 end
 # Initialize the rails application
 Yogo::Application.initialize!
