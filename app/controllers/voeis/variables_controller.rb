@@ -178,6 +178,7 @@ class Voeis::VariablesController < Voeis::BaseController
   
   # GET /variables/new
   def new
+    @project = parent
     @variables = Voeis::Variable.all
     @variable = Voeis::Variable.new
     @units = Voeis::Unit.all
@@ -194,8 +195,8 @@ class Voeis::VariablesController < Voeis::BaseController
     @variables.all(:order => [:variable_name.asc]).each do |var|
       @temp_array =Array[var.variable_name, var.variable_code,@units.get(var.variable_units_id).units_name, var.speciation,var.sample_medium, var.value_type, var.is_regular.to_s, var.time_support.to_s, var.time_units_id.to_s, var.data_type, var.general_category, var.detection_limit.to_s]
       @current_variables << @temp_array
-    end         
-    @project = parent
+    end
+    
     respond_to do |format|
       format.html # new.html.erb
     end
@@ -282,38 +283,94 @@ class Voeis::VariablesController < Voeis::BaseController
   
   # POST /variables
   def create
-    @variable = Voeis::Variable.new(params[:variable])
+    @project = parent
+    varparams = params[:variable]
+    varparams.each{|prop,value| 
+      v = value.strip
+      varparams[prop] = nil if v=='NaN' || v=='null' }
+    [:variable_units_id,:time_units_id,:quality_control].each{|prop| 
+      varparams[prop] = varparams[prop].to_i}
+    [:lab_id,:lab_method_id,:field_method_id,:spatial_units_id].each{|prop| 
+      if varparams[prop]=='0' || varparams[prop]==nil
+        varparams[prop] = nil
+      else
+        varparams[prop] = varparams[prop].to_i
+      end }
+    [:time_support,:detection_limit,:spatial_offset_value].each{|prop| 
+      varparams[prop] = varparams[prop]=='' ? nil : varparams[prop].to_f }
+    #varparams[:hid_id] = varparams[:his_id]=='' ? nil : varparams[:hid_id].to_i
+    varparams[:is_regular] = varparams[:is_regular]=~(/(true|t|yes|y|1)$/i) ? true : false
+    
+    varparams.each do |key, value|
+      varparams[key] = value.blank? ? nil : value
+    end
+
+    @variable = Voeis::Variable.new(varparams)
     if @variable.variable_code.nil? || @variable_code =="undefined"
       @variable.variable_code = @variable.id.to_s+@variable.variable_name+@variable.speciation+Voeis::Unit.get(@variable.variable_units_id).units_name
     end
-    @variable.detection_limit = nil if params[:variable][:detection_limit].empty?
-    @variable.field_method_id = nil if params[:variable][:field_method_id].empty?
-    @variable.lab_id = nil if params[:variable][:lab_id].empty?
-    @variable.lab_method_id = nil if params[:variable][:lab_method_id].empty?
-    @variable.spatial_offset_type = nil if params[:variable][:spatial_offset_type].empty?
-    @variable.valid?
+    #@variable.detection_limit = nil if params[:variable][:detection_limit].empty?
+    #@variable.field_method_id = nil if params[:variable][:field_method_id].empty?
+    #@variable.lab_id = nil if params[:variable][:lab_id].empty?
+    #@variable.lab_method_id = nil if params[:variable][:lab_method_id].empty?
+    #@variable.spatial_offset_type = nil if params[:variable][:spatial_offset_type].empty?
+    #@variable.valid?
+    puts '### VARIABLE ERRORS ###'
     puts @variable.errors.inspect()
+    
+    err_mess = 'VARIABLE SAVE ERROR: '
     if @variable.save  
-      respond_to do |format|
-        flash[:notice] = 'Variable was successfully created.'
-        redirect_to(new_project_variable_path(parent))
-        format.json do
-           render :json => @variable.as_json, :callback => params[:jsoncallback]
+      if @project.managed_repository{ @variable.save  }
+        respond_to do |format|
+          format.html do
+            flash[:notice] = 'Variable was successfully created.'
+            redirect_to(new_project_variable_path(parent))
+          end
+          format.json do
+             render :json => @variable.as_json, :callback => params[:jsoncallback]
+          end
+          return
         end
-        return
+      else
+        err_mess += 'local SAVE failed.'
       end
     else
-      respond_to do |format|
-        flash[:warning] = 'There was a problem saving the Variable.'
-        format.html { render :action => "new" }
-        format.json do
-           render :json => @variable.as_json, :callback => params[:jsoncallback]
-        end
-        return
+      err_mess += 'global SAVE failed.'
+    end
+    respond_to do |format|
+      format.html do
+        flash[:warning] = err_mess
+        redirect_to(new_project_variable_path(parent))
       end
+      format.json do
+        render :json => @variable.to_hash.merge!({:error=>err_mess}).to_json, :callback => params[:jsoncallback]
+      end
+      return
     end
   end
   
+  # DELETE /variables/$ID$
+  def destroy
+    @project = parent
+    @project.managed_repository{
+      variable = Voeis::Variable.get(params[:id].to_i)
+      variable.destroy
+      
+      respond_to do |format|
+        if variable.destroy
+          format.html{
+            flash[:notice] = "Variable was successfully Deleted."
+            redirect_to project_url(@project)
+          }
+          format.json{
+            render :json => {}.as_json, :callback => params[:jsoncallback]
+          }
+        end
+      end
+    }
+  end
+  
+  # GET /variables/versions
   def versions
     @project = parent
     @variable = @project.managed_repository{ Voeis::Variable.get(params[:id].to_i) }
