@@ -12,9 +12,21 @@
   var proj_jobs = new dojo.data.ItemFileWriteStore({
     data: jobs_json
   });
+  
+  var get_filename = function(job_parameters) {
+    return JSON.parse(job_parameters).original_filename;
+  };
 
-%h3{:style=>"margin:0;"}
-  Project Jobs
+%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+  %strong PROJECT JOBS (#{@job_array.count})
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+  %span(data-dojo-type="dijit.form.Button")
+    = link_to('Refresh', 'javascript:', :onclick=>"refreshTab('project_jobs');") 
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+
+-#%h3{:style=>"margin:0;"}
+-#  Project Jobs
 
 %br
 
@@ -24,11 +36,11 @@
     :jsId=>"JobsGrid", 
     :store=>"proj_jobs", 
     :autoWidth=>"false",
-      :style=>"width:80%;min-height:200px;height:90%;float:left;margin:0;padding:0;cursor:pointer;"}
+    :style=>"width:80%;min-height:200px;height:90%;float:left;margin:0;padding:0;cursor:pointer;"}
     %thead
       %tr
         %th{:field => "id", :width => "50px"} Job ID
-        %th{:field => "name", :width => "auto"} Name
+        %th{:field => "job_parameters", :width => "auto", :formatter=>"get_filename"} File Name
         %th{:field => "job_type", :width => "auto"} Type
         %th{:field => "submitted_at", :width => "auto"} Time Submitted
         %th{:field => "user_name", :width => "auto"} User
