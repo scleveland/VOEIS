@@ -122,29 +122,39 @@
 -#                      }.join(",\n")}
 
 
--#%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;", :class=>"icon icon-#{@global ? 'voeis' : 'project'}"}
-%h3{:style=>"margin:0;"}
-  Manage Project Variables
-  -#%span.small{:style=>"font-size:14px;"}
-  -#  EXISTING SAMPLES
-      
-%br
+%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+  %strong MANAGE PROJECT VARIABLES (#{@variables.count})
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+  %span(data-dojo-type="dijit.form.Button")
+    = link_to('New Variable', 'javascript:', :onclick=>"dojo.publish('voeis/project/variable', [0,'',0]);")
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+  %span(data-dojo-type="dijit.form.Button")
+    = link_to('Refresh', 'javascript:', :onclick=>"refreshTab('#{tabId}');") 
+  %span(data-dojo-type="dijit.ToolbarSeparator")
 
-%strong
-  VARIABLES (#{@variables.count})
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;", :class=>"icon icon-#{@global ? 'voeis' : 'project'}"}
+-#%h3{:style=>"margin:0;"}
+-#  Manage Project Variables
+      
+-#%br
+
+-#%strong
+-#  VARIABLES (#{@variables.count})
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 -#= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/cv_datum/new');")
 -#= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"cv_datum_new();")
 -# if !@copy_data.nil?
 -#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 -#  = link_to('COPY GLOBAL', 'javascript:', :class=>'icon icon-copy', :onclick=>"copy_dialog_box.show();")
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('NEW VARIABLE', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/project/variable', [0,'',0]);")
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-copy', :onclick=>"refreshTab('#{tabId}');") 
+
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#= link_to('NEW VARIABLE', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/project/variable', [0,'',0]);")
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#= link_to('REFRESH', 'javascript:', :class=>'icon icon-copy', :onclick=>"refreshTab('#{tabId}');") 
   
-%br
+-#%br
 %br
 
 %table{:dojoType=>"dojox.grid.EnhancedGrid", 

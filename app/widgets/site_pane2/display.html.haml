@@ -82,7 +82,36 @@
 -#= render(:partial => "../views/voeis/sites/new_local_projection")
 
 
-%h3{:id=>"site00-name-head", :style=>"margin:0 0 16px 0;padding:0;"}
+%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+  %strong SITE DETAILS
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+  %span(data-dojo-type="dijit.form.ToggleButton" jsId="site00_querybutton")
+    -if @edit_auth
+      -#= link_to('DATA QUERY QA/QC', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
+      = link_to('Data Query QA/QC', 'javascript:', :onclick=>"site00_editbutton.set('checked',false);$('.site00-divs').hide();if(site00_querybutton.checked) $('#show-site00').show(); else $('#query-site00').show();return false;")
+    -else
+      -#= link_to('DATA QUERY', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
+      = link_to('Data Query', 'javascript:', :onclick=>"site00_editbutton.set('checked',false);$('.site00-divs').hide();if(site00_querybutton.checked) $('#show-site00').show(); else $('#query-site00').show();return false;")
+  -if @auth
+    %span(data-dojo-type="dijit.ToolbarSeparator")
+    %span(data-dojo-type="dijit.form.ToggleButton" jsId="site00_editbutton")
+      = link_to('Edit', 'javascript:', :onclick=>"site00_querybutton.set('checked',false);$('.site00-divs').hide();if(site00_editbutton.checked) $('#show-site00').show(); else $('#edit-site00').show();return false;")
+    %span(data-dojo-type="dijit.ToolbarSeparator")
+    %span(data-dojo-type="dijit.form.Button")
+      = link_to('Delete', 'javascript:', :onclick=>"delete_site($$$id$$$);")
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+  %span(data-dojo-type="dijit.form.Button")
+    = link_to('History', 'javascript:', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+  %span(data-dojo-type="dijit.form.Button")
+    = link_to('Sample Data Details', 'javascript:', :onclick=>"dojo.publish('voeis/project/samples', [$$$id$$$]);")
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+  %span(data-dojo-type="dijit.form.Button")
+    = link_to('Manage Variables', 'javascript:', :onclick=>"dojo.publish('voeis/project/variables');")
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+
+%h3{:id=>"site00-name-head", :style=>"margin:10px 0 16px 0;padding:0;"}
   $$$site-name$$$
 
 -#-if !current_user.nil? && current_user.projects.include?(@project)
@@ -91,27 +120,27 @@
 -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
 -#%br
 
-#show-site00{:style=>"margin-top:0;padding-top:0;"}
-  %strong SITE DETAILS
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  -if @edit_auth
-    -#= link_to('DATA QUERY QA/QC', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
-    = link_to('DATA QUERY QA/QC', 'javascript:', :class=>'icon icon-proj', :onclick=>"$('#show-site00').hide();$('#query-site00').show();return false;")
-  -else
-    -#= link_to('DATA QUERY', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
-    = link_to('DATA QUERY', 'javascript:', :class=>'icon icon-proj', :onclick=>"$('#show-site00').hide();$('#query-site00').show();return false;")
-  -if @auth
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show-site00').hide();$('#edit-site00').show();")
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('DELETE', 'javascript:', :class=>'icon icon-delete', :onclick=>"delete_site($$$id$$$);")
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+#show-site00{:class=>"site00-divs", :style=>"margin-top:0;padding-top:0;"}
+  -#%strong SITE DETAILS
+  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#-if @edit_auth
+  -#  -#= link_to('DATA QUERY QA/QC', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
+  -#  = link_to('DATA QUERY QA/QC', 'javascript:', :class=>'icon icon-proj', :onclick=>"$('#show-site00').hide();$('#query-site00').show();return false;")
+  -#-else
+  -#  -#= link_to('DATA QUERY', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/dataquery', [$$$id$$$]);")
+  -#  = link_to('DATA QUERY', 'javascript:', :class=>'icon icon-proj', :onclick=>"$('#show-site00').hide();$('#query-site00').show();return false;")
+  -#-if @auth
+  -#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#  = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('#show-site00').hide();$('#edit-site00').show();")
+  -#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#  = link_to('DELETE', 'javascript:', :class=>'icon icon-delete', :onclick=>"delete_site($$$id$$$);")
+  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#= link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
 
   -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   -#= link_to('SAMPLES', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
-  %br
+  -#%br
   
   -#%table{:style=>"width:90%;"}
   -#  %tr
@@ -147,7 +176,7 @@
   -#%br
 
   %h4{:style=>"margin-top:0;"}
-    Sample Data
+    Sample Data Summary
   
   %table{:id=>"site00-sample-table", :style=>"width:48%;"} 
     %tr{:class=>"row-gr"}
@@ -157,8 +186,9 @@
       %th{:width=>"14%"} Stop
     %tr
       %td{:style=>"width:34%;align:left;", :align=>"left"}
-        %strong
-          = link_to('Sample Details', 'javascript:', :onclick=>"dojo.publish('voeis/project/samples', [$$$id$$$]);")
+        &nbsp;
+        -#%strong
+        -#  = link_to('Sample Details', 'javascript:', :onclick=>"dojo.publish('voeis/project/samples', [$$$id$$$]);")
       %td{:style=>"width:14%;align:left;"}
         $$$site-sample-count$$$
       %td{:style=>"width:14%;align:center;"}
@@ -169,7 +199,7 @@
 
   %h4{:style=>"margin-top:0;"}
     Variable Data
-    -if @auth
+    -if @auth && false
       %span{:style=>"font-size:11px;"}
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         -#= link_to('NEW VARIABLE', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/project/variable', [0,'',$$$id$$$]);")
@@ -211,7 +241,7 @@
   -#      $$$site-sample-data$$$
     
 
-#query-site00{:style=>"margin-top:0;padding-top:0;display:none;"}
+#query-site00{:class=>"site00-divs", :style=>"margin-top:0;padding-top:0;display:none;"}
 
   %strong QUERY SITE
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -219,7 +249,7 @@
   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   - tabId = 'site00_data'
   -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
-  = link_to('CANCEL QUERY', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#query-site00').hide();$('#show-site00').show();return false;") 
+  = link_to('CANCEL QUERY', 'javascript:', :class=>'icon icon-cancel', :onclick=>"site00_querybutton.set('checked',false);$('#query-site00').hide();$('#show-site00').show();return false;") 
   %br
   %br
   %br
@@ -310,299 +340,7 @@
 
 -if @auth
   -##edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>'EDIT', :style=>"margin-top:0;padding-top:0;display:none;"}
-  #edit-site00{:style=>"margin-top:0;padding-top:0;display:none;"}
-
-    #site00_lat_long_picker{:dojoType=>"dijit.Dialog", :jsId=>"site00_lat_long_picker", :title=>"Select location for Latitude/Longitude v0 (click/shift-click to zoom in/out)", 
-      :style=>"padding:0;"}
-      %script{:type=>"dojo/method", :event=>"onShow"}
-        :plain
-          //var form = dijit.byId("site00_vertical_datum_form");
-          var form = site00_edit_form;
-          site00_lat_long = {};
-          //var mapdiv = dojo.byId("site00_loat_long_mapdiv");
-          var mapdiv = document.getElementById('site00_lat_long_mapdiv');
-          var innerdiv = document.getElementById('site00_lat_long_innerdiv');
-          var button = document.getElementById('site00_lat_long_map_control')
-          var mapclick = false;
-          var crosshairShape = {coords:[0,0,0,0],type:'rect'};
-          var crosshairImg = '/images/cross-hairs.gif';
-          var map_center = new google.maps.LatLng(39.707187,-96.152344);
-          var map_zoom = 3;
-          if(!site00ref.newSite) {
-            map_center = new google.maps.LatLng(parseFloat(site00ref.site.latitude),parseFloat(site00ref.site.longitude));
-            map_zoom = 15;
-            console.log('EDIT SITE MAP:',map_center);
-          };
-          site00_lat_long.map_opts = {
-            //center: new google.maps.LatLng(46.739861,-110.786133), 
-            center: map_center,
-            zoom: map_zoom,
-            mapTypeId: google.maps.MapTypeId.HYBRID,
-            //mapTypeId: google.maps.MapTypeId.SATELLITE,
-            //mapTypeId: google.maps.MapTypeId.TERRAIN,
-            draggableCursor: 'crosshair',
-            scaleControl: true, 
-            zoomControl: true, 
-            mapTypeControl: true,
-            scrollwheel: true
-          };
-          var myOptions = {
-            zoom:12,
-            center:new google.maps.LatLng(39.707187,-96.152344),
-            mapTypeId:google.maps.MapTypeId.SATELLITE,
-            draggableCursor:'crosshair',
-            mapTypeControlOptions:{style:google.maps.MapTypeControlStyle.DROPDOWN_MENU}
-          };
-        
-          site00_lat_long.map = new google.maps.Map(mapdiv, site00_lat_long.map_opts);
-          site00_lat_long.crosshair = new google.maps.Marker({
-            map: site00_lat_long.map,
-            icon: crosshairImg,
-            shape: crosshairShape
-          });
-          site00_lat_long.crosshair.bindTo('position',site00_lat_long.map,'center');
-          site00_lat_long.map.controls[google.maps.ControlPosition.RIGHT_TOP].push(button);
-          //###CLICK-MAP
-          $('body').click( function(e){
-            console.log('DOMCLICK:',e);
-            if(!mapclick) return;
-            var clickat = mapclick.latLng;
-            var mapzoom = site00_lat_long.map.getZoom();
-            if(e.shiftKey) mapzoom -= 1;
-            else mapzoom += 1;
-            site00_lat_long.map.setCenter(clickat);
-            site00_lat_long.map.setZoom(mapzoom);
-            mapclick = false;
-          });
-          //google.maps.event.addDomListener(mapdiv, 'click', function(ev){ domclick = ev; });
-          google.maps.event.addListener(site00_lat_long.map, 'click', function(mapev){ 
-            mapclick = mapev;
-            //mapclick['mapCenter'] = site00_lat_long.map.getCenter();
-            var clickat = mapev.latLng;
-            console.log('CLICKAT:',clickat.toString());
-          });
-          //###SELECT FUNCTION
-          site00_lat_long.map_select = function(){
-            var form = site00_edit_form.domNode;
-            var formlat = dijit.byId('site00_latitude');
-            var formlong = dijit.byId('site00_longitude');
-            var mapCenter = site00_lat_long.map.getCenter();
-            formlat.set('value',mapCenter.lat());
-            formlong.set('value',mapCenter.lng());
-            site00_lat_long_picker.hide();
-          };
-          //###ON-HIDE
-          this.connect(this, "onHide", function(){
-            //var form = site00_edit_form.domNode;
-            //form.elements['site_lat_long_datum'].focus();
-            var formlat = dijit.byId('site00_latitude');
-            formlat.focus();
-          });
-      #site00_lat_long_mapdiv{:style=>"margin:0!important;"}
-        #site00_lat_long_map_control{:onclick=>"site00_lat_long.map_select();"}
-          %a{:href=>"javascript:", :onclick=>"alert('TESTING!!!');this.hide();return false;"}
-    
-    -#site00_xnew_local_projection{:dojoType=>"dijit.Dialog", :title=>"NEW Local Projection"}
-    -##site00_new_local_projection{:dojoType=>"dijit.Dialog", :jsId=>"site00_new_local_projection", :title=>"NEW Local Projection"}
-    -#  TESTING Local Projection
-    -##site00_new_vertical_datum{:dojoType=>"dijit.Dialog", :jsId=>"site00_new_local_projection", :title=>"NEW Local Projection"}
-    -#  TESTING Vertical Datum
-
-    #site00_new_vertical_datum{:dojoType=>"dijit.Dialog", :jsId=>"site00_new_vertical_datum", :title=>"NEW Vertical Datum", :style=>"width:400px;"}
-      %form(id="site00_vertical_datum_form" jsId="site00_vertical_datum_form" dojoType="dijit.form.Form" method="post")
-        %label Term
-        %br
-        %input(name="vertical_datum_term" dojoType="dijit.form.ValidationTextBox" id="site00_vertical_datum_term" size="30" required="true")
-        %br{:style=>'float:none; clear:both;'}
-        %br
-        %label Definition
-        %br
-        %textarea{:type=>"text", :name=>"vertical_datum_definition", :id=>"site00_vertical_datum_definition", :style=>"width:95%;", :rows=>"4"}
-        %br{:style=>'float:none; clear:both;'}
-        %br
-        %button{:id=>"site00_vertical_datum_submit_button",:dojoType=>"dijit.form.Button", :title=>'Create'}
-          Create Vertical Datum
-          %script{:type=>"dojo/method", :event=>"startup"}
-            :plain
-              var form = dijit.byId("site00_vertical_datum_form");
-              //var form = dijit.byId("site00_vertical_datum_form");
-              // set initial state
-              this.attr("disabled", !form.isValid());
-              this.connect(form, "onValidStateChange", function(state){
-                this.attr("disabled", !state);
-              });
-              this.connect(this, "onClick", function(){
-                var data = {vertical_datum_c_v: {
-                  term: $("#site00_vertical_datum_term").val(),
-                  definition: $("#site00_vertical_datum_definition").val()}};
-                console.log('POST:',data);
-                $.post("/vertical_datum_c_vs.json", data, function(dat) {
-                  $('#site00_vertical_datum').append($("<option></option>").attr("value",dat['id']).text($('#site00_vertical_datum_term').val()));
-                  $('#site00_vertical_datum').val(dat['id']);
-                  site00_new_vertical_datum.hide();
-                });
-              });
-        &nbsp;&nbsp;
-        %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"site00_new_vertical_datum.hide();return false;"} Cancel
-    
-    -#site00_xnew_local_projection{:title=>"NEW Local Projection", :style=>"display:none;"}
-    #site00_new_spatial_reference{:dojoType=>"dijit.Dialog", :jsId=>"site00_new_spatial_reference", :title=>"NEW Spatial Reference", :style=>"width:400px;"}
-      %form(id="site00_spatial_reference_form" jsId="site00_spatial_reference_form" dojoType="dijit.form.Form" method="post")
-        %label Source ID
-        %br
-        -#=f.text_field :quality_control_level_code, :size => 30
-        -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
-        -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :style=>"width:95%;"}
-        %input(name="source_id" dojoType="dijit.form.NumberTextBox" id="site00_source_id" size="30" required="true")
-        %br{:style=>'float:none; clear:both;'}
-        %br
-        %label Source Name
-        %br
-        -#=f.text_field :quality_control_level_code, :size => 30
-        -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
-        -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :style=>"width:95%;"}
-        %input(name="source_name" dojoType="dijit.form.ValidationTextBox" id="site00_source_name" size="50" required="true")
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        %input(name="source_geographic" dojoType="dijit.form.CheckBox" id="site00_source_geographic")
-        Geographic
-        
-        %br{:style=>'float:none; clear:both;'}
-        %br
-        %label Notes
-        %br
-        -#=f.text_area :definition, :cols=>50, :rows=>3
-        -#%input{:type=>"text", :name=>"local_projection_definition", :id=>"site00_local_projection_definition", :dojoType=>"dijit.form.ValidationTextBox", :style=>"width:50em", :size=>50, :rows=>"3"}
-        %textarea{:type=>"text", :name=>"source_notes", :id=>"site00_source_notes", :style=>"width:95%;", :rows=>"4"}
-        %br{:style=>'float:none; clear:both;'}
-        %br
-        -#%button{:id=> 'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"site00_createLocalProjection();"}
-        -#%button{:id=>'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create'}
-        -#%button{:id=>'site00_new_local_projection_button', :value=>"Create Local Projection", :onclick=>"submit_site_dialog($$$id$$$,'local_projection');site00ref.dialog.hide();return false;"}
-        %button{:id=>"site00_source_submit_button",:dojoType=>"dijit.form.Button", :title=>'Create'}
-          Create Spatial Reference
-          %script{:type=>"dojo/method", :event=>"startup"}
-            :plain
-              var form = dijit.byId("site00_spatial_reference_form");
-              // set initial state
-              this.attr("disabled", !form.isValid());
-              this.connect(form, "onValidStateChange", function(state){
-                this.attr("disabled", !state);
-              });
-              this.connect(this, "onClick", function(){
-                var is_geo = (dojo.byId("site00_source_geographic").checked) ? true : false;
-                var data = {spatial_reference: {
-                  srs_id: parseInt($("#site00_source_id").val()),
-                  srs_name: $("#site00_source_name").val(),
-                  is_geographic: is_geo,
-                  notes: $("#site00_source_notes").val()}};
-                console.log('POST:',data);
-                $.post("/spatial_references.json", data, function(dat) {
-                  $('#site00_lat_long_datum').append($("<option></option>").attr("value",dat['id']).text($('#site00_source_name').val()));
-                  if(SRfrom=='LLD') $('#site00_lat_long_datum').val(dat['id']);
-                  $('#site00_local_projection').append($("<option></option>").attr("value",dat['id']).text($('#site00_source_name').val()));
-                  if(SRfrom='LP') $('#site00_local_projection').val(dat['id']);
-                  site00_new_spatial_reference.hide();
-                });
-              });
-        &nbsp;&nbsp;
-        -#%button{:onclick=>"site00ref.dialog.hide();return false;", :value=>"Cancel"} Cancel
-        %button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"site00_new_spatial_reference.hide();return false;"} Cancel
-    
-    
-    -##site00_xnew_local_projection{:title=>"NEW Local Projection", :style=>"display:none;"}
-    -#  -#= form_for :local_projection, :url=>"", :html=>{:dojoType=>"dijit.form.Form", :id=>"site00_local_projection_form"} do |f|
-    -#  -#%form(id="site00_local_projection_form" jsId="site00_local_projection_form" dojoType="dijit.form.Form" method="post")
-    -#  %form(id="site00_local_projection_form" method="post")
-    -#    %label Term
-    -#    %br
-    -#    -#=f.text_field :quality_control_level_code, :size => 30
-    -#    -#%input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
-    -#    %input{:type=>"text", :name=>"local_projection_term", :id=>"site00_local_projection_term", :style=>"width:95%;"}
-    -#    %br{:style=>'float:none; clear:both;'}
-    -#    %br
-    -#    %label Definition
-    -#    %br
-    -#    -#=f.text_area :definition, :cols=>50, :rows=>3
-    -#    -#%input{:type=>"text", :name=>"local_projection_definition", :id=>"site00_local_projection_definition", :dojoType=>"dijit.form.ValidationTextBox", :style=>"width:50em", :size=>50, :rows=>"3"}
-    -#    %textarea{:type=>"text", :name=>"local_projection_definition", :id=>"site00_local_projection_definition", :style=>"width:95%;", :rows=>"4"}
-    -#    %br{:style=>'float:none; clear:both;'}
-    -#    %br
-    -#    -#%button{:id=> 'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"site00_createLocalProjection();"}
-    -#    -#%button{:id=>'site00_new_local_projection_buttonx',:dojoType=>"dijit.form.Button", :title=>'Create'}
-    -#    %button{:id=>'site00_new_local_projection_button', :value=>"Create Local Projection", :onclick=>"submit_site_dialog($$$id$$$,'local_projection');site00ref.dialog.hide();return false;"}
-    -#      Create Local Projection
-    -#      -#%script{:type=>"dojo/method", :event=>"startup"}
-    -#      -#  var form = dijit.byId("site00_local_projection_form");
-    -#      -#  // set initial state
-    -#      -#  //this.attr("disabled", !form.isValid());
-    -#      -#  //this.connect(form, "onValidStateChange", function(state){
-    -#      -#  //this.attr("disabled", !state);
-    -#      -#  //});
-    -#      -#  this.connect(form, "onClick", function(){
-    -#      -#  //$.post("#{root_url}/local_projection_cvs.json?local_projection_c_vs[term]="+$("#site00_local_projection_term").val()+"&local_projection_c_vs[definition]="+$("#site00_local_projection_definition").val(),
-    -#      -#  $.post("#{@root_url}/local_projection_c_vs.json", {local_projection_c_v: {term: $("#site00_local_projection_term").val(), definition: $("#site00_local_projection_definition").val()}},
-    -#      -#  function(data) {
-    -#      -#  //$('#site00_local_projection').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val() + ':' + $("#site00_vertical_datum_definition").val())); 
-    -#      -#  $('#site00_local_projection').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val()));
-    -#      -#  $('#site00_local_projection').val(data['id']);
-    -#      -#  dijit.byId("site00_xnew_local_projection").hide();
-    -#      -#  });
-    -#      -#  };
-    -#    &nbsp;&nbsp;
-    -#    -#%button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"dijit.byNode(dojo.byId('site00')).dialog.hide();"} Cancel
-    -#    %button{:onclick=>"site00ref.dialog.hide();return false;", :value=>"Cancel"} Cancel
-    -#
-    -##site00_xnew_vertical_datum{:title=>"NEW Vertical Datum", :style=>"display:none;"}
-    -#  -#= form_for :vertical_datum_c_vs, :url=>"", :html=>{:dojoType=>"dijit.form.Form", :id=>"site00_vertical_datum_form"} do |f|
-    -#  -#%form(id="site00_vertical_datum_form" jsId="site00_vertical_datum_form" dojoType="dijit.form.Form" method="post")
-    -#  %form(id="site00_vertical_datum_formXX" method="post")
-    -#    %label Term
-    -#    %br
-    -#    -#=f.text_field :quality_control_level_code, :size => 30
-    -#    -#%input{:type=>"text", :name=>"vertical_datum_term", :id=>"site00_vertical_datum_term", :dojoType=>"dijit.form.ValidationTextBox", :size=>40,  :style=>"width:30em", :required=>"true"}
-    -#    %input{:type=>"text", :name=>"vertical_datum_term", :id=>"site00_vertical_datum_termXX", :style=>"width:95%;"}
-    -#    %br{:style=>'float:none; clear:both;'}
-    -#    %br
-    -#    %label Definition
-    -#    %br
-    -#    -#=f.text_area :definition, :cols=>50, :rows=>3
-    -#    -#%input{:type=>"text", :name=>"vertical_datum_definition", :id=>"site00_vertical_datum_definition", :dojoType=>"dijit.form.ValidationTextBox", :style=>"width:50em", :size=>50, :rows=>"3", :required=>"true"}
-    -#    %textarea{:type=>"text", :name=>"vertical_datum_definition", :id=>"site00_vertical_datum_definitionXX", :style=>"width:95%;", :rows=>"4"}
-    -#    %br{:style=>'float:none; clear:both;'}
-    -#    %br
-    -#    -#%button{:id=> 'site00_new_vertical_datum_button',:dojoType=>"dijit.form.Button", :title=>'Create', :onClick=>"site00_createVerticalDatum();return false;"}
-    -#    -#%button{:id=> 'site00_new_vertical_datum_button',:dojoType=>"dijit.form.Button", :title=>'Create'}
-    -#    %button{:id=> 'site00_new_vertical_datum_buttonXX', :value=>"Create Vertical Datum", :onClick=>"submit_site_dialog($$$id$$$,'vertical_datum');site00ref.dialog.hide();return false;"}
-    -#      Create Vertical Datum
-    -#      -#%script{:type=>"dojo/method", :event=>"startup"}
-    -#      -#  var form = dijit.byNode(dojo.byId("site00_vertical_datum_form"));
-    -#      -#  // set initial state
-    -#      -#  this.attr("disabled", !form.isValid());
-    -#      -#  this.connect(form, "onValidStateChange", function(state){
-    -#      -#  this.attr("disabled", !state);
-    -#      -#  });
-    -#      -#  this.connect(form, "onClick", function(){
-    -#      -#  console.log('create Vert Datum CV');
-    -#      -#  $.post("#{@root_url}/vertical_datum_c_vs.json", {vertical_datum_c_v: {term: $("#site00_vertical_datum_term").val(), definition: $("#site00_vertical_datum_definition").val()}},
-    -#      -#  function(data) {
-    -#      -#  //$('#site00_vertical_datum').append($("<option></option>").attr("value",data['id']).text($("#site00_vertical_datum_term").val() + ':' + $("#site00_vertical_datum_definition").val()));
-    -#      -#  $('#site00_vertical_datum').append($("<option></option>").attr("value",data['id']).text($("#vertical_datum_term").val()));
-    -#      -#  $('#site00_vertical_datum').val(data['id']);
-    -#      -#  dijit.byId("site00_xnew_vertical_datum").hide();
-    -#      -#  });
-    -#      -#  };
-    -#    &nbsp;&nbsp;
-    -#    -#%button{:dojoType=>"dijit.form.Button", :title=>'Cancel', :onClick=>"dijit.byNode(dojo.byId('site00')).dialog.hide();"} Cancel
-    -#    %button{:onClick=>"site00ref.dialog.hide();return false;", :value=>"Cancel"} Cancel
-
-    -#%table{:id=>"site00-edit-control"}
-    -#  %tr
-    -#    %td{:style=>"width:200px;"}
-    -#      %strong EDIT SITE
-    -#    %td
-    -#      = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"$('#edit-site00').hide();$('#show-site00').show();") 
-    -#%br
+  #edit-site00{:class=>"site00-divs", :style=>"margin-top:0;padding-top:0;display:none;"}
 
     %strong EDIT SITE
     &nbsp;&nbsp;&nbsp; (* Required)
@@ -612,7 +350,6 @@
     -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
     = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"cancel_site_form($$$id$$$);") 
     %br
-
 
     -#%script{:type=>"dojo/method"}
     %script{:type=>"text/javascript"}
@@ -665,6 +402,7 @@
           if(parseInt(siteId)) {
             //EXISTING SITE
             var sitePane = window['site'+siteId+'ref'];
+            window['site'+siteId+'_editbutton'].set('checked',false);
             sitePane.siteUpdate(sitePane.getSite());
             $('#edit-site'+siteId).hide();
             $('#show-site'+siteId).show();

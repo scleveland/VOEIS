@@ -51,25 +51,26 @@
 %h3{:style=>"margin:0;"}
   - if !@project.nil?
     %span.small{:style=>"font-size:14px;"}
-      EXISTING SAMPLES
+      EXISTING SAMPLES (#{@samples.count})
     - if !@site.nil?
       = ': %s [Id:%s]'%[@site.name,@site.id]
       
-%br
+-#%br
 
-%strong
-  LIST SAMPLES (#{@samples.count})
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#%strong
+-#  LIST SAMPLES (#{@samples.count})
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
 -#= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/cv_datum/new');")
 -#= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"cv_datum_new();")
 -# if !@copy_data.nil?
 -#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 -#  = link_to('COPY GLOBAL', 'javascript:', :class=>'icon icon-copy', :onclick=>"copy_dialog_box.show();")
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-copy', :onclick=>"refreshTab('#{tabId}');") 
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#= link_to('REFRESH', 'javascript:', :class=>'icon icon-copy', :onclick=>"refreshTab('#{tabId}');") 
   
-%br
+-#%br
 %br
 
 %table{:dojoType=>"dojox.grid.EnhancedGrid", 

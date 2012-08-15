@@ -60,7 +60,25 @@
 - siteId = @site.nil? ? "site0" : "site"+@site.id.to_s
 - varId = siteId+'_var'+@variable[:id].to_s
 
-%h3{:style=>"margin-top:0;"}
+-#%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+-#%span(data-dojo-type="dijit.ToolbarSeparator")
+-#%span(data-dojo-type="dijit.form.Button")
+-#%span(data-dojo-type="dijit.MenuSeparator")
+-#%span(data-dojo-type="dijit.MenuBarItem")
+-#%div(data-dojo-type="dijit.MenuBar" style="height:25px!important;margin: 0 0 15px 0;")
+%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+  %strong VARIABLE DETAILS
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+  %span(data-dojo-type="dijit.form.ToggleButton" jsId="#{varId}_editbutton")
+    = link_to('Edit', 'javascript:', :onclick=>"if(#{varId}_editbutton.checked){dijit.byId('#{varId}').cancel_edit('#{varId}');}else{$('##{varId}_show').hide();$('##{varId}_edit').show();}")
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+  %span(data-dojo-type="dijit.form.Button")
+    = link_to('History', 'javascript:', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{@site.id}]);")
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+
+-#%h3{:style=>"margin-top:0;"}
+%h3{:style=>"margin:10px 0 0 0;"}
   - if @var_id>0
     - if @site 
       #{@site.name}: #{@variable.variable_name}
@@ -71,17 +89,17 @@
     
 
 - if @var_id>0 && @site_id>0
-  %div{:id=>"#{varId}_show", :style=>"width:900px;"}
+  %div{:id=>"#{varId}_show", :style=>""}
       
-    %strong VARIABLE DETAILS
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    -if @auth && @site
-      %span{:id=>"#{varId}_buttons"}
-        = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('##{varId}_show').hide();$('##{varId}_edit').show();")
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{@site.id}]);")
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    -#%strong VARIABLE DETAILS
+    -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    -#-if @auth && @site
+    -#  %span{:id=>"#{varId}_buttons"}
+    -#    = link_to('EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"$('##{varId}_show').hide();$('##{varId}_edit').show();")
+    -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    -#= link_to('HISTORY', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{@site.id}]);")
+    -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     
     
     -#= link_to('DATA', 'javascript:', :class=>'icon icon-proj', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
@@ -100,7 +118,7 @@
     -#%br
     -#%br
   
-    %table{:id => "property-table", :style=>'float:left;margin-right:15px;'}
+    %table{:id => "property-table", :style=>'width:45%;float:left;margin-right:15px;'}
       -if @site
         %tr{:class=>"row#{cycle('1','0')}"}
           %td{:style=>"text-align:right;width:30%;"}
@@ -118,58 +136,57 @@
             -#{@variable[prop.name]}
   
     -if @site
-      %div{:id=>"graph-site"+@site.id.to_s+"-var"+@variable.id.to_s, :style=>"width:300px;height:150px;margin:0 0 25px 50px;float:left;"}
-
+      %div{:style=>"width:50%;margin:0;float:left;"}
+        %div{:id=>"graph-site"+@site.id.to_s+"-var"+@variable.id.to_s, :style=>"width:300px;width:70%;height:150px;margin:0 0 25px 50px;"}
     
-      %br
-      %br
+        %br
     
-      -# COLLECTED DATA STATS
-      -# COMMENTED OUT because lack of SITE ID to select
-      - var_stats = @site_variable_stats.first(:variable_id=>@variable.id)
-      -unless var_stats.nil?
-        %table{:id => "var-stats-table", :style=>'float:left;margin-left:5px;width:45%'}
-          %tr{:class=>"row#{cycle('0','1')}"}
-            %td{:colspan=>"2"}
-              %h4{:style=>"margin:0 0 5px 0;"}
-                Collected Data
-          %tr{:class=>"row-gr"}
-            %td
-              %b
-                &nbsp;&nbsp; Count
-            %td
-              = var_stats.record_number
-          %tr{:class=>""}
-            %td
-              %b
-                &nbsp;&nbsp; Starting
-            %td
-              = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
-          %tr{:class=>"row-gr"}
-            %td
-              %b
-                &nbsp;&nbsp; Ending
-            %td
-              = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
-          %tr
-            %td{:colspan=>"2"}
-              %h4{:style=>"margin:20px 0 5px 0;"}
-                Recent Data Values
-          %tr{:class=>"row-gr"}
-            %th
-              Timestamp
-            %th
-              Value   
-          -if !@data.nil?
-            -@data.each do |dv|
-              %tr{:class=>"row-lt#{cycle('0','1')} smfont",:style=>""}
-                %td{:style=>"text-align:center;"}
-                  = dv[0].strftime('%Y-%m-%d %H:%M:%S')
-                %td
-                  %strong
-                    = dv[1].to_s+' '
-                  &nbsp;#{@units[:units_abbreviation]} (#{@units[:units_type]})
-                  = "["+dv[2]+"]"
+        -# COLLECTED DATA STATS
+        -# COMMENTED OUT because lack of SITE ID to select
+        - var_stats = @site_variable_stats.first(:variable_id=>@variable.id)
+        -unless var_stats.nil?
+          %table{:id => "var-stats-table", :style=>'float:left;margin-left:5px;width:90%'}
+            %tr{:class=>"row#{cycle('0','1')}"}
+              %td{:colspan=>"2"}
+                %h4{:style=>"margin:0 0 5px 0;"}
+                  Collected Data
+            %tr{:class=>"row-gr"}
+              %td
+                %b
+                  &nbsp;&nbsp; Count
+              %td
+                = var_stats.record_number
+            %tr{:class=>""}
+              %td
+                %b
+                  &nbsp;&nbsp; Starting
+              %td
+                = var_stats.starting_timestamp.nil? ? 'NA' : var_stats.starting_timestamp.strftime('%d/%m/%Y')
+            %tr{:class=>"row-gr"}
+              %td
+                %b
+                  &nbsp;&nbsp; Ending
+              %td
+                = var_stats.ending_timestamp.nil? ? 'NA' : var_stats.ending_timestamp.strftime('%d/%m/%Y')
+            %tr
+              %td{:colspan=>"2"}
+                %h4{:style=>"margin:20px 0 5px 0;"}
+                  Recent Data Values
+            %tr{:class=>"row-gr"}
+              %th
+                Timestamp
+              %th
+                Value   
+            -if !@data.nil?
+              -@data.each do |dv|
+                %tr{:class=>"row-lt#{cycle('0','1')} smfont",:style=>""}
+                  %td{:style=>"text-align:center;"}
+                    = dv[0].strftime('%Y-%m-%d %H:%M:%S')
+                  %td
+                    %strong
+                      = dv[1].to_s+' '
+                    &nbsp;#{@units[:units_abbreviation]} (#{@units[:units_type]})
+                    = "["+dv[2]+"]"
   
 
       :javascript
