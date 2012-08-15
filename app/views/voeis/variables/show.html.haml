@@ -34,6 +34,11 @@
   .smfont, .smfont * { font-size:10px }
 
 
+-#- not_browse = (request.fullpath =~ /\/projects\/?$/).nil?
+- siteId0 = @site.nil? ? "0" : @site.id.to_s
+- siteId = "site"+siteId0
+- varId = siteId+'_var'+@variable[:id].to_s
+
 = javascript_include_tag("jquery.flot.js")
 - content_for(:javascripts) do
   :javascript
@@ -43,10 +48,10 @@
     dojo.require("dijit.form.TextBox");
     
     //GLOBALS
-    var variable = #{@variable.to_json};
-    var var_id = parseInt(variable.id);
-    var site_id = parseInt(#{@site.nil? ? 0 : @site.id});
-    var this_pane_id, this_pane;
+    //var variable = #{@variable.to_json};
+    //var var_id = parseInt(variable.id);
+    //var site_id = parseInt(#{@site.nil? ? 0 : @site.id});
+    //var this_pane_id, this_pane;
     
     $(window).ready(function(){ 
       //##### 
@@ -56,25 +61,21 @@
     
 
 
--#- not_browse = (request.fullpath =~ /\/projects\/?$/).nil?
-- siteId = @site.nil? ? "site0" : "site"+@site.id.to_s
-- varId = siteId+'_var'+@variable[:id].to_s
-
 -#%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
 -#%span(data-dojo-type="dijit.ToolbarSeparator")
 -#%span(data-dojo-type="dijit.form.Button")
 -#%span(data-dojo-type="dijit.MenuSeparator")
 -#%span(data-dojo-type="dijit.MenuBarItem")
 -#%div(data-dojo-type="dijit.MenuBar" style="height:25px!important;margin: 0 0 15px 0;")
-%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;" id="#{varId}-toolbar")
   -#%strong VARIABLE DETAILS
   -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   %span(data-dojo-type="dijit.ToolbarSeparator")
   %span(data-dojo-type="dijit.form.ToggleButton" jsId="#{varId}_editbutton")
-    = link_to('Edit', 'javascript:', :onclick=>"if(#{varId}_editbutton.checked){dijit.byId('#{varId}').cancel_edit('#{varId}');}else{$('##{varId}_show').hide();$('##{varId}_edit').show();}")
+    = link_to('Edit', 'javascript:', :onclick=>"if(#{varId}_editbutton.checked){dijit.byId('#{varId}').cancel_edit(true);}else{$('##{varId}_show').hide();$('##{varId}_edit').show();}")
   %span(data-dojo-type="dijit.ToolbarSeparator")
   %span(data-dojo-type="dijit.form.Button")
-    = link_to('History', 'javascript:', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{@site.id}]);")
+    = link_to('History', 'javascript:', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{siteId0}]);")
   %span(data-dojo-type="dijit.ToolbarSeparator")
 
 -#%h3{:style=>"margin-top:0;"}
@@ -193,7 +194,6 @@
 
       :javascript
         TEST = 'TESTING ShowVariable';
-        #{varId} = {};
         
         var date_formatter = function(value) {
           if(value==null || value=='') return '-';
@@ -212,8 +212,10 @@
           //if(parseInt(#{@var_id})) graphInit(variable.id, variable.variable_name);
           #{varId}_gdata = #{@graph_data.to_json};
           if(parseInt(#{@var_id})) graphInit(#{@site.nil? ? 0 : @site.id},#{@variable[:id].to_s},'#{@variable[:variable_name]}',#{varId}_gdata);
-          else $('##{varId}-provenance-row').hide();
-          
+          else {
+            $('##{varId}-provenance-row').hide();
+            $('##{varId}-toolbar').hide();
+          }
           console.log('initPage: DONE');
         };
         
@@ -317,11 +319,12 @@
 -if @auth
   %div{:id=>"#{varId}_edit", :style=>"width:900px;#{(@var_id>0 && @site_id>0) ? 'display:none;' : ''}"}
 
+    %br
     %strong EDIT VARIABLE
     &nbsp;&nbsp;&nbsp; (* Required)
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"dijit.byId('#{varId}').cancel_edit('#{varId}');")
+    = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"dijit.byId('#{varId}').cancel_edit();")
     %br
     %br
   
@@ -581,9 +584,10 @@
                   //if(parseInt(#{@var_id})) graphInit(variable.id,variable.name,#{varId}_gdata);
                   //else $('##{varId}-provenance-row').hide();
                   this_pane.var_id = var_id;
-                  this_pane.cancel_edit = function(varID) {
-                    console.log('CANCEL!',varID);
-                    var this_pane = dijit.byId(varID);
+                  this_pane.cancel_edit = function(toggle_edit) {
+                    console.log('CANCEL! - #{varId}');
+                    var varID = '#{varId}';
+                    var this_pane = dijit.byId('#{varId}');
                     console.log('CANCEL_THIS_PANE:',this_pane);
                     //###SCROLL TO TOP
                     //window.scrollTo(0,0);
@@ -591,12 +595,13 @@
                     $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
                     if(parseInt(#{@var_id}) && parseInt(#{@site_id})) {
                       var elems = #{varId}_edit_form.domNode.elements;
-                      $(elems['var_units']).val(#{@variable.variable_units_id})
-                      $(elems['var_time_units']).val(#{@variable.time_units_id})
-                      $(elems['var_lab']).val(#{@variable.lab_id})
-                      $(elems['var_lab_method']).val(#{@variable.lab_method_id})
-                      $(elems['var_field_method']).val(#{@variable.field_method_id})
-                      $(elems['var_spat_units']).val(#{@variable.spatial_units_id})
+                      $(elems['var_units']).val(#{@variable.variable_units_id});
+                      $(elems['var_time_units']).val(#{@variable.time_units_id});
+                      $(elems['var_lab']).val(#{@variable.lab_id});
+                      $(elems['var_lab_method']).val(#{@variable.lab_method_id});
+                      $(elems['var_field_method']).val(#{@variable.field_method_id});
+                      $(elems['var_spat_units']).val(#{@variable.spatial_units_id});
+                      if(!toggle_edit) #{varId}_editbutton.set('checked',false);
                       $('#'+varID+'_edit').hide();
                       $('#'+varID+'_show').show();
                     } else {
@@ -704,7 +709,7 @@
                           if(site_pane) site_pane.siteUpdate();
                         };
                         //#{varId}_cancel_edit();
-                        dijit.byId('#{varId}').cancel_edit('#{varId}');
+                        dijit.byId('#{varId}').cancel_edit();
                       },
                       dataType: 'json'
                     });
@@ -712,7 +717,7 @@
                   });
             
             &nbsp;&nbsp;
-            %button(dojoType="dijit.form.Button" value="Cancel" onclick="dijit.byId('#{varId}').cancel_edit('#{varId}');") Cancel
+            %button(dojoType="dijit.form.Button" value="Cancel" onclick="dijit.byId('#{varId}').cancel_edit();") Cancel
 
 
 %br{:style=>'float:none; clear:both;'}
