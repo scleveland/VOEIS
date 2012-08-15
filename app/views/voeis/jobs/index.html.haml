@@ -10,7 +10,7 @@
     items: #{@job_array.to_json} };
 
   var proj_jobs = new dojo.data.ItemFileWriteStore({
-    data: jobs_json
+    data: proj_jobs_json
   });
   
   var get_filename = function(job_parameters) {
