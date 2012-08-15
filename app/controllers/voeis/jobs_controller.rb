@@ -14,13 +14,16 @@ class Voeis::JobsController < Voeis::BaseController
   end
   
   def index
-    @jobs  = parent.managed_repository{Voeis::Job.all}
-    @job_array = Array.new
-    @jobs.each do |j|
-      j.check_status
-      job_temp = Hash.new
-      job_temp = j.attributes.merge({:user_name => j.user_name})
-      @job_array << job_temp
+    parent.managed_repository do
+      @jobs = Voeis::Job.all
+      @job_array = Array.new
+      @jobs.each do |j|
+        j.check_status
+        job_temp = Hash.new
+        debugger
+        job_temp = j.attributes.merge({:user_name => j.user_name, :filename=>JSON.parse(j.job_parameters)["parameters"]["datafile"]["original_filename"]})
+        @job_array << job_temp
+      end
     end
   end
 
