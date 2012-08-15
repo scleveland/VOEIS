@@ -14,7 +14,10 @@
   });
   
   var get_filename = function(job_parameters) {
-    return JSON.parse(job_parameters).original_filename;
+    if(JSON.parse(job_parameters).parameters)
+      if(JSON.parse(job_parameters).parameters.datafile)
+        return JSON.parse(job_parameters)parameters.datafile.original_filename;
+    return '- none -'
   };
 
 %div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
