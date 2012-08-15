@@ -67,8 +67,8 @@
 -#%span(data-dojo-type="dijit.MenuBarItem")
 -#%div(data-dojo-type="dijit.MenuBar" style="height:25px!important;margin: 0 0 15px 0;")
 %div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
-  %strong VARIABLE DETAILS
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#%strong VARIABLE DETAILS
+  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   %span(data-dojo-type="dijit.ToolbarSeparator")
   %span(data-dojo-type="dijit.form.ToggleButton" jsId="#{varId}_editbutton")
     = link_to('Edit', 'javascript:', :onclick=>"if(#{varId}_editbutton.checked){dijit.byId('#{varId}').cancel_edit('#{varId}');}else{$('##{varId}_show').hide();$('##{varId}_edit').show();}")
@@ -80,6 +80,8 @@
 -#%h3{:style=>"margin-top:0;"}
 %h3{:style=>"margin:10px 0 0 0;"}
   - if @var_id>0
+    %span.small{:style=>"font-size:14px;"}
+      VARIABLE DETAILS:
     - if @site 
       #{@site.name}: #{@variable.variable_name}
     - else

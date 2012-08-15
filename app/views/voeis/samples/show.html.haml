@@ -49,6 +49,8 @@
 #samp-container
   %h3{:style=>"margin-top:0;"}
     -if !@sample.nil?
+      %span.small{:style=>"font-size:14px;"}
+        SAMPLE DETAILS:
       -if !@site.nil? 
         #{@site.name}: 
         [Sample: #{@sample.lab_sample_code}]
@@ -57,10 +59,10 @@
     -else
       UNKNOWN
 
-  %strong
-    SAMPLE DETAILS
-  %br
-  %br
+  -#%strong
+  -#  SAMPLE DETAILS
+  -#%br
+  -#%br
 
   #samp_properties
 

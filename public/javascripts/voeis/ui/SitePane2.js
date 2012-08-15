@@ -191,6 +191,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			//$(this.domNode).find('#'+siteTag+'-name-head').text('NEW SITE');
 			$(this.domNode).find('#'+siteTag+'-edit-control').hide();
 			$(this.domNode).find('#'+siteTag+'-provenance-row').hide();
+			$(this.domNode).find('#'+siteTag+'-toolbar').hide();
+			$(this.domNode).find('#'+siteTag+'-detail-label').hide();
 			console.log('NewSite:',siteTag);
 			console.log('domNode.id:',this.domNode.id);
 			

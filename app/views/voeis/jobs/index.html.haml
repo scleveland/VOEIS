@@ -13,16 +13,10 @@
     data: proj_jobs_json
   });
   
-  var get_filename = function(job_parameters) {
-    //if(JSON.parse(job_parameters).parameters)
-    //  if(JSON.parse(job_parameters).parameters.datafile)
-    //    return JSON.parse(job_parameters)parameters.datafile.original_filename;
-    return '- none -'
-  };
-
+  
 %div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
-  %strong PROJECT JOBS (#{@job_array.count})
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#%strong PROJECT JOBS (#{@job_array.count})
+  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   %span(data-dojo-type="dijit.ToolbarSeparator")
   %span(data-dojo-type="dijit.form.Button")
     = link_to('Refresh', 'javascript:', :onclick=>"refreshTab('project_jobs');") 

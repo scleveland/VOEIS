@@ -82,9 +82,9 @@
 -#= render(:partial => "../views/voeis/sites/new_local_projection")
 
 
-%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
-  %strong SITE DETAILS
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+#site00-toolbar(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+  -#%strong SITE DETAILS
+  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   %span(data-dojo-type="dijit.ToolbarSeparator")
   %span(data-dojo-type="dijit.form.ToggleButton" jsId="site00_querybutton")
     -if @edit_auth
@@ -107,11 +107,13 @@
   %span(data-dojo-type="dijit.form.Button")
     = link_to('Sample Data Details', 'javascript:', :onclick=>"dojo.publish('voeis/project/samples', [$$$id$$$]);")
   %span(data-dojo-type="dijit.ToolbarSeparator")
-  %span(data-dojo-type="dijit.form.Button")
-    = link_to('Manage Variables', 'javascript:', :onclick=>"dojo.publish('voeis/project/variables');")
-  %span(data-dojo-type="dijit.ToolbarSeparator")
+  -#%span(data-dojo-type="dijit.form.Button")
+  -#  = link_to('Manage Variables', 'javascript:', :onclick=>"dojo.publish('voeis/project/variables');")
+  -#%span(data-dojo-type="dijit.ToolbarSeparator")
 
 %h3{:id=>"site00-name-head", :style=>"margin:10px 0 16px 0;padding:0;"}
+  %span.small{:style=>"font-size:14px;", :id=>"site00-detail-label"}
+    SITE DETAILS:
   $$$site-name$$$
 
 -#-if !current_user.nil? && current_user.projects.include?(@project)
@@ -652,7 +654,10 @@
               %script{:type=>"dojo/method", :event=>"startup"}
                 :plain
                   //var form = dijit.byId("site00_vertical_datum_form");
-                  if('site00'.slice(-2)=='00') return;
+                  if('site00'.slice(-2)=='00') {
+                    console.log('-SITE0-')
+                    return;
+                  };
                   var SRfrom = '';
                   var form0 = 'site00-edit-form';
                   var form = dijit.byId(form0);
@@ -663,6 +668,7 @@
                   var pane = window['site00ref']
                   var site = pane.site;
                   console.log('GO PANE_UPDATE:',pane);
+                  if(site.id==0)
                   //INITIALIZE PANE: drop-downs, etc...
                   pane_update(pane);
                   //INITIALIZE: submit button

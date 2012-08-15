@@ -123,8 +123,8 @@
 
 
 %div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
-  %strong MANAGE PROJECT VARIABLES (#{@variables.count})
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#%strong MANAGE PROJECT VARIABLES (#{@variables.count})
+  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   %span(data-dojo-type="dijit.ToolbarSeparator")
   %span(data-dojo-type="dijit.form.Button")
     = link_to('New Variable', 'javascript:', :onclick=>"dojo.publish('voeis/project/variable', [0,'',0]);")
