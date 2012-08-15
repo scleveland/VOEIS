@@ -14,9 +14,9 @@
   });
   
   var get_filename = function(job_parameters) {
-    if(JSON.parse(job_parameters).parameters)
-      if(JSON.parse(job_parameters).parameters.datafile)
-        return JSON.parse(job_parameters)parameters.datafile.original_filename;
+    //if(JSON.parse(job_parameters).parameters)
+    //  if(JSON.parse(job_parameters).parameters.datafile)
+    //    return JSON.parse(job_parameters)parameters.datafile.original_filename;
     return '- none -'
   };
 
@@ -43,7 +43,7 @@
     %thead
       %tr
         %th{:field => "id", :width => "50px"} Job ID
-        %th{:field => "job_parameters", :width => "auto", :formatter=>"get_filename"} File Name
+        %th{:field => "filename", :width => "auto"} File Name
         %th{:field => "job_type", :width => "auto"} Type
         %th{:field => "submitted_at", :width => "auto"} Time Submitted
         %th{:field => "user_name", :width => "auto"} User
