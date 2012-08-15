@@ -69,7 +69,8 @@
   SHOW SITE VERSIONS
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history/update', [#{@site.id}]);")
+-#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history/update', [#{@site.id}]);")
+= link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"dojo.publish('voeis/project/site/history/update', [#{@site.id}]);")
 %br
 
 

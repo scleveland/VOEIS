@@ -71,7 +71,8 @@
   VARIABLE VERSIONS
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history/update', [#{@variable.id},#{@site.nil? ? 0 : @site.id}]);")
+-#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history/update', [#{@variable.id},#{@site.nil? ? 0 : @site.id}]);")
+= link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"dojo.publish('voeis/project/variable/history/update', [#{@variable.id},#{@site.nil? ? 0 : @site.id}]);")
 %br
 
 

@@ -267,6 +267,7 @@
                       - @cv_list.each do |cv|
                         = link_to(cv[:cv_title], project_path(@project)+cv[:cv_url], :onclick=>"cv_pop('#{cv[:cv_title]}','#{cv[:cv_title2]}',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
 
+                %div{:dojoType=>"dijit.MenuSeparator"}
                 = link_to("Settings...", edit_project_path(@project), :dojoType => "yogo.ui.MenuLink")
 
                 -#- if !@sites.nil? && @sites.count > 0
@@ -318,11 +319,12 @@
                   
                   = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_sample_menu")
                   = link_to("Add Field Observation Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")
+                  %div{:dojoType=>"dijit.MenuSeparator"}
                   
-                  - if !@edit_auth.nil? && @edit_auth
-                    = link_to("Data Query QA/QC", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
-                  - else
-                    = link_to("Data Query", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
+                  -#- if !@edit_auth.nil? && @edit_auth
+                  -#  = link_to("Data Query QA/QC", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
+                  -#- else
+                  -#  = link_to("Data Query", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/dataquery',[0]); return false;")
                   
                   = link_to("Data Search", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/search'); return false;")
                   %div{:dojoType=>"dijit.PopupMenuItem"}

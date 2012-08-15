@@ -147,7 +147,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 -#= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
 -#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/data/history/update', [#{@data_value.id}]);")
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"refreshTab('#{thisTabId}');")
+-#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"refreshTab('#{thisTabId}');")
+= link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"refreshTab('#{thisTabId}');")
 %br
 
 

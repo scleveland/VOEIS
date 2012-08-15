@@ -417,9 +417,11 @@
       var tabs = dijit.byId('tab_browser');
       selected = tabs.selectedChildWidget;
       console.log('REFRESH:',selected.id);
-      selected.refresh();
-      //if(!selected.id=='overview' && !selected.id=='SiteDisplayGrid')
-      //  refreshTab(selected.id);
+      if(selected.id!='overview' && selected.id!='SiteDisplayGrid') {
+        //if(selected.id.match(/site\d+/))
+        if(selected.siteUpdate) selected.siteUpdate();
+        else selected.refresh();
+      }
       
     };
     
@@ -1660,6 +1662,8 @@
 
 = clear_break
 
+-########### MAIN TAB CONTAINER
+
 -#tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width:905px;height:540px;margin-top:0;padding-top:0;"}
 #tab_browser{:dojoType=>"dijit.layout.TabContainer", :style=>"width-min:920px;width:1100px;height-min:480px;height:540px;margin-top:0;padding-top:0;"}
   #overview{:dojoType=>"dijit.layout.ContentPane", :title=>"Project", :style=>"margin:0;padding:0;float:left;", :selected=>true, :jsId=>"overviewTab"}
@@ -1980,7 +1984,7 @@
         tabPane = new dojox.layout.ContentPane({
           id: tabId,
           title: tabTitle,
-          style: "margine-top:0;padding-top:0;",
+          style: "margine-top:0!important;padding-top:0!important;float:left;",
           closable: true,
           //parseOnLoad: false,
         	executeScripts: true,
