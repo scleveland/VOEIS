@@ -103,8 +103,8 @@
 #cv-versions
   = render_widget :versions, :display, :item=>@cv_item,
                                         :versions=>@cv_versions,
-                                        :unique_id=>"%s_%s%03d"%[projId,@cv_title2,@cv_item.id],
-                                        :unique_jsid=>"%s_%s%03d"%[projId.tr('-','$'),@cv_title2,@cv_item.id],
+                                        :unique_id=>"%s%03d"%[@cv_title2,@cv_item.id],
+                                        :unique_jsid=>"%s%03d"%[@cv_title2,@cv_item.id],
                                         :item_refs=>@cv_refs,
                                         :properties=>@cv_properties,
                                         :restore_callback=>"cv_item_restore",

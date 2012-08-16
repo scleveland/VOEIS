@@ -40,8 +40,18 @@
 
 -###################
 
+%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+  %span(data-dojo-type="dijit.form.Button")
+    = link_to('Create New', 'javascript:', :onclick=>"dojo.publish('voeis/cv_datum/new',['#{@cv_title2}']);")
+  %span(data-dojo-type="dijit.ToolbarSeparator")
+  - if !@copy_data.nil?
+    %span(data-dojo-type="dijit.form.Button")
+      = link_to('Copy Global', 'javascript:', :onclick=>"dojo.publish('voeis/cv_datum/copy',['#{@cv_title2}']);")
+    %span(data-dojo-type="dijit.ToolbarSeparator")
+
 -#%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;", :class=>"icon icon-#{@global ? 'voeis' : 'project'}"}
-%h3{:style=>"margin-top:0;padding-top:0;"}
+%h3{:style=>"margin:10px 0 10px 0;padding-top:0;"}
   %span(id="#{@tabId}_proj_title" style="display:none;")
     - if !@project.nil?
       %span.small{:style=>"font-size:14px;"}
@@ -51,7 +61,7 @@
     %br
   %span.small{:style=>"font-size:14px;"}
     -#%strong
-    CONTROLLED VOCABULARY:
+    CONTROLLED VOCABULARY ENTRIES (#{@cv_data.length}):
   = @cv_title
   -#{'%s [Id:%s]'%[@site.name,@site.id]}
 

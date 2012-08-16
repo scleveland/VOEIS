@@ -433,7 +433,12 @@
       if(updElemID)
         window.update_select_element=$('#'+updElemID);
       //window.open(hist_url, hist_title, 'width=950,height=550'); return;
-      var cv_callback = callback || function(){ if(window.loaded) window.loaded() };
+      var cv_callback = function(){
+        if(window.loaded) window.loaded();
+        else callback();
+        //if(window.initPage) 
+        initPage();
+      };
       dojo.publish('voeis/project/openTab',[cv_url,cv_id,cv_title,cv_callback]);
     }
     // OPEN CV MANAGEMENT TAB-- return to CURR TAB and POP NEW

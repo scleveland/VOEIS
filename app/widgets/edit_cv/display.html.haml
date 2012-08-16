@@ -413,9 +413,17 @@
   $(window).ready(function(){ 
     console.log('DONE LOADING!!');
     #{@tabId}_tab_loaded = false;
+    //#{@tabId}_data.cv_management_grid.startup();
     
   });
 
+  //##### INIT PAGE #####
+  //ON-TAB-LOAD-DONE!
+  function initPage() {
+     console.log('initPage: NOW!!');
+     #{@tabId}_data.cv_management_grid.startup();
+  };
+  
 
 
 -#################################
@@ -539,17 +547,17 @@
 
 -################# MAIN
 
-%strong
-  #{(@project.nil? ? 'GLOBAL ' : 'PROJECT ')+@cv_title.upcase} ENTRIES (#{@cv_data.length})
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
--#= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/cv_datum/new');")
-= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"#{@tabId}_exec.cv_datum_new();")
-- if !@copy_data.nil?
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  = link_to('COPY GLOBAL', 'javascript:', :class=>'icon icon-copy', :onclick=>"#{@tabId}_copy_dialog_box.show();")
-%br
+-#%strong
+-#  #{(@project.nil? ? 'GLOBAL ' : 'PROJECT ')+@cv_title.upcase} ENTRIES (#{@cv_data.length})
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#-#= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/cv_datum/new');")
+-#= link_to('CREATE NEW', 'javascript:', :class=>'icon icon-add', :onclick=>"#{@tabId}_exec.cv_datum_new();")
+-#- if !@copy_data.nil?
+-#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#  = link_to('COPY GLOBAL', 'javascript:', :class=>'icon icon-copy', :onclick=>"#{@tabId}_copy_dialog_box.show();")
+-#%br
 
 -#%div{:id=>"version_store_site#{@site.id}", :dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pversions_site#{@site.id}", :data=>"pversions_json_site#{@site.id}", :style=>"height:0;margin:0;padding:0;"}
 
@@ -626,21 +634,15 @@
 :javascript
   (function(){
 
-    dojo.subscribe("voeis/cv_datum/edit", function(item) {
-      console.log('EDIT:',item);
-      console.log(arguments);
-      cv_dialog_box.set('title', cv_title);
-      cv_dialog_populate(item);
-      cv_delete_button(item.used[0]);
-      cv_dialog_box.show();
+    console.log('END LOADING!!');
+    //#{@tabId}_data.cv_management_grid.startup();
+
+    dojo.subscribe("voeis/cv_datum/new", function(cv_title2) {
+      window[cv_title2+'_exec'].cv_datum_new();
     });
 
-    dojo.subscribe("voeis/cv_datum/new", function() {
-      console.log(arguments);
-      cv_dialog_box.set('title', 'NEW '+cv_title);
-      cv_dialog_clear();
-      $(delete_button.domNode).hide();
-      cv_dialog_box.show();
+    dojo.subscribe("voeis/cv_datum/copy", function(cv_title2) {
+      window[cv_title2+'_copy_dialog_box'].show();
     });
   })();
 
