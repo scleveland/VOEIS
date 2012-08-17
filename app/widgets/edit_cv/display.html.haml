@@ -386,7 +386,7 @@
   //######################################
   // OPEN EDIT DIALOG
   #{@tabId}_exec.cv_datum_edit = function(item) {
-    console.log('EDIT:',item);
+    console.log('EDIT #{@tabId}:',item);
     delete item.provenance_comment;
     #{@tabId}_cv_dialog_box.set('title', #{@tabId}_data.cv_title);
     #{@tabId}_exec.cv_form_populate(item);
@@ -395,7 +395,7 @@
   };
   // OPEN NEW DIALOG
   #{@tabId}_exec.cv_datum_new = function() {
-    console.log('NEW');
+    console.log('NEW #{@tabId}');
     #{@tabId}_cv_dialog_box.set('title', 'NEW '+#{@tabId}_data.cv_title);
     #{@tabId}_exec.cv_form_clear();
     $('##{@cv_title2}_form #cv_prov_com').hide();

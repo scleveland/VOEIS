@@ -435,7 +435,7 @@
       //window.open(hist_url, hist_title, 'width=950,height=550'); return;
       var cv_callback = function(){
         if(window.loaded) window.loaded();
-        else callback();
+        if(callback) callback();
         //if(window.initPage) 
         initPage();
       };
@@ -1899,8 +1899,10 @@
 
     var openVarTab = function(tabs, projectId, varId, varName, siteId) {
       var tabTitle = 'NEW VARIABLE';
-      if(parseInt(varId)) tabTitle = 'Edit: '+varName;
+      if(parseInt(varId)) {
+        tabTitle = 'Edit: '+varName;
         if(parseInt(siteId)) tabTitle = 'Site-'+siteId+': '+varName;
+      };
       //var varPane = new voeis.ui.VariablePane();
       var projVarId = 'site'+siteId+'_var'+varId;
       var projVarHref = "/projects/#{@project.id}/variables/"+varId+".html?&site_id="+siteId;
@@ -1911,7 +1913,6 @@
       //tabs.tabStrip = false;
       var projVarLoad = function(varId,varName) {
         initPage();
-        
       };
       openProjTab(tabs, projVarHref, projVarId, tabTitle, projVarLoad);
       //##

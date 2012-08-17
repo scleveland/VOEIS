@@ -60,35 +60,39 @@
     });
     
 
-
--#%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
--#%span(data-dojo-type="dijit.ToolbarSeparator")
--#%span(data-dojo-type="dijit.form.Button")
--#%span(data-dojo-type="dijit.MenuSeparator")
--#%span(data-dojo-type="dijit.MenuBarItem")
--#%div(data-dojo-type="dijit.MenuBar" style="height:25px!important;margin: 0 0 15px 0;")
-%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;" id="#{varId}-toolbar")
-  -#%strong VARIABLE DETAILS
-  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  %span(data-dojo-type="dijit.ToolbarSeparator")
-  %span(data-dojo-type="dijit.form.ToggleButton" jsId="#{varId}_editbutton")
-    = link_to('Edit', 'javascript:', :onclick=>"if(#{varId}_editbutton.checked){dijit.byId('#{varId}').cancel_edit(true);}else{$('##{varId}_show').hide();$('##{varId}_edit').show();}")
-  %span(data-dojo-type="dijit.ToolbarSeparator")
-  %span(data-dojo-type="dijit.form.Button")
-    = link_to('History', 'javascript:', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{siteId0}]);")
-  %span(data-dojo-type="dijit.ToolbarSeparator")
-
--#%h3{:style=>"margin-top:0;"}
-%h3{:style=>"margin:10px 0 0 0;"}
-  - if @var_id>0
+//-if @var_id>0 && siteId0!='0'
+- if @var_id>0 && @site_id>0
+  -#%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+  -#%span(data-dojo-type="dijit.ToolbarSeparator")
+  -#%span(data-dojo-type="dijit.form.Button")
+  -#%span(data-dojo-type="dijit.MenuSeparator")
+  -#%span(data-dojo-type="dijit.MenuBarItem")
+  -#%div(data-dojo-type="dijit.MenuBar" style="height:25px!important;margin: 0 0 15px 0;")
+  %div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;" id="#{varId}-toolbar")
+    -#%strong VARIABLE DETAILS
+    -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    %span(data-dojo-type="dijit.ToolbarSeparator")
+    %span(data-dojo-type="dijit.form.ToggleButton" jsId="#{varId}_editbutton")
+      = link_to('Edit', 'javascript:', :onclick=>"if(#{varId}_editbutton.checked){dijit.byId('#{varId}').cancel_edit(true);}else{$('##{varId}_show').hide();$('##{varId}_edit').show();}")
+    %span(data-dojo-type="dijit.ToolbarSeparator")
+    %span(data-dojo-type="dijit.form.Button")
+      = link_to('History', 'javascript:', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{siteId0}]);")
+    %span(data-dojo-type="dijit.ToolbarSeparator")
+    
+  %h3{:style=>"margin:10px 0 0 0;"}
     %span.small{:style=>"font-size:14px;"}
       VARIABLE DETAILS:
-    - if @site 
-      #{@site.name}: #{@variable.variable_name}
+    #{@site.name}: #{@variable.variable_name}
+
+- else
+  -#%h3{:style=>"margin-top:0;"}
+  %h3{:style=>"margin:0;"}
+    - if @var_id>0
+      %span.small{:style=>"font-size:14px;"}
+        EDIT:
+      = @variable.variable_name
     - else
-      #{@variable.variable_name}
-  - else
-    NEW VARIABLE
+      NEW VARIABLE
     
 
 - if @var_id>0 && @site_id>0
@@ -191,129 +195,131 @@
                     &nbsp;#{@units[:units_abbreviation]} (#{@units[:units_type]})
                     = "["+dv[2]+"]"
   
+  %br{:style=>'float:none; clear:both;'}
 
-      :javascript
-        TEST = 'TESTING ShowVariable';
-        
-        var date_formatter = function(value) {
-          if(value==null || value=='') return '-';
-          // Format DateTime string
-          var d = new Date(value);
-          //var fmt = d.getMonth()+'/'+d.getFullYear()
-          return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
-        };
-        
-        function initPage() {
-          console.log('initPage: NOW');
-          //this_pane_id = '#{@project.id}-site'+site_id+'-var'+var_id;
-          //this_pane = dojo.byId(this_pane_id);
-          //if(this_pane) this_pane = dijit.byNode(this_pane);
 
-          //if(parseInt(#{@var_id})) graphInit(variable.id, variable.variable_name);
-          #{varId}_gdata = #{@graph_data.to_json};
-          if(parseInt(#{@var_id})) graphInit(#{@site.nil? ? 0 : @site.id},#{@variable[:id].to_s},'#{@variable[:variable_name]}',#{varId}_gdata);
-          else {
-            $('##{varId}-provenance-row').hide();
-            $('##{varId}-toolbar').hide();
-          }
-          console.log('initPage: DONE');
-        };
-        
-        //var gdata = #{@variable.last_ten_values_graph(@site).to_json};
-        var #{varId}_gdata = #{@graph_data.to_json};
-        #{varId}_gdata = #{varId}_gdata || {};
+:javascript
+  TEST = 'TESTING ShowVariable';
+  console.log('varShow javascript--');
+  
+  var date_formatter = function(value) {
+    if(value==null || value=='') return '-';
+    // Format DateTime string
+    var d = new Date(value);
+    //var fmt = d.getMonth()+'/'+d.getFullYear()
+    return dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ss z"});
+  };
+  
+  function initPage() {
+    console.log('varShow initPage: NOW');
+    console.log('SITE-ID=', '#{@site_id}');
+    console.log('VAR-ID=', '#{@var_id}');
+    
+    //this_pane_id = '#{@project.id}-site'+site_id+'-var'+var_id;
+    //this_pane = dojo.byId(this_pane_id);
+    //if(this_pane) this_pane = dijit.byNode(this_pane);
+    
+    console.log('VAR_ID=', '#{@var_id}');
+    //if(parseInt(#{@var_id})) graphInit(variable.id, variable.variable_name);
+    #{varId}_gdata = #{@graph_data.to_json};
+    if(parseInt(#{@site_id})) graphInit(#{@site_id},#{@variable[:id].to_s},'#{@variable[:variable_name]}',#{varId}_gdata);
+    if(parseInt(#{@var_id})==0) $('##{varId}-provenance-row').hide();
+    console.log('initPage: DONE');
+  };
 
-        //graphInit();
-        var graphInit = function(siteId,varId,varName,gdata) {
-            gdata = gdata || {};
-            console.log('>>>graphInit');
-            console.log('SITE-ID= ', '#{@site.id}');
-            console.log('VAR-ID= ', '#{@variable.id}');
-            console.log('GDATA= ', gdata);
-            console.log('TEST= ', TEST);
-            plotGraph(gdata,siteId,varId);
-            handleGraph(varName);
-        };
-        var plotGraph = function(gdata,siteId,varId) {
-            //console.debug(gdata);
-            //console.log('GDATA= ', gdata);
-            console.log('>>>plotGraph:', TEST);
-            var plot = $.plot($("#graph-site"+siteId+"-var"+varId), [gdata],{
-                series: {
-                    color : "blue",
-                    lines: { show: true },
-                    points: { show: true }
-                },
-                ticks: 12,
-                grid:  { hoverable: true, clickable: true },
-                xaxis: { mode: "time" },
-                pan:   { interactive: true },
-                zoom:  { interactive: true }
-            });
-        };
+- if @site_id>0
+  :javascript
+    //var gdata = #{@variable.last_ten_values_graph(@site).to_json};
+    var #{varId}_gdata = #{@graph_data.to_json};
+    #{varId}_gdata = #{varId}_gdata || {};
 
-        //Function ShowToolTip and previousPoint allow the hover function to display
-        //a message for each data point on the graph when the cursor hoversover
+    //graphInit();
+    var graphInit = function(siteId,varId,varName,gdata) {
+        gdata = gdata || {};
+        console.log('>>>graphInit');
+        console.log('GDATA= ', gdata);
+        console.log('TEST= ', TEST);
+        plotGraph(gdata,siteId,varId);
+        handleGraph(varName);
+    };
+    var plotGraph = function(gdata,siteId,varId) {
+        //console.debug(gdata);
+        //console.log('GDATA= ', gdata);
+        console.log('>>>plotGraph:', TEST);
+        var plot = $.plot($("#graph-site"+siteId+"-var"+varId), [gdata],{
+            series: {
+                color : "blue",
+                lines: { show: true },
+                points: { show: true }
+            },
+            ticks: 12,
+            grid:  { hoverable: true, clickable: true },
+            xaxis: { mode: "time" },
+            pan:   { interactive: true },
+            zoom:  { interactive: true }
+        });
+    };
 
-        //I would only mess with the css if you really need to otherwise this
-        //shouldn't need any modification
-        var showTooltip = function(x, y, contents) {
-            //console.log('>>>tooltip:',contents);
-            //var divpos = $("body ##{varId}_show").offset();
-            //x = x - divpos.left;
-            //y = y - divpos.top;
-            $('<div id="tooltip">' + contents + '</div>').css( {
-                position: 'absolute',
-                //'min-width': '50%',
-                display: 'none',
-                //overflow: 'visible',
-                'z-index': 1000,
-                top: y + 5,
-                left: x + 5,
-                border: '1px solid #fdd',
-                padding: '2px',
-                'background-color': '#fee',
-                opacity: 0.80
-            }).appendTo("body").fadeIn(200);
-            //}).appendTo("body ##{varId}_show").fadeIn(200);
-        };
+    //Function ShowToolTip and previousPoint allow the hover function to display
+    //a message for each data point on the graph when the cursor hoversover
 
-        //Most of this should remain the same
-        //NOTE-- the time string for #x is in UTC format and currently is in GMT time
-        var handleGraph = function(variable_name) {
-            console.log('>>>handleGraph');
-            var previousPoint = null;
-            //$("#graph#{@variable.id.to_s}").bind("plothover", function (event, pos, item) {
-            $("#{"#graph-site"+@site.id.to_s+"-var"+@variable.id.to_s}").bind("plothover", function (event, pos, item) {
-                var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
-                dDate = new Date();
-                dDate.setTime(mEpoch);
-                //console.log('>>>plothover');
-                $("#x").text(dDate.toLocaleString());
-                $("#y").text(pos.y);
+    //I would only mess with the css if you really need to otherwise this
+    //shouldn't need any modification
+    var showTooltip = function(x, y, contents) {
+        //console.log('>>>tooltip:',contents);
+        //var divpos = $("body ##{varId}_show").offset();
+        //x = x - divpos.left;
+        //y = y - divpos.top;
+        $('<div id="tooltip">' + contents + '</div>').css( {
+            position: 'absolute',
+            //'min-width': '50%',
+            display: 'none',
+            //overflow: 'visible',
+            'z-index': 1000,
+            top: y + 5,
+            left: x + 5,
+            border: '1px solid #fdd',
+            padding: '2px',
+            'background-color': '#fee',
+            opacity: 0.80
+        }).appendTo("body").fadeIn(200);
+        //}).appendTo("body ##{varId}_show").fadeIn(200);
+    };
 
-                if (item) {
-                    if (previousPoint != item.datapoint) {
-                        previousPoint = item.datapoint;
-                        $("#tooltip").remove();
-                        var x = item.datapoint[0].toFixed(2),
-                        y = item.datapoint[1].toFixed(2);
-                        var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
-                        dDate = new Date();
-                        dDate.setTime(mEpoch);
-                        showTooltip(item.pageX, item.pageY,
-                        //*****You will need to change the sensor name here to the appropriate one selected above
-                            //***dDate.toLocaleString() + " = " + y + " " + "#{@variable.variable_name}|" );
-                            date_formatter(dDate.toLocaleString())+" = "+y+" "+variable_name+" | #{@units.units_name}");
-                    };
-                } else {
+    //Most of this should remain the same
+    //NOTE-- the time string for #x is in UTC format and currently is in GMT time
+    var handleGraph = function(variable_name) {
+        console.log('>>>handleGraph');
+        var previousPoint = null;
+        //$("#graph#{@variable.id.to_s}").bind("plothover", function (event, pos, item) {
+        $("#{"#graph-site"+@site.id.to_s+"-var"+@variable.id.to_s}").bind("plothover", function (event, pos, item) {
+            var mEpoch = pos.x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+            dDate = new Date();
+            dDate.setTime(mEpoch);
+            //console.log('>>>plothover');
+            $("#x").text(dDate.toLocaleString());
+            $("#y").text(pos.y);
+
+            if (item) {
+                if (previousPoint != item.datapoint) {
+                    previousPoint = item.datapoint;
                     $("#tooltip").remove();
-                    previousPoint = null;            
-                }
-            });
-        };
-      
-    %br{:style=>'float:none; clear:both;'}
+                    var x = item.datapoint[0].toFixed(2),
+                    y = item.datapoint[1].toFixed(2);
+                    var mEpoch = x; // convert to milliseconds (Epoch is usually expressed in seconds, but Javascript uses Milliseconds)
+                    dDate = new Date();
+                    dDate.setTime(mEpoch);
+                    showTooltip(item.pageX, item.pageY,
+                    //*****You will need to change the sensor name here to the appropriate one selected above
+                        //***dDate.toLocaleString() + " = " + y + " " + "#{@variable.variable_name}|" );
+                        date_formatter(dDate.toLocaleString())+" = "+y+" "+variable_name+" | #{@units.units_name}");
+                };
+            } else {
+                $("#tooltip").remove();
+                previousPoint = null;            
+            }
+        });
+    };
 
 
 -if @auth

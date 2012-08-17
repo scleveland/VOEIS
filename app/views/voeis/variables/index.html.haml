@@ -235,21 +235,5 @@
 :javascript
   (function(){
 
-    dojo.subscribe("voeis/cv_datum/edit", function(item) {
-      console.log('EDIT:',item);
-      console.log(arguments);
-      cv_dialog_box.set('title', cv_title);
-      cv_dialog_populate(item);
-      cv_delete_button(item.used[0]);
-      cv_dialog_box.show();
-    });
-
-    dojo.subscribe("voeis/cv_datum/new", function() {
-      console.log(arguments);
-      cv_dialog_box.set('title', 'NEW '+cv_title);
-      cv_dialog_clear();
-      $(delete_button.domNode).hide();
-      cv_dialog_box.show();
-    });
   })();
 
