@@ -97,9 +97,9 @@
     %span(data-dojo-type="dijit.ToolbarSeparator")
     %span(data-dojo-type="dijit.form.ToggleButton" jsId="site00_editbutton")
       = link_to('Edit', 'javascript:', :onclick=>"site00_querybutton.set('checked',false);$('.site00-divs').hide();if(site00_editbutton.checked) $('#show-site00').show(); else $('#edit-site00').show();return false;")
-    %span(data-dojo-type="dijit.ToolbarSeparator")
-    %span(data-dojo-type="dijit.form.Button")
-      = link_to('Delete', 'javascript:', :onclick=>"delete_site($$$id$$$);")
+    -#%span(data-dojo-type="dijit.ToolbarSeparator")
+    -#%span(data-dojo-type="dijit.form.Button")
+    -#  = link_to('Delete', 'javascript:', :onclick=>"delete_site($$$id$$$);")
   %span(data-dojo-type="dijit.ToolbarSeparator")
   %span(data-dojo-type="dijit.form.Button")
     = link_to('History', 'javascript:', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
@@ -111,11 +111,6 @@
   -#  = link_to('Manage Variables', 'javascript:', :onclick=>"dojo.publish('voeis/project/variables');")
   -#%span(data-dojo-type="dijit.ToolbarSeparator")
 
-%h3{:id=>"site00-name-head", :style=>"margin:10px 0 16px 0;padding:0;"}
-  %span.small{:style=>"font-size:14px;", :id=>"site00-detail-label"}
-    SITE DETAILS:
-  $$$site-name$$$
-
 -#-if !current_user.nil? && current_user.projects.include?(@project)
 -#  = link_to('Edit', edit_project_site_path(@project,@site.id), :class=>'icon icon-edit')
 -#  &nbsp;&nbsp;&nbsp;
@@ -123,6 +118,12 @@
 -#%br
 
 #show-site00{:class=>"site00-divs", :style=>"margin-top:0;padding-top:0;"}
+  
+  %h3{:style=>"margin:10px 0 16px 0;padding:0;"}
+    %span.small{:style=>"font-size:14px;"}
+      SITE DETAILS:
+    $$$site-name$$$
+  
   -#%strong SITE DETAILS
   -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -245,14 +246,19 @@
 
 #query-site00{:class=>"site00-divs", :style=>"margin-top:0;padding-top:0;display:none;"}
 
-  %strong QUERY SITE
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  - tabId = 'site00_data'
-  -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
-  = link_to('CANCEL QUERY', 'javascript:', :class=>'icon icon-cancel', :onclick=>"site00_querybutton.set('checked',false);$('#query-site00').hide();$('#show-site00').show();return false;") 
-  %br
+  %h3{:style=>"margin:10px 0 16px 0;padding:0;"}
+    %span.small{:style=>"font-size:14px;"}
+      QUERY SITE:
+    $$$site-name$$$
+
+  -#%strong QUERY SITE
+  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#- tabId = 'site00_data'
+  -#-#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
+  -#= link_to('CANCEL QUERY', 'javascript:', :class=>'icon icon-cancel', :onclick=>"site00_querybutton.set('checked',false);$('#query-site00').hide();$('#show-site00').show();return false;") 
+  -#%br
   %br
   %br
   
@@ -344,13 +350,29 @@
   -##edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>'EDIT', :style=>"margin-top:0;padding-top:0;display:none;"}
   #edit-site00{:class=>"site00-divs", :style=>"margin-top:0;padding-top:0;display:none;"}
 
-    %strong EDIT SITE
-    &nbsp;&nbsp;&nbsp; (* Required)
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
-    = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"cancel_site_form($$$id$$$);") 
+    %h3{:id=>"site00-name-head", :style=>"margin:10px 0 16px 0;padding:0;"}
+      %span.small{:style=>"font-size:14px;", :id=>"site00-detail-label"}
+        EDIT SITE:
+      $$$site-name$$$
+      &nbsp;&nbsp;&nbsp;
+      %span.small{:style=>"font-size:11px;"}
+        (* Required)
+
+    %span(id="site00-edit-buttons")
+      &nbsp;&nbsp;&nbsp;&nbsp;
+      %button(dojoType="dijit.form.Button" value="Delete" onclick="delete_site($$$id$$$);") Delete Site
+      &nbsp;&nbsp;
+      %button(dojoType="dijit.form.Button" value="Cancel" onclick="cancel_site_form($$$id$$$);") Cancel Edit
+      %br
+      %br
+
+
+    -#%strong EDIT SITE
+    -#&nbsp;&nbsp;&nbsp; (* Required)
+    -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"cancel_site_form($$$id$$$);") 
     %br
 
     -#%script{:type=>"dojo/method"}
@@ -424,7 +446,11 @@
                   type: "DELETE",
                   dataType: "json"}).done(
                   function (data){
-                    alert(data["msg"]);    
+                    //alert(data["msg"]);
+                    var site = datastore.get_raw(site_id,psites);
+                    datastore.delete(site,psites);
+                    //error_dialog.pop(data["msg"],3,'DELETED');
+                    dojo.publish('voeis/project/site/close',[site_id]);
                   })}},
             {buttonOk:'YES!'});
         }

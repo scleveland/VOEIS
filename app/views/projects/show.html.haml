@@ -855,7 +855,7 @@
   %script{:type=>"dojo/method", :event=>"startup"}
     :plain
       error_dialog.pop = function(msg,dly,ttl){
-        var delay = dly==null ? 3000 : dly;
+        var delay = dly==null ? 3000 : dly*1000;
         if(ttl) error_dialog.set('title',ttl);
         $('#error_dialog .error_message').html(msg);
         error_dialog.show();
