@@ -1400,21 +1400,33 @@ class Voeis::ApivsController < Voeis::BaseController
     respond_to do |format|
       format.csv do
         data_array = []
-        data_array = @data_values[:data_values][0]["time_series_data"]
-        unless @data_values[:data_values][0]["sample_data"].empty?
-          data_array << @data_values[:data_values][0]["sample_data"]
-        end
-        data_array.compact!
-        csv_string = CSV.generate do |csv|
-            debugger
-            unless data_array.empty?
-              csv << data_array.first.to_hash.keys
-              data_array.each do |obj|
-                  csv << obj.values
+        unless @data_values[:data_values].nil?
+          data_array = @data_values[:data_values][0]["time_series_data"]
+          unless @data_values[:data_values][0]["sample_data"].empty?
+            data_array << @data_values[:data_values][0]["sample_data"]
+          end
+          data_array.compact!
+          csv_string = CSV.generate do |csv|
+              debugger
+              unless data_array.empty?
+                csv << data_array.first.to_hash.keys
+                data_array.each do |obj|
+                    csv << obj.values
+                end
+              else
+                csv_string = "There are no data values for the given parameters."
               end
-            else
-              csv_string = "There are no data values for the given parameters."
-            end
+          end
+        else
+          csv_string=""
+          unless @var_hash["time_series_data"].empty? && @var_hash["sample_data"].empty?
+            csv_string << @var_hash["time_series_data"].first.attributes.keys.to_csv
+            csv_string << @var_hash["time_series_data"].to_csv
+            csv_string << @var_hash["sample_data"].to_csv
+
+          else
+            csv_string = "There are no data values for the given parameters."
+          end
         end
         render :text => csv_string
       end

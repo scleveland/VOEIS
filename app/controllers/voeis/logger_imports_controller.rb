@@ -643,81 +643,39 @@ class Voeis::LoggerImportsController < Voeis::BaseController
       #create csv_row array
       @results=""
       parent.managed_repository do 
-         @results = Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, nil, nil,current_user.id)
-         
-      # @csv_row = Array.new
-      #       csv_temp_data = CSV.read(params[:datafile])
-      #       csv_size = csv_temp_data.length
-      #       csv_data = CSV.read(params[:datafile])
-      # 
-      #       i = params[:start_line].to_i
-      #       csv_data[params[:start_line].to_i-1..-1].each do |row|
-      #         @csv_row[i] = row
-      #             i = i + 1
-      #       end#end row loop
-      #           (params[:start_line].to_i-1..csv_size.to_i).each do |row|
-      #             if !@csv_row[row].nil?
-      #             #create meta_tag_data
-      #              row_meta_tag_array = Array.new #store the current rows MetaTagData objects for association later
-      #              data_stream.data_stream_columns.all(:name=>"MetaTag").each do |col| 
-      #                @mtag = col.meta_tag
-      #                parent.managed_repository do
-      #                  mdtag = Voeis::MetaTag.new(:name=>@mtag.name, :category=>@mtag.category)
-      #                  mdtag.value = @csv_row[row][col.column_number]
-      #                  mdtag.save
-      #                  row_meta_tag_array << mdtag
-      #                end #managed_repository
-      #              end #data_stream_columns
-      #             parent.managed_repository do
-      #               #create sample
-      #               @site = Voeis::Site.get(site.id)
-      #               #calculate the correct local_offset
-      #               sample_datetime = Chronic.parse(@csv_row[row][timestamp_col]).to_datetime
-      #               sampletime = DateTime.civil(sample_datetime.year,sample_datetime.month,
-      #                            sample_datetime.day,sample_datetime.hour,sample_datetime.min,
-      #                            sample_datetime.sec, data_stream.utc_offset/24.to_f)
-      # 
-      #               (0..range).each do |i|
-      #                 if columns_array[i] != "ignore" && sample_id_col != i && timestamp_col != i &&
-      #                    columns_array[i] != nil && vertical_offset_col != i && 
-      #                    ending_vertical_offset_col != i && meta_tag_array[i].to_i == -1
-      # 
-      #                   new_data_val = Voeis::DataValue.new(:data_value => /^[-]?[\d]+(\.?\d*)(e?|E?)(\-?|\+?)\d*$|^[-]?(\.\d+)(e?|E?)(\-?|\+?)\d*$/.match(@csv_row[row][i].to_s) ? @csv_row[row][i].to_f : -9999.0, 
-      #                        :local_date_time => sampletime,
-      #                        :utc_offset => utc_offset,
-      #                        :observes_daylight_savings => dst,
-      #                        :date_time_utc => sampletime.utc,  
-      #                        :replicate => 0,
-      #                        :quality_control_level=>@col_vars[i].quality_control.to_i,
-      #                        :string_value =>  @csv_row[row][i].blank? ? "Empty" : @csv_row[row][i],
-      #                        :vertical_offset =>  vertical_offset_col == "" ? 0.0 : @csv_row[row][vertical_offset_col].to_i,
-      #                        :end_vertical_offset => ending_vertical_offset_col == "" ? nil : @csv_row[row][ending_vertical_offset_col].to_i) 
-      #                   new_data_val.save
-      #                   new_data_val.site = @site
-      #                   # @site.data_values << new_data_val
-      #                   # @site.save
-      #                   new_data_val.variable << @col_vars[i]
-      #                   new_data_val.source = @project_source
-      #                   row_meta_tag_array.map{|mtag| new_data_val.meta_tags << mtag}  #add meta_data
-      #                   new_data_val.data_streams << data_stream
-      #                   new_data_val.save
-      #                  end #end if
-      #                 end #end i loop
-      #                end #end if @csv_array.nil?
-      #             end #end managed repo
-      #           end #end row loop
+        debugger
+        if params[:datafile].size > 10000
+          puts "***********ADDING DELAYED JOB******************"
+          dj = nil
+          req = Hash.new
+          req[:url]= request.url
+          req[:ip_address] = request.remote_ip
+          req [:parameters] = request.filtered_parameters.as_json
+          job = Voeis::Job.create(:job_type=>"File Upload", :job_parameters=>req.to_json, :status => "queued", :submitted_at=>Time.now, :user_id => current_user.id)
+          repository("default") do
+            dj = Delayed::Job.enqueue(ProcessAFile.new(parent, params[:datafile], data_stream.id, site.id, params[:start_line],nil,nil,current_user, job.id))
+          end
+          job.delayed_job_id = dj.id
+          job.save
+          puts dj.attributes
+          puts dj.repository.name
+          flash_error[:job_queue_id] = job.id
+          flash_error[:notice] = "File has been successfully queued.  Check the job queue for job id:"+job.id+" status and you will recieve and email when the file parsing completes."
+        else
+          @results = Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, nil, nil,current_user.id)
           puts "updating the site catalog" 
-           Voeis::Site.get(site.id).update_site_data_catalog_variables(@variables)
-        end
-          # parent.publish_his
+          Voeis::Site.get(site.id).update_site_data_catalog_variables(@variables)
           flash[:notice] = "File parsed and stored successfully for #{site.name}. #{@results[:total_records_saved]} data values saved and #{@results[:total_rows_parsed]} rows where parsed. "
-          redirect_to project_path(params[:project_id]) and return
-        rescue Exception => e  
-          email_exception(e,request.env)
-          parent.managed_repository{Voeis::Site.get(site.id).update_site_data_catalog}
-          flash[:error] = "Problem Parsing Logger File: "+ e.message
-          redirect_to(:controller =>"voeis/logger_imports", :action => "pre_process_logger_file_upload", :params => {:id => params[:project_id]})
         end
+      end
+        # parent.publish_his
+        redirect_to project_path(params[:project_id]) and return
+      rescue Exception => e  
+        email_exception(e,request.env)
+        parent.managed_repository{Voeis::Site.get(site.id).update_site_data_catalog}
+        flash[:error] = "Problem Parsing Logger File: "+ e.message
+        redirect_to(:controller =>"voeis/logger_imports", :action => "pre_process_logger_file_upload", :params => {:id => params[:project_id]})
+      end
     end# end def
     
     #columns is an array of the columns that store the variable id
