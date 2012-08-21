@@ -1,8 +1,10 @@
-# This is really an example class for someone to template off of
+# Process a file that is uploaded - for use with delayed job
 # 
 # To use
 #   Delayed::Job.enqueue(ProcessAFile.new(a_user,a_project,path_to_csv,template_id,site_id))
-class ProcessAFile
+class ProcessAFileDelayed
+
+
   attr_accessor :project_id
   attr_accessor :user_id
   attr_accessor :file_path
@@ -25,7 +27,7 @@ class ProcessAFile
     self.project_job_id = project_job_id
   end
   
-  def perform
+  def self.perform(project_id,file, data_stream_template_id, site_id, start_line, sample_type, sample_medium, user_id, project_job_id)
     # Get the user and the project associated with this action
     puts user = User.get(self.user_id)
     project = Project.get(self.project_id)
