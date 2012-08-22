@@ -658,7 +658,7 @@ class Voeis::LoggerImportsController < Voeis::BaseController
             #resque way
             dj = Resque.enqueue(ProcessAFile, parent.id, params[:datafile], data_stream.id, site.id, params[:start_line],nil,nil,current_user.id, job.id)
           end
-          flash[:notice] = "File has been successfully queued.  Check the job queue for job id:"+job.id+" status and you will recieve and email when the file parsing completes."
+          flash[:notice] = "File has been successfully queued.  Check the job queue for job id:"+job.id.to_s+" status and you will recieve and email when the file parsing completes."
         else
           @results = Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, nil, nil,current_user.id)
           puts "updating the site catalog" 
