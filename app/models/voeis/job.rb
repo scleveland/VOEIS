@@ -3,7 +3,7 @@ class Voeis::Job
   include Facet::DataMapper::Resource
 
   property :id, Serial
-  property :delayed_job_id, Integer, :required => true, :default=>-1
+  property :delayed_job_id, Integer, :required => false, :default=>-1
   property :job_type, String, :required => true
   property :job_parameters, Text, :required=> true
   property :results, Text, :required => false

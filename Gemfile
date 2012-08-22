@@ -51,7 +51,7 @@ gem 'apotomo', "~> 1.1"
 gem 'aaronh-chronic',  :git =>"git://github.com/scleveland/chronic.git"
 
 gem 'rql', ">= 0.0.1",        :git => "git://github.com/yogo/rql-ruby.git", :branch => 'voeis-rql'
-
+gem 'resque'
 # Rserve client -for 'R' interface
 gem 'rserve-simpler',         :require => 'rserve/simpler'
 gem "test-unit", "~> 1.2.1"  #this is apparently required so it is going here so rack works

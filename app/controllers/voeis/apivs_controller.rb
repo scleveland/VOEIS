@@ -189,7 +189,10 @@ class Voeis::ApivsController < Voeis::BaseController
               req [:parameters] = request.filtered_parameters.as_json
               job = Voeis::Job.create(:job_type=>"File Upload", :job_parameters=>req.to_json, :status => "queued", :submitted_at=>Time.now, :user_id => current_user.id)
               repository("default") do
-                dj = Delayed::Job.enqueue(ProcessAFile.new(parent, @new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,current_user, job.id))
+                #delayed job way
+                #dj = Delayed::Job.enqueue(ProcessAFile.new(parent, @new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,current_user, job.id))
+                #resque way
+                dj = Resque.enqueue(ProcessAFile, parent.id, @new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,current_user.id, job.id)
               end
               job.delayed_job_id = dj.id
               job.save
@@ -324,7 +327,9 @@ class Voeis::ApivsController < Voeis::BaseController
                   req [:parameters] = request.filtered_parameters.as_json
                   job = Voeis::Job.create(:job_type=>"File Upload", :job_parameters=>req.to_json, :status => "queued", :submitted_at=>Time.now, :user_id => current_user.id)
                   repository("default") do
-                    dj = Delayed::Job.enqueue(ProcessAFile.new(parent, @new_file, data_stream_template.id, site.id, start_line,nil,nil,current_user, job.id))
+                    #dj = Delayed::Job.enqueue(ProcessAFile.new(parent, @new_file, data_stream_template.id, site.id, start_line,nil,nil,current_user, job.id))
+                    #resque way
+                    dj = Resque.enqueue(ProcessAFile, parent.id, @new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,current_user.id, job.id)
                   end
                   job.delayed_job_id = dj.id
                   job.save

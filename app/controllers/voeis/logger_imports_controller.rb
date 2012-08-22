@@ -642,9 +642,10 @@ class Voeis::LoggerImportsController < Voeis::BaseController
       #site.save
       #create csv_row array
       @results=""
+      flash_error={}
       parent.managed_repository do 
         debugger
-        if params[:datafile].size > 10000
+        if File.open(params[:datafile]).size > 1000
           puts "***********ADDING DELAYED JOB******************"
           dj = nil
           req = Hash.new
@@ -653,14 +654,11 @@ class Voeis::LoggerImportsController < Voeis::BaseController
           req [:parameters] = request.filtered_parameters.as_json
           job = Voeis::Job.create(:job_type=>"File Upload", :job_parameters=>req.to_json, :status => "queued", :submitted_at=>Time.now, :user_id => current_user.id)
           repository("default") do
-            dj = Delayed::Job.enqueue(ProcessAFile.new(parent, params[:datafile], data_stream.id, site.id, params[:start_line],nil,nil,current_user, job.id))
+           # dj = Delayed::Job.enqueue(ProcessAFile.new(parent, params[:datafile], data_stream.id, site.id, params[:start_line],nil,nil,current_user, job.id))
+            #resque way
+            dj = Resque.enqueue(ProcessAFile, parent.id, params[:datafile], data_stream.id, site.id, params[:start_line],nil,nil,current_user.id, job.id)
           end
-          job.delayed_job_id = dj.id
-          job.save
-          puts dj.attributes
-          puts dj.repository.name
-          flash_error[:job_queue_id] = job.id
-          flash_error[:notice] = "File has been successfully queued.  Check the job queue for job id:"+job.id+" status and you will recieve and email when the file parsing completes."
+          flash[:notice] = "File has been successfully queued.  Check the job queue for job id:"+job.id+" status and you will recieve and email when the file parsing completes."
         else
           @results = Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, nil, nil,current_user.id)
           puts "updating the site catalog" 
