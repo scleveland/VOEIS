@@ -12,11 +12,15 @@ set :use_sudo,    false
 set :deploy_via, :remote_cache
 set :copy_exclude, [".git"]
 set :user, "rails"
+#set :user, "sean.cleveland"
 set :deploy_to, "/var/rails"
+#set :deploy_to, "/var/voeis"
+
+set :workers, { "process_file" => 2 }
 
 desc "Setup Development Settings"
 task :development do
-  set :branch, "master"
+  set :branch, "resque"
   role :web, "voeis-dev.rcg.montana.edu"
   role :app, "voeis-dev.rcg.montana.edu"
   role :db,  "voeis-dev.rcg.montana.edu", :primary => true
@@ -29,6 +33,16 @@ task :production do
   role :web, "voeis.rcg.montana.edu"
   role :app, "voeis.rcg.montana.edu"
   role :db,  "voeis.rcg.montana.edu", :primary => true
+
+end
+
+desc "Setup Production Settings"
+task :production2 do
+
+  set :branch, "production"
+  role :web, "voeis2.rcg.montana.edu"
+  role :app, "voeis2.rcg.montana.edu"
+  role :db,  "voeis2.rcg.montana.edu", :primary => true
 
 end
 
@@ -109,12 +123,23 @@ end
 namespace :jobs do
   desc "Start up worker jobs"
   task :start do
-    run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec rake jobs:work >> log/delayed_worker.log'"
+    #run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec rake jobs:work >> log/delayed_worker.log'"
+    run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec rake resque:work QUEUE=* COUNT=1  
   end
   
   desc "Stop the remote worker jobs"
   task :stop do
     run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec rake jobs:stop'"
+  end
+  
+  desc "Stop resque web interface"
+  task :web-stop do
+    run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec resque-web -K'"
+  end
+  
+  desc "Start resque web interface"
+  task :web-start do
+    run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec resque-web'"
   end
 end
 
@@ -125,3 +150,9 @@ after "deploy:setup",       "assets:setup"
 after "deploy:update_code", "db:symlink"
 after "deploy:update_code", "assets:symlink"
 after "deploy:update_code", "docs:publish"
+after "deploy:update_code", "resque:stop"
+after "resque:stop", "resque:start"
+after "deploy:update_code", "job:web-stop"
+after "job:web-stop", "job:web-start"
+
+after "deploy:restart", 'resque:restart'
