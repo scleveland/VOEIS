@@ -25,6 +25,8 @@ class ProcessAFile
       job.status = "complete"
       job.completed_time = Time.now
       job.results = results
+      puts "Job Valid:" + job.valid?
+      puts job.errors.inspect()
       job.save
     end
     # Message the user when action is complete.
