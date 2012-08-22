@@ -14,14 +14,6 @@ GIT
     aaronh-chronic (0.3.9)
 
 GIT
-  remote: git://github.com/sshingler/capistrano-resque.git
-  revision: 81e45487a7f2bc91d77d296515ca96a61718542d
-  ref: 81e45487a7f2bc91d77d296515ca96a61718542d
-  specs:
-    capistrano-resque (0.0.6)
-      capistrano
-
-GIT
   remote: git://github.com/yogo/dm-is-versioned.git
   revision: 53acfa5faa34249b080acc398e0c865dd3d9ec1a
   ref: 53acfa5faa34249b080acc398e0c865dd3d9ec1a
@@ -377,7 +369,6 @@ DEPENDENCIES
   activerecord
   apotomo (~> 1.1)
   capistrano
-  capistrano-resque!
   cells (~> 3.5.4)
   compass (>= 0.10.6)
   dm-aggregates (= 1.1.0)

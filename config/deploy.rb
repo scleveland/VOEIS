@@ -133,15 +133,42 @@ namespace :jobs do
   end
   
   desc "Stop resque web interface"
-  task :web-stop do
+  task :web_stop do
     run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec resque-web -K'"
   end
   
   desc "Start resque web interface"
-  task :web-start do
+  task :web_start do
     run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec resque-web'"
   end
+  
+  desc "Restart Resque Workers"
+  task :restart_workers, :roles => :db do
+    run_remote_rake "resque:restart_workers"
+  end
+
+  desc "Restart Resque scheduler"
+  task :restart_scheduler, :roles => :db do
+    run_remote_rake "resque:restart_scheduler"
+  end
 end
+
+
+##
+# Rake helper task.
+# http://pastie.org/255489
+# http://geminstallthat.wordpress.com/2008/01/27/rake-tasks-through-capistrano/
+# http://ananelson.com/said/on/2007/12/30/remote-rake-tasks-with-capistrano/
+def run_remote_rake(rake_cmd)
+  rake_args = ENV['RAKE_ARGS'].to_s.split(',')
+  cmd = "cd #{fetch(:latest_release)} && #{fetch(:rake, "rake")} RAILS_ENV=#{fetch(:rails_env, "production")} #{rake_cmd}"
+  cmd += "['#{rake_args.join("','")}']" unless rake_args.empty?
+  run cmd
+  set :rakefile, nil if exists?(:rakefile)
+end
+
+
+
 
 # These are one time setup steps
 after "deploy:setup",       "assets:setup"
@@ -150,9 +177,6 @@ after "deploy:setup",       "assets:setup"
 after "deploy:update_code", "db:symlink"
 after "deploy:update_code", "assets:symlink"
 after "deploy:update_code", "docs:publish"
-after "deploy:update_code", "resque:stop"
-after "resque:stop", "resque:start"
-after "deploy:update_code", "job:web-stop"
-after "job:web-stop", "job:web-start"
-
-after "deploy:restart", "resque:restart"
+after "deploy:update_code", "deploy:restart_workers"
+after "deploy:update_code", "job:web_stop"
+after "job:web_stop", "job:web_start"

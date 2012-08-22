@@ -52,7 +52,7 @@ gem 'aaronh-chronic',  :git =>"git://github.com/scleveland/chronic.git"
 
 gem 'rql', ">= 0.0.1",        :git => "git://github.com/yogo/rql-ruby.git", :branch => 'voeis-rql'
 gem 'resque'
-gem 'capistrano-resque',  :git => "git://github.com/sshingler/capistrano-resque.git", :ref=>"81e45487a7f2bc91d77d296515ca96a61718542d"
+#gem 'capistrano-resque',  :git => "git://github.com/sshingler/capistrano-resque.git", :ref=>"81e45487a7f2bc91d77d296515ca96a61718542d"
 
 # Rserve client -for 'R' interface
 gem 'rserve-simpler',         :require => 'rserve/simpler'
