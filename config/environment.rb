@@ -31,8 +31,10 @@ class Array
     self.map{|k| k.to_hash}.to_xml
   end
   def sql_to_csv
-    header = self[0].to_hash.keys.map{|k| k}.join(',') + "\n"
-    header << self.map{|k| k.to_a.to_csv}.join("\n")
+    unless self[0].nil?
+      header = self[0].to_hash.keys.map{|k| k}.join(',') + "\n"
+      header << self.map{|k| k.to_a.to_csv}.join("\n")
+    end
   end
 end
 
