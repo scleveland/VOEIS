@@ -45,13 +45,15 @@ gem 'i18n', "~> 0.4.0"
 
 gem 'exception_notification',      :require => 'exception_notifier'
 
-gem 'delayed_job',                 :git => 'git://github.com/yogo/delayed_job.git'
+gem 'delayed_job',                 :git => 'git://github.com/yogo/delayed_job.git', :ref=>"81e45487a7f2bc91d77d296515ca96a61718542d"
 gem "cells", "~> 3.5.4"
 gem 'apotomo', "~> 1.1"
 gem 'aaronh-chronic',  :git =>"git://github.com/scleveland/chronic.git"
 
 gem 'rql', ">= 0.0.1",        :git => "git://github.com/yogo/rql-ruby.git", :branch => 'voeis-rql'
 gem 'resque'
+gem 'capistrano-resque',  :git => "git://github.com/sshingler/capistrano-resque.git"
+
 # Rserve client -for 'R' interface
 gem 'rserve-simpler',         :require => 'rserve/simpler'
 gem "test-unit", "~> 1.2.1"  #this is apparently required so it is going here so rack works
