@@ -25,7 +25,7 @@ class ProcessAFile
       job.status = "complete"
       job.completed_time = Time.now
       job.results = results
-      puts "Job Valid:" + job.valid?
+      puts "*****************************Job Errors:"
       puts job.errors.inspect()
       job.save
     end
