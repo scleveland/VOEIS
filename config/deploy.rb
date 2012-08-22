@@ -124,7 +124,7 @@ namespace :jobs do
   desc "Start up worker jobs"
   task :start do
     #run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec rake jobs:work >> log/delayed_worker.log'"
-    run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec rake resque:work QUEUE=* COUNT=1  
+    run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec rake resque:work QUEUE=* COUNT=1"  
   end
   
   desc "Stop the remote worker jobs"
@@ -155,4 +155,4 @@ after "resque:stop", "resque:start"
 after "deploy:update_code", "job:web-stop"
 after "job:web-stop", "job:web-start"
 
-after "deploy:restart", 'resque:restart'
+after "deploy:restart", "resque:restart"
