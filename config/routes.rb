@@ -6,6 +6,10 @@
 # FILE: routes.rb
 #
 #
+
+require 'resque/server' 
+
+
 Yogo::Application.routes.draw do
   
   #Project Namespace
@@ -332,6 +336,7 @@ Yogo::Application.routes.draw do
       get :get_api_key
     end
   end
+  mount Resque::Server.new, :at => "/resque"
   # resource :user_session,   :only => [ :show, :new, :create, :destroy, :get_api_key ], :collection=>{:get_api_key => 'get'}
   match '/logout' => 'user_sessions#destroy', :as => :logout
   match '/login' => 'user_sessions#new', :as => :login
