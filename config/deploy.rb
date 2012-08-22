@@ -20,7 +20,7 @@ set :workers, { "process_file" => 2 }
 
 desc "Setup Development Settings"
 task :development do
-  set :branch, "resque"
+  set :branch, "master"
   role :web, "voeis-dev.rcg.montana.edu"
   role :app, "voeis-dev.rcg.montana.edu"
   role :db,  "voeis-dev.rcg.montana.edu", :primary => true
