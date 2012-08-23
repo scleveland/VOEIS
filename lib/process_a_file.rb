@@ -32,6 +32,6 @@ class ProcessAFile
     # Message the user when action is complete.
     puts results
     puts "****** USER EMAIL #{user.email}  **************"
-    puts VoeisMailer.email_user(user.email, "From VOEIS:: Your Job is complete!", results.to_s)
+    puts VoeisMailer.email_user(user.email, "From VOEIS:: Your Job (id:#{job.id}) is complete!", results.to_s)
   end
 end
