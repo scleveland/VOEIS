@@ -20,6 +20,7 @@ class ProcessAFile
       results =  Voeis::DataValue.parse_logger_csv(file, data_stream_template_id, site_id, start_line.to_i, sample_type,sample_medium, user_id)
       Voeis::Site.get(site_id).update_site_data_catalog
     }
+    job=""
     project.managed_repository do
       job = Voeis::Job.get(project_job_id)
       job.status = "complete"
