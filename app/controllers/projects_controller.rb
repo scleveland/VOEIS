@@ -2,7 +2,7 @@ require 'responders/rql'
 
 class ProjectsController < InheritedResources::Base
   responders :rql
-  respond_to :html, :json
+  respond_to :html, :json 
   layout :choose_layout
 
   has_widgets do |root|
