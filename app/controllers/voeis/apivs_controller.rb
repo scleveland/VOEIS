@@ -194,10 +194,6 @@ class Voeis::ApivsController < Voeis::BaseController
                 #resque way
                 dj = Resque.enqueue(ProcessAFile, parent.id, @new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,current_user.id, job.id)
               end
-              job.delayed_job_id = dj.id
-              job.save
-              puts dj.attributes
-              puts dj.repository.name
               flash_error[:job_queue_id] = job.id
               flash_error[:success] = "File has been successfully queued.  Check the job queue for status and you will recieve and email when the job completes."
             end
@@ -243,7 +239,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # this requires that a site and a datastream has already been created
   # to parse this file.  Can return json or xml as specified
   #
-  # @example curl -F datafile=@CR1000_2_BigSky_NFork_small.dat -F data_template_id=1 -F site_id=1 https://voeis.msu.montana.edu/projects/fbf20340-af15-11df-80e4-002500d43ea0/apivs/upload_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398ca5557adf
+  # @example curl -k -F datafile=@CR1000_2_BigSky_NFork_small.csv -F data_template_id=1 -F site_id=1 https://voeis-dev.msu.montana.edu/projects/cfee5aec-c520-11e0-a45c-c82a14fffebf/apivs/upload_data.json?api_key=e79b135dcfeb6699bbaa6c9ba9c1d0fc474d7adb755fa215446c398ca5557adf
   #
   #
   # @param [File] :datafile csv file to store
@@ -331,10 +327,6 @@ class Voeis::ApivsController < Voeis::BaseController
                     #resque way
                     dj = Resque.enqueue(ProcessAFile, parent.id, @new_file, data_stream_template.id, data_stream_template.sites.first.id, start_line,nil,nil,current_user.id, job.id)
                   end
-                  job.delayed_job_id = dj.id
-                  job.save
-                  puts dj.attributes
-                  puts dj.repository.name
                   flash_error[:job_queue_id] = job.id
                   flash_error[:success] = "File has been successfully queued.  Check the job queue for status and you will recieve and email when the job completes."
                 end
