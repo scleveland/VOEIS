@@ -7,7 +7,7 @@ class Voeis::ApivsController < Voeis::BaseController
             :collection_name => 'apivs',
             :instance_name => 'apiv',
             :resource_class => Voeis::Apiv
-
+   before_filter :check_authorization
 
 
   def format_response(data_obj, format)
@@ -2161,7 +2161,19 @@ class Voeis::ApivsController < Voeis::BaseController
      
     end
   private
- 
+   def check_authorization
+     if parent.nil?
+       render text:"Invalid project UID"
+       return
+     elsif current_user.nil? 
+        render text: "Access Denied"
+        return
+     elsif parent.is_private
+       unless current_user.projects.include?(parent)
+         render text: "Access Denied"
+       end
+     end
+   end
      
      #'https://glassfish.msu.montana.edu/yogo/projects/Big%20Sky.json?api_key=Red-0bl_n0qxeOIwh4WQ&sitecode=UPGL-GLTNR24--MSU_UPGL-GLTNR24_MF_ESTBSWS&sensors[]=H2OCond_Avg&sensors[]=H2OTemp_Avg&sensors[]=AirTemp_Avg&sensors[]=AirTemp_SMP&hours=48&jsoncallback=?'
      def get_project_data_by_site_and_sensor
