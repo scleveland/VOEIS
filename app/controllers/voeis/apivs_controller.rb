@@ -9,7 +9,7 @@ class Voeis::ApivsController < Voeis::BaseController
             :resource_class => Voeis::Apiv
    before_filter :check_authorization
 
-
+ 
   def format_response(data_obj, format)
     format.json do
       render :json => data_obj.as_json, :callback => params[:jsoncallback]
