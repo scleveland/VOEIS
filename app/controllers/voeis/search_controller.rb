@@ -60,8 +60,12 @@ class Voeis::SearchController < Voeis::BaseController
         data.each do |d|
           #results[d.date_time_utcto_datetime.change(:offset => "+00:00")] ||= {}
           #results[d.date_time_utc.to_datetime.change(:offset => "+00:00")][d.variable_id] = d.data_value
-          presults[(Time.at((d.date_time_utc.to_time.change(:offset => "+00:00").to_f / 60).round * 60)).to_datetime.change(:offset => "+00:00")] ||= {}
-          presults[(Time.at((d.date_time_utc.to_time.change(:offset => "+00:00").to_f / 60).round * 60)).to_datetime.change(:offset => "+00:00")]["#{site_names[d.site_id]}: #{variable_names[d.variable_id]}"] = d.data_value
+          # presults[(Time.at((d.date_time_utc.to_time.change(:offset => "+00:00").to_f / 60).round * 60)).to_datetime.change(:offset => "+00:00")] ||= {}
+          # presults[(Time.at((d.date_time_utc.to_time.change(:offset => "+00:00").to_f / 60).round * 60)).to_datetime.change(:offset => "+00:00")]["#{site_names[d.site_id]}: #{variable_names[d.variable_id]}"] = d.data_value
+          
+          presults[d.date_time_utc.to_time.change(:offset => "+00:00")] ||= {}
+          presults[d.date_time_utc.to_time.change(:offset => "+00:00")]["#{site_names[d.site_id]}: #{variable_names[d.variable_id]}"] = d.data_value
+          
           #@variable_ids << d.variable_id unless @variable_ids.include?(d.variable_id)
           @variable_ids << "#{site_names[d.site_id]}: #{variable_names[d.variable_id]}" unless  @variable_ids.include?("#{site_names[d.site_id]}: #{variable_names[d.variable_id]}")
         end
