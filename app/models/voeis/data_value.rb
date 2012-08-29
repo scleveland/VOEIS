@@ -185,7 +185,7 @@ class Voeis::DataValue
       user = User.get(user_id)
     end
     create_comment = "Created at #{created_at} by #{user.first_name} #{user.last_name} [#{user.login}]"
-    rows = CSV.read(csv_file)
+    #rows = CSV.read(csv_file)
     results = Hash.new
     total_results = Array.new
     total_records = 0
@@ -385,7 +385,7 @@ class Voeis::DataValue
               }.join(',')
               repository.adapter.execute(sql)
               #puts "AFTER SAMPLE ASSOC ********************************"
-            else
+            #else
                #sql = "INSERT INTO \"voeis_data_value_sensor_types\" (\"data_value_id\",\"sensor_type_id\") VALUES "
                #sql << sensor_sql.join(',')
                #repository.adapter.execute(sql)
