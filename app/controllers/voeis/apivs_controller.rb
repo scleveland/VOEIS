@@ -1330,108 +1330,110 @@ class Voeis::ApivsController < Voeis::BaseController
    #
    # @api public
    def get_project_site_variable_data    
-    @var = ""
-    @data_values = Hash.new
-    @values = Array.new
+    
     parent.managed_repository do
-      @site = Voeis::Site.get(params[:site_id].to_i)
-      if @site.nil?
-        @data_values[:error] = "There is no site with the ID:" + params[:site_id]
+      var = ""
+      data_values = Hash.new
+      values = Array.new
+      var_hash = Hash.new
+      site = Voeis::Site.get(params[:site_id].to_i)
+      if site.nil?
+        data_values[:error] = "There is no site with the ID:" + params[:site_id]
       else
-        @var= Voeis::Variable.get(params[:variable_id].to_i)
-        if @var.nil?
-          @data_values[:error] = "There is no variable with the ID:" + params[:variable_id]
+        var= Voeis::Variable.get(params[:variable_id].to_i)
+        if var.nil?
+          data_values[:error] = "There is no variable with the ID:" + params[:variable_id]
         else
-          @var_hash = Hash.new
-          @var_hash = @var.as_json
+          
+          var_hash = var.as_json
           if params[:small_data] == 'true'
-            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            @var_hash = @var_hash.merge({'time_series_data' => repository.adapter.select(sql)})
-            sql = "SELECT COUNT(*) FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            @var_hash = @var_hash.merge({:time_series_count => repository.adapter.select(sql)})
-            sql = "SELECT MAX(data_value) FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            @var_hash = @var_hash.merge({:time_series_max => repository.adapter.select(sql)})
-            sql = "SELECT MIN(data_value) FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            @var_hash = @var_hash.merge({:time_series_min => repository.adapter.select(sql)})
-            sql = "SELECT AVG(data_value) FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            @var_hash = @var_hash.merge({:time_series_avg =>repository.adapter.select(sql)})
-            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            @var_hash = @var_hash.merge({'sample_data' => repository.adapter.select(sql)})
-            sql = "SELECT COUNT(*) FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            @var_hash = @var_hash.merge({:sample_count => repository.adapter.select(sql)})
-            sql = "SELECT MAX(data_value) FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            @var_hash = @var_hash.merge({:sample_max => repository.adapter.select(sql)})
-            sql = "SELECT MIN(data_value) FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            @var_hash = @var_hash.merge({:sample_min => repository.adapter.select(sql)})
-            sql = "SELECT AVG(data_value) FROM  voeis_data_values WHERE site_id=#{@site.id} AND variable_id=#{@var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            @var_hash = @var_hash.merge({:sample_avg =>repository.adapter.select(sql)})
-            @values << @var_hash
-            @data_values[:data_values] = @values
+            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            var_hash = var_hash.merge({'time_series_data' => repository.adapter.select(sql)})
+            sql = "SELECT COUNT(*) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            var_hash = var_hash.merge({:time_series_count => repository.adapter.select(sql)})
+            sql = "SELECT MAX(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            var_hash = var_hash.merge({:time_series_max => repository.adapter.select(sql)})
+            sql = "SELECT MIN(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            var_hash = var_hash.merge({:time_series_min => repository.adapter.select(sql)})
+            sql = "SELECT AVG(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            var_hash = var_hash.merge({:time_series_avg =>repository.adapter.select(sql)})
+            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            var_hash = var_hash.merge({'sample_data' => repository.adapter.select(sql)})
+            sql = "SELECT COUNT(*) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            var_hash = var_hash.merge({:sample_count => repository.adapter.select(sql)})
+            sql = "SELECT MAX(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            var_hash = var_hash.merge({:sample_max => repository.adapter.select(sql)})
+            sql = "SELECT MIN(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            var_hash = var_hash.merge({:sample_min => repository.adapter.select(sql)})
+            sql = "SELECT AVG(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            var_hash = var_hash.merge({:sample_avg =>repository.adapter.select(sql)})
+            values << var_hash
+            data_values[:data_values] = values
           else
             #if !@var.sensor_types.first.nil?
              
-            tseries = Voeis::DataValue.all(:datatype=>"Sensor", :site_id=>@site.id, :variable_id=>@var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)
-            @var_hash = @var_hash.merge({'time_series_data'=> tseries})
+            tseries = Voeis::DataValue.all(:datatype=>"Sensor", :site_id=>site.id, :variable_id=>var.id, :local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)
+            var_hash = var_hash.merge({'time_series_data'=> tseries})
             
-            sseries = Voeis::DataValue.all(:site_id=>@site.id, :variable_id=>@var.id,:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)
-            @var_hash = @var_hash.merge({'sample_data' => sseries})
-            @var_hash[:time_series_count] = tseries.count
-            @var_hash[:time_series_max] = tseries.max(:data_value)
-            @var_hash[:time_series_min] =tseries.min(:data_value)
-            @var_hash[:time_series_avg]=tseries.avg(:data_value)
-            @var_hash[:sample_count] = sseries.count
-            @var_hash[:sample_max] = sseries.max(:data_value)
-            @var_hash[:sample_min] =sseries.min(:data_value)
-            @var_hash[:sample_avg]=sseries.avg(:data_value)
+            sseries = Voeis::DataValue.all(:site_id=>site.id, :variable_id=>var.id,:datatype=>"Sample",:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)
+            var_hash = var_hash.merge({'sample_data' => sseries})
+            var_hash[:time_series_count] = tseries.count
+            var_hash[:time_series_max] = tseries.max(:data_value)
+            var_hash[:time_series_min] =tseries.min(:data_value)
+            var_hash[:time_series_avg]=tseries.avg(:data_value)
+            var_hash[:sample_count] = sseries.count
+            var_hash[:sample_max] = sseries.max(:data_value)
+            var_hash[:sample_min] =sseries.min(:data_value)
+            var_hash[:sample_avg]=sseries.avg(:data_value)
             
               #@var_hash = @var_hash.merge({'data' => @var.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time) & @site.data_values.all(:local_date_time.gte => params[:start_datetime].to_time, :local_date_time.lte => params[:end_datetime].to_time)})  
-            @values << @var_hash
-            @data_values[:variable] = @values
-            @data_values[:site] = @site
-            @data_values[:project] = parent.as_json
+            values << var_hash
+            data_values[:variable] = values
+            data_values[:site] = site
+            data_values[:project] = parent.as_json
 
            end
         end
       end
-    end
-    respond_to do |format|
-      format.csv do
-        data_array = []
-        unless @data_values[:data_values].nil?
-          data_array = @data_values[:data_values][0]["time_series_data"]
-          unless @data_values[:data_values][0]["sample_data"].empty?
-            data_array << @data_values[:data_values][0]["sample_data"]
-          end
-          data_array.compact!
-          csv_string = CSV.generate do |csv|
-              debugger
-              unless data_array.empty?
-                csv << data_array.first.to_hash.keys
-                data_array.each do |obj|
-                    csv << obj.values
+      respond_to do |format|
+        format.csv do
+          data_array = []
+          unless data_values[:data_values].nil?
+            data_array = data_values[:data_values][0]["time_series_data"]
+            unless data_values[:data_values][0]["sample_data"].empty?
+              data_array << data_values[:data_values][0]["sample_data"]
+            end
+            data_array.compact!
+            csv_string = CSV.generate do |csv|
+                debugger
+                unless data_array.empty?
+                  csv << data_array.first.to_hash.keys
+                  data_array.each do |obj|
+                      csv << obj.values
+                  end
+                else
+                  csv_string = "There are no data values for the given parameters."
                 end
-              else
-                csv_string = "There are no data values for the given parameters."
-              end
-          end
-        else
-          csv_string=""
-          unless @var_hash["time_series_data"].empty? && @var_hash["sample_data"].empty?
-            csv_string << @var_hash["time_series_data"].first.attributes.keys.to_csv
-            csv_string << @var_hash["time_series_data"].to_csv
-            csv_string << @var_hash["sample_data"].to_csv
-
+            end
           else
-            csv_string = "There are no data values for the given parameters."
+            csv_string=""
+            unless var_hash["time_series_data"].empty? && var_hash["sample_data"].empty?
+              csv_string << var_hash["time_series_data"].first.attributes.keys.to_csv
+              csv_string << var_hash["time_series_data"].to_csv
+              csv_string << var_hash["sample_data"].to_csv
+
+            else
+              csv_string = "There are no data values for the given parameters."
+            end
           end
+          render :text => csv_string
         end
-        render :text => csv_string
-      end
-      format.json do
-        render :json => @data_values.as_json, :callback => params[:jsoncallback]
-      end
-      format.xml do
-         render :xml => @data_values.to_xml
+        format.json do
+          render :json => data_values.as_json, :callback => params[:jsoncallback]
+        end
+        format.xml do
+           render :xml => data_values.to_xml
+        end
       end
     end
    end
