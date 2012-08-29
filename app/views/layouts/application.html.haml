@@ -25,7 +25,7 @@
     -#= javascript_include_tag('rails.js', 'jquery.1.7.1.min.js', 'jquery-snippet.js', "dojo_old/dojo.js", "voeislayer.js", "jquery.flot.min.js")
     = csrf_meta_tag
 
-    = stylesheet_link_tag('jquery-ui-1.8.1.custom')
+    -#= stylesheet_link_tag('jquery-ui-1.8.1.custom')
     
     -#= stylesheet_link_tag("/javascripts/dijit/themes/claro/claro.css")
     = stylesheet_link_tag("/javascripts/dojox/grid/resources/Grid.css") 	
@@ -310,7 +310,7 @@
             - if !@project.sites.nil? && @project.sites.count > 0
               #dataButton{:dojoType => "dijit.form.DropDownButton"}
                 %span
-                  Project Data
+                  Data Tools
                 %div{:dojoType => "dijit.Menu"}
                   -#= link_to("Browse", campaigns_path, :dojoType => "yogo.ui.MenuLink")
                   -#= link_to("Browse Data Streams", query_project_data_streams_path(@project), :dojoType => "yogo.ui.MenuLink")
