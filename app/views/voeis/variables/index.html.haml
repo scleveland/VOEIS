@@ -3,7 +3,7 @@
 - tabId = 'project_variables'
 - dataId = tabId+'_data'
 - edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project))
-- url_api_key = current_user.nil? || current_user.api_key.blank? ? "" : "?api_key=#{current_user.api_key}"
+- url_api_key = current_user.nil? || current_user.api_key.blank? ? "" : "&api_key=#{current_user.api_key}"
 
 -#= javascript_include_tag("jquery.flot.js")
 -# content_for(:javascripts) do
@@ -54,8 +54,8 @@
     //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
     //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
     //var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
-    var hist_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/variable/history\', ['+id+',\''+item.variable_name+'\',0]);return false;">'+hist_icon+'</a>\n';
-    var edit_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/variable\', ['+id+',\''+item.variable_name+'\',0]);return false;">'+edit_icon+'</a>\n';
+    var hist_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/variable/history\', ['+id+',\''+item.variable_name+'\',0,\'#{tabId}_tabs\']);return false;">'+hist_icon+'</a>\n';
+    var edit_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/variable\', ['+id+',\''+item.variable_name+'\',0,\'#{tabId}_tabs\']);return false;">'+edit_icon+'</a>\n';
     var delete_link = '<a href="javascript:" onclick="var_confirm_delete('+id+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
     var spaces = '&nbsp;';
     //if(item.used[0]) return spaces+hist_link;
@@ -77,7 +77,7 @@
         //DELETE Variable
         $.ajax({
           type: 'DELETE',
-          url: "#{project_path(@project)}/variables/"+varId+".json#{url_api_key}",
+          url: "#{project_path(@project)}/variables/"+varId+".json?#{url_api_key}",
           data: {},
           dataType: 'json',
           success: function(data){
@@ -122,16 +122,16 @@
 -#                      }.join(",\n")}
 
 
-%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
-  -#%strong MANAGE PROJECT VARIABLES (#{@variables.count})
-  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  %span(data-dojo-type="dijit.ToolbarSeparator")
-  %span(data-dojo-type="dijit.form.Button")
-    = link_to('New Variable', 'javascript:', :onclick=>"dojo.publish('voeis/project/variable', [0,'',0]);")
-  %span(data-dojo-type="dijit.ToolbarSeparator")
-  %span(data-dojo-type="dijit.form.Button")
-    = link_to('Refresh', 'javascript:', :onclick=>"refreshTab('#{tabId}');") 
-  %span(data-dojo-type="dijit.ToolbarSeparator")
+-#%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+-#  -#%strong MANAGE PROJECT VARIABLES (#{@variables.count})
+-#  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#  %span(data-dojo-type="dijit.ToolbarSeparator")
+-#  %span(data-dojo-type="dijit.form.Button")
+-#    = link_to('New Variable', 'javascript:', :onclick=>"dojo.publish('voeis/project/variable', [0,'',0]);")
+-#  %span(data-dojo-type="dijit.ToolbarSeparator")
+-#  %span(data-dojo-type="dijit.form.Button")
+-#    = link_to('Refresh', 'javascript:', :onclick=>"refreshTab('#{tabId}');") 
+-#  %span(data-dojo-type="dijit.ToolbarSeparator")
 
 -#%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;", :class=>"icon icon-#{@global ? 'voeis' : 'project'}"}
 -#%h3{:style=>"margin:0;"}
@@ -155,44 +155,58 @@
 -#= link_to('REFRESH', 'javascript:', :class=>'icon icon-copy', :onclick=>"refreshTab('#{tabId}');") 
   
 -#%br
-%br
 
-%table{:dojoType=>"dojox.grid.EnhancedGrid", 
-        :plugins=> "{nestedSorting:false, filter:true, indirectSelection:false}",  
-        :store=>"#{dataId}.variable_store", 
-        :clientSort=>"true", 
-        :sortInfo=>"1",
-        :rowSelect=>"false",
-        :style=>"width:90%;margin:0;padding:0;border:#E3EBF2 2px solid;", 
-        :style=>"width:80%;height:80%"}
-  -#:rowSelector=>"20px", 
-  -#:selectionMode=>"none", 
-  %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
-    :plain
-      //var map = dijit.byId(@project);
-      //var map = getElementById('#{@project.id}');
-      var item = this.getItem(idx);
-      var projPane = dijit.byId("overview");
-      var tabs = dijit.byId('tab_browser');
-      console.log('TAB: '+tabs.selectedChildWidget.id);
-      dojo.publish('voeis/project/sample', [parseInt(item.id.toString()),item.lab_sample_code.toString(),#{@site.nil? ? 1 : @site.id}]);
-      //this.selection.clear();
-      //if(tabs.selectedChildWidget.id=='overview') return
-      //tabs.selectChild(project);
-  %thead
-    %tr
-      %th{:field=>"variable_name", :width=>"auto"} Variable Name
-      %th{:field=>"id", :width=>"30px"} ID
-      %th{:field=>"general_category", :width=>"120px"} General Category
-      %th{:field=>"sample_medium", :width=>"120px"} Sample Medium
-      %th{:field=>"value_type", :width=>"120px"} Value Type
-      -#%th{:field=>"variable_units", :width=>"150px"} Units
-      %th{:field=>"variable_code", :width=>"auto"} Variable Code
-      %th{:field=>"_item", :width=>"75px", :formatter=>"#{dataId}.controls"} DO
+
+%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:0;padding-top:0;", 
+  :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"#{tabId}_tabs"}
+  -#, :nested=>"true"}
+
+  %table{:dojoType=>"dojox.grid.EnhancedGrid", 
+          :title=>"Variables", :id=>"vars_#{tabId}",
+          :plugins=> "{nestedSorting:false, filter:true, indirectSelection:false}",  
+          :store=>"#{dataId}.variable_store", 
+          :clientSort=>"true", 
+          :sortInfo=>"1",
+          :rowSelect=>"false",
+          :style=>"width:90%;margin:0;padding:0;border:#E3EBF2 2px solid;", 
+          :style=>"width:99%;height:80%"}
+    -#:rowSelector=>"20px", 
+    -#:selectionMode=>"none", 
+    %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
+      :plain
+        //var map = dijit.byId(@project);
+        //var map = getElementById('#{@project.id}');
+        var item = this.getItem(idx);
+        var projPane = dijit.byId("overview");
+        var tabs = dijit.byId('tab_browser');
+        console.log('TAB: '+tabs.selectedChildWidget.id);
+        dojo.publish('voeis/project/sample', [parseInt(item.id.toString()),item.lab_sample_code.toString(),#{@site.nil? ? 1 : @site.id}]);
+        //this.selection.clear();
+        //if(tabs.selectedChildWidget.id=='overview') return
+        //tabs.selectChild(project);
+    %thead
+      %tr
+        %th{:field=>"variable_name", :width=>"auto"} Variable Name
+        %th{:field=>"id", :width=>"30px"} ID
+        %th{:field=>"general_category", :width=>"120px"} General Category
+        %th{:field=>"sample_medium", :width=>"120px"} Sample Medium
+        %th{:field=>"value_type", :width=>"120px"} Value Type
+        -#%th{:field=>"variable_units", :width=>"150px"} Units
+        %th{:field=>"variable_code", :width=>"auto"} Variable Code
+        %th{:field=>"_item", :width=>"75px", :formatter=>"#{dataId}.controls"} - - -
       
-      -#%th{:field=>"id", :width=>"55px", :filterable=>true} ID
-      -#%th{:field=>"latitude", :width=>"100px", :filterable=>true} Lat
-      -#%th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
+        -#%th{:field=>"id", :width=>"55px", :filterable=>true} ID
+        -#%th{:field=>"latitude", :width=>"100px", :filterable=>true} Lat
+        -#%th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
+
+
+  %div{:dojoType=>"dojox.layout.ContentPane", :title=>"New", :id=>"new_#{tabId}", :executeScripts=>"true", 
+    :style=>"margin:0;padding:8px 0 0 8px;", :ioArgs=>"{ headers: {'Accept': 'text/html'} }", 
+    :href=>"#{project_path(@project)}/variables/0.html?site_id=0#{url_api_key}"}
+    %script{:type=>"dojo/method", :event=>"onShow"}
+      :plain
+        //var pane = dijit.byId('samples-site00');
+
 
 -#%br
 -#%br

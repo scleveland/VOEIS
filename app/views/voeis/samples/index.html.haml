@@ -1,4 +1,4 @@
-- siteId = @site.nil? ? 'site00' : 'site'+@site.id.to_s
+- siteId = @site.nil? ? 'site0' : 'site'+@site.id.to_s
 - tabId = siteId+'_samples'
 - dataId = tabId+'_data'
 
@@ -48,12 +48,17 @@
 
 
 -#%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;", :class=>"icon icon-#{@global ? 'voeis' : 'project'}"}
-%h3{:style=>"margin:0;"}
-  - if !@project.nil?
-    %span.small{:style=>"font-size:14px;"}
-      EXISTING SAMPLES (#{@samples.count})
-    - if !@site.nil?
-      = ': %s [Id:%s]'%[@site.name,@site.id]
+- if @site.nil?
+  %h3{:style=>"margin:0;"}
+    Project Samples (#{@samples.count})
+  -#  - if !@project.nil?
+  -#    %span.small{:style=>"font-size:14px;"}
+  -#      EXISTING SAMPLES (#{@samples.count})
+  -#    - if !@site.nil?
+  -#      = ': %s [Id:%s]'%[@site.name,@site.id]
+- else
+  %p(style="margin:0 0 8px 0;padding:0;font-weight:bold;")
+    EXISTING SAMPLES (#{@samples.count})
       
 -#%br
 
@@ -71,7 +76,6 @@
 -#= link_to('REFRESH', 'javascript:', :class=>'icon icon-copy', :onclick=>"refreshTab('#{tabId}');") 
   
 -#%br
-%br
 
 %table{:dojoType=>"dojox.grid.EnhancedGrid", 
         :plugins=> "{nestedSorting:false, filter:true, indirectSelection:false}",  
@@ -90,7 +94,7 @@
       var projPane = dijit.byId("overview");
       var tabs = dijit.byId('tab_browser');
       console.log('TAB: '+tabs.selectedChildWidget.id);
-      dojo.publish('voeis/project/sample', [parseInt(item.id.toString()),item.lab_sample_code.toString(),#{@site.nil? ? 1 : @site.id}]);
+      dojo.publish('voeis/project/sample', [parseInt(item.id.toString()),item.lab_sample_code.toString(),#{@site.nil? ? 1 : @site.id},'#{siteId}_tabs']);
       //this.selection.clear();
       //if(tabs.selectedChildWidget.id=='overview') return
       //tabs.selectChild(project);

@@ -67,6 +67,7 @@ class Role
       Voeis::ValueTypeCV,
       Voeis::VariableNameCV,
       Voeis::DataSet,
+      Voeis::Script,
       Voeis::Job,
       Voeis::Visit,
       Voeis::Campaign]

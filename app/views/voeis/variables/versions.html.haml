@@ -59,21 +59,24 @@
   };
   
   
-%h3{:style=>"margin-top:0;"}
-  %span.small{:style=>"font-size:14px;"}
-    HISTORY: 
-  - if @site.nil?
-    = @variable.variable_name
-  - else
-    = '%s [site-%s]'%[@variable.variable_name,@site.id]
+-#%h3{:style=>"margin-top:0;"}
+-#  %span.small{:style=>"font-size:14px;"}
+-#    HISTORY: 
+-#  - if @site.nil?
+-#    = @variable.variable_name
+-#  - else
+-#    = '%s [site-%s]'%[@variable.variable_name,@site.id]
 
-%strong
-  VARIABLE VERSIONS
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
--#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history/update', [#{@variable.id},#{@site.nil? ? 0 : @site.id}]);")
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"dojo.publish('voeis/project/variable/history/update', [#{@variable.id},#{@site.nil? ? 0 : @site.id}]);")
-%br
+-#%strong
+-#  VARIABLE VERSIONS
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#-#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/variable/history/update', [#{@variable.id},#{@site.nil? ? 0 : @site.id}]);")
+-#= link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"dojo.publish('voeis/project/variable/history/update', [#{@variable.id},#{@site.nil? ? 0 : @site.id}]);")
+-#%br
+
+%p(style="margin:8px 0 8px 0;padding:0;font-weight:bold;")
+  = 'VARIABLE HISTORY: %s [Id:%s]'%[@variable.variable_name,@variable.id]
 
 
 - projId = @project.nil? ? '' : @project.id.to_s

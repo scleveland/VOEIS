@@ -60,39 +60,33 @@
     });
     
 
-//-if @var_id>0 && siteId0!='0'
-- if @var_id>0 && @site_id>0
-  -#%div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
-  -#%span(data-dojo-type="dijit.ToolbarSeparator")
-  -#%span(data-dojo-type="dijit.form.Button")
-  -#%span(data-dojo-type="dijit.MenuSeparator")
-  -#%span(data-dojo-type="dijit.MenuBarItem")
-  -#%div(data-dojo-type="dijit.MenuBar" style="height:25px!important;margin: 0 0 15px 0;")
-  %div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;" id="#{varId}-toolbar")
-    -#%strong VARIABLE DETAILS
-    -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    %span(data-dojo-type="dijit.ToolbarSeparator")
-    %span(data-dojo-type="dijit.form.ToggleButton" jsId="#{varId}_editbutton")
-      = link_to('Edit', 'javascript:', :onclick=>"if(#{varId}_editbutton.checked){dijit.byId('#{varId}').cancel_edit(true);}else{$('##{varId}_show').hide();$('##{varId}_edit').show();}")
-    %span(data-dojo-type="dijit.ToolbarSeparator")
-    %span(data-dojo-type="dijit.form.Button")
-      = link_to('History', 'javascript:', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{siteId0}]);")
-    %span(data-dojo-type="dijit.ToolbarSeparator")
-    
-  %h3{:style=>"margin:10px 0 0 0;"}
-    %span.small{:style=>"font-size:14px;"}
-      VARIABLE DETAILS:
-    #{@site.name}: #{@variable.variable_name}
-
-- else
-  -#%h3{:style=>"margin-top:0;"}
-  %h3{:style=>"margin:0;"}
-    - if @var_id>0
-      %span.small{:style=>"font-size:14px;"}
-        EDIT:
-      = @variable.variable_name
-    - else
-      NEW VARIABLE
+-#-if @var_id>0 && siteId0!='0'
+-#- if @var_id>0 && @site_id>0
+-#  %div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;" id="#{varId}-toolbar")
+-#    -#%strong VARIABLE DETAILS
+-#    -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#    -#%span(data-dojo-type="dijit.ToolbarSeparator")
+-#    %span(data-dojo-type="dijit.form.ToggleButton" jsId="#{varId}_editbutton")
+-#      = link_to('Edit', 'javascript:', :onclick=>"if(#{varId}_editbutton.checked){dijit.byId('#{varId}').cancel_edit(true);}else{$('##{varId}_show').hide();$('##{varId}_edit').show();}")
+-#    %span(data-dojo-type="dijit.ToolbarSeparator")
+-#    %span(data-dojo-type="dijit.form.Button")
+-#      = link_to('History', 'javascript:', :onclick=>"dojo.publish('voeis/project/variable/history', [#{@variable.id},'#{@variable.variable_name}',#{siteId0},'#{siteId}_tabs']);")
+-#    %span(data-dojo-type="dijit.ToolbarSeparator")
+-#    
+-#  -#%h3{:style=>"margin:10px 0 0 0;"}
+-#  -#  %span.small{:style=>"font-size:14px;"}
+-#  -#    VARIABLE DETAILS:
+-#  -#  #{@site.name}: #{@variable.variable_name}
+-#
+-#- else
+-#  -#%h3{:style=>"margin-top:0;"}
+-#  %h3{:style=>"margin:0;"}
+-#    - if @var_id>0
+-#      %span.small{:style=>"font-size:14px;"}
+-#        EDIT:
+-#      = @variable.variable_name
+-#    - else
+-#      NEW VARIABLE
     
 
 - if @var_id>0 && @site_id>0
@@ -124,6 +118,9 @@
     -#  UNKNOWN
     -#%br
     -#%br
+    
+    -#%strong
+    -#  = "#{@variable.variable_name} [Id:#{@variable.id}]"
   
     %table{:id => "property-table", :style=>'width:45%;float:left;margin-right:15px;'}
       -if @site
@@ -223,7 +220,6 @@
     //if(parseInt(#{@var_id})) graphInit(variable.id, variable.variable_name);
     #{varId}_gdata = #{@graph_data.to_json};
     if(parseInt(#{@site_id})) graphInit(#{@site_id},#{@variable[:id].to_s},'#{@variable[:variable_name]}',#{varId}_gdata);
-    if(parseInt(#{@var_id})==0) $('##{varId}-provenance-row').hide();
     console.log('initPage: DONE');
   };
 
@@ -322,17 +318,17 @@
     };
 
 
--if @auth
+-if @auth && @site_id==0
   %div{:id=>"#{varId}_edit", :style=>"width:900px;#{(@var_id>0 && @site_id>0) ? 'display:none;' : ''}"}
 
-    %br
-    %strong EDIT VARIABLE
-    &nbsp;&nbsp;&nbsp; (* Required)
+    %p(style="margin:8px 0 8px 0;padding:0;font-weight:bold;")
+      = @variable.id==0 ? "NEW VARIABLE" : "EDIT: #{@variable.variable_name} [Id:#{@variable.id}]"
+    &nbsp;&nbsp; (* Required Fields)
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    = link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"dijit.byId('#{varId}').cancel_edit();")
-    %br
-    %br
+    %span(class="#{varId}_cancel_buttons")
+      -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-edit', :onclick=>"dijit.byId('#{varId}').cancel_edit();")
+      %button(dojoType="dijit.form.Button" value="Cancel" onclick="dijit.byId('#{varId}').cancel_edit();") Cancel
   
     -#%form(accept-charset="UTF-8" action="/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/sites/$$$id$$$" class="new_voeis_site" data-remote="true" id="site00-edit-form" method="put")
     %form(accept-charset="UTF-8" class="new_voeis_site" data-remote="true" id="#{varId}-edit-form" jsId="#{varId}_edit_form" dojoType="dijit.form.Form")
@@ -562,24 +558,29 @@
               Save Variable
               %script{:type=>"dojo/method", :event=>"startup"}
                 :plain
-                  var browse = false;
                   var form = #{varId}_edit_form;
                   var variable = #{@variable.to_json};
                   var var_id = parseInt(variable.id);
                   var site_id = parseInt(#{@site.nil? ? 0 : @site.id});
                   //var this_pane_id = '#{@project.id}-var'+var_id;
-                  var this_pane_id = 'site#{@site_id}_var'+var_id;
-                  var this_pane = dijit.byId(this_pane_id);
-                  if(this_pane) {
-                    browse = true
-                    var button_div = $('##{varId}_buttons');
-                    button_div.hide();
+                  if(site_id || var_id) {
+                    var this_pane_id = 'site#{@site_id}_var'+var_id;
                   } else {
-                    this_pane_id = 'site'+site_id+'_var'+var_id;
-                    this_pane = dojo.byId(this_pane_id);
-                    if(this_pane) this_pane = dijit.byNode(this_pane);
+                    var this_pane_id = 'new_project_variables';
+                    $('.#{varId}_cancel_buttons').hide();
+                    $('##{varId}-provenance-row').hide();
+                    //if(parseInt(#{@var_id})==0) $('##{varId}-provenance-row').hide();
                   };
-                  
+                  var this_pane = dijit.byId(this_pane_id);
+                  if(!this_pane) {
+                    this_pane = dojo.byId(this_pane_id);
+                    if(!this_pane) {
+                      //BAD! ERR! -lets blow!
+                      console.log('NO VAR PANE!!');
+                      return;
+                    };
+                    this_pane = dijit.byNode(this_pane);
+                  };
                   console.log('INIT-FORM:',form);
                   console.log('FOR VAR:',variable);
                   console.log('PANE ID:',this_pane_id);
@@ -590,7 +591,7 @@
                   //if(parseInt(#{@var_id})) graphInit(variable.id,variable.name,#{varId}_gdata);
                   //else $('##{varId}-provenance-row').hide();
                   this_pane.var_id = var_id;
-                  this_pane.cancel_edit = function(toggle_edit) {
+                  this_pane.cancel_edit = function() {
                     console.log('CANCEL! - #{varId}');
                     var varID = '#{varId}';
                     var this_pane = dijit.byId('#{varId}');
@@ -607,14 +608,14 @@
                       $(elems['var_lab_method']).val(#{@variable.lab_method_id});
                       $(elems['var_field_method']).val(#{@variable.field_method_id});
                       $(elems['var_spat_units']).val(#{@variable.spatial_units_id});
-                      if(!toggle_edit) #{varId}_editbutton.set('checked',false);
+                      //if(!toggle_edit) #{varId}_editbutton.set('checked',false);
                       $('#'+varID+'_edit').hide();
                       $('#'+varID+'_show').show();
                     } else {
-                      var tabs = dijit.byId('tab_browser');
-                      if(parseInt(#{@site_id})) var pane = dijit.byId('#{@site_id}');
-                      else var pane = dijit.byId('project_variables');
-                      if(pane) tabs.selectChild(pane);
+                      var tabs = dijit.byId('project_variables_tabs');
+                      //if(parseInt(#{@site_id})) var to_pane = dijit.byId('#{@site_id}');
+                      var to_pane = dijit.byId('vars_project_variables');
+                      if(to_pane) tabs.selectChild(to_pane);
                       if(parseInt(#{@var_id})) refreshTab('var#{@var_id}-history');
                       tabs.removeChild(this_pane);
                       //this_pane.onClose();
@@ -722,8 +723,8 @@
                     return false;
                   });
             
-            &nbsp;&nbsp;
-            %button(dojoType="dijit.form.Button" value="Cancel" onclick="dijit.byId('#{varId}').cancel_edit();") Cancel
+            %span(class="#{varId}_cancel_buttons")
+              %button(dojoType="dijit.form.Button" value="Cancel" onclick="dijit.byId('#{varId}').cancel_edit();") Cancel
 
 
 %br{:style=>'float:none; clear:both;'}

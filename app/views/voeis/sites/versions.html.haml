@@ -60,31 +60,38 @@
   };
   
   
-%h3{:style=>"margin-top:0;"}
-  %span.small{:style=>"font-size:14px;"}
-    HISTORY: 
-  = '%s [Id:%s]'%[@site.name,@site.id]
+-#%h3{:style=>"margin-top:0;"}
+-#  %span.small{:style=>"font-size:14px;"}
+-#    SITE HISTORY: 
+-#  = @site.name
+-#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#  %span.small{:style=>"font-size:11px;font-weight:bold;"}
+-#    = link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"refreshTab('#{thisTabId}');")
 
-%strong
-  SHOW SITE VERSIONS
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
--#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history/update', [#{@site.id}]);")
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"dojo.publish('voeis/project/site/history/update', [#{@site.id}]);")
-%br
+-#%strong(style="margin:5px 0 0 0;")
+-#  SITE HISTORY
+-#  -#(#{@versions.length} VERSIONS)
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#-#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history/update', [#{@site.id}]);")
+-#-#= link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"dojo.publish('voeis/project/site/history/update', [#{@site.id}]);")
+-#= link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"refreshTab('site#{@site.id}-history');")
+-#%br
+
+%p(style="margin:0 0 8px 0;padding:0;font-weight:bold;") SITE HISTORY
+-#  = ('%s History: <strong>%s</strong> [Id:%s]'%[@cv_title,@cv_item[@cv_term],@cv_item.id]).html_safe
 
 
 - projId = @project.nil? ? '' : @project.id.to_s
-#cv-versions
+%div
   = render_widget :versions, :display, :item=>@site,
                                         :versions=>@versions,
-                                        :unique_id=>"%s_site%03d"%[projId,@site.id],
-                                        :unique_jsid=>"%s_site%03d"%[projId.tr('-','$'),@site.id],
+                                        :unique_id=>"site%03d"%[@site.id],
+                                        :unique_jsid=>"site%03d"%[@site.id],
                                         :item_refs=>@site_refs,
                                         :properties=>@ver_properties,
                                         :restore_callback=>"cv_item_restore",
                                         :user=>current_user,
                                         :project=>@project
-
 
 

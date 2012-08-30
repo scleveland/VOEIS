@@ -1,5 +1,8 @@
 -### EDIT_CV widget view
 
+- edit_auth = !@current_user.nil? && (@current_user.has_role?('Data Manager',@project) || @current_user.has_role?('Principal Investigator',@project))
+- url_api_key = @current_user.nil? || @current_user.api_key.blank? ? "" : "&api_key=#{@current_user.api_key}"
+
 :javascript
   //dojoConfig = { parseOnLoad: false };
   console.log('JAVASCRIPT:LOADING!');
@@ -100,12 +103,13 @@
       var id = parseInt(item.id.toString());
       //var idx = item.idx[0];
       var idx = item._0;
+      var name = item['#{@cv_name}'].toString();
       var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" />';
       var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" />';
       //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
       //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
       //var hist_link = '<a href="'+post_url+'/versions/?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;">'+hist_icon+'</a>\n';
-      var hist_link = '<a href="javascript:" onclick="#{@tabId}_exec.cv_history('+id+');return false;">'+hist_icon+'</a>\n';
+      var hist_link = '<a href="javascript:" onclick="#{@tabId}_exec.cv_history('+id+',\''+name+'\');return false;">'+hist_icon+'</a>\n';
       var delete_link = '<a href="javascript:" onclick="#{@tabId}_exec.cv_delete('+idx+');return false;">'+delete_icon+'</a>\n';
       var spaces = '&nbsp;';
       if(item.used[0]) return spaces+hist_link;
@@ -120,7 +124,7 @@
     var new_store = store || #{@tabId}_data.cv_store;
     //console.log('STORE_NEW:',item0,item);
     $('##{@tabId}_cv_empty').hide();
-    $('##{@tabId}_cv_management').show();
+    $('##{@tabId}_cv_main').show();
     #{@tabId}_data.cv_management_grid.update();
     var item = #{@tabId}_exec.cv_data_filter(item0)
     item['used'] = false;
@@ -142,13 +146,14 @@
   
   //###############################
   //### OPEN HISTORY
-  #{@tabId}_exec.cv_history = function(id) {
+  #{@tabId}_exec.cv_history = function(id,name) {
     var hist_url = #{@tabId}_data.post_url+'/versions/?api_key=#{@current_user.api_key}&id='+id
     var hist_id = "#{@cv_title2}_"+id+"_history";
-    var hist_title = "Hist: #{@cv_title} ["+id+"]";
+    var hist_title = "Hist: "+name+" ["+id+"]";
     if(#{@tabId}_tab_loaded) {
       var hist_callback = function(){ if(window.loaded) window.loaded() };
-      dojo.publish('voeis/project/openTab',[hist_url,hist_id,hist_title,hist_callback]);
+      var close_callback = function(){ #{@tabId}_exec.cleanup(); };
+      dojo.publish('voeis/project/openTab',[hist_url,hist_id,hist_title,hist_callback,close_callback,'#{@tabId}_tabs']);
     } else {
       window.open(hist_url, hist_title, 'width=950,height=550');
     };
@@ -402,6 +407,17 @@
     #{@tabId}_cv_dialog_box.show();
   };
   
+  // CLEAN-UP FOR CLOSING
+  #{@tabId}_exec.cleanup = function() {
+    console.log('CLEANUP: #{@tabId}');
+    #{@tabId}_tabs.destroyRecursive(false);
+    #{@tabId}_cv_management.destroyRecursive(false);
+    #{@tabId}_cv_dialog_box.destroyRecursive(false);
+    #{@tabId}_copy_dialog_box.destroyRecursive(false);
+    delete #{@tabId}_data;
+    delete #{@tabId}_exec;
+  };
+  
   
   //######################################
   //##### LOADED! #####
@@ -420,8 +436,42 @@
   //##### INIT PAGE #####
   //ON-TAB-LOAD-DONE!
   function initPage() {
-     console.log('initPage: NOW!!');
-     #{@tabId}_data.cv_management_grid.startup();
+    console.log('initPage: NOW!!');
+    #{@tabId}_data.cv_management_grid.startup();
+    
+    //CLOSE PANE
+    var pane = dijit.byId('#{@tabId}');
+    if(pane)
+      pane.connect(pane, "onClose", function(){
+       //var this_pane = this;
+       //this_pane.
+       #{@tabId}_exec.cleanup();
+      });
+    
+    //EDIT TAB CLICK-OVERRIDE
+    var tabs = dijit.byId('#{@tabId}_tabs');
+    var cur_pane = tabs.selectedChildWidget;
+    var newpane = dijit.byId('#{@tabId}_cv_newtab');
+    var newclick = newpane.controlButton;
+    newclick.onClick = function(mouse_evt) {
+      console.log('CV-NEW TABclick!!',cur_pane.id);
+      cur_pane.controlButton.focus();
+      #{@cv_title2}_exec.cv_datum_new()
+      
+    };
+    //dojo.connect(newclick, "_onClick", function(item,node,evt){
+     //evt.preventDefault();
+     //console.log('CV-NEW TABclick!!',item,node,evt);
+     //#{@cv_title2}_exec.cv_datum_new()
+     
+     //var new_pane = this;
+     //var tabs = dijit.byId('#{@tabId}_tabs');
+     //var cur_pane = tabs.selectedChildWidget;
+     //console.log('CV-NEW2: onShow:',cur_pane.id);
+     //tabs.selectChild(cur_pane);
+     //cur_pane.controlButton.focus();
+    //});
+    
   };
   
 
@@ -513,7 +563,7 @@
 
 -################# COPY GLOBAL DIALOG
 
-- if !@copy_data.nil?
+- if !@copy_data.nil? && false
   %div{:id=>"#{@tabId}_copy_dialog_box", :dojoType=>"dijit.Dialog", :jsId=>"#{@tabId}_copy_dialog_box", :title=>"#{@cv_title}: Copy Global", 
         :style=>"width:760px;"}
     * click an entry to save a copy from these GLOBAL #{@cv_title} entries
@@ -567,66 +617,114 @@
 -#:selected=>"true", :useSlider=>"false", :tabStrip=>"false"}
 -#:style=>"width:870px;height:400px;margin:0;padding:0;", :selected=>"true"}
 
-%div{:id=>"#{@tabId}_cv_empty", :style=>"display:#{@cv_data.empty? ? 'block' : 'none'}"}
-  %br
-  %br
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  %strong.icon.icon-warning
-    %em NO #{@cv_title.upcase}S EXIST!
 
--##### MAIN CONTENT PANE (TAB)
-%div{:id=>"#{@tabId}_cv_management", :dojoType=>"dijit.layout.ContentPane", :title=>"#{@cv_title}", 
-  :jsId=>"#{@tabId}_cv_management", :style=>"width:860px;height:350px;margin-top:10px;display:#{@cv_data.empty? ? 'none' : 'block'}"}
-  %script{:type=>"dojo/method", :event=>"startup"}
-    :plain
-      //CLOSE PANE
-      this.connect(this, "onClose", function(){
-        //var this_pane = this;
-        //this_pane.
-        #{@tabId}_cv_management.destroyRecursive(false);
-        #{@tabId}_cv_dialog_box.destroyRecursive(false);
-        #{@tabId}_copy_dialog_box.destroyRecursive(false);
-        delete #{@tabId}_data;
-        delete #{@tabId}_exec;
-      });
+-##### MAIN TAB CONTAINER
+-#%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:900px;height:400px;margin-top:10px;padding-top:0;", 
+-#  :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"#{@tabId}_tabs"}
+-#  -#, :nested=>"true"}
+-#  %script{:type=>"dojo/method", :event=>"startup"}
+-#    :plain
+-#      //CLOSE PANE
+-#      var pane = dijit.byId('#{@tabId}');
+-#      if(pane)
+-#        pane.connect(pane, "onClose", function(){
+-#          //var this_pane = this;
+-#          //this_pane.
+-#          #{@tabId}_exec.cleanup();
+-#        });
+%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:10px;padding-top:0;", 
+  :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"#{@tabId}_tabs"}
+
+  -##### MAIN SUB TAB- MANAGEMENT
+  %div{:id=>"#{@tabId}_cv_management", :dojoType=>"dijit.layout.ContentPane", :title=>"#{@cv_title}", 
+    :jsId=>"#{@tabId}_cv_management", :style=>"margin-top:10px;"}
       
-  -#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=>"{filter:true}",  :store=>"cv_store", :selected=>true, 
-  -#    :style=>"width:90%;margin:0;padding:2px;", :jsId=>"cv_management_grid", :id=>"cv_management_grid"}
-  -#  :style=>"width:90%;margin:0;", :rowSelector=>"20px", :jsId=>"VersionDisplayGrid", :id=>"VersionDisplayGrid"}
-  %table{:dojoType=>"dojox.grid.EnhancedGrid", :store=>"#{@tabId}_data.cv_store", 
-          :plugins=> "{nestedSorting:false, filter:true, indirectSelection:false}",  
-          :clientSort=>"true", 
-          :sortInfo=>"2",
-          :style=>"margin:0;padding:0;border:#E3EBF2 2px solid;", 
-          :jsId=>"#{@tabId}_data.cv_management_grid", 
-          :id=>"#{@tabId}_data.cv_management_grid"}
-    %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
-      :plain
-        //SELECT CV TERM
-        var item = this.getItem(idx);
-        this.selection.clear();
-        //$('#cv_management').hide();
-        //$('#cv_management').show();
-        //cv_management_grid.dijit.focus;
-        //console.log('CLICKz', this.focus);
-        var this_col = this.focus.cell.index;
-        var col = this.layout.cells[1];
-        this.focus.setFocusCell(col,idx);
-        if(this_col==this.layout.cellCount-1) return;
-        console.log('CLICK!', item);
-        #{@tabId}_exec.cv_datum_edit(item);
-    %thead
-      %tr
-        - @cv_columns.each do |col|
-          %th{:field=>"#{col[:field]}", :filterable=>"#{col[:filterable]}", :width=>"#{col[:width]}", :style=>"#{col[:style]}", 
-              :formatter=>"#{col[:formatter].blank? ? '' : 'Formatter.'+col[:formatter]}"} #{col[:label]}
-        %th{:field=>"_item", :filterable=>false, :width=>"72px", :formatter=>"Formatter.controls"} DO
-      -#%th{:field=>"srs_id", :filterable=>true, :width=>"10%", :style=>""} Source ID
-      -#%th{:field=>"srs_name", :filterable=>true, :width=>"30%", :style=>""} Source Name
-      -#%th{:field=>"is_geographic", :filterable=>true, :width=>"10%", :style=>""} Geo?
-      -#%th{:field=>"notes", :filterable=>true, :width=>"", :style=>""} Notes
-      -#- @cv_columns.each do |col|
-      -#  %th{:field=>"#{col[:field]}", :filterable=>true, :width=>"#{col[:width]}", :style=>"#{col[:style]}"} #{col[:label]}
+    %div{:id=>"#{@tabId}_cv_empty", :style=>"display:#{@cv_data.empty? ? 'block' : 'none'};"}
+      %br
+      %br
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      %strong.icon.icon-warning
+        %em NO #{@cv_title.upcase}S EXIST!
+    
+    %div{:id=>"#{@tabId}_cv_main", :style=>"margin:0;padding:0;display:#{@cv_data.empty? ? 'none' : 'block'};height:100%;"}
+      
+      -#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=>"{filter:true}",  :store=>"cv_store", :selected=>true, 
+      -#    :style=>"width:90%;margin:0;padding:2px;", :jsId=>"cv_management_grid", :id=>"cv_management_grid"}
+      -#  :style=>"width:90%;margin:0;", :rowSelector=>"20px", :jsId=>"VersionDisplayGrid", :id=>"VersionDisplayGrid"}
+      %table{:dojoType=>"dojox.grid.EnhancedGrid", :store=>"#{@tabId}_data.cv_store", 
+              :plugins=> "{nestedSorting:false, filter:true, indirectSelection:false}",  
+              :clientSort=>"true", 
+              :sortInfo=>"2",
+              :style=>"margin:0;padding:0;border:#E3EBF2 2px solid;height:99%", 
+              :jsId=>"#{@tabId}_data.cv_management_grid", 
+              :id=>"#{@tabId}_data.cv_management_grid"}
+        %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
+          :plain
+            //SELECT CV TERM
+            var item = this.getItem(idx);
+            this.selection.clear();
+            //$('#cv_management').hide();
+            //$('#cv_management').show();
+            //cv_management_grid.dijit.focus;
+            //console.log('CLICKz', this.focus);
+            var this_col = this.focus.cell.index;
+            var col = this.layout.cells[1];
+            this.focus.setFocusCell(col,idx);
+            if(this_col==this.layout.cellCount-1) return;
+            console.log('CLICK!', item);
+            #{@tabId}_exec.cv_datum_edit(item);
+        %thead
+          %tr
+            - @cv_columns.each do |col|
+              %th{:field=>"#{col[:field]}", :filterable=>"#{col[:filterable]}", :width=>"#{col[:width]}", :style=>"#{col[:style]}", 
+                  :formatter=>"#{col[:formatter].blank? ? '' : 'Formatter.'+col[:formatter]}"} #{col[:label]}
+            %th{:field=>"_item", :filterable=>false, :width=>"72px", :formatter=>"Formatter.controls"} - - -
+          -#%th{:field=>"srs_id", :filterable=>true, :width=>"10%", :style=>""} Source ID
+          -#%th{:field=>"srs_name", :filterable=>true, :width=>"30%", :style=>""} Source Name
+          -#%th{:field=>"is_geographic", :filterable=>true, :width=>"10%", :style=>""} Geo?
+          -#%th{:field=>"notes", :filterable=>true, :width=>"", :style=>""} Notes
+          -#- @cv_columns.each do |col|
+          -#  %th{:field=>"#{col[:field]}", :filterable=>true, :width=>"#{col[:width]}", :style=>"#{col[:style]}"} #{col[:label]}
+
+
+  -##### 2ND SUB TAB- COPY GLOBAL
+  - if !@copy_data.nil?
+    %div{:id=>"#{@tabId}_cv_copytab", :dojoType=>"dijit.layout.ContentPane", :title=>"Copy Global", 
+      :style=>"width:860px;height:350px;margin-top:10px;display:#{@cv_data.empty? ? 'none' : 'block'}"}
+      * click an entry to save a copy from these GLOBAL #{@cv_title} entries
+      %table{:dojoType=>"dojox.grid.EnhancedGrid", :store=>"#{@tabId}_data.copy_store", 
+              :plugins=> "{filter:true}",  
+              :clientSort=>"true", 
+              :sortInfo=>"2",
+              :style=>"width:100%;height:320px;margin:0;padding:0;border:#E3EBF2 2px solid;"}
+        %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
+          :plain
+            //SELECT GLOBAL CV TERM
+            var form = #{@cv_title2}_form.domNode;
+            var item = this.getItem(idx);
+            this.selection.clear();
+            var col = this.layout.cells[1];
+            this.focus.setFocusCell(col,idx);
+            //#{@tabId}_copy_dialog_box.hide();
+            #{@tabId}_exec.cv_form_populate(item);
+            $('##{@cv_title2}_form #cv_prov_com').hide();
+            //$('##{@cv_title2}_idx').val('#'+item.idx);
+            var cv_idx = dojo.byId('#{@cv_title2}_idx');
+            if(cv_idx) cv_idx.value = '#'+item._0;
+            #{@tabId}_cv_dialog_box.set('title', 'NEW '+#{@tabId}_data.cv_title);
+            #{@tabId}_cv_dialog_box.show();
+        %thead
+          %tr
+            - @copy_columns.each do |col|
+              %th{:field=>"#{col[:field]}", :filterable=>"#{col[:filterable]}", :width=>"#{col[:width]}", :style=>"#{col[:style]}", 
+                  :formatter=>"#{col[:formatter].blank? ? '' : 'Formatter.'+col[:formatter]}"} #{col[:label]}
+
+
+  -##### SUB TAB- NEW
+  - if edit_auth
+    %div{:id=>"#{@tabId}_cv_newtab", :dojoType=>"dijit.layout.ContentPane", :title=>"NEW", 
+      :style=>"width:860px;height:350px;margin-top:10px;display:#{@cv_data.empty? ? 'none' : 'block'}"}
+      
 
 -#%br{:style=>'float:none; clear:both;'}
 

@@ -102,8 +102,10 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		if(this.site_var_stats.length>0) {
 			for(var i=0;i<this.site_var_stats.length;i++) {
 				data += '<a href="javascript:" onclick="dojo.publish(\'voeis/project/variable\', [';
-				data += this.site_var_stats[i].varid+',\''+this.site_var_stats[i].varname+'\','+this.site.id+']);">';
-				data += '<strong>'+this.site_var_stats[i].varname+'</strong></a></td><td class="smfont">\n';
+				data += this.site_var_stats[i].varid+',\''+this.site_var_stats[i].varname+'\',';
+				data += this.site.id+',\''+this.id+'_tabs\']);">';
+				data += '<strong>'+this.site_var_stats[i].varname+' ['+this.site_var_stats[i].varid;
+				data += ']</strong></a></td><td class="smfont">\n';
 				data += this.site_var_stats[i].varunits+'</td><td class="smfont">\n';
 				data += this.site_var_stats[i].count+'</td><td class="smfont">\n';
 				data += this.site_var_stats[i].first+'</td><td class="smfont">\n';
@@ -154,7 +156,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		var dates1 = [], dates2 = [];
 		for(var i=0;i<this.site_var_stats.length;i++) {
 			data += '<option value="'+this.site_var_stats[i].varid+'">';
-			data += this.site_var_stats[i].varname+': '+this.site_var_stats[i].varunits;
+			data += this.site_var_stats[i].varname+' ['+this.site_var_stats[i].varid+']: ';
+			data += this.site_var_stats[i].varunits;
 			if(parseInt(this.site_var_stats[i].count)) {
 				data += '  ['+this.site_var_stats[i].first+'&ndash;'+this.site_var_stats[i].last+']';
 				dates1.push(new Date(this.site_var_stats[i].first));
@@ -186,13 +189,17 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		
 		if(this.newSite) {
 			//this.set("title", 'NEW SITE');
+			//$(this.domNode).find('#'+siteTag+'-name-head').text('NEW SITE');
 			$(this.domNode).find('#show-'+siteTag).hide();
 			$(this.domNode).find('#edit-'+siteTag).show();
-			//$(this.domNode).find('#'+siteTag+'-name-head').text('NEW SITE');
 			$(this.domNode).find('#'+siteTag+'-edit-control').hide();
 			$(this.domNode).find('#'+siteTag+'-provenance-row').hide();
 			$(this.domNode).find('#'+siteTag+'-toolbar').hide();
 			$(this.domNode).find('#'+siteTag+'-detail-label').hide();
+			$(this.domNode).find('#'+siteTag+'-edit-buttons').hide();
+			$(this.domNode).find('#'+siteTag+'_tabs .dijitTabContainerTop-tabs').hide()
+			var editPane = dijit.byId('edit-'+siteTag);
+			dijit.byId(siteTag+'_tabs').selectChild(editPane);
 			console.log('NewSite:',siteTag);
 			console.log('domNode.id:',this.domNode.id);
 			

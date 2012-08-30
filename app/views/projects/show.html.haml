@@ -23,6 +23,8 @@
 
 -########################
 - edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project))
+- url_api_key = current_user.nil? || current_user.api_key.blank? ? "" : "?api_key=#{current_user.api_key}"
+- url_api_key0 = current_user.nil? || current_user.api_key.blank? ? "" : "&api_key=#{current_user.api_key}"
 -#- site_id = @site.nil? ? 0 : @site.id
 -# tabId = @project.id.to_s+'-site'+site_id.to_s+'-data'
 -#- tabId = 'site'+site_id.to_s+'_data'
@@ -412,23 +414,40 @@
 
     function data_value_edit_setup(){};
     
-    // REFRESH TAB
+    //### REFRESH TAB
+    //# TABS: tab_browser --> site1 ----------------> _tabs
+    //#                       site1_dataquery_001 --> _tabs
+    //#                       project_variables ----> _tabs
+    //#                       cv_vertical_datum ----> _tabs
+    //#                       dataset3
     function refresh_tab() {
       var tabs = dijit.byId('tab_browser');
-      selected = tabs.selectedChildWidget;
+      var selected = tabs.selectedChildWidget;
       console.log('REFRESH:',selected.id);
       if(selected.id!='overview' && selected.id!='SiteDisplayGrid') {
-        //if(selected.id.match(/site\d+/))
-        if(selected.siteUpdate) selected.siteUpdate();
-        else selected.refresh();
-      }
-      
+        if(selected.id.match(/site\d+_dataquery_/)) {
+          console.log('REFRESH DATAQUERY TAB!');
+          var tabs = dijit.byId(selected.id+'_tabs');
+          var selected = tabs.selectedChildWidget;
+          selected.refresh();
+        } else if(selected.id.match(/site\d+/)) {
+          console.log('REFRESH SITE TAB!');
+          var tabs = dijit.byId(selected.id+'_tabs');
+          var selected = tabs.selectedChildWidget;
+          if($.inArray(selected.id.slice(0,5),['show-','edit-','query'])>=0)
+            return;
+        };
+        selected.refresh();
+          
+        //if(selected.siteUpdate) selected.siteUpdate();
+      };
+    
     };
     
     // OPEN CV MANAGEMENT TAB
     function cv_pop(title,title2,href,updElemID,callback) {
       var cv_url = href;
-      var cv_id = title2;
+      var cv_id = 'cv_'+title2;
       var cv_title = title;
       if(updElemID)
         window.update_select_element=$('#'+updElemID);
@@ -855,7 +874,7 @@
   %script{:type=>"dojo/method", :event=>"startup"}
     :plain
       error_dialog.pop = function(msg,dly,ttl){
-        var delay = dly==null ? 3000 : dly;
+        var delay = dly==null ? 3000 : dly*1000;
         if(ttl) error_dialog.set('title',ttl);
         $('#error_dialog .error_message').html(msg);
         error_dialog.show();
@@ -1845,7 +1864,7 @@
         count = ('0000'+count).slice(-3);
         var tabTitle = 'Data Query Results: '+count;
         //var tabId = '#{@project.id}-dataquery'+count;
-        var tabId = 'site0_dataquery'+count;
+        var tabId = 'site0_dataquery_'+count;
       };
       var tabHref = "/projects/#{@project.id}/samples/search?tab_id="+tabId+"&"+qstring;
       var tabLoaded = function(varId,varName) {
@@ -1884,7 +1903,7 @@
     
     var openSampsTab = function(tabs, projectId, varId, varName, siteId) {
       var tabTitle = 'Samples: Site-'+siteId;
-      var projVarId = '#{@project.id}-site'+siteId+'-var'+varId;
+      var projVarId = 'site'+siteId+'-var'+varId;
       var projVarHref = "/projects/#{@project.id}/samples/";
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
@@ -1900,8 +1919,8 @@
     var openVarTab = function(tabs, projectId, varId, varName, siteId) {
       var tabTitle = 'NEW VARIABLE';
       if(parseInt(varId)) {
-        tabTitle = 'Edit: '+varName;
-        if(parseInt(siteId)) tabTitle = 'Site-'+siteId+': '+varName;
+        tabTitle = 'Edit: '+varName+' ['+varId+']';
+        if(parseInt(siteId)) tabTitle = 'Variable: '+varName+' ['+varId+']';
       };
       //var varPane = new voeis.ui.VariablePane();
       var projVarId = 'site'+siteId+'_var'+varId;
@@ -1920,8 +1939,8 @@
 
     var openSampTab = function(tabs, projectId, sampId, sampName, siteId) {
       //var varPane = new voeis.ui.VariablePane();
-      var tabTitle = 'Site-'+siteId+': '+sampName;
-      var projSampId = '#{@project.id}-samp'+sampId;
+      var tabTitle = 'Sample Data: '+sampName;
+      var projSampId = 'samp'+sampId;
       var projSampHref = "/projects/#{@project.id}/samples/"+sampId+".html";
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
@@ -1936,7 +1955,7 @@
       //var varPane = new voeis.ui.VariablePane();
       var projTabTitle = 'History: Site-'+siteId;
       var projHistHref = "/projects/#{@project.id}/sites/versions?id="+siteId;
-      var projHistId = '#{@project.id}-site'+siteId+'-history';
+      var projHistId = 'site'+siteId+'-history';
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
       var projHistLoad = function(siteId,varName) {
@@ -1947,7 +1966,7 @@
 
     //##### DATA-VALUE HISTORY TAB
     var openDataHistoryTab = function(tabs, projectId, dataId, dataVal, varId, varName, siteId, tabId) {
-      var tabTitle = 'History: Site-'+siteId+' / '+varName+' ('+dataVal+')';
+      var tabTitle = 'Data History: '+varName+' ('+dataVal+')';
       var projHistHref = "/projects/#{@project.id}/data_values/versions?id="+dataId+"&tab_id="+tabId;
       projHistHref += '#{current_user.nil? ? "" : "&api_key="+current_user.api_key.to_s}';
       // "/projects/#{@project.id}/variables/versions?id="+varId+"&site_id="+siteId;
@@ -1963,7 +1982,7 @@
     //##### VARIABLE HISTORY TAB
     var openVarHistoryTab = function(tabs, projectId, varId, varName, siteId) {
       siteId = parseInt(siteId);
-      var tabTitle = 'History: '+(siteId? 'Site-'+siteId+': ' : '')+varName;
+      var tabTitle = (siteId? 'Variable Hist: ' : 'Hist: ')+varName+' ['+varId+']';
       var projVarHistHref = "/projects/#{@project.id}/variables/versions?id="+varId;
       if(siteId) projVarHistHref += "&site_id="+siteId;
       //var projVarHistId = '#{@project.id}-site'+siteId+'-var'+varId+'-history';
@@ -1977,7 +1996,7 @@
     };
 
     //######### open project tab ##########
-    var openProjTab = function(tabs, tabHref, tabId, tabTitle, tabLoad) {
+    var openProjTab = function(tabs, tabHref, tabId, tabTitle, tabLoad, tabClose) {
       //###SCROLL TO TOP
       //window.scrollTo(0,0);
       $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
@@ -1993,8 +2012,8 @@
           style: "margine-top:0!important;padding-top:0!important;float:left;",
           closable: true,
           //parseOnLoad: false,
-        	executeScripts: true,
-      	  ioArgs: { headers: {"Accept": "text/html"} },
+          executeScripts: true,
+          ioArgs: { headers: {"Accept": "text/html"} },
           store: voeis.Server.DEFAULT,
           onDownloadEnd: function(){
             console.log('tab-load-done-NOW!');
@@ -2019,7 +2038,7 @@
             this_pane.destroyRecursive(false);
             //dojo.destroy(this_pane);
             //### tab close callback
-            //tabClose();
+            if(tabClose) tabClose();
             return false;
           },
           href: tabHref});
@@ -2138,10 +2157,10 @@
       openDataQueryResultsTab(tabs, projectId, siteId, qstring);
     });
     
-    dojo.subscribe("voeis/project/data/history", function(dataId,dataVal,varId,varName,siteId,tabId) {
+    dojo.subscribe("voeis/project/data/history", function(dataId,dataVal,varId,varName,siteId,tabId,tabsId) {
       console.log('DATA-VALUE HISTORY',arguments);
       var projectId = "#{@project.id}";
-      var tabs = dijit.byId('tab_browser');
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
       openDataHistoryTab(tabs, projectId, dataId, dataVal, varId, varName, siteId,tabId);
     });
 
@@ -2155,24 +2174,24 @@
       };
     });
 
-    dojo.subscribe("voeis/project/sample", function(sampId,sampName,siteId) {
+    dojo.subscribe("voeis/project/sample", function(sampId,sampName,siteId,tabsId) {
       console.log('SAMPLE',arguments);
       var projectId = "#{@project.id}";
-      var tabs = dijit.byId('tab_browser');
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
       openSampTab(tabs, projectId, sampId, sampName, siteId);
     });
 
-    dojo.subscribe("voeis/project/variable", function(varId,varName,siteId) {
+    dojo.subscribe("voeis/project/variable", function(varId,varName,siteId,tabsId) {
       console.log('VARIABLE',arguments);
       var projectId = "#{@project.id}";
-      var tabs = dijit.byId('tab_browser');
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
       openVarTab(tabs, projectId, varId, varName, siteId);
     });
 
-    dojo.subscribe("voeis/project/variable/history", function(varId,varName,siteId) {
+    dojo.subscribe("voeis/project/variable/history", function(varId,varName,siteId,tabsId) {
       console.log('VAR HISTORY:',arguments);
       var projectId = "#{@project.id}";
-      var tabs = dijit.byId('tab_browser');
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
       openVarHistoryTab(tabs, projectId, varId, varName, siteId);
     });
 
@@ -2279,13 +2298,15 @@
       openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
     });
     
-    dojo.subscribe("voeis/project/openTab", function(tabHref,tabId,tabTitle,load_callback) {
+    dojo.subscribe("voeis/project/openTab", function(tabHref,tabId,tabTitle,load_callback,close_callback,tabsId) {
       console.log('OPEN-TAB',arguments);
       var projectId = "#{@project.id}";
-      var tabs = dijit.byId('tab_browser');
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
       var loadCallback = load_callback || function() {
       };
-      openProjTab(tabs, tabHref, tabId, tabTitle, loadCallback);
+      var closeCallback = close_callback || function() {
+      };
+      openProjTab(tabs, tabHref, tabId, tabTitle, loadCallback, closeCallback);
     });
     
     dojo.subscribe("tab_browser-selectChild", function(selected){
