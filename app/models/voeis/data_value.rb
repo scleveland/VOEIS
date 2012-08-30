@@ -228,6 +228,7 @@ class Voeis::DataValue
     else
        data_value = {:message => "No new Records were saved - it appears this file has already been parsed and stored."}
     end
+    system 'gzip #{csv_file}'
     return_hash = {:total_records_saved => total_records, :rows_skipped => skipped_rows, :total_rows_parsed => rows_parsed, :last_record => Voeis::DataValue.last(:site_id=> site_id, :variable_id => data_col_array[variable_cols.last][0].id, :order => [:created_at]).as_json, :last_record_for_this_file => data_value.as_json,:errors=>errors}
   end
   
