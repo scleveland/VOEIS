@@ -6,6 +6,10 @@
 # FILE: routes.rb
 #
 #
+
+require 'resque/server' 
+
+
 Yogo::Application.routes.draw do
   
   #Project Namespace
@@ -245,7 +249,6 @@ Yogo::Application.routes.draw do
     resources :data_values
   end
 
-  
   resources :users do
     collection do
       post :api_key_update
@@ -332,6 +335,20 @@ Yogo::Application.routes.draw do
       get :get_api_key
     end
   end
+  resque_constraint = lambda do |request|
+    User.current.admin?
+  end
+
+  # constraints resque_constraint do
+  #   mount Resque::Server, :at => "/admin/resque"
+  # end
+  
+
+    # constraints CanAccessResque.matches?() do
+    #     mount Resque::Server.new, at: 'resque'
+    #   end
+    # 
+  mount SecureResqueServer.new, :at => "/resque"
   # resource :user_session,   :only => [ :show, :new, :create, :destroy, :get_api_key ], :collection=>{:get_api_key => 'get'}
   match '/logout' => 'user_sessions#destroy', :as => :logout
   match '/login' => 'user_sessions#new', :as => :login

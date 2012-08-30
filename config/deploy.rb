@@ -12,7 +12,11 @@ set :use_sudo,    false
 set :deploy_via, :remote_cache
 set :copy_exclude, [".git"]
 set :user, "rails"
+#set :user, "sean.cleveland"
 set :deploy_to, "/var/rails"
+#set :deploy_to, "/var/voeis"
+
+set :workers, { "process_file" => 2 }
 
 desc "Setup Development Settings"
 task :development do
@@ -29,6 +33,16 @@ task :production do
   role :web, "voeis.rcg.montana.edu"
   role :app, "voeis.rcg.montana.edu"
   role :db,  "voeis.rcg.montana.edu", :primary => true
+
+end
+
+desc "Setup Production Settings"
+task :production2 do
+
+  set :branch, "production"
+  role :web, "voeis2.rcg.montana.edu"
+  role :app, "voeis2.rcg.montana.edu"
+  role :db,  "voeis2.rcg.montana.edu", :primary => true
 
 end
 
@@ -109,14 +123,52 @@ end
 namespace :jobs do
   desc "Start up worker jobs"
   task :start do
-    run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec rake jobs:work >> log/delayed_worker.log'"
+    #run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec rake jobs:work >> log/delayed_worker.log'"
+    run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec rake resque:work QUEUE=* COUNT=1"  
   end
   
   desc "Stop the remote worker jobs"
   task :stop do
     run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec rake jobs:stop'"
   end
+  
+  desc "Stop resque web interface"
+  task :web_stop do
+    run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec resque-web -K'"
+  end
+  
+  desc "Start resque web interface"
+  task :web_start do
+    run "bash -l -c 'cd #{current_release}; RAILS_ENV=production bundle exec resque-web'"
+  end
+  
+  desc "Restart Resque Workers"
+  task :restart_workers, :roles => :db do
+    run_remote_rake "resque:restart_workers"
+  end
+
+  desc "Restart Resque scheduler"
+  task :restart_scheduler, :roles => :db do
+    run_remote_rake "resque:restart_scheduler"
+  end
 end
+
+
+##
+# Rake helper task.
+# http://pastie.org/255489
+# http://geminstallthat.wordpress.com/2008/01/27/rake-tasks-through-capistrano/
+# http://ananelson.com/said/on/2007/12/30/remote-rake-tasks-with-capistrano/
+def run_remote_rake(rake_cmd)
+  rake_args = ENV['RAKE_ARGS'].to_s.split(',')
+  cmd = "cd #{fetch(:latest_release)} && #{fetch(:rake, "rake")} RAILS_ENV=#{fetch(:rails_env, "production")} #{rake_cmd}"
+  cmd += "['#{rake_args.join("','")}']" unless rake_args.empty?
+  run cmd
+  set :rakefile, nil if exists?(:rakefile)
+end
+
+
+
 
 # These are one time setup steps
 after "deploy:setup",       "assets:setup"
@@ -125,3 +177,6 @@ after "deploy:setup",       "assets:setup"
 after "deploy:update_code", "db:symlink"
 after "deploy:update_code", "assets:symlink"
 after "deploy:update_code", "docs:publish"
+after "deploy:update_code", "jobs:restart_workers"
+after "deploy:update_code", "jobs:web_stop"
+after "jobs:web_stop", "jobs:web_start"

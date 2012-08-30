@@ -177,8 +177,8 @@
             -#= link_to("About", page_url(:about), :dojoType => "yogo.ui.MenuLink")
             = link_to("Help", "http://yogo.github.com/voeis-docs/index.html",:dojoType => "yogo.ui.MenuLinkBlankTarget") 
             -#= link_to("Video Tutorials", page_url(:video_tutorials), :dojoType => "yogo.ui.MenuLink")  
-            = link_to("Development Activity", page_url(:activity), :dojoType => "yogo.ui.MenuLink")
-            = link_to("Development Roadmap", page_url(:roadmap), :dojoType => "yogo.ui.MenuLink")
+            -#= link_to("Development Activity", page_url(:activity), :dojoType => "yogo.ui.MenuLink")
+            -#= link_to("Development Roadmap", page_url(:roadmap), :dojoType => "yogo.ui.MenuLink")
             = link_to("Developers", "https://voeis.msu.montana.edu/doc/yard/_index.html", :dojoType => "yogo.ui.MenuLinkBlankTarget") 
             -if !current_user.nil? && current_user.system_role.name=='Administrator'
               %div{:dojoType=>"dijit.MenuSeparator"}

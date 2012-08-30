@@ -106,7 +106,7 @@ class Voeis::DataValue
   #
   # @api publicsenosr
   def self.parse_logger_csv(csv_file, data_stream_template_id, site_id, start_line, sample_type, sample_medium, user_id)
-    puts "USER ID: #{user_id} ********************************"
+    #puts "USER ID: #{user_id} ********************************"
     #Determine how the time is stored
     errors = ""
     if !Voeis::DataStream.get(data_stream_template_id).data_stream_columns.first(:name => "Timestamp").nil?
@@ -140,23 +140,23 @@ class Voeis::DataValue
     meta_tag_cols = Array.new
     meta_tag_hash = Hash.new
     sample_id = -1
-    puts "Creating Hashes ********************************"
+    #puts "Creating Hashes ********************************"
     Voeis::DataStream.get(data_stream_template_id).data_stream_columns.each do |col|
       data_col_array[col.column_number] = [col.variables.first, col.unit, col.name]
       if col.name != "Ignore"  && col.name != "Timestamp"  && col.name != "Time" && col.name != "Date" && col.name !=  "VerticalOffset" && col.name !=  "EndingVerticalOffset" && col.name !=  "SampleID" && col.name != "ignore" && col.name != "MetaTag"
-        puts "Variable COL ********************************"
+        #puts "Variable COL ********************************"
         variable_cols << col.column_number
         
         unless col.sensor_types.empty?
-          puts "Sensor HASH ********************************"
+          #puts "Sensor HASH ********************************"
           sensor_cols << col.column_number
           sensor_col_hash[col.column_number.to_s] = col.sensor_types.first.id
         end
       elsif col.name ==  "SampleID"
-        puts "SAMPLE ID COL ********************************"
+        #puts "SAMPLE ID COL ********************************"
         sample_id = col.column_number
       elsif col.name = "MetaTag"
-        puts "MetaTag HASH ********************************"
+        #puts "MetaTag HASH ********************************"
         meta_tag_cols = col.column_number
         meta_tag_hash[col.column_number.to_s] = col.meta_tag
       end
@@ -165,7 +165,7 @@ class Voeis::DataValue
         
       #end
     end
-    puts "DONE Creating Hashes ********************************"
+    #puts "DONE Creating Hashes ********************************"
     if Voeis::DataValue.last(:order =>[:id.asc]).nil?
       starting_id = -9999
     else
@@ -185,7 +185,7 @@ class Voeis::DataValue
       user = User.get(user_id)
     end
     create_comment = "Created at #{created_at} by #{user.first_name} #{user.last_name} [#{user.login}]"
-    rows = CSV.read(csv_file)
+    #rows = CSV.read(csv_file)
     results = Hash.new
     total_results = Array.new
     total_records = 0
@@ -251,7 +251,7 @@ class Voeis::DataValue
   # @api public
   def self.parse_logger_row(data_timestamp_col, data_stream_id, vertical_offset_col, date_col, time_col, row, site_id, data_col_array, variable_cols, meta_tag_cols, meta_tag_hash, sample_id, sample_type, sample_medium, end_vertical_offset_col, sensor_col_array,sensor_cols, sensor_col_hash, source_id, dst_time, dst, user,filename, row_number)
     require 'chronic'  #for robust timestamp parsing
-     puts "INSIDE USER ID: #{user.id} ********************************"
+     #puts "INSIDE USER ID: #{user.id} ********************************"
     name = 2
     variable = 0
     sensor = 0
@@ -279,7 +279,7 @@ class Voeis::DataValue
     #if (Voeis::DataValue.first(:local_date_time => timestamp) & 
     
     if Voeis::DataValue.first(:datatype=>data_stream.type, :local_date_time=>timestamp, :site_id=> site_id, :variable_id => data_col_array[variable_cols[0]][variable].id).nil? || sample_id != -1
-          puts "INSIDE For Insert ********************************"
+          #puts "INSIDE For Insert ********************************"
           created_at = updated_at = Time.now.strftime("%Y-%m-%dT%H:%M:%S%z")
           create_comment = "Created at #{created_at} by #{user.first_name} #{user.last_name} [#{user.login}]"
           row_values = []
@@ -310,7 +310,7 @@ class Voeis::DataValue
                #                               :variable_id=>data_col_array[i][variable].id, :filename=>filename, :sample_id=>newsample_id))
             elsif data_col_array[i][name] == "MetaTag"
               meta_values << "('#{row[i].to_s}', '#{meta_tag_hash[i.to_s].name}', '#{meta_tag_hash[i.to_s].category}', '#{updated_at}', '#{created_at}', #{user.id}, '#{create_comment}')"
-              puts "INSIDE META VALUES ********************************"
+              #puts "INSIDE META VALUES ********************************"
             end #end if
           end #end loop
           if !row_values.empty?
@@ -385,10 +385,10 @@ class Voeis::DataValue
               }.join(',')
               repository.adapter.execute(sql)
               #puts "AFTER SAMPLE ASSOC ********************************"
-            else
-               sql = "INSERT INTO \"voeis_data_value_sensor_types\" (\"data_value_id\",\"sensor_type_id\") VALUES "
-               sql << sensor_sql.join(',')
-               repository.adapter.execute(sql)
+            #else
+               #sql = "INSERT INTO \"voeis_data_value_sensor_types\" (\"data_value_id\",\"sensor_type_id\") VALUES "
+               #sql << sensor_sql.join(',')
+               #repository.adapter.execute(sql)
                #puts "AFTER SENSOR TYPE ASSOC ********************************"
            end
         end#end if
