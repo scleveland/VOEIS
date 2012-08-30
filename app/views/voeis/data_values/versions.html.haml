@@ -133,23 +133,31 @@
   };
   
   
-%h3{:style=>"margin-top:0;"}
-  %span.small{:style=>"font-size:14px;"}
-    HISTORY: 
-  = 'site-%s / %s [%s / %s]'% [@site.id,
-                                @variable.variable_name,
-                                @data_value.local_date_time.strftime("%Y-%m-%d %H:%M:%S"),
-                                @data_value.data_value.to_s]
+-#%h3{:style=>"margin:8px 0 0 0;"}
+-#  %span.small{:style=>"font-size:14px;"}
+-#    DATA HISTORY: 
+-#  = ('%s [Id:%s] &mdash; [%s / %s]'% [@variable.variable_name,
+-#                     @variable.id,
+-#                     @data_value.local_date_time.strftime("%Y-%m-%d %H:%M:%S"),
+-#                     @data_value.data_value]).html_safe
+-#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#  %span.small{:style=>"font-size:11px;font-weight:bold;"}
+-#    = link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"refreshTab('#{thisTabId}');")
 
-%strong
-  SHOW DATA VALUE VERSIONS
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
--#= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
--#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/data/history/update', [#{@data_value.id}]);")
--#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"refreshTab('#{thisTabId}');")
-= link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"refreshTab('#{thisTabId}');")
-%br
+%p(style="margin:8px 0 0 0;padding:0;")
+  %strong
+    -#SHOW DATA VALUE VERSIONS
+    DATA HISTORY:
+    = ('%s [Id:%s] &mdash; [%s / %s]'% [@variable.variable_name,
+                       @variable.id,
+                       @data_value.local_date_time.strftime("%Y-%m-%d %H:%M:%S"),
+                       @data_value.data_value]).html_safe
+  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  -#= link_to('RETURN', 'javascript:', :class=>'icon icon-cancel', :onclick=>"back_or_close();")
+  -#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/data/history/update', [#{@data_value.id}]);")
+  -#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"refreshTab('#{thisTabId}');")
+  -##= link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"refreshTab('#{thisTabId}');")
 
 
 #cv-versions

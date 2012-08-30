@@ -18,11 +18,7 @@ class Voeis::VariablesController < Voeis::BaseController
     @project = parent
     @auth = !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
     @var_id = params[:id].to_i
-    if params[:site_id].nil?
-      @site_id = 0
-    else
-      @site_id = params[:site_id].to_i
-    end
+    @site_id = params[:site_id].nil? ? 0 : params[:site_id].to_i
     @variable = Voeis::Variable.new
     @variable.id = 0
     @variable_ref = {}
@@ -107,6 +103,11 @@ class Voeis::VariablesController < Voeis::BaseController
     #logger.debug('>>>> data = '+@data.to_s)
     #@versions = parent.managed_repository{Voeis::Site.get(params[:id]).versions}
     
+    ### NEED to seperate SHOW & EDIT views for Variable
+    #if @site_id==0
+    #  render 'edit.html.haml'
+    #  return
+    #end
   end
 
   # GET /variables

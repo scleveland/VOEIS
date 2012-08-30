@@ -183,23 +183,30 @@
 - dataSetGrid = "dataSet" + @data_set.id.to_s + "_grid"
 - dataSetStore ="dataSet" + @data_set.id.to_s + "_store"
 -#%h3{:style=>"margin:5px 0;"}
-%h3{:style=>"margin-top:0;"}
+%h3{:style=>"margin:0 0 10px 0;"}
+  %span.small{:style=>"font-size:14px;"}
+    DATA SET:
   #{@data_set.name}
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  %span(style="font-size:11px;")
+    -if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
+      %button(dojoType="dijit.form.Button" value="Remove" onclick="ConfirmRemoveSelectedFromDataSet(#{@data_set.id},#{dataSetGrid});") Remove Selected Data
+      &nbsp;&nbsp;
+    %button(dojoType="dijit.form.Button" value="Export" onclick="ExportDataSet(#{@data_set.id});") Export Data Set
 
-%strong DATA SET DETAILS
+-#%strong DATA SET DETAILS
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#-if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
+-#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#  = link_to('REMOVE SELECTED DATA FROM DATA SET', 'javascript:', :class=>'icon icon-cancel', :onclick=>"RemoveSelectedFromDataSet(#{@data_set.id},#{dataSetGrid});return false;") 
+-#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-#= link_to('EXPORT DATA SET', 'javascript:', :class=>'icon icon-proj', :onclick=>"ExportDataSet(#{@data_set.id});return false;") 
+-#%br
+-#%br
 
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
--if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-  = link_to('REMOVE SELECTED DATA FROM DATA SET', 'javascript:', :class=>'icon icon-cancel', :onclick=>"RemoveSelectedFromDataSet(#{@data_set.id},#{dataSetGrid});return false;") 
-
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-= link_to('EXPORT DATA SET', 'javascript:', :class=>'icon icon-proj', :onclick=>"ExportDataSet(#{@data_set.id});return false;") 
-
-%br
-%br
-
-%div{:id=>"#{dataSetGrid}", :style=>"width:900px;height:475px;"}
+%div{:id=>"#{dataSetGrid}", :style=>"width:90%;height:375px;"}
 %br
 -if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
   %button(dojoType="dijit.form.Button" name="remove_data_button" onclick="RemoveSelectedFromDataSet(#{@data_set.id},#{dataSetGrid});") 
@@ -216,6 +223,18 @@
   function ExportDataSet(setId){
     window.location= '#{root_url}projects/#{@project.id}/data_sets/'+setId+'/export';
   }
+  
+  function ConfirmRemoveSelectedFromDataSet(setId,grid){
+    confirmDialog('Confirm: Remove from Data Set &mdash;',
+      'ARE YOU SURE?\n<br/>REMOVE '+sel_data_len+' DATA VALUES FROM: \n<br/>'+datasetname,
+      function(yes){
+        console.log('CONFIRM:',yes);
+        if(!yes) return;
+        //REMOVE SELECTED DATA####
+        RemoveSelectedFromDataSet(setId,grid);
+      }, 
+      { buttonOk:'YES', buttonCancel:'Cancel' });
+  };
   
   function RemoveSelectedFromDataSet(setId,grid){
     //get the data values
@@ -294,7 +313,7 @@
      field: 'local_date_time',
      name: 'Timestamp',
      formatter: set_grid_formatter.dateTime,
-     width: '185px'
+     width: '165px'
   },
   {
      field: 'vertical_offset',

@@ -2,11 +2,49 @@
 - edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project))
 - url_api_key = current_user.nil? || current_user.api_key.blank? ? "" : "?api_key=#{current_user.api_key}"
 
+:css
+  div.gridbutton {
+      width: 10px;
+      height: 12px;
+      font-size: smaller;
+      font-weight: bold;
+      text-align: center;
+      opacity:0.3;
+      filter:alpha(opacity=30); /* For IE8 and earlier */
+      color: #999;
+      color: #fff;
+      background-color: #ccc;
+      background-color: #055;
+      padding: 3px;
+  }
+  .gridbutton {
+      position: absolute;
+      cursor: pointer;
+  }
+  #xxx {
+      opacity:0.6;
+      filter:alpha(opacity=60); /* For IE8 and earlier */
+  
+  }
+  
+  #gridContainer img { margin:0; }
+  #gridContainer a { margin:0; }
+  
+  ##{@tabId}_query_script .dijitButton .dijitButtonNode { width:70px!important; }
+  ##{@tabId}_query_script .dijitButton.bigButton .dijitButtonNode { width:170px!important; }
+  
+  #xxgrid_toolbar .dijitButtonText { color:#777!important; }
+  #plot_toolbar .dijitButtonText { color:#398a93!important; }
+  #grid_toolbar .dijitButtonText { color:#398a93!important; }
+
+
 -#%h3{:style=>"margin:5px 0;"}
-%h3{:style=>"margin-top:0;"}
-  = @site_name+':'
-  Query Results
-  [#{@tabId[-3,3]}]
+%h3{:style=>"margin:0 0 10px 0;"}
+  %span.small{:style=>"font-size:14px;", :id=>"site00-detail-label"}
+    QUERY RESULTS
+    [#{@tabId[-3,3]}]:
+  = "#{@site_name} / #{@var_name} [Id:#{@variable.id}]"
+  -#%span.small{:style=>"font-size:11px;font-weight:bold;"}
 
 
 -# #pagination-links
@@ -29,38 +67,10 @@
 
 -else
   
-  :css
-    div.gridbutton {
-        width: 10px;
-        height: 12px;
-        font-size: smaller;
-        font-weight: bold;
-        text-align: center;
-        opacity:0.3;
-        filter:alpha(opacity=30); /* For IE8 and earlier */
-        color: #999;
-        color: #fff;
-        background-color: #ccc;
-        background-color: #055;
-        padding: 3px;
-    }
-    .gridbutton {
-        position: absolute;
-        cursor: pointer;
-    }
-    #xxx {
-        opacity:0.6;
-        filter:alpha(opacity=60); /* For IE8 and earlier */
-    
-    }
-    
-    #gridContainer img { margin:0; }
-    #gridContainer a { margin:0; }
-    
-    ##{@tabId}_query_script .dijitButton .dijitButtonNode { width:70px!important; }
-
-  
   = javascript_include_tag(:defaults, "jquery.flot.min.js", "jquery.flot.selection.min.js","jquery.flot.navigate.min.js")
+  -#= stylesheet_link_tag 'jquery.jdMenu.css', :media => 'screen, projection'
+  -#= javascript_include_tag(:defaults, "jquery.flot.min.js", "jquery.flot.selection.min.js","jquery.flot.navigate.min.js",'jdMenu-1.4.1/jquery.bgiframe.js','jdMenu-1.4.1/jquery.dimensions.js','jdMenu-1.4.1/jquery.positionBy.js','jdMenu-1.4.1/jquery.jdMenu.js')
+  -#= javascript_include_tag(:defaults, 'jdMenu-1.4.1/jquery.bgiframe.js','jdMenu-1.4.1/jquery.dimensions.js','jdMenu-1.4.1/jquery.positionBy.js','jdMenu-1.4.1/jquery.jdMenu.js')
   
   -if edit_auth
     :javascript
@@ -147,11 +157,72 @@
       var data_del_url = '';
   
   
-  %div{:id=>"#{@tabId}_query_results"}
-    -form_tag(:controller=>'samples', :action=>'export') do 
+  -#%div{:id=>"#{@tabId}_query_results"}
+  %div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:10px;padding-top:0;", 
+    :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"#{@tabId}_tabs"}
+    -#:prop=>"parseOnLoad:true;", :tabPosition=>"top", :useSlider=>"true", :tabStrip=>"true"}
+    -#:prop=>"parseOnLoad:true;", :tabPosition=>"left-h", :tabStrip=>"false", :nested=>"true"}
+    
+    %div{:id=>"#{@tabId}_plot_view", :dojoType=>"dojox.layout.ContentPane", :title=>"Graph", 
+      :style=>"margin:0;padding:0;", :selected=>"true"}
+      -#:style=>"margin:0;padding:0;", :selected=>"true", :useSlider=>"false", :tabStrip=>"false"}
+      %script{:type=>"dojo/method", :event=>"onShow"}
+        :plain
+          //var tabs = dijit.byId('#{@tabId}_query_tabs');
+          //var pane0 = dijit.byId('#{@tabId}_plot_view');
+          //tabs.selectChild(pane0);
+          #{dataId}.update_views();
       
-      %strong
-        QUERY DATES:
+      %div(data-dojo-type="dijit.Toolbar" id="plot_toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+        &nbsp;&nbsp;
+        %strong SELECT
+        &nbsp;&nbsp;&nbsp;
+        -#%span(data-dojo-type="dijit.ToolbarSeparator")
+        -#%span(data-dojo-type="dijit.form.Button")
+        %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('CLR');") Clear All
+        %span(data-dojo-type="dijit.ToolbarSeparator")
+        %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('ALL');") Select All
+        %span(data-dojo-type="dijit.ToolbarSeparator")
+        %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('DEL');") Delete Selected
+        %span(data-dojo-type="dijit.ToolbarSeparator")
+        -if !current_user.nil? && current_user.projects.include?(@project)
+          %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('NEW');") New Data Set
+          %span(data-dojo-type="dijit.ToolbarSeparator")
+          -#%span(data-dojo-type="dijit.form.DropDownButton") 
+          %button(dojoType="dijit.form.DropDownButton")
+            %span
+              Add to Data Set
+            %div(data-dojo-type="dijit.Menu")
+              - @data_set_array.each do |ds|
+                = link_to("#{ds[1]}", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"#{dataId}.selected_tools('#{ds[0]}','#{ds[1]}');") 
+          %span(data-dojo-type="dijit.ToolbarSeparator")
+        %button(dojoType="dijit.form.Button" onclick="#{dataId}.export_data();") Export All
+        %span(data-dojo-type="dijit.ToolbarSeparator")
+      
+      -#%ul(class="jd_menu" )
+      -#  %li
+      -#    = link_to('Clear All', 'javascript:', :onclick=>"#{dataId}.selected_tools('CLR');return false;")
+      -#  %li
+      -#    = link_to('Select All', 'javascript:', :onclick=>"#{dataId}.selected_tools('ALL');return false;")
+      -#  %li
+      -#    = link_to('Delete Selected', 'javascript:', :onclick=>"#{dataId}.selected_tools('DEL');return false;")
+      -#  -if !current_user.nil? && current_user.projects.include?(@project)
+      -#    %li
+      -#      = link_to('New Data Set', 'javascript:', :onclick=>"#{dataId}.selected_tools('NEW');return false;")
+      -#    %li
+      -#      Add to Data Set
+      -#      %ul
+      -#        - @data_set_array.each do |ds|
+      -#          %li
+      -#            = link_to("#{ds[1]}", "javascript:", :onclick=>"#{dataId}.selected_tools('#{ds[0]}','#{ds[1]}');") 
+      -#  %li
+      -#    = link_to('Export All', 'javascript:', :onclick=>"#{dataId}.export_data();return false;")
+      
+      -#%h4{:style=>"margin:5px 0 0 5px;float:left;"}
+      -#%strong(style="margin-left:10px;")
+      %p(style="margin:10px 0 8px 10px;padding:0;font-weight:bold;")
+        = "#{@var_name} [Id:#{@variable.id}] | #{@units} |"
+        -#&nbsp;&nbsp;&nbsp;
         -if !@start_date.nil?
           -if @start_date > @end_date
             ERROR - start date should not come after end date
@@ -163,258 +234,351 @@
             -#= "(<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)".html_safe
         -else
           ERROR - invalid date entry
-      
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
-      = link_to('VIEW TABLE', 'javascript:', :class=>'icon icon-cancel', :id=>"#{@tabId}_toggle_view_id", :onclick=>"#{dataId}.toggle_views();return false;") 
-    
-      -#if !@row_array.empty?
-      -if !@data_structs.empty?
-        -if edit_auth
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          -#= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
-          -#= link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.pop_query_script();return false;") 
-          = link_to('BATCH QA/QC', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.show_scripting(true);return false;")
-        
-        -#=hidden_field_tag('column_array', @column_array.to_json)
-        -#=hidden_field_tag('row_array', @row_array.to_json)
-        -#=hidden_field_tag('site_name', @site_name)
-        -#=hidden_field_tag('site', @site.to_json)
-        -#=hidden_field_tag('variable', @variable.to_json)
-        -#=hidden_field_tag('start_date', @start_date)
-        -#=hidden_field_tag('data_vals', @data_vals.to_json)
-        -#=hidden_field_tag('end_date', @end_date)
-        
-        =hidden_field_tag('site', @site.to_json)
-        =hidden_field_tag('variable', @variable.to_json)
-        =hidden_field_tag('start_date', @start_date)
-        =hidden_field_tag('end_date', @end_date)
-        
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        -#=submit_tag("Export Results")
-        = link_to('EXPORT RESULTS', 'javascript:', :class=>'icon icon-proj', 
-              :onclick=>"#{dataId}.export_data();return false;") 
 
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      = link_to('REFRESH', 'javascript:', :class=>'icon icon-proj', :onclick=>"refreshTab('#{@tabId}');") 
-      -#= link_to('REFRESH', 'javascript:', :class=>'icon icon-hist', :onclick=>"refresh_history(#{@cv_item.id});return false;")
-    
-    =clear_break
-    -#simplechart{:style=>"width: 250px; height: 150px;"}
-    -#chartDiv{:style=>"width: 250px; height: 150px;"}
-    
-    %h3{:style=>"margin:0;float:left;"}
-      = "#{@var_name} | #{@units}"
-
-      -#-if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
-      -if !current_user.nil? && current_user.projects.include?(@project)
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        -#%p{:style=>"margin:7px 0;"}
-        -#  %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
-        -#    %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
-        -#      Data Set:
-        -##%button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet('#{@tabId}');") 
-        -##  Add Selection &gt;&gt;
-        -## opts0 = "<option value='-'>- Select Data Set -</option>\n<option value='NEW'>NEW DATA SET</option>\n"
+        -#-if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
+        -if !current_user.nil? && current_user.projects.include?(@project) && false
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          -#%p{:style=>"margin:7px 0;"}
+          -#  %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
+          -#    %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
+          -#      Data Set:
+          -##%button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet('#{@tabId}');") 
+          -##  Add Selection &gt;&gt;
+          -## opts0 = "<option value='-'>- Select Data Set -</option>\n<option value='NEW'>NEW DATA SET</option>\n"
         
-        - opts0 = "<option value='-'>- with selected data -</option>\n"
-        - opts0 += "<option value='CLR'>CLEAR SELECTED</option>\n<option value='ALL'>SELECT ALL</option>\n"
-        - opts0 += "<option value='DEL'>DELETE SELECTED</option>\n<option value='NEW'>NEW DATA SET</option>\n"
-        - @data_set_array.each{|ds| opts0+="<option value='%s'>Add to Data Set: %s</option>\n" %ds }
-        = select_tag("#{@tabId}_data_set_select", opts0.html_safe)
+          - opts0 = "<option value='-'>- with selected data -</option>\n"
+          - opts0 += "<option value='CLR'>CLEAR SELECTED</option>\n<option value='ALL'>SELECT ALL</option>\n"
+          - opts0 += "<option value='DEL'>DELETE SELECTED</option>\n<option value='NEW'>NEW DATA SET</option>\n"
+          - @data_set_array.each{|ds| opts0+="<option value='%s'>Add to Data Set: %s</option>\n" %ds }
+          = select_tag("#{@tabId}_data_set_select", opts0.html_safe)
     
-    =clear_break
-    -# #pagination-links
-    -# = pagination_links(@query, params[:page], 10)  
-    %br
+      -#=clear_break
+      -# #pagination-links
+      -# = pagination_links(@query, params[:page], 10)  
+      -#%br
     
-    %div{:id=>"#{@tabId}_plot_view", :style=>"margin:0;"}
+      -#%div{:id=>"#{@tabId}_plot_view", :style=>"margin:0;"}
       
-      #plotContainer{:style=>"width:800px;height:310px;margin:0;"}
+      #plotContainer{:style=>"width:80%;height:310px;margin:0 0 0 12px;"}
       %br
       
-    %div{:id=>"#{@tabId}_grid_view", :style=>"margin:0;"}
+    -#%div{:id=>"#{@tabId}_grid_view", :style=>"margin:0;"}
+    %div{:id=>"#{@tabId}_grid_view", :dojoType=>"dojox.layout.ContentPane", :title=>"Table", 
+      :style=>"margin:0;padding:0;"}
+      %script{:type=>"dojo/method", :event=>"onShow"}
+        :plain
+          #{dataId}.update_views();
       
-      #gridContainer{:style=>"width:850px;height:310px;margin:0;border:solid 1px #3A7594;"}
+      %div(data-dojo-type="dijit.Toolbar" id="grid_toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+        &nbsp;&nbsp;
+        %strong SELECT
+        &nbsp;&nbsp;&nbsp;
+        -#%span(data-dojo-type="dijit.ToolbarSeparator")
+        -#%span(data-dojo-type="dijit.form.Button")
+        %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('CLR');") Clear All
+        %span(data-dojo-type="dijit.ToolbarSeparator")
+        %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('ALL');") Select All
+        %span(data-dojo-type="dijit.ToolbarSeparator")
+        %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('DEL');") Delete Selected
+        %span(data-dojo-type="dijit.ToolbarSeparator")
+        -if !current_user.nil? && current_user.projects.include?(@project)
+          %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('NEW');") New Data Set
+          %span(data-dojo-type="dijit.ToolbarSeparator")
+          -#%span(data-dojo-type="dijit.form.DropDownButton") 
+          %button(dojoType="dijit.form.DropDownButton")
+            %span
+              Add to Data Set
+            %div(data-dojo-type="dijit.Menu")
+              - @data_set_array.each do |ds|
+                = link_to("#{ds[1]}", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"#{dataId}.selected_tools('#{ds[0]}','#{ds[1]}');") 
+          %span(data-dojo-type="dijit.ToolbarSeparator")
+        %button(dojoType="dijit.form.Button" onclick="#{dataId}.export_data();") Export All
+        %span(data-dojo-type="dijit.ToolbarSeparator")
+      
+      -#%ul(class="jd_menu" )
+      -#  %li
+      -#    = link_to('Clear All', 'javascript:', :onclick=>"#{dataId}.selected_tools('CLR');return false;")
+      -#  %li
+      -#    = link_to('Select All', 'javascript:', :onclick=>"#{dataId}.selected_tools('ALL');return false;")
+      -#  %li
+      -#    = link_to('Delete Selected', 'javascript:', :onclick=>"#{dataId}.selected_tools('DEL');return false;")
+      -#  -if !current_user.nil? && current_user.projects.include?(@project)
+      -#    %li
+      -#      = link_to('New Data Set', 'javascript:', :onclick=>"#{dataId}.selected_tools('NEW');return false;")
+      -#    %li
+      -#      Add to Data Set
+      -#      %ul
+      -#        - @data_set_array.each do |ds|
+      -#          %li
+      -#            = link_to("#{ds[1]}", "javascript:", :onclick=>"#{dataId}.selected_tools('#{ds[0]}','#{ds[1]}');") 
+      -#  %li
+      -#    = link_to('Export All', 'javascript:', :onclick=>"#{dataId}.export_data();return false;")
+      
+      -#%h4{:style=>"margin:5px 0 0 5px;float:left;"}
+      %p(style="margin:10px 0 8px 10px;padding:0;font-weight:bold;")
+        = "#{@var_name} [Id:#{@variable.id}] | #{@units} |"
+        -#&nbsp;&nbsp;&nbsp;
+        -if !@start_date.nil?
+          -if @start_date > @end_date
+            ERROR - start date should not come after end date
+          -else
+            = @start_date.to_date.strftime('%b %d, %Y')
+            &ndash;
+            = @end_date.to_date.strftime('%b %d, %Y')
+            (<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)
+            -#= "(<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)".html_safe
+        -else
+          ERROR - invalid date entry
+
+        -#-if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
+        -if !current_user.nil? && current_user.projects.include?(@project) && false
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          -#%p{:style=>"margin:7px 0;"}
+          -#  %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
+          -#    %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
+          -#      Data Set:
+          -##%button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet('#{@tabId}');") 
+          -##  Add Selection &gt;&gt;
+          -## opts0 = "<option value='-'>- Select Data Set -</option>\n<option value='NEW'>NEW DATA SET</option>\n"
+        
+          - opts0 = "<option value='-'>- with selected data -</option>\n"
+          - opts0 += "<option value='CLR'>CLEAR SELECTED</option>\n<option value='ALL'>SELECT ALL</option>\n"
+          - opts0 += "<option value='DEL'>DELETE SELECTED</option>\n<option value='NEW'>NEW DATA SET</option>\n"
+          - @data_set_array.each{|ds| opts0+="<option value='%s'>Add to Data Set: %s</option>\n" %ds }
+          = select_tag("#{@tabId}_data_set_select", opts0.html_safe)
+    
+      -#=clear_break
+      -# #pagination-links
+      -# = pagination_links(@query, params[:page], 10)  
+      -#%br
+      
+      #gridContainer{:style=>"width:96%;height:310px;margin:0;border:solid 1px #3A7594;"}
       %br
-      -# 33e 3A7594 3889AA
-      -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
+    -# 33e 3A7594 3889AA
+    -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
   
-  -if !@data_structs.empty? and edit_auth
-    %div{:id=>"#{@tabId}_query_script", :style=>"display:none;overflow:visible;"}
-      %form(id="#{@tabId}_query_script_form" dojoType="dijit.form.Form" method="post" style="overflow:visible;")
+    -if !@data_structs.empty? and edit_auth
+      %div{:id=>"#{@tabId}_qaqc_view", :dojoType=>"dojox.layout.ContentPane", :title=>"Batch QA/QC", 
+        :style=>"margin:0;padding:0 0 0 8px;"}
+        
+        %div{:id=>"#{@tabId}_query_script", :style=>"overflow:visible;"}
+          %form(id="#{@tabId}_query_script_form" dojoType="dijit.form.Form" method="post" style="overflow:visible;")
       
-        %strong
-          BATCH QA/QC &nbsp;
+            -#%strong
+            -#  BATCH QA/QC &nbsp;
+            -#
+            -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            -#-#= link_to('ROLLBACK LAST CHANGE', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
+            -#= link_to('ROLLBACK BATCH CHANGE', 'javascript:', :class=>'icon icon-hist', :onclick=>"#{dataId}.rollback_batch();return false;")
+            -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            -#= link_to('QUERY RESULTS', 'javascript:', :class=>'icon icon-cancel', :onclick=>"#{dataId}.show_scripting(false);return false;")
         
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        -#= link_to('ROLLBACK LAST CHANGE', 'javascript:', :class=>'icon icon-hist', :onclick=>"dojo.publish('voeis/project/site/history', [$$$id$$$]);")
-        = link_to('ROLLBACK BATCH CHANGE', 'javascript:', :class=>'icon icon-hist', :onclick=>"#{dataId}.rollback_batch();return false;")
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        = link_to('QUERY RESULTS', 'javascript:', :class=>'icon icon-cancel', :onclick=>"#{dataId}.show_scripting(false);return false;")
+            %br
+            %em
+              ENTER R-SCRIPT HERE &nbsp; &mdash; &nbsp; LOAD/SAVE: 
+            - opts02 = "<option value='-'>- select -</option>\n"
+            - opts02 += "<option value='SAVE'>SAVE SCRIPT</option>\n"
+            - opts02 += "<option value='SAVEAS'>SAVE SCRIPT AS</option>\n"
+            - opts02 += @scripts_options
+            = select_tag("#{@tabId}_script_load_select", (opts02).html_safe)
+            %br
+            %input(name="script" dojoType="dijit.form.SimpleTextarea" id="#{@tabId}_query_script_text" rows="20" 
+                  style="width:600px!important;line-height:16px!important;float:left;")
         
-        %br
-        %br
-        %em
-          ENTER R-SCRIPT HERE &nbsp; &mdash; &nbsp; LOAD/SAVE: 
-        - opts02 = "<option value='-'>- select -</option>\n"
-        - opts02 += "<option value='SAVE'>SAVE SCRIPT</option>\n"
-        - opts02 += "<option value='SAVEAS'>SAVE SCRIPT AS</option>\n"
-        - opts02 += @scripts_options
-        = select_tag("#{@tabId}_script_load_select", (opts02).html_safe)
-        %br
-        %input(name="script" dojoType="dijit.form.SimpleTextarea" id="#{@tabId}_query_script_text" rows="21" 
-              style="width:600px!important;line-height:16px!important;float:left;")
-        
-        - dv_fields = ['data_value',
-                        'string_value',
-                        'date_time',
-                        'utc_offset',
-                        'datatype',
-                        'value_accuracy',
-                        'quality_control_level',
-                        'replicate',
-                        'vertical_offset',
-                        'end_vertical_offset',
-                        'published',
-                        'variable_id'].join("<br/>\n").html_safe
-        - dv_fields1 = ['data_value',
-                        'date_time',
-                        'quality_control_level',
-                        'vertical_offset',
-                        'published',
-                        'variable_id'].join("<br/>\n").html_safe
-        - dv_fields2 = ['string_value',
-                        'utc_offset',
-                        'value_accuracy',
-                        'end_vertical_offset',
-                        'replicate',
-                        'provenance_comment'].join("<br/>\n").html_safe
-        %div(style="width:350px;margin-left:10px;float:left;")
-          %strong
-            FIELDS:
-          %br
-          -#= dv_fields
-          %table
-            %tr
-              %td(style="width:40%;")
-                = dv_fields1
-              %td
-                = dv_fields2
-          %br
-          %strong
-            SOURCE:
-          %br
-          - opts00 = "<option value='SEL'>SELECTED DATA</option>\n<option value='ALL'>ALL DATA (<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)</option>\n"
-          - @data_set_array.each{|ds| opts00+="<option value='%s'>%s (Data Set)</option>\n" %ds }
-          = select_tag("#{@tabId}_script_source_select", opts00.html_safe)
-          %br
-          %br
-          -#%strong
-          -#  TARGET (SELF or VARIABLE):
-          -#%br
-          -#- opts01 =  "<option value='SELF'>UPDATE SELF</option>\n"
-          -#-# opts01 += "<option value='DISP'>POPULATE DISPLAY GRID</option>\n"
-          -#-# opts01 += "<option value='CSV'>EXPORT CSV FILE</option>\n"
-          -#- opts01 += @variables_options
-          -#= select_tag("#{@tabId}_script_target_select", opts01.html_safe)
-          %br
-          %br
-          %input(name="dryrun" dojoType="dijit.form.CheckBox" id="#{@tabId}_query_script_dryrun" checked)
-          DRYRUN
-          %br
-          %br
-          %button{:dojoType=>"dijit.form.Button", :title=>"Execute"}
-            EXECUTE
-            %script{:type=>"dojo/method", :event=>"startup"}
-              :plain
-                //### ON-CLICK: SAVE
-                this.connect(this, "onClick", function(){
-                  dijit.byId('loading_dialog').show();
-                  var start_time = new Date().valueOf();
-                  var textarea = dijit.byId("#{@tabId}_query_script_text");
-                  var datatarget = $('##{@tabId}_script_target_select').val();
-                  var data_vals = [];
-                  var script = '';
-                  var formdata = {
-                    script: '', 
-                    dryrun: dijit.byId('#{@tabId}_query_script_dryrun').get('checked').toString()};
-                  // GET BATCH DATA
-                  var batch = #{dataId}.get_batch()
-                  if(batch.error) {
-                    //textarea.set('value','###NO DATA TO EXECUTE ON!\r\n'+textarea.value);
-                    dijit.byId('loading_dialog').hide();
-                    //error_dialog.pop(batch.error);
-                    error_dialog.pop('### NO DATA TO EXECUTE ON ###');
-                    return;
-                  };
-                  $.extend(formdata, batch);
-                  //CLEANUP SCRIPT
-                  lines = textarea.value.split(/\r\n|\n|\r/);
-                  lines.forEach(function(ln,idx){
-                    ln = ln.replace(/^\s+|\s+$/g, '');  //TRIM
-                    if(ln[0]!='#' && ln.length) script += ln+'\r\n';
-                  });
-                  if(!script.length) {
-                    //textarea.set('value','###NOTHING TO EXECUTE!\r\n'+textarea.value);
-                    dijit.byId('loading_dialog').hide();
-                    error_dialog.pop('### NOTHING TO EXECUTE ###');
-                    return;
-                  };
-                  formdata['script'] = script;
-                  //SET TARGET VARIABLE (or SELF)
-                  if(datatarget!='SELF')
-                    formdata['target'] = datatarget;
-                  
-                  $.post("#{project_path(@project)}/data_values/batch_update#{url_api_key}",
-                    formdata,
-                    function(data) {
-                      //QUERY SCRIPT RESULTS
-                      console.log('SCRIPT RESULTS:',data);
-                      if(formdata.dryrun=='false') {
-                        //UPDATE GRID/PLOT
-                        var errs = #{dataId}.val_grid.batchUpdate(data);
-                      } else {
-                        //DRY-RUN: SHOW DRY-RUN GRID
-                        var errs = [];
-                        var grid_struct = val_layout.slice(0,-1);
-                        var grid_data = []
-                        for(var i=0; i<data.length; i++){
-                          var item = datastore.get(data[i].id,#{dataId}.val_store);
-                          var dateval = new Date(item.local_date_time.toString());
-                          for(fld in data[i]) {
-                            if(fld!='id' && fld!='error') item[fld] = data[i][fld];
-                            else if(fld=='error') {
-                              item['string_value'] = data[i]['error'];
-                              var val_string = ' -- ['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
-                              errs.push(data[i].error+val_string);
-                            };
-                          };
-                          grid_data.push(item);
-                        };
-                        grid_dialog.pop('DRY-RUN SCRIPT RESULTS (first 20)',grid_struct,grid_data);
+            - dv_fields = ['data_value',
+                            'string_value',
+                            'date_time',
+                            'utc_offset',
+                            'datatype',
+                            'value_accuracy',
+                            'quality_control_level',
+                            'replicate',
+                            'vertical_offset',
+                            'end_vertical_offset',
+                            'published',
+                            'variable_id'].join("<br/>\n").html_safe
+            - dv_fields1 = ['data_value',
+                            'date_time',
+                            'quality_control_level',
+                            'vertical_offset',
+                            'published',
+                            'variable_id'].join("<br/>\n").html_safe
+            - dv_fields2 = ['string_value',
+                            'utc_offset',
+                            'value_accuracy',
+                            'end_vertical_offset',
+                            'replicate',
+                            'provenance_comment'].join("<br/>\n").html_safe
+            %div(style="width:350px;margin-left:10px;float:left;")
+              %strong
+                FIELDS:
+              %br
+              -#= dv_fields
+              %table
+                %tr
+                  %td(style="width:40%;")
+                    = dv_fields1
+                  %td
+                    = dv_fields2
+              %br
+              %strong
+                SOURCE:
+              %br
+              - opts00 = "<option value='SEL'>SELECTED DATA</option>\n<option value='ALL'>ALL DATA (<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)</option>\n"
+              - @data_set_array.each{|ds| opts00+="<option value='%s'>%s (Data Set)</option>\n" %ds }
+              = select_tag("#{@tabId}_script_source_select", opts00.html_safe)
+              %br
+              -#%br
+              -#%strong
+              -#  TARGET (SELF or VARIABLE):
+              -#%br
+              -#- opts01 =  "<option value='SELF'>UPDATE SELF</option>\n"
+              -#-# opts01 += "<option value='DISP'>POPULATE DISPLAY GRID</option>\n"
+              -#-# opts01 += "<option value='CSV'>EXPORT CSV FILE</option>\n"
+              -#- opts01 += @variables_options
+              -#= select_tag("#{@tabId}_script_target_select", opts01.html_safe)
+              %br
+              %br
+              %input(name="dryrun" dojoType="dijit.form.CheckBox" id="#{@tabId}_query_script_dryrun" checked)
+              DRYRUN
+              %br
+              %br
+              %button{:dojoType=>"dijit.form.Button", :title=>"Execute"}
+                EXECUTE
+                %script{:type=>"dojo/method", :event=>"startup"}
+                  :plain
+                    //### ON-CLICK: SAVE
+                    this.connect(this, "onClick", function(){
+                      dijit.byId('loading_dialog').show();
+                      var start_time = new Date().valueOf();
+                      var textarea = dijit.byId("#{@tabId}_query_script_text");
+                      var datatarget = $('##{@tabId}_script_target_select').val();
+                      var data_vals = [];
+                      var script = '';
+                      var formdata = {
+                        script: '', 
+                        dryrun: dijit.byId('#{@tabId}_query_script_dryrun').get('checked').toString()};
+                      // GET BATCH DATA
+                      var batch = #{dataId}.get_batch()
+                      if(batch.error) {
+                        //textarea.set('value','###NO DATA TO EXECUTE ON!\r\n'+textarea.value);
+                        dijit.byId('loading_dialog').hide();
+                        //error_dialog.pop(batch.error);
+                        error_dialog.pop('### NO DATA TO EXECUTE ON ###');
+                        return;
                       };
-                      var elapsed = (new Date().valueOf()-start_time)/1000;
-                      var elapsed_mins = parseInt(elapsed/60);
-                      var elapsed_secs = (elapsed%60).toFixed(3);
-                      elapsed = 'Executed: ';
-                      if(elapsed_mins) elapsed += elapsed_mins+' mins, '
-                      elapsed += elapsed_secs+' secs\n';
-                      if(errs) elapsed += '<br/><br/>\n'+errs.join('<br/>\n');
-                      console.log(elapsed);
-                      error_dialog.pop(elapsed,0,'SCRIPT COMPLETED');
-                      dijit.byId('loading_dialog').hide();
-                  });
-                });
-          &nbsp;&nbsp;
-          %button{:dojoType=>"dijit.form.Button", :title=>"Clear", :onclick=>"$('##{@tabId}_query_script_text').val('');"}
-            CLEAR
+                      $.extend(formdata, batch);
+                      //CLEANUP SCRIPT
+                      lines = textarea.value.split(/\r\n|\n|\r/);
+                      lines.forEach(function(ln,idx){
+                        ln = ln.replace(/^\s+|\s+$/g, '');  //TRIM
+                        if(ln[0]!='#' && ln.length) script += ln+'\r\n';
+                      });
+                      if(!script.length) {
+                        //textarea.set('value','###NOTHING TO EXECUTE!\r\n'+textarea.value);
+                        dijit.byId('loading_dialog').hide();
+                        error_dialog.pop('### NOTHING TO EXECUTE ###');
+                        return;
+                      };
+                      formdata['script'] = script;
+                      //SET TARGET VARIABLE (or SELF)
+                      if(datatarget!='SELF')
+                        formdata['target'] = datatarget;
+                  
+                      $.post("#{project_path(@project)}/data_values/batch_update#{url_api_key}",
+                        formdata,
+                        function(data) {
+                          //QUERY SCRIPT RESULTS
+                          console.log('SCRIPT RESULTS:',data);
+                          if(formdata.dryrun=='false') {
+                            //UPDATE GRID/PLOT
+                            var errs = #{dataId}.val_grid.batchUpdate(data);
+                          } else {
+                            //DRY-RUN: SHOW DRY-RUN GRID
+                            var errs = [];
+                            var grid_struct = val_layout.slice(0,-1);
+                            var grid_data = []
+                            for(var i=0; i<data.length; i++){
+                              var item = datastore.get(data[i].id,#{dataId}.val_store);
+                              var dateval = new Date(item.local_date_time.toString());
+                              for(fld in data[i]) {
+                                if(fld!='id' && fld!='error') item[fld] = data[i][fld];
+                                else if(fld=='error') {
+                                  item['string_value'] = data[i]['error'];
+                                  var val_string = ' -- ['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
+                                  errs.push(data[i].error+val_string);
+                                };
+                              };
+                              grid_data.push(item);
+                            };
+                            grid_dialog.pop('DRY-RUN SCRIPT RESULTS (first 20)',grid_struct,grid_data);
+                          };
+                          var elapsed = (new Date().valueOf()-start_time)/1000;
+                          var elapsed_mins = parseInt(elapsed/60);
+                          var elapsed_secs = (elapsed%60).toFixed(3);
+                          elapsed = 'Executed: ';
+                          if(elapsed_mins) elapsed += elapsed_mins+' mins, '
+                          elapsed += elapsed_secs+' secs\n';
+                          if(errs) elapsed += '<br/><br/>\n'+errs.join('<br/>\n');
+                          console.log(elapsed);
+                          error_dialog.pop(elapsed,0,'SCRIPT COMPLETED');
+                          dijit.byId('loading_dialog').hide();
+                      });
+                    });
+              &nbsp;&nbsp;
+              %button{:dojoType=>"dijit.form.Button", :title=>"Clear", :onclick=>"$('##{@tabId}_query_script_text').val('');"}
+                CLEAR
+              %br
+              %br
+              %button{:dojoType=>"dijit.form.Button", :title=>"Rollback", :class=>"bigButton", :onclick=>"#{dataId}.rollback_batch();"}
+                ROLLBACK BATCH CHANGE
+    
+    -#= link_to('ROLLBACK BATCH CHANGE', 'javascript:', :class=>'icon icon-hist', :onclick=>"#{dataId}.rollback_batch();return false;")
+    
+    %div{:id=>"#{@tabId}_export_view", :style=>"margin:0;padding:0;display:none;"}
+  
+      -form_tag(:controller=>'samples', :action=>'export') do 
+      
+        -#if !@row_array.empty?
+        -if !@data_structs.empty?
+          -if edit_auth
+            -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            -##= link_to('CANCEL EDIT', 'javascript:', :class=>'icon icon-cancel', :onclick=>"if($$$id$$$){$('#edit-site00').hide();$('#show-site00').show();}else{site0ref.close()};") 
+            -##= link_to('QUERY SCRIPT', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.pop_query_script();return false;") 
+            -#= link_to('BATCH QA/QC', 'javascript:', :class=>'icon icon-edit', :onclick=>"#{dataId}.show_scripting(true);return false;")
+        
+          -#=hidden_field_tag('column_array', @column_array.to_json)
+          -#=hidden_field_tag('row_array', @row_array.to_json)
+          -#=hidden_field_tag('site_name', @site_name)
+          -#=hidden_field_tag('site', @site.to_json)
+          -#=hidden_field_tag('variable', @variable.to_json)
+          -#=hidden_field_tag('start_date', @start_date)
+          -#=hidden_field_tag('data_vals', @data_vals.to_json)
+          -#=hidden_field_tag('end_date', @end_date)
+        
+          =hidden_field_tag('site', @site.to_json)
+          =hidden_field_tag('variable', @variable.to_json)
+          =hidden_field_tag('start_date', @start_date)
+          =hidden_field_tag('end_date', @end_date)
+        
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+          -#=submit_tag("Export Results")
+          = link_to('EXPORT RESULTS', 'javascript:', :class=>'icon icon-proj', 
+                :onclick=>"#{dataId}.export_data();return false;") 
+
+      -#simplechart{:style=>"width: 250px; height: 150px;"}
+      -#chartDiv{:style=>"width: 250px; height: 150px;"}
+    
+      -# #pagination-links
+      -# = pagination_links(@query, params[:page], 10)  
+    
+    
     
     
   :javascript
@@ -491,6 +655,7 @@
     #{dataId}.update_views = function(item) {
       var val_grid = #{dataId}.val_grid;
       var val_plot = #{dataId}.plot;
+      var tabs = dijit.byId('#{@tabId}_tabs');
       if(item) {
         //### Update Grid
         var upd = datastore.update(item,#{dataId}.val_store);
@@ -506,16 +671,19 @@
       };
       $('span.#{@tabId}_datacount').text(#{dataId}.data.length);
       $("#tooltip").remove();
-      if($('##{@tabId}_toggle_view_id').text()=='VIEW TABLE') {
+      //if($('##{@tabId}_toggle_view_id').text()=='VIEW TABLE') {
+      if(tabs.selectedChildWidget.title=='Table') {
         //### UPDATE PLOT
+        console.log('UPDATE PLOT:',tabs.selectedChildWidget.title);
         var data_upd = #{dataId}.plot.getData();
         #{dataId}.plot.setData(data_upd);
         #{dataId}.plot.draw();
         #{dataId}.plot.unhighlight();
         var val_selected = #{dataId}.val_grid.selection.getSelected();
         plotutils.highlightItems(val_selected,0,#{dataId}.plot);
-      } else {
+      } else if(tabs.selectedChildWidget.title=='Graph') {
         //### UPDATE GRID
+        console.log('UPDATE GRID:',tabs.selectedChildWidget.title);
         //val_grid.render();
         //val_grid.update();
         #{dataId}.val_grid.update();
@@ -531,8 +699,99 @@
       };
     };
     
+    //############################## EXPORT-TAB
+    #{dataId}.export = function() {
+      var tabs = dijit.byId('#{@tabId}_tabs');
+      var pane0 = dijit.byId('#{@tabId}_plot_view');
+      tabs.selectChild(pane0);
+      #{dataId}.export_data();
+      var tabs = dijit.byId('#{@tabId}_tabs');
+      var pane0 = dijit.byId('#{@tabId}_plot_view');
+      var this_pane = tabs.selectedChildWidget;
+      console.log('EXPORT!', this_pane.title);
+      tabs.selectChild(this_pane);
+      this_pane.controlButton.focus();
+      
+      
+    };
     
-    //################################### BATCH-STUFF
+    //############################## SELECTED-TOOLS
+    #{dataId}.selected_tools = function(toolId, ds_name) {
+      var val_grid = #{dataId}.val_grid;
+      var val_plot = #{dataId}.plot;
+      var val_data = #{dataId}.value_data;
+      var sel_data_len = val_grid.selection.getSelected().length;
+      var datasetname = ds_name || '';
+      switch(toolId){
+        case 'CLR':
+          //CLEAR SELECTION
+          val_plot.unhighlight();
+          val_grid.selection.deselectAll();
+          return;
+        case 'ALL':
+          //SELECT ALL
+          val_grid.selection.deselectAll();
+          val_grid.selection.selectRange(0,val_data.length-1);
+          val_plot.unhighlight();
+          plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
+          return;
+        case 'DEL':
+          //OPEN CONFIRM: DELETE ALL SELECTED??!
+          if(sel_data_len==0) return;
+          //DELETE SELECTED DataValues
+          #{dataId}.delete_batch(true,function(){
+            #{dataId}.val_grid.selection.deselectAll();
+            //#{dataId}.plot.setData(mydata);
+            //#{dataId}.plot.draw();
+            //#{dataId}.plot.unhighlight();
+            //### Update Grid
+            //#{dataId}.val_grid.update();
+            ////#{dataId}.val_grid.setQuery({id: '*'});
+            #{dataId}.update_views();
+          });
+          return;
+        case 'NEW':
+          //OPEN NEW DATASET DIALOG
+          //new_data_set.setup("#{@tabId}_data_set_select");
+          //NEW name_entry_dialog--
+          if(sel_data_len==0) return;
+          //createDataSet();
+          name_entry_dialog.pop('Create New Data Set',{
+            SAVE: 'Create Data Set',
+            FIELD1: 'Type:',
+            FIELD3: 'Description:'
+          },function(results){
+            var vardata = {name: results.name, description: results.description, type: results.type};
+            console.log('CREATE DATASET:',vardata);
+            $.post("#{project_path(@project)}/apivs/create_project_data_set.json#{url_api_key}",
+              vardata,
+              function(data) {
+                $('##{@tabId}_data_set_select').append($("<option></option>").attr("value",data['id']).text('Add to Data Set: '+results.name.toUpperCase()));
+                $('##{@tabId}_data_set_select').val(data['id']);
+                //$('#data_set_select').append($("<option></option>").attr("value",data['id']).text(els.name.value)); 
+                //$('#data_set_select').val(data['id']);
+            });
+          });
+          return;
+        default:
+          //ADD SELECTED TO DATASET: OPEN CONFIRM
+          if(sel_data_len==0) return;
+          if(datasetname=='') return;
+          console.log('ADD SELECTED TO DATASET:',datasetname);
+          confirmDialog('Confirm: Add To Data Set &mdash;',
+            'ARE YOU SURE?\n<br/>ADD '+sel_data_len+' DATA VALUES TO: \n<br/>'+datasetname,
+            function(yes){
+              console.log('CONFIRM:',yes);
+              if(!yes) return;
+              //ADD SELECTED DATA####
+              addSelectedToDataSet('#{@tabId}',parseInt(sel_val));
+            }, 
+            { buttonOk:'YES', buttonCancel:'Cancel' });
+      };
+    };
+    
+    
+    //############################## BATCH-STUFF
     //*** SHOW/HIDE BATCH-SCRIPT DIV
     #{dataId}.show_scripting = function(show) {
       if(show){
@@ -554,7 +813,7 @@
           console.log('CONFIRM:',yes);
           if(!yes) return;
           //EXPORT DATA SUBMIT####
-          $('##{@tabId}_query_results form')[0].submit();
+          $('##{@tabId}_export_view form')[0].submit();
         }, 
         { buttonOk:'YES', buttonCancel:'Cancel' });
     };
@@ -783,8 +1042,10 @@
       controls: function(item) {
         if(item==null || item=='') return '-';
         //return 'TESTING-- #';
+        var tabsId = '#{@tabId}_tabs';
         var id = item.id[0];
         var idx = item._0;
+        //openDataHistoryTab(tabs, projectId, dataId, dataVal, varId, varName, siteId,tabId);
         //console.log('GRID ITEM:',item);
         var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" style="margin:0;padding:0;height:16px;" />';
         var edit_icon = '<img src="/images/icons/edit.png" alt="history icon" title="EDIT" style="margin:0;padding:0;height:16px;" />';
@@ -792,7 +1053,8 @@
         //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
         //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
         //var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
-        var hist_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/data/history\', ['+id+',\''+item.data_value.toString()+'\','+item.variable_id.toString()+',\'#{@var_name}\','+item.site_id+',\'#{@tabId}\']);return false;">'+hist_icon+'</a>\n';
+        var hist_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/data/history\', ['+id+',\''+item.data_value.toString()+'\','+item.variable_id.toString()+',\'#{@var_name}\','+item.site_id+',\'#{@tabId}\',\''+tabsId+'\']);return false;">'+hist_icon+'</a>\n';
+        //var hist_link = '<a href="javascript:" onclick="#{dataId}.history_tab('+id+');return false;">'+hist_icon+'</a>\n';
         var edit_link = '<a href="javascript:" onclick="#{dataId}.val_grid.popEdit('+id+');return false;" style="margin:0;padding:0;">'+edit_icon+'</a>\n';
         var delete_link = '<a href="javascript:" onclick="dv_item_confirm_delete('+id+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
         var spaces = '&nbsp;';
@@ -914,10 +1176,11 @@
        plotutils.highlightItems(this.selection.getSelected(),0,val_plot);
       },
       popEdit: function(id) {
+       console.log('POP-EDIT:',id);
        //var item = this.getItem(idx);
        //var item = #{dataId}.value_data[idx];
        var item = datastore.get_raw(id,#{dataId}.val_store);
-       if(!item._0){
+       if(item._0==null){
          console.log('NO ITEM!');
          return;
        };
@@ -999,7 +1262,7 @@
     // append the new grid to the div " ":
     //dojo.byId("gridContainer").appendChild(val_grid.domNode);
     
-    $('##{@tabId}_query_results #gridContainer').append(#{dataId}.val_grid.domNode);
+    $('##{@tabId}_grid_view #gridContainer').append(#{dataId}.val_grid.domNode);
 
     // Call startup, in order to render the grid:
     #{dataId}.val_grid.startup();
@@ -1016,7 +1279,7 @@
     //    $("#tooltip").remove();
     //});    
     
-    #{dataId}.plot = $.plot($("##{@tabId}_query_results #plotContainer"), [#{dataId}.data],{
+    #{dataId}.plot = $.plot($("##{@tabId}_plot_view #plotContainer"), [#{dataId}.data],{
            series: {
                color : "blue",
                lines: { show: true },
@@ -1033,14 +1296,14 @@
     });
 
     // ADD ZOOM in/out button 
-    $('<div class="gridbutton" title="ZOOM-IN" style="right:20px;top:20px;">+</div>').appendTo($("##{@tabId}_query_results #plotContainer")).click(function (e) {
+    $('<div class="gridbutton" title="ZOOM-IN" style="right:20px;top:20px;">+</div>').appendTo($("##{@tabId}_plot_view #plotContainer")).click(function (e) {
        e.preventDefault();
        var sel = #{dataId}.val_grid.selection.getSelected();
        #{dataId}.plot.unhighlight();
        plotutils.highlightItems(sel,0,#{dataId}.plot);
        #{dataId}.plot.zoom();
     });
-    $('<div class="gridbutton" title="ZOOM-OUT" style="right:20px;top:44px;">-</div>').appendTo($("##{@tabId}_query_results #plotContainer")).click(function (e) {
+    $('<div class="gridbutton" title="ZOOM-OUT" style="right:20px;top:44px;">-</div>').appendTo($("##{@tabId}_plot_view #plotContainer")).click(function (e) {
        e.preventDefault();
        var sel = #{dataId}.val_grid.selection.getSelected();
        #{dataId}.plot.unhighlight();
@@ -1048,7 +1311,7 @@
        #{dataId}.plot.zoomOut();
     });
     // CLEAR SELECTION
-    $('<div class="gridbutton" title="CLEAR SELECTION" style="right:20px;bottom:40px;background-color:red;">x</div>').appendTo($("##{@tabId}_query_results #plotContainer")).click(function (e) {
+    $('<div class="gridbutton" title="CLEAR SELECTION" style="right:20px;bottom:40px;background-color:red;">x</div>').appendTo($("##{@tabId}_plot_view #plotContainer")).click(function (e) {
        #{dataId}.plot.unhighlight();
        #{dataId}.val_grid.selection.deselectAll();
     });
@@ -1210,7 +1473,7 @@
      });
      
      
-     $("##{@tabId}_query_results #plotContainer").bind("plothover", function (event, pos, item) {
+     $("##{@tabId}_plot_view #plotContainer").bind("plothover", function (event, pos, item) {
        //
        //showPlotTooltip(event,pos,item);
        #{dataId}.plotHover = [event,pos,item];
@@ -1253,7 +1516,7 @@
      
      
      // PLOTCLICK event to scroll to point on datagrid
-     $("##{@tabId}_query_results #plotContainer").bind("plotclick", function (event, pos, item) {
+     $("##{@tabId}_plot_view #plotContainer").bind("plotclick", function (event, pos, item) {
          //
          #{dataId}.plotClick = [event,pos,item];
          //var e = #{dataId}.domClick;
@@ -1341,6 +1604,14 @@
           #{dataId}.update_views();
         });
         
+        // INIT jdMenus
+        //$('ul.jd_menu').jdMenu();
+        // FIX: Add menu hiding on document click
+        //$('ul.jd_menu').bind('click', function() {
+        //  $('ul.jd_menu').show();
+        //});
+        
+        //SELECTED DATA DROP-DOWN --NO LONGER USED!!!
         $("##{@tabId}_data_set_select").change(function(e){
           console.log('DATA-SET-SELECT-CHANGE!');
           if(this.value=='-') return;
@@ -1352,6 +1623,7 @@
           var val_data = #{dataId}.value_data;
           var sel_data_len = val_grid.selection.getSelected().length;
           $("##{@tabId}_data_set_select").val('-');
+          
           switch(sel_val){
             case 'CLR':
               //CLEAR SELECTION
@@ -1539,7 +1811,7 @@
      $(window).ready(function(){
        console.log('QUERY-RESULTS **LOADED**');
        
-       initPage();
+       //initPage();
 
      });
 

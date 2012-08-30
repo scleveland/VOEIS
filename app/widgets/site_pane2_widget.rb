@@ -11,6 +11,8 @@ class SitePane2Widget < Apotomo::Widget
     #@id = UUIDTools::UUID.timestamp_create
     @auth = !@current_user.nil? && @current_user.projects.include?(@project) && !@current_user.has_role?('Observer',@project)
     @edit_auth = !@current_user.nil? && (@current_user.has_role?('Data Manager',@project) || @current_user.has_role?('Principal Investigator',@project))
+    @url_api_key = @current_user.nil? || @current_user.api_key.blank? ? "" : "?api_key=#{@current_user.api_key}"
+    @url_api_key0 = @current_user.nil? || @current_user.api_key.blank? ? "" : "&api_key=#{@current_user.api_key}"
     
     #@newSite = Voies::
     @site_stats = []
