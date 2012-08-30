@@ -44,6 +44,7 @@ htmlreports/**/*
 app/stylesheets/screen.css
 doc/voeis-demo/*
 temp_data/*
+data/*
 .vagrant
 .project
 dmlog.txt
