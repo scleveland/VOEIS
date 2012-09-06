@@ -34,9 +34,7 @@
   ##{@tabId}_query_script .dijitButton.bigButton .dijitButtonNode { width:170px!important; }
   
   #xxgrid_toolbar .dijitButtonText { color:#777!important; }
-  #plot_toolbar .dijitButtonText { color:#398a93!important; }
-  #grid_toolbar .dijitButtonText { color:#398a93!important; }
-
+  ##{@tabId}_tabs .dijitToolbar .dijitButtonText { color:#398a93!important; }
 
 -#%h3{:style=>"margin:5px 0;"}
 %h3{:style=>"margin:0 0 10px 0;"}
@@ -173,7 +171,7 @@
           //tabs.selectChild(pane0);
           #{dataId}.update_views();
       
-      %div(data-dojo-type="dijit.Toolbar" id="plot_toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+      %div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
         &nbsp;&nbsp;
         %strong SELECT
         &nbsp;&nbsp;&nbsp;
@@ -269,7 +267,7 @@
         :plain
           #{dataId}.update_views();
       
-      %div(data-dojo-type="dijit.Toolbar" id="grid_toolbar" style="height:25px!important;margin: 0 0 15px 0;")
+      %div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
         &nbsp;&nbsp;
         %strong SELECT
         &nbsp;&nbsp;&nbsp;
@@ -1128,7 +1126,7 @@
     },
     {
        field: '_item',
-       name: 'DO',
+       name: '- - -',
        formatter: val_grid_formatter.controls,
        width: '80px'
     }
