@@ -152,12 +152,12 @@ class Voeis::QualityControlLevelsController  < Voeis::BaseController
                   {:field=>"quality_control_level_code", :label=>"Quality Control Level", :width=>"200px", :filterable=>true, :formatter=>"", :style=>""},
                   {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
                   {:field=>"explanation", :label=>"Explanation", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
-                  {:field=>"updated_at", :label=>"Updated", :width=>"80px", :filterable=>true, :formatter=>"dateTime", :style=>""}]
+                  {:field=>"updated_at", :label=>"Updated", :width=>"130px", :filterable=>true, :formatter=>"dateTime", :style=>""}]
     @copy_columns = [{:field=>"id", :label=>"ID", :width=>"25px", :filterable=>false, :formatter=>"", :style=>""},
                   {:field=>"quality_control_level_code", :label=>"Quality Control Level", :width=>"100px", :filterable=>true, :formatter=>"", :style=>""},
                   {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
                   {:field=>"explanation", :label=>"Explanation", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
-                  {:field=>"updated_at", :label=>"Updated", :width=>"80px", :filterable=>true, :formatter=>"dateTime", :style=>""}]
+                  {:field=>"updated_at", :label=>"Updated", :width=>"130px", :filterable=>true, :formatter=>"dateTime", :style=>""}]
     @cv_form = [{:field=>"id", :type=>"-IH", :required=>"", :style=>""},
                   {:field=>"idx", :type=>"-XH", :required=>"", :style=>""},
                   {:field=>"Quality Control Level", :type=>"-LL", :required=>"", :style=>""},
