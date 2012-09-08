@@ -425,21 +425,49 @@
       var selected = tabs.selectedChildWidget;
       console.log('REFRESH:',selected.id);
       if(selected.id!='overview' && selected.id!='SiteDisplayGrid') {
+        //###QUERY-RESULTS-TAB
         if(selected.id.match(/site\d+_dataquery_/)) {
-          console.log('REFRESH DATAQUERY TAB!');
-          var tabs = dijit.byId(selected.id+'_tabs');
-          var selected = tabs.selectedChildWidget;
-          selected.refresh();
-        } else if(selected.id.match(/site\d+/)) {
-          console.log('REFRESH SITE TAB!');
-          var tabs = dijit.byId(selected.id+'_tabs');
-          var selected = tabs.selectedChildWidget;
-          if($.inArray(selected.id.slice(0,5),['show-','edit-','query'])>=0)
+          var mytabs = dijit.byId(selected.id+'_tabs');
+          var myselected = mytabs.selectedChildWidget;
+          console.log('REFRESH DATAQUERY TAB:',myselected.id);
+          if($.inArray(myselected.id.slice(0,5),['plot_','grid_','qaqc_'])<0) {
+            myselected.refresh();
             return;
+          };
+        //###SITE-TAB
+        } else if(selected.id.match(/site\d+/)) {
+          var mytabs = dijit.byId(selected.id+'_tabs');
+          var myselected = mytabs.selectedChildWidget;
+          console.log('REFRESH SITE TAB:',myselected.id);
+          if($.inArray(myselected.id.slice(0,5),['show-','edit-','query'])<0) {
+            myselected.refresh();
+            return;
+          };
+          //selected.siteUpdate();
+          return;
+        //###MANAGE-VARS-TAB
+        } else if(selected.id=='project_variables') {
+          var mytabs = dijit.byId(selected.id+'_tabs');
+          var myselected = mytabs.selectedChildWidget;
+          console.log('REFRESH MANAGE VARs TAB:',myselected.id);
+          var mysel = myselected.id.slice(0,4);
+          if(mysel!='vars' && mysel!='new_') {
+            myselected.refresh();
+            return;
+          };
+        //###CV-MANAGE-TAB
+        } else if(selected.id.match(/cv_.+/)) {
+          var mytabs = dijit.byId(selected.id+'_tabs');
+          var myselected = mytabs.selectedChildWidget;
+          console.log('REFRESH CV TAB:',myselected.id);
+          var mysel = myselected.id.slice(0,7);
+          if(mysel!='manage_' && mysel!='copytab') {
+            myselected.refresh();
+            return;
+          };
         };
         selected.refresh();
           
-        //if(selected.siteUpdate) selected.siteUpdate();
       };
     
     };
@@ -474,7 +502,7 @@
       if(window[title2+'_exec'] && window[title2+'_exec'].cv_datum_new)
         window[title2+'_exec'].cv_datum_new();
       else
-        loading.show()
+        loading.show();
     }
     
     //### Create DataSet dialog
