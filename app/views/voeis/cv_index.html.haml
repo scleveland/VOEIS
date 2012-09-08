@@ -69,7 +69,7 @@
 - projId = @project.nil? ? '' : @project.id.to_s
 %div{:id=>"#{@cv_title2}-cv-edit"}
   = render_widget :edit_cv, :display, :project=>@project,
-                                        :tabId=>@cv_title2,
+                                        :tabId=>'cv_'+@cv_title2,
                                         :cv_data=>@cv_data,
                                         :copy_data=>@copy_data,
                                         :cv_title=>@cv_title,

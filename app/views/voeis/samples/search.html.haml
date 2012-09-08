@@ -161,7 +161,7 @@
     -#:prop=>"parseOnLoad:true;", :tabPosition=>"top", :useSlider=>"true", :tabStrip=>"true"}
     -#:prop=>"parseOnLoad:true;", :tabPosition=>"left-h", :tabStrip=>"false", :nested=>"true"}
     
-    %div{:id=>"#{@tabId}_plot_view", :dojoType=>"dojox.layout.ContentPane", :title=>"Graph", 
+    %div{:id=>"plot_view_#{@tabId}", :dojoType=>"dojox.layout.ContentPane", :title=>"Graph", 
       :style=>"margin:0;padding:0;", :selected=>"true"}
       -#:style=>"margin:0;padding:0;", :selected=>"true", :useSlider=>"false", :tabStrip=>"false"}
       %script{:type=>"dojo/method", :event=>"onShow"}
@@ -261,7 +261,7 @@
       %br
       
     -#%div{:id=>"#{@tabId}_grid_view", :style=>"margin:0;"}
-    %div{:id=>"#{@tabId}_grid_view", :dojoType=>"dojox.layout.ContentPane", :title=>"Table", 
+    %div{:id=>"grid_view_#{@tabId}", :dojoType=>"dojox.layout.ContentPane", :title=>"Table", 
       :style=>"margin:0;padding:0;"}
       %script{:type=>"dojo/method", :event=>"onShow"}
         :plain
@@ -356,7 +356,7 @@
     -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
   
     -if !@data_structs.empty? and edit_auth
-      %div{:id=>"#{@tabId}_qaqc_view", :dojoType=>"dojox.layout.ContentPane", :title=>"Batch QA/QC", 
+      %div{:id=>"qaqc_view_#{@tabId}", :dojoType=>"dojox.layout.ContentPane", :title=>"Batch QA/QC", 
         :style=>"margin:0;padding:0 0 0 8px;"}
         
         %div{:id=>"#{@tabId}_query_script", :style=>"overflow:visible;"}
@@ -638,7 +638,7 @@
       if($('##{@tabId}_toggle_view_id').text()=='VIEW TABLE') {
         $('##{@tabId}_toggle_view_id').text('VIEW GRAPH');
         $('##{@tabId}_plot_view').hide();
-        $('##{@tabId}_grid_view').show();
+        $('#grid_view_#{@tabId}').show();
       } else {
         $('##{@tabId}_toggle_view_id').text('VIEW TABLE');
         $('##{@tabId}_grid_view').hide();
@@ -695,22 +695,6 @@
           val_grid.scrollToRow(grid_sel[0]._0);
         };
       };
-    };
-    
-    //############################## EXPORT-TAB
-    #{dataId}.export = function() {
-      var tabs = dijit.byId('#{@tabId}_tabs');
-      var pane0 = dijit.byId('#{@tabId}_plot_view');
-      tabs.selectChild(pane0);
-      #{dataId}.export_data();
-      var tabs = dijit.byId('#{@tabId}_tabs');
-      var pane0 = dijit.byId('#{@tabId}_plot_view');
-      var this_pane = tabs.selectedChildWidget;
-      console.log('EXPORT!', this_pane.title);
-      tabs.selectChild(this_pane);
-      this_pane.controlButton.focus();
-      
-      
     };
     
     //############################## SELECTED-TOOLS
@@ -1260,13 +1244,13 @@
     // append the new grid to the div " ":
     //dojo.byId("gridContainer").appendChild(val_grid.domNode);
     
-    $('##{@tabId}_grid_view #gridContainer').append(#{dataId}.val_grid.domNode);
+    $('#grid_view_#{@tabId} #gridContainer').append(#{dataId}.val_grid.domNode);
 
     // Call startup, in order to render the grid:
     #{dataId}.val_grid.startup();
     // Hide grid div initially (after rendering)
     setTimeout(function(){
-      $('##{@tabId}_grid_view').hide();
+      $('#grid_view_#{@tabId}').hide();
       
     },200);
     
@@ -1277,7 +1261,7 @@
     //    $("#tooltip").remove();
     //});    
     
-    #{dataId}.plot = $.plot($("##{@tabId}_plot_view #plotContainer"), [#{dataId}.data],{
+    #{dataId}.plot = $.plot($("#plot_view_#{@tabId} #plotContainer"), [#{dataId}.data],{
            series: {
                color : "blue",
                lines: { show: true },
@@ -1294,14 +1278,14 @@
     });
 
     // ADD ZOOM in/out button 
-    $('<div class="gridbutton" title="ZOOM-IN" style="right:20px;top:20px;">+</div>').appendTo($("##{@tabId}_plot_view #plotContainer")).click(function (e) {
+    $('<div class="gridbutton" title="ZOOM-IN" style="right:20px;top:20px;">+</div>').appendTo($("#plot_view_#{@tabId} #plotContainer")).click(function (e) {
        e.preventDefault();
        var sel = #{dataId}.val_grid.selection.getSelected();
        #{dataId}.plot.unhighlight();
        plotutils.highlightItems(sel,0,#{dataId}.plot);
        #{dataId}.plot.zoom();
     });
-    $('<div class="gridbutton" title="ZOOM-OUT" style="right:20px;top:44px;">-</div>').appendTo($("##{@tabId}_plot_view #plotContainer")).click(function (e) {
+    $('<div class="gridbutton" title="ZOOM-OUT" style="right:20px;top:44px;">-</div>').appendTo($("#plot_view_#{@tabId} #plotContainer")).click(function (e) {
        e.preventDefault();
        var sel = #{dataId}.val_grid.selection.getSelected();
        #{dataId}.plot.unhighlight();
@@ -1309,7 +1293,7 @@
        #{dataId}.plot.zoomOut();
     });
     // CLEAR SELECTION
-    $('<div class="gridbutton" title="CLEAR SELECTION" style="right:20px;bottom:40px;background-color:red;">x</div>').appendTo($("##{@tabId}_plot_view #plotContainer")).click(function (e) {
+    $('<div class="gridbutton" title="CLEAR SELECTION" style="right:20px;bottom:40px;background-color:red;">x</div>').appendTo($("#plot_view_#{@tabId} #plotContainer")).click(function (e) {
        #{dataId}.plot.unhighlight();
        #{dataId}.val_grid.selection.deselectAll();
     });
@@ -1471,7 +1455,7 @@
      });
      
      
-     $("##{@tabId}_plot_view #plotContainer").bind("plothover", function (event, pos, item) {
+     $("#plot_view_#{@tabId} #plotContainer").bind("plothover", function (event, pos, item) {
        //
        //showPlotTooltip(event,pos,item);
        #{dataId}.plotHover = [event,pos,item];
@@ -1514,7 +1498,7 @@
      
      
      // PLOTCLICK event to scroll to point on datagrid
-     $("##{@tabId}_plot_view #plotContainer").bind("plotclick", function (event, pos, item) {
+     $("#plot_view_#{@tabId} #plotContainer").bind("plotclick", function (event, pos, item) {
          //
          #{dataId}.plotClick = [event,pos,item];
          //var e = #{dataId}.domClick;
