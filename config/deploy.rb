@@ -36,10 +36,10 @@ task :production do
 
 end
 
-desc "Setup Production Settings"
+desc "Setup Production2 Settings"
 task :production2 do
 
-  set :branch, "production"
+  set :branch, "production2"
   role :web, "voeis2.rcg.montana.edu"
   role :app, "voeis2.rcg.montana.edu"
   role :db,  "voeis2.rcg.montana.edu", :primary => true
