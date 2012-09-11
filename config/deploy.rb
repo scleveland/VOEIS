@@ -39,6 +39,8 @@ end
 desc "Setup Production2 Settings"
 task :production2 do
 
+  set :rvm_ruby_string, 'ruby-1.9.2-p180@unicorn'
+  set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p180@global/bin/bundle"
   set :branch, "production2"
   role :web, "voeis2.rcg.montana.edu"
   role :app, "voeis2.rcg.montana.edu"
