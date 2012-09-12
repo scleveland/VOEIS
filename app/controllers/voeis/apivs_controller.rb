@@ -134,7 +134,11 @@ class Voeis::ApivsController < Voeis::BaseController
         flash_error = Hash.new
         @msg = "There was a problem parsing this file."
         name = Time.now.to_s + params[:datafile].original_filename 
-        directory = "temp_data"
+
+       directory = "data/" + @project.id + "/" + Date.today.to_s
+        unless Dir.exists?(directory)
+          Dir.mkdir(directory)
+        end
         @new_file = File.join(directory,name)
         File.open(@new_file, "wb"){ |f| f.write(params['datafile'].read)}
         begin 
@@ -269,7 +273,14 @@ class Voeis::ApivsController < Voeis::BaseController
   
             @msg = "There was a problem parsing this file."
             name = Time.now.to_s + params[:datafile].original_filename 
-            directory = "temp_data"
+            
+           directory = "data/" + @project.id + "/" + Date.today.to_s
+            unless Dir.exists?(directory)
+              unless Dir.exist?("data/" + @project.id)
+                Dir.mkdir("data/" + @project.id)
+              end
+              Dir.mkdir(directory)
+            end
             @new_file = File.join(directory,name)
             File.open(@new_file, "wb"){ |f| f.write(params['datafile'].read)}
             begin 
@@ -2089,7 +2100,13 @@ class Voeis::ApivsController < Voeis::BaseController
         flash_error = Hash.new
         @msg = "There was a problem parsing this file."
         name = Time.now.to_s + params[:datafile].original_filename 
-        directory = "temp_data"
+       directory = "data/" + @project.id + "/" + Date.today.to_s
+        unless Dir.exists?(directory)
+          unless Dir.exist?("data/" + @project.id)
+            Dir.mkdir("data/" + @project.id)
+          end
+          Dir.mkdir(directory)
+        end
         @new_file = File.join(directory,name)
         File.open(@new_file, "wb"){ |f| f.write(params['datafile'].read)}
         site = Voeis::Site.get(params[:site_id].to_i)
