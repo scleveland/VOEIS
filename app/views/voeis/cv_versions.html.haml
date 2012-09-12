@@ -87,8 +87,8 @@
 -#  -#= @cv_title+': '
 -#  -#= @cv_term
 
-%p(style="margin:8px 0 8px 0;padding:0;font-weight:bold;")
-  = '%s History: %s [Id:%s]'%[@cv_title,@cv_item[@cv_term],@cv_item.id]
+%p(style="margin:8px 0 0 0;padding:0;font-weight:bold;")
+  = 'History: %s [Id:%s]'%[@cv_item[@cv_term],@cv_item.id]
   
 -#%strong
 -#  = "SHOW %s VERSIONS"%((@global ? 'GLOBAL ' : '')+@cv_title.upcase)
@@ -103,12 +103,13 @@
 -#%br
 
 - projId = @project.nil? ? '' : @project.id.to_s
+-### "#{@cv_title2}_"+id+"_history"
 -#cv-versions
-%div
+%div(style="margin:0;")
   = render_widget :versions, :display, :item=>@cv_item,
                                         :versions=>@cv_versions,
                                         :unique_id=>"cv_%s%03d"%[@cv_title2,@cv_item.id],
-                                        :unique_jsid=>"cv_%s%03d"%[@cv_title2,@cv_item.id],
+                                        :parent_id=>"%s_%s_history"%[@cv_title2,@cv_item.id],
                                         :item_refs=>@cv_refs,
                                         :properties=>@cv_properties,
                                         :restore_callback=>"cv_item_restore",

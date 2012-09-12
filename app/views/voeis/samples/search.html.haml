@@ -37,13 +37,33 @@
   ##{@tabId}_tabs .dijitToolbar .dijitButtonText { color:#398a93!important; }
 
 -#%h3{:style=>"margin:5px 0;"}
-%h3{:style=>"margin:0 0 10px 0;"}
-  %span.small{:style=>"font-size:14px;", :id=>"site00-detail-label"}
-    QUERY RESULTS
-    [#{@tabId[-3,3]}]:
-  = "#{@site_name} / #{@var_name} [Id:#{@variable.id}]"
-  -#%span.small{:style=>"font-size:11px;font-weight:bold;"}
+-###%h3{:style=>"margin:0 0 10px 0;"}
+-###  %span.small{:style=>"font-size:14px;", :id=>"site00-detail-label"}
+-###    QUERY RESULTS [#{@tabId[-3,3]}]:
+-###  = "#{@site_name} / #{@var_name} [Id:#{@variable.id}]"
+-###  -#%span.small{:style=>"font-size:11px;font-weight:bold;"}
 
+%p(style="margin:0 0 8px 0;padding:0;")
+  %strong
+    QUERY RESULTS [#{@tabId[-3,3]}]:
+  = "#{@site_name} [Id:#{@site.id}]"
+  %strong
+    = "/ #{@var_name} [Id:#{@variable.id}] | #{@units} |"
+  -if !@start_date.nil?
+    -if @start_date > @end_date
+      %strong
+        %em
+          ERROR - start date should not come after end date
+    -else
+      = @start_date.to_date.strftime('%b %d, %Y')
+      &ndash;
+      = @end_date.to_date.strftime('%b %d, %Y')
+      (<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)
+      -#= "(<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)".html_safe
+  -else
+    %strong
+      %em
+        ERROR - invalid date entry
 
 -# #pagination-links
 -# = pagination_links(@query, params[:page], 10)  
@@ -218,37 +238,37 @@
       
       -#%h4{:style=>"margin:5px 0 0 5px;float:left;"}
       -#%strong(style="margin-left:10px;")
-      %p(style="margin:10px 0 8px 10px;padding:0;font-weight:bold;")
-        = "#{@var_name} [Id:#{@variable.id}] | #{@units} |"
-        -#&nbsp;&nbsp;&nbsp;
-        -if !@start_date.nil?
-          -if @start_date > @end_date
-            ERROR - start date should not come after end date
-          -else
-            = @start_date.to_date.strftime('%b %d, %Y')
-            &ndash;
-            = @end_date.to_date.strftime('%b %d, %Y')
-            (<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)
-            -#= "(<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)".html_safe
-        -else
-          ERROR - invalid date entry
-
-        -#-if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
-        -if !current_user.nil? && current_user.projects.include?(@project) && false
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          -#%p{:style=>"margin:7px 0;"}
-          -#  %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
-          -#    %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
-          -#      Data Set:
-          -##%button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet('#{@tabId}');") 
-          -##  Add Selection &gt;&gt;
-          -## opts0 = "<option value='-'>- Select Data Set -</option>\n<option value='NEW'>NEW DATA SET</option>\n"
-        
-          - opts0 = "<option value='-'>- with selected data -</option>\n"
-          - opts0 += "<option value='CLR'>CLEAR SELECTED</option>\n<option value='ALL'>SELECT ALL</option>\n"
-          - opts0 += "<option value='DEL'>DELETE SELECTED</option>\n<option value='NEW'>NEW DATA SET</option>\n"
-          - @data_set_array.each{|ds| opts0+="<option value='%s'>Add to Data Set: %s</option>\n" %ds }
-          = select_tag("#{@tabId}_data_set_select", opts0.html_safe)
+      -###%p(style="margin:10px 0 8px 10px;padding:0;font-weight:bold;")
+      -###  = "#{@var_name} [Id:#{@variable.id}] | #{@units} |"
+      -###  -#&nbsp;&nbsp;&nbsp;
+      -###  -if !@start_date.nil?
+      -###    -if @start_date > @end_date
+      -###      ERROR - start date should not come after end date
+      -###    -else
+      -###      = @start_date.to_date.strftime('%b %d, %Y')
+      -###      &ndash;
+      -###      = @end_date.to_date.strftime('%b %d, %Y')
+      -###      (<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)
+      -###      -#= "(<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)".html_safe
+      -###  -else
+      -###    ERROR - invalid date entry
+      -###
+      -###  -#-if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
+      -###  -if !current_user.nil? && current_user.projects.include?(@project) && false
+      -###    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      -###    -#%p{:style=>"margin:7px 0;"}
+      -###    -#  %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
+      -###    -#    %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
+      -###    -#      Data Set:
+      -###    -##%button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet('#{@tabId}');") 
+      -###    -##  Add Selection &gt;&gt;
+      -###    -## opts0 = "<option value='-'>- Select Data Set -</option>\n<option value='NEW'>NEW DATA SET</option>\n"
+      -###  
+      -###    - opts0 = "<option value='-'>- with selected data -</option>\n"
+      -###    - opts0 += "<option value='CLR'>CLEAR SELECTED</option>\n<option value='ALL'>SELECT ALL</option>\n"
+      -###    - opts0 += "<option value='DEL'>DELETE SELECTED</option>\n<option value='NEW'>NEW DATA SET</option>\n"
+      -###    - @data_set_array.each{|ds| opts0+="<option value='%s'>Add to Data Set: %s</option>\n" %ds }
+      -###    = select_tag("#{@tabId}_data_set_select", opts0.html_safe)
     
       -#=clear_break
       -# #pagination-links
@@ -258,7 +278,6 @@
       -#%div{:id=>"#{@tabId}_plot_view", :style=>"margin:0;"}
       
       #plotContainer{:style=>"width:80%;height:310px;margin:0 0 0 12px;"}
-      %br
       
     -#%div{:id=>"#{@tabId}_grid_view", :style=>"margin:0;"}
     %div{:id=>"grid_view_#{@tabId}", :dojoType=>"dojox.layout.ContentPane", :title=>"Table", 
@@ -313,37 +332,37 @@
       -#    = link_to('Export All', 'javascript:', :onclick=>"#{dataId}.export_data();return false;")
       
       -#%h4{:style=>"margin:5px 0 0 5px;float:left;"}
-      %p(style="margin:10px 0 8px 10px;padding:0;font-weight:bold;")
-        = "#{@var_name} [Id:#{@variable.id}] | #{@units} |"
-        -#&nbsp;&nbsp;&nbsp;
-        -if !@start_date.nil?
-          -if @start_date > @end_date
-            ERROR - start date should not come after end date
-          -else
-            = @start_date.to_date.strftime('%b %d, %Y')
-            &ndash;
-            = @end_date.to_date.strftime('%b %d, %Y')
-            (<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)
-            -#= "(<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)".html_safe
-        -else
-          ERROR - invalid date entry
-
-        -#-if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
-        -if !current_user.nil? && current_user.projects.include?(@project) && false
-          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          -#%p{:style=>"margin:7px 0;"}
-          -#  %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
-          -#    %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
-          -#      Data Set:
-          -##%button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet('#{@tabId}');") 
-          -##  Add Selection &gt;&gt;
-          -## opts0 = "<option value='-'>- Select Data Set -</option>\n<option value='NEW'>NEW DATA SET</option>\n"
-        
-          - opts0 = "<option value='-'>- with selected data -</option>\n"
-          - opts0 += "<option value='CLR'>CLEAR SELECTED</option>\n<option value='ALL'>SELECT ALL</option>\n"
-          - opts0 += "<option value='DEL'>DELETE SELECTED</option>\n<option value='NEW'>NEW DATA SET</option>\n"
-          - @data_set_array.each{|ds| opts0+="<option value='%s'>Add to Data Set: %s</option>\n" %ds }
-          = select_tag("#{@tabId}_data_set_select", opts0.html_safe)
+      -###%p(style="margin:10px 0 8px 10px;padding:0;font-weight:bold;")
+      -###  = "#{@var_name} [Id:#{@variable.id}] | #{@units} |"
+      -###  -#&nbsp;&nbsp;&nbsp;
+      -###  -if !@start_date.nil?
+      -###    -if @start_date > @end_date
+      -###      ERROR - start date should not come after end date
+      -###    -else
+      -###      = @start_date.to_date.strftime('%b %d, %Y')
+      -###      &ndash;
+      -###      = @end_date.to_date.strftime('%b %d, %Y')
+      -###      (<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)
+      -###      -#= "(<span class='#{@tabId}_datacount'>#{@graph_data.length}</span> Points)".html_safe
+      -###  -else
+      -###    ERROR - invalid date entry
+      -###
+      -###  -#-if !current_user.nil? && current_user.projects.include?(Project.get(@project_uid))
+      -###  -if !current_user.nil? && current_user.projects.include?(@project) && false
+      -###    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      -###    -#%p{:style=>"margin:7px 0;"}
+      -###    -#  %a{:href=>"javascript:", :onclick=>"dijit.byNode($('##{@tabId}_new_data_set')[0]).show();return false;"}
+      -###    -#    %label{:id=>"d_set", :class=>"icon icon-add", :onmouseover=>"this.style.cursor='hand'"}
+      -###    -#      Data Set:
+      -###    -##%button(name="add_data_button" id="#{@tabId}_add_data_button" onclick="addSelectedToDataSet('#{@tabId}');") 
+      -###    -##  Add Selection &gt;&gt;
+      -###    -## opts0 = "<option value='-'>- Select Data Set -</option>\n<option value='NEW'>NEW DATA SET</option>\n"
+      -###  
+      -###    - opts0 = "<option value='-'>- with selected data -</option>\n"
+      -###    - opts0 += "<option value='CLR'>CLEAR SELECTED</option>\n<option value='ALL'>SELECT ALL</option>\n"
+      -###    - opts0 += "<option value='DEL'>DELETE SELECTED</option>\n<option value='NEW'>NEW DATA SET</option>\n"
+      -###    - @data_set_array.each{|ds| opts0+="<option value='%s'>Add to Data Set: %s</option>\n" %ds }
+      -###    = select_tag("#{@tabId}_data_set_select", opts0.html_safe)
     
       -#=clear_break
       -# #pagination-links
@@ -351,7 +370,7 @@
       -#%br
       
       #gridContainer{:style=>"width:96%;height:310px;margin:0;border:solid 1px #3A7594;"}
-      %br
+      
     -# 33e 3A7594 3889AA
     -#%div(dojoType="dijit.Dialog" title="DataSet" href="#{root_url}projects/#{@project_uid}/data_sets/#{#data_set.id}" style= "overflow:auto; width: 400px; height: 200px;")
   
@@ -359,7 +378,7 @@
       %div{:id=>"qaqc_view_#{@tabId}", :dojoType=>"dojox.layout.ContentPane", :title=>"Batch QA/QC", 
         :style=>"margin:0;padding:0 0 0 8px;"}
         
-        %div{:id=>"#{@tabId}_query_script", :style=>"overflow:visible;"}
+        %div{:id=>"#{@tabId}_query_script", :style=>"overflow:visible;padding-top:8px;"}
           %form(id="#{@tabId}_query_script_form" dojoType="dijit.form.Form" method="post" style="overflow:visible;")
       
             -#%strong
@@ -377,7 +396,6 @@
             -#&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             -#= link_to('QUERY RESULTS', 'javascript:', :class=>'icon icon-cancel', :onclick=>"#{dataId}.show_scripting(false);return false;")
         
-            %br
             %em
               ENTER R-SCRIPT HERE &nbsp; &mdash; &nbsp; LOAD/SAVE: 
             - opts02 = "<option value='-'>- select -</option>\n"

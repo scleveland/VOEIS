@@ -156,7 +156,11 @@
     var hist_id = "#{@cv_title2}_"+id+"_history";
     var hist_title = "Hist: "+name+" ["+id+"]";
     if(#{@tabId}_tab_loaded) {
-      var hist_callback = function(){ if(window.loaded) window.loaded() };
+      var hist_callback = function(){
+        if(window.loaded) window.loaded();
+        //resize History tabContainer
+        initTabs();
+      };
       var close_callback = function(){ #{@cv_title2}_exec.cleanup(); };
       dojo.publish('voeis/project/openTab',[hist_url,hist_id,hist_title,hist_callback,close_callback,'#{@tabId}_tabs']);
     } else {
@@ -447,19 +451,30 @@
     
   });
 
+  //RESIZE CV-pane tabs
+  #{@cv_title2}_exec.resize = function() {
+    resizeTabs('#{@tabId}_tabs',85,'95%');
+  };
+  
   //##### INIT PAGE #####
   //ON-TAB-LOAD-DONE!
   function initPage() {
     console.log('initPage: NOW!!');
     #{@cv_title2}_data.cv_management_grid.startup();
     
-    //CLOSE PANE
+    //RESIZE TABS STUFF
+    global_resize['#{@cv_title2}'] = #{@cv_title2}_exec.resize;
+    #{@cv_title2}_exec.resize();
+    
+    //PANE--
     var pane = dijit.byId('#{@tabId}');
     if(pane)
+      //ON-CLOSE STUFF
       pane.connect(pane, "onClose", function(){
        //var this_pane = this;
        //this_pane.
        #{@cv_title2}_exec.cleanup();
+       delete global_resize['#{@cv_title2}'];
       });
     
     //EDIT TAB CLICK-OVERRIDE

@@ -300,6 +300,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		window[this.id+'ref'] = pane;
 		
 		this.siteUpdate();
+		global_resize[this.id] = this.resize;
+		this.resize();
 		
 	},
 
@@ -460,12 +462,18 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			};
 	},
 	
+	resize: function() {
+		var Hoffset = 85;
+		resizeTabs(this.id+'_tabs',Hoffset,'95%');
+	},
+	
 	onClose: function() {
 		//REMOVE Global Ref
-		eval('delete '+this.id+'ref');
+		//eval('delete '+this.id+'ref');
+		delete window[this.id+'ref'];
 		console.log('CLOSE:',this.domNode,this.containerNode)
 		this.purgeContent();
-		
+		delete global_resize[this.id];
 		//dojo.byId(this.id);
 		//dijit.byId(this.id)
 		//this.destroyRecursive();

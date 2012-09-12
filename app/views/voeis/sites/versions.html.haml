@@ -59,6 +59,11 @@
     tabs.selectChild(sitePane);
   };
   
+  // ON LOAD
+  $(window).ready(function(){ 
+    //##### 
+  });
+  
   
 -#%h3{:style=>"margin-top:0;"}
 -#  %span.small{:style=>"font-size:14px;"}
@@ -86,8 +91,8 @@
 %div
   = render_widget :versions, :display, :item=>@site,
                                         :versions=>@versions,
-                                        :unique_id=>"site%03d"%[@site.id],
-                                        :unique_jsid=>"site%03d"%[@site.id],
+                                        :unique_id=>"site%s"%[@site.id],
+                                        :parent_id=>"history-site%s"%[@site.id],
                                         :item_refs=>@site_refs,
                                         :properties=>@ver_properties,
                                         :restore_callback=>"cv_item_restore",

@@ -11,16 +11,16 @@
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
   dojo.require("dijit.form.Button");
   
-  var version_data_#{@unique_jsid} = [
+  var version_data_#{@unique_id} = [
      #{@versions_ref.map{|version| "        "+version.to_json}.join(",\n")}
   ];
-  var versions_json_#{@unique_jsid} = {
+  var versions_json_#{@unique_id} = {
       //identifier: 'updated_at',
       identifier: 'version',
       label: 'name',
-      items: version_data_#{@unique_jsid} };
-  var versions_store_#{@unique_jsid} = new dojo.data.ItemFileReadStore({
-    data: versions_json_#{@unique_jsid}
+      items: version_data_#{@unique_id} };
+  var versions_store_#{@unique_id} = new dojo.data.ItemFileReadStore({
+    data: versions_json_#{@unique_id}
   });
   
   // NICE Dijit ConfirmDialog
@@ -107,21 +107,49 @@
         { buttonOk:'YES', buttonCancel:'Cancel' });
   };
   
+  // RESIZE tabs
+  resize_#{@unique_id} = function(Hoffset){
+    if(!Hoffset) {
+      var Hoffset = 200;
+      if('#{@unique_id}'.match(/^datavalue\d+/)) Hoffset = 150;
+      if('#{@unique_id}'.match(/^site\d+_var\d+/)) Hoffset = 135;
+      if('#{@unique_id}'.match(/^site\d+$/)) Hoffset = 160;
+      if('#{@unique_id}'.match(/^cv_.+/)) Hoffset = 160;
+    };
+    console.log('##### VERSIONS resize_',Hoffset);
+    resizeTabs('history-tabs-#{@unique_id}',Hoffset,'95%');
+  };
+  
+  function initTabs(){
+    console.log('##### VERSIONS initTabs!');
+    //### Adjust size of TabContainer
+    console.log('#####>> #{@parent_id}');
+    mypane = dijit.byId('#{@parent_id}');
+    console.log('#####>> ',mypane);
+    global_resize['#{@unique_id}'] = resize_#{@unique_id};
+    resize_#{@unique_id}();
+    mypane.connect(mypane, "onClose", function(){
+      delete global_resize['#{@unique_id}'];
+    });
+    
+  };
+  
   $(window).ready(function(){ 
-    console.log('DONE LOADING!!');
+    console.log('VERSIONS DONE LOADING!!');
     
   });
   
 
 
--#%div{:id=>"versions_store_#{@unique_id}", :dojoType=>"dojo.data.ItemFileReadStore", :data=>"versions_json_#{@unique_jsid}", :style=>"height:0;margin:0;padding:0;"}
+-#%div{:id=>"versions_store_#{@unique_id}", :dojoType=>"dojo.data.ItemFileReadStore", :data=>"versions_json_#{@unique_id}", :style=>"height:0;margin:0;padding:0;"}
 
 %div{:id=>"history-tabs-#{@unique_id}", :dojoType=>"dijit.layout.TabContainer", :style=>"width:870px;height:360px;margin-top:10px;padding-top:0;", 
   :prop=>"parseOnLoad:true;", :tabPosition=>"top", :useSlider=>"true", :tabStrip=>"true"}
   -#:prop=>"parseOnLoad:true;", :tabPosition=>"left-h", :tabStrip=>"false"}
+  
   %div{:id=>"versions-tab-#{@unique_id}", :dojoType=>"dijit.layout.ContentPane", 
     :title=>"VERSIONS", :style=>"margin:0;padding:0;", :selected=>"true", :useSlider=>"false", :tabStrip=>"false"}
-    %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=>"{filter:true}",  :store=>"versions_store_#{@unique_jsid}", :clientSort=>"true", 
+    %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=>"{filter:true}",  :store=>"versions_store_#{@unique_id}", :clientSort=>"true", 
         :style=>"width:90%;margin:0;", :jsId=>"VersionDisplayGrid_#{@unique_id}", :id=>"VersionsDisplayGrid_#{@unique_id}"}
       -#  :style=>"width:90%;margin:0;", :rowSelector=>"20px", :jsId=>"VersionDisplayGrid", :id=>"VersionDisplayGrid"}
       %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
