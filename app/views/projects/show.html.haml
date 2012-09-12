@@ -558,7 +558,7 @@
       var offH = 120;
       var offW = 50;
       var offMap = 255;
-      var offGrid = 152;
+      var offGrid = 158;
       var tabs = dijit.byId('tab_browser');
       var winH = $(window).height();
       var winW = $(window).width();
@@ -572,24 +572,23 @@
       var tabsH = (winH-offH)+'px';
       var tabsW = (winW-offW)+'px';
       var mapW = (winW-offMap)+'px';
-      var gridH = (winH-offGrid)+'px';
       $(tabs.domNode).css('height',tabsH);
       $(tabs.domNode).css('width',tabsW);
       tabs.resize();
       $(map).css('width',mapW);
       setTimeout(function(){
-        setSiteListSize();
+        setSiteListSize(offGrid);
         //console.log('SiteGridW:',gridW);
       },1500);
       //OTHER TAB SIZES
       for(resize in global_resize) 
         if(resize.slice(0,3)!='win') global_resize[resize]();
     };
-    function setSiteListSize() {
+    function setSiteListSize(offGrid) {
       var winH = $(window).height();
       var winW = $(window).width();
       var gridW = parseInt($('#project_sites').css('width'));
-      var gridH = (winH-168)+'px';
+      var gridH = (winH-offGrid)+'px';
       $('#project_sites').css('height',gridH);
       OverviewGrid.set('height',gridH);
       $('#project_sites').css('width',(gridW-50)+'px');
