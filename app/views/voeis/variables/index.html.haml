@@ -92,7 +92,7 @@
   };
   
   resize_#{tabId} = function(){
-    resizeTabs('#{tabId}_tabs',60,'95%');
+    resizeTabs('#{tabId}_tabs',55,'95%');
   };
   
   function pageInit() {
@@ -175,7 +175,7 @@
 -#%br
 
 
-%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:0;padding-top:0;", 
+%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:8px;padding-top:0;", 
   :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"#{tabId}_tabs"}
   -#, :nested=>"true"}
 

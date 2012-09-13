@@ -463,7 +463,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	},
 	
 	resize: function() {
-		var Hoffset = 85;
+		var Hoffset = 80;
 		resizeTabs(this.id+'_tabs',Hoffset,'95%');
 	},
 	

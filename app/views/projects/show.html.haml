@@ -555,10 +555,10 @@
 
     //### Dynamically Adjust TabContainer size
     function setTabSize() {
-      var offH = 120;
+      var offH = 124;
       var offW = 50;
       var offMap = 255;
-      var offGrid = 158;
+      var offGrid = 162;
       var tabs = dijit.byId('tab_browser');
       var winH = $(window).height();
       var winW = $(window).width();
@@ -1824,7 +1824,7 @@
         -#%th{:field=>"latitude", :width=>"100px", :filterable=>true} Lat
         -#%th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
   
-  = clear_break
+  -#= clear_break
   
   -#%table{:id=>'project_sites_test', :dojoType=>"dojox.grid.EnhancedGrid", 
   -#        :jsId=>"OverviewGrid_test", 

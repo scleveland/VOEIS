@@ -111,10 +111,10 @@
   resize_#{@unique_id} = function(Hoffset){
     if(!Hoffset) {
       var Hoffset = 200;
-      if('#{@unique_id}'.match(/^datavalue\d+/)) Hoffset = 150;
-      if('#{@unique_id}'.match(/^site\d+_var\d+/)) Hoffset = 135;
-      if('#{@unique_id}'.match(/^site\d+$/)) Hoffset = 160;
-      if('#{@unique_id}'.match(/^cv_.+/)) Hoffset = 160;
+      if('#{@unique_id}'.match(/^datavalue\d+/)) Hoffset = 145;
+      if('#{@unique_id}'.match(/^site\d+_var\d+/)) Hoffset = 130;
+      if('#{@unique_id}'.match(/^site\d+$/)) Hoffset = 155;
+      if('#{@unique_id}'.match(/^cv_.+/)) Hoffset = 155;
     };
     console.log('##### VERSIONS resize_',Hoffset);
     resizeTabs('history-tabs-#{@unique_id}',Hoffset,'95%');

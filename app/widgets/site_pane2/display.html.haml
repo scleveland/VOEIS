@@ -132,8 +132,9 @@
 -###    SITE$$$id$$$:
 -###  $$$site-name$$$
 
-%p(style="margin:0 0 8px 0;padding:0;")
-  SITE$$$id$$$:
+%p(style="margin:8px 0 8px 0;padding:0;")
+  %span{:id=>"site00-detail-label"}  
+    SITE$$$id$$$:
   %strong
     $$$site-name$$$
 
@@ -365,6 +366,7 @@
             //NEW SITE
             dojo.publish('voeis/project/site/close',[0]);
           };
+          
           function delete_site(site_id){
             confirmDialog(
               'DELETE SITE?',
