@@ -192,14 +192,16 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			//$(this.domNode).find('#'+siteTag+'-name-head').text('NEW SITE');
 			$(this.domNode).find('#show-'+siteTag).hide();
 			$(this.domNode).find('#edit-'+siteTag).show();
-			$(this.domNode).find('#'+siteTag+'-edit-control').hide();
 			$(this.domNode).find('#'+siteTag+'-provenance-row').hide();
 			$(this.domNode).find('#'+siteTag+'-toolbar').hide();
 			$(this.domNode).find('#'+siteTag+'-detail-label').hide();
 			$(this.domNode).find('#'+siteTag+'-edit-buttons').hide();
 			$(this.domNode).find('#'+siteTag+'_tabs .dijitTabContainerTop-tabs').hide()
-			var editPane = dijit.byId('edit-'+siteTag);
-			dijit.byId(siteTag+'_tabs').selectChild(editPane);
+			setTimeout(function(){
+				//console.log('SiteGridW:',gridW);
+				var editPane = dijit.byId('edit-'+siteTag);
+				dijit.byId(siteTag+'_tabs').selectChild(editPane);
+			},500);
 			console.log('NewSite:',siteTag);
 			console.log('domNode.id:',this.domNode.id);
 			
@@ -207,7 +209,6 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		
 		//this.refresh();
 		//if(this.loaded) initForm(siteTag);
-
 	},
 
 	setEdit: function(editMode0) {
@@ -300,9 +301,10 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		window[this.id+'ref'] = pane;
 		
 		this.siteUpdate();
-		global_resize[this.id] = this.resize;
-		this.resize();
-		
+		if(!this.newSite) {
+			global_resize[this.id] = this.resize;
+			this.resize();
+		};
 	},
 
 	getSite: function(siteId) {
