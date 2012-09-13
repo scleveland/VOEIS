@@ -1,0 +1,175 @@
+-### MANAGE SITES TAB
+
+- tabId = 'project_sites'
+- dataId = tabId+'_data'
+- edit_auth = !current_user.nil? && (current_user.has_role?('Data Manager',@project) || current_user.has_role?('Principal Investigator',@project))
+- url_api_key = current_user.nil? || current_user.api_key.blank? ? "" : "&api_key=#{current_user.api_key}"
+
+-#= javascript_include_tag("jquery.flot.js")
+-# content_for(:javascripts) do
+:javascript
+  dojo.require("dijit.dijit");
+  dojo.require("dijit.Declaration");
+  dojo.require("dojox.layout.TableContainer");
+  dojo.require("dijit.form.TextBox");
+  dojo.require("dijit.layout.TabContainer");
+  dojo.require("dijit.layout.ContentPane");
+  dojo.require("dojox.layout.ContentPane");
+  dojo.require("dojox.grid.EnhancedGrid");
+  dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+  dojo.require("dojox.grid.enhanced.plugins.Filter");
+  dojo.require("dojo.data.ItemFileReadStore");
+  //dojo.require("dojo.data.ItemFileWriteStore");
+  
+  console.log('### SITES -TABID: #{tabId}');
+  
+  edit_auth = true;
+  
+  // Datastore
+  var #{dataId} = {};
+  
+  #{dataId}.controls = function(item) {
+    if(item==null || item=='') return '-';
+    //return 'TESTING-- #';
+    var id = item.id[0];
+    var idx = item._0;
+    //console.log('GRID ITEM:',item);
+    var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" style="margin:0;padding:0;height:16px;" />';
+    var edit_icon = '<img src="/images/icons/edit.png" alt="history icon" title="EDIT" style="margin:0;padding:0;height:16px;" />';
+    var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" style="margin:0;padding:0;height:16px;" />';
+    //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
+    //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
+    //var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
+    var hist_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/history\', ['+id+',\'#{tabId}_tabs\']);return false;">'+hist_icon+'</a>\n';
+    var edit_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/edit\', ['+id+',\'#{tabId}_tabs\']);return false;">'+edit_icon+'</a>\n';
+    var delete_link = '<a href="javascript:" onclick="delete_site('+id+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
+    var spaces = '&nbsp;';
+    //if(item.used[0]) return spaces+hist_link;
+    //return spaces+hist_link+spaces+delete_link;
+    if(!edit_auth) return spaces+hist_link;
+    return spaces+edit_link+spaces+hist_link+spaces+delete_link;
+  };
+  
+  
+  resize_#{tabId} = function(){
+    resizeTabs('#{tabId}_tabs',60,'95%');
+  };
+  
+  function pageInit() {
+    console.log('##### SITES pageInit!');
+    //### Adjust Height of TabContainer
+    console.log('#####>> #{tabId}');
+    mypane = dijit.byId('#{tabId}');
+    global_resize['#{tabId}'] = resize_#{tabId};
+    resize_#{tabId}();
+    mypane.connect(mypane, "onClose", function(){
+      delete global_resize['#{tabId}'];
+    });
+    
+  };
+  
+  $(window).ready(function(){ 
+    //##### 
+    console.log('##### MAN-SITES-READY-NOW!');
+    
+  });
+    
+
+
+
+%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:0;padding-top:0;", 
+  :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"#{tabId}_tabs"}
+  -#, :nested=>"true"}
+
+  %table{:dojoType=>"dojox.grid.EnhancedGrid", :title=>"Sites", 
+          :plugins=> "{nestedSorting:false, filter:true, indirectSelection:false}",  
+          :store=>"psites", 
+          :clientSort=>"true", 
+          :sortInfo=>"2",
+          :jsId=>"#{tabId}_grid", 
+          :id=>"#{tabId}_grid", 
+          :style=>"float:left;width:95%;", 
+          :style=>"width:90%;margin:0;padding:0;border:#E3EBF2 2px solid;", 
+          :style=>"width:99%;height:80%"}
+    -#:rowSelector=>"20px", 
+    -#:selectionMode=>"none", 
+    %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
+      :plain
+        //var map = dijit.byId(@project);
+        //var map = getElementById('#{@project.id}');
+        var item = this.getItem(idx);
+        var projPane = dijit.byId("overview");
+        var tabs = dijit.byId('tab_browser');
+        console.log('TAB: '+tabs.selectedChildWidget.id);
+        this.selection.clear();
+        if(tabs.selectedChildWidget.id=='overview') return
+        //tabs.selectChild(project);
+        dojo.publish('voeis/project/site/select', item.id);
+        //tabs.selectChild(project);
+        //pmarkers[item.idx].pop();
+        //pmarkers[item.idx].selsite();
+    %thead
+      %tr
+        %th{:field=>"name", :width=>"auto", :filterable=>true} Site Name
+        %th{:field=>"id", :width=>"55px", :filterable=>true} ID
+        %th{:field=>"code", :width=>"autopx", :filterable=>true} Code
+        %th{:field=>"state", :width=>"70px", :filterable=>true} State
+        %th{:field=>"_item", :width=>"75px", :formatter=>"#{dataId}.controls"} - - -
+        
+
+  %div{:dojoType=>"dojox.layout.ContentPane", :title=>"New", :id=>"new_#{tabId}", :executeScripts=>"true", 
+    :style=>"margin:0;padding:8px 0 0 8px;"}
+    -#, :ioArgs=>"{ headers: {'Accept': 'text/html'} }",
+    -#:href=>"#{project_path(@project)}/variables/0.html?site_id=0#{url_api_key}"}
+    %script{:type=>"dojo/method", :event=>"onShow"}
+      :plain
+        //NEW SITE PANE
+        #{dataId}.newPane = new voeis.ui.SitePane2();
+        #{dataId}.newPane.setSite(0);
+        $('#new_#{tabId}').append(#{dataId}.newPane.domNode);
+
+    -#%div
+
+-#%br
+-#%br
+-#
+-#%table{:id=>"sample-table", :style=>"width:70%;"} 
+-#  %tr{:class=>"row-gr"}
+-#    %th{:width=>"30%", :align=>"left"} &nbsp;&nbsp;&nbsp; Lab Code
+-#    %th{:width=>"10%", :align=>"left"} Type
+-#    %th{:width=>"14%"} Medium
+-#    %th{:width=>"20%"} Timestamp
+-#    %th{:width=>"20%"} Data Values
+-#  - @samples.each do |samp|
+-#    - unless samp.nil?
+-#      %tr{:class=>cycle('row-lt1','row0')}
+-#        %td{:style=>"width:30%;align:left;", :align=>"left"}
+-#          %strong
+-#            = link_to(samp.lab_sample_code, 'javascript:', :onclick=>"dojo.publish('voeis/project/sample', [#{samp.id},'#{samp.lab_sample_code}',#{@site.nil? ? 1 : @site.id}]);")
+-#        %td{:style=>"width:10%;align:left;"}
+-#          = samp.sample_type
+-#        %td{:style=>"width:14%;align:center;"}
+-#          = samp.material
+-#        %td{:style=>"width:20%;align:center;"}
+-#          = samp.local_date_time.strftime('%m/%d/%Y %H:%M:%S')
+-#        %td{:style=>"width:20%;align:center;"}
+-#          = samp.data_values.count
+
+
+-#%div{:id=>"version_store_site#{@site.id}", :dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pversions_site#{@site.id}", :data=>"pversions_json_site#{@site.id}", :style=>"height:0;margin:0;padding:0;"}
+
+-#cv_management_tabs{:dojoType=>"dijit.layout.TabContainer", :style=>"width:870px;height:360px;margin-top:10px;padding-top:0;", 
+-#  :prop=>"parseOnLoad:true;", :tabPosition=>"top", :useSlider=>"true", :tabStrip=>"true"}
+-#  -#:prop=>"parseOnLoad:true;", :tabPosition=>"left-h", :tabStrip=>"false"}
+-#:selected=>"true", :useSlider=>"false", :tabStrip=>"false"}
+-#:style=>"width:870px;height:400px;margin:0;padding:0;", :selected=>"true"}
+
+
+%br{:style=>'float:none; clear:both;'}
+
+
+:javascript
+  (function(){
+
+  })();
+

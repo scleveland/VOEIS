@@ -2180,9 +2180,9 @@
       openSiteTab(tabs, siteId, false);
     });
 
-    dojo.subscribe("voeis/project/site/edit", function(siteId) {
+    dojo.subscribe("voeis/project/site/edit", function(siteId,tabsId) {
       console.log(arguments);
-      var tabs = dijit.byId('tab_browser');    
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
       openSiteTab(tabs, siteId, true);
     });
 
@@ -2258,10 +2258,10 @@
       };
     });
 
-    dojo.subscribe("voeis/project/site/history", function(siteId) {
+    dojo.subscribe("voeis/project/site/history", function(siteId,tabsId) {
       console.log('SITE HISTORY',arguments);
       var projectId = "#{@project.id}";
-      var tabs = dijit.byId('tab_browser');
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
       openHistoryTab(tabs, projectId, siteId);
     });
 
@@ -2311,8 +2311,21 @@
       openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
     });
     
+    dojo.subscribe("voeis/project/sites/manage", function() {
+      console.log('MAN-SITES');
+      var tabs = dijit.byId('tab_browser');
+      var tabHref = '#{project_path(@project)}/sites';
+      tabHref += '#{current_user.nil? ? "" : "?api_key="+current_user.api_key}';
+      var tabId = 'project_sites';
+      var tabTitle = 'Manage Sites';
+      var tabCallback = function() {
+        pageInit();
+      };
+      openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
+    });
+    
     dojo.subscribe("voeis/project/variables", function() {
-      console.log('VARIABLES');
+      console.log('MAN-VARIABLES');
       var tabs = dijit.byId('tab_browser');
       var tabHref = '#{project_path(@project)}/variables';
       tabHref += '#{current_user.nil? ? "" : "?api_key="+current_user.api_key}';

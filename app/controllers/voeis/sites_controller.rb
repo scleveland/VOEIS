@@ -41,7 +41,33 @@ class Voeis::SitesController < Voeis::BaseController
     @vertical_datums.each { |item| @vertical_datum_items << [item.term, item.id.to_s] }
     @local_projections.each { |item| @local_projection_items << [item.srs_name, item.id.to_s] }
   end
+
+  # GET /sites
+  # Manage Sites
+  def index
+    @project = parent
+    @project.managed_repository{
+      @sites = @project.sites.all(:order=>[:id.asc])
+      @variables = @project.variables.all(:order=>[:id.asc])
+      @units = Voeis::Unit.all
+      @time_units = Voeis::Unit.all(:units_type.like=>'%Time%')
+      #### CV stuff - CV drop-down entries
+      @vartical_datum_items = Voeis::VerticalDatumCV.all(:order => [:term.asc])
+      @spatial_reference_items = Voeis::SpatialReference.all(:order => [:srs_name.asc])
+      
+      #@label_array = Array["Variable Name","Variable Code","Unit Name","Speciation","Sample Medium","Value Type","Is Regular","Time Support","Time Unit ID","Data Type","General Cateogry", "Detection Limit"]
+      #@vars = @variables.map{ |var| var.to_hash.merge!({:variable_units=>var.get_units}) }
+    }
+    
+    respond_to do |format|
+      format.html # new.html.erb
+      format.json do
+        render :json => @sites.as_json, :callback => params[:jsoncallback]
+      end
+    end
+  end
   
+  # GET /
   def show
     @site =  parent.managed_repository{Voeis::Site.get(params[:id])}
     @site_variable_stats = parent.managed_repository{Voeis::SiteDataCatalog.all(:site_id=>params[:id])}
