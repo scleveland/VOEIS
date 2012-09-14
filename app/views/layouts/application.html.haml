@@ -211,8 +211,9 @@
               %div{:dojoType=>"dijit.MenuSeparator"}
               %div{:dojoType=>"dijit.PopupMenuItem"}
                 %span My Projects
-                %div{:dojoType=>"dijit.Menu", :id=>"projectSubMenu"}
-                  = render_cell(:project_menu, :display, :current_user => current_user)
+                #projectSubMenu{:dojoType=>"dijit.Menu"}
+                  #project_list  
+                    = render_cell(:project_menu, :display, :current_user => current_user)
         
         -##campaignButton{:dojoType => "dijit.form.DropDownButton"}
         -#  %span{:style => "font-weight:bold"}
