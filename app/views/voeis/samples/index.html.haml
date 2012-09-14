@@ -77,7 +77,7 @@
   
 -#%br
 
-%table{:dojoType=>"dojox.grid.EnhancedGrid", 
+%table{:dojoType=>"dojox.grid.EnhancedGrid", :id=>"#{tabId}_grid",
         :plugins=> "{nestedSorting:false, filter:true, indirectSelection:false}",  
         :store=>"#{dataId}.sample_store", 
         :clientSort=>"true", 

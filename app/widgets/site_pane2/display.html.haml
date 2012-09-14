@@ -127,10 +127,16 @@
 -#%br
 
 
-%h3{:id=>"site00-name-head", :style=>"margin:0 0 10px 0;padding:0;"}
-  %span.small{:style=>"font-size:14px;", :id=>"site00-detail-label"}
+-###%h3{:id=>"site00-name-head", :style=>"margin:0 0 10px 0;padding:0;"}
+-###  %span.small{:style=>"font-size:14px;", :id=>"site00-detail-label"}
+-###    SITE$$$id$$$:
+-###  $$$site-name$$$
+
+%p(style="margin:8px 0 8px 0;padding:0;")
+  %span{:id=>"site00-detail-label"}  
     SITE$$$id$$$:
-  $$$site-name$$$
+  %strong
+    $$$site-name$$$
 
 %div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:10px;padding-top:0;", 
   :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"site00_tabs"}
@@ -360,6 +366,7 @@
             //NEW SITE
             dojo.publish('voeis/project/site/close',[0]);
           };
+          
           function delete_site(site_id){
             confirmDialog(
               'DELETE SITE?',
@@ -842,9 +849,10 @@
     :style=>"margin:0;padding:8px 0 0 8px;", :ioArgs=>"{ headers: {'Accept': 'text/html'} }", 
     :href=>"#{project_path(@project)}/samples/?site_id=$$$id$$$#{@url_api_key0}"}
     -#:style=>"margin:0;padding:8px 0 0 8px;", :href=>"#{project_path(@project)}/samples/?site_id=$$$id$$$#{@url_api_key0}"}
-    %script{:type=>"dojo/method", :event=>"onShow"}
+    %script{:type=>"dojo/method", :event=>"onLoad"}
       :plain
         var pane = dijit.byId('samples-site00');
+        resizeTabs('site00_samples_grid','90%');
         //pane.set('href','#{project_path(@project)}/samples/?site_id=$$$id$$$#{@url_api_key0}');
         //pane._load();
 
@@ -853,9 +861,10 @@
     :style=>"margin:0;padding:8px 0 0 8px;", :ioArgs=>"{ headers: {'Accept': 'text/html'} }", 
     :href=>"#{project_path(@project)}/sites/versions?id=$$$id$$$#{@url_api_key0}"}
     -#:style=>"margin:0;padding:8px 0 0 8px;", :href=>"#{project_path(@project)}/sites/versions?id=$$$id$$$#{@url_api_key0}"}
-    %script{:type=>"dojo/method", :event=>"onShow"}
+    %script{:type=>"dojo/method", :event=>"onLoad"}
       :plain
         var pane = dijit.byId('history-site00');
+        initTabs();
         //pane.set('href','#{project_path(@project)}/sites/versions?id=$$$id$$$#{@url_api_key0}');
         //pane._load();
 

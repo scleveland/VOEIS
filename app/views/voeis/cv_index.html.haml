@@ -51,25 +51,29 @@
 -#    %span(data-dojo-type="dijit.ToolbarSeparator")
 
 -#%h3{:style=>"margin-top:0;padding-top:5px;padding-bottom:5px;", :class=>"icon icon-#{@global ? 'voeis' : 'project'}"}
-%h3{:style=>"margin:0 0 10px 0;padding-top:0;"}
-  %span(id="#{@tabId}_proj_title" style="display:none;")
-    - if !@project.nil?
-      %span.small{:style=>"font-size:14px;"}
-        -#%strong
-        PROJECT:
-      = @project.name
-    %br
-  %span.small{:style=>"font-size:14px;"}
-    -#%strong
-    CONTROLLED VOCABULARY ENTRIES (#{@cv_data.length}):
-  = @cv_title
-  -#{'%s [Id:%s]'%[@site.name,@site.id]}
+-###%h3{:style=>"margin:0 0 10px 0;padding-top:0;"}
+-###  %span(id="#{@tabId}_proj_title" style="display:none;")
+-###    - if !@project.nil?
+-###      %span.small{:style=>"font-size:14px;"}
+-###        -#%strong
+-###        PROJECT:
+-###      = @project.name
+-###    %br
+-###  %span.small{:style=>"font-size:14px;"}
+-###    -#%strong
+-###    CONTROLLED VOCABULARY ENTRIES (#{@cv_data.length}):
+-###  = @cv_title
+-###  -#{'%s [Id:%s]'%[@site.name,@site.id]}
 
+%p(style="margin:8px 0 8px 0;padding:0;")
+  CONTROLLED VOCABULARY ENTRIES (#{@cv_data.length}):
+  %strong
+    = @cv_title
 
 - projId = @project.nil? ? '' : @project.id.to_s
 %div{:id=>"#{@cv_title2}-cv-edit"}
   = render_widget :edit_cv, :display, :project=>@project,
-                                        :tabId=>@cv_title2,
+                                        :tabId=>'cv_'+@cv_title2,
                                         :cv_data=>@cv_data,
                                         :copy_data=>@copy_data,
                                         :cv_title=>@cv_title,

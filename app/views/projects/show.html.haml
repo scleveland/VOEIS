@@ -72,6 +72,7 @@
     // GLOBALS & STORES
     var projectSearchCount = 0;
     var update_select_element = false;
+    var global_resize = {};
     var projectsDataStore = voeis.Server.DEFAULT.projectsDataStore();
     var projectStore = dojo.store.JsonRest({target: "#{root_url}projects.json?"});
     //var Sitestore = voeis.Server.DEFAULT.projectSitesDataStore('#{@project.id}');
@@ -425,21 +426,49 @@
       var selected = tabs.selectedChildWidget;
       console.log('REFRESH:',selected.id);
       if(selected.id!='overview' && selected.id!='SiteDisplayGrid') {
+        //###QUERY-RESULTS-TAB
         if(selected.id.match(/site\d+_dataquery_/)) {
-          console.log('REFRESH DATAQUERY TAB!');
-          var tabs = dijit.byId(selected.id+'_tabs');
-          var selected = tabs.selectedChildWidget;
-          selected.refresh();
-        } else if(selected.id.match(/site\d+/)) {
-          console.log('REFRESH SITE TAB!');
-          var tabs = dijit.byId(selected.id+'_tabs');
-          var selected = tabs.selectedChildWidget;
-          if($.inArray(selected.id.slice(0,5),['show-','edit-','query'])>=0)
+          var mytabs = dijit.byId(selected.id+'_tabs');
+          var myselected = mytabs.selectedChildWidget;
+          console.log('REFRESH DATAQUERY TAB:',myselected.id);
+          if($.inArray(myselected.id.slice(0,5),['plot_','grid_','qaqc_'])<0) {
+            myselected.refresh();
             return;
+          };
+        //###SITE-TAB
+        } else if(selected.id.match(/site\d+/)) {
+          var mytabs = dijit.byId(selected.id+'_tabs');
+          var myselected = mytabs.selectedChildWidget;
+          console.log('REFRESH SITE TAB:',myselected.id);
+          if($.inArray(myselected.id.slice(0,5),['show-','edit-','query'])<0) {
+            myselected.refresh();
+            return;
+          };
+          //selected.siteUpdate();
+          return;
+        //###MANAGE-VARS-TAB
+        } else if(selected.id=='project_variables') {
+          var mytabs = dijit.byId(selected.id+'_tabs');
+          var myselected = mytabs.selectedChildWidget;
+          console.log('REFRESH MANAGE VARs TAB:',myselected.id);
+          var mysel = myselected.id.slice(0,4);
+          if(mysel!='vars' && mysel!='new_') {
+            myselected.refresh();
+            return;
+          };
+        //###CV-MANAGE-TAB
+        } else if(selected.id.match(/cv_.+/)) {
+          var mytabs = dijit.byId(selected.id+'_tabs');
+          var myselected = mytabs.selectedChildWidget;
+          console.log('REFRESH CV TAB:',myselected.id);
+          var mysel = myselected.id.slice(0,7);
+          if(mysel!='manage_' && mysel!='copytab') {
+            myselected.refresh();
+            return;
+          };
         };
         selected.refresh();
           
-        //if(selected.siteUpdate) selected.siteUpdate();
       };
     
     };
@@ -474,7 +503,7 @@
       if(window[title2+'_exec'] && window[title2+'_exec'].cv_datum_new)
         window[title2+'_exec'].cv_datum_new();
       else
-        loading.show()
+        loading.show();
     }
     
     //### Create DataSet dialog
@@ -497,34 +526,69 @@
       });
     }
     
+    // RESIZE tabs- generic
+    // tabs = widget
+    // Hoff = height offset (0 for 90%)
+    // Woff = width offset (0 for 95%)
+    function resizeTabs(tabs_id,Hoff,Woff){
+      if(Hoff && typeof Hoff==='string')
+        var myH = Hoff;
+      else if(Hoff && typeof Hoff==='number')
+        var myH = (global_resize.winH-Hoff).toString()+'px';
+      else var myH = 0;
+      if(Woff && typeof Woff==='string')
+        var myW = Woff;
+      else if(Woff && typeof Woff==='number')
+        var myW = (global_resize.winW-Woff).toString()+'px';
+      else var myW = 0;
+      
+      var tabs = dojo.byId(tabs_id);
+      if(tabs) tabs = dijit.byNode(tabs);
+      if(tabs)  {
+        if(myH) $(tabs.domNode).css('height',myH);
+        if(myW) $(tabs.domNode).css('width',myW);
+        tabs.resize();
+        console.log('resizeTabs: '+tabs_id+'--',myH,myW);
+      } else
+        console.log('resizeTabs-- BAD ID: '+tabs_id+'--',myH,myW);
+    };
+
     //### Dynamically Adjust TabContainer size
     function setTabSize() {
+      var offH = 124;
+      var offW = 50;
+      var offMap = 255;
+      var offGrid = 162;
       var tabs = dijit.byId('tab_browser');
       var winH = $(window).height();
       var winW = $(window).width();
+      global_resize.winH = winH-offH;
+      global_resize.winW = winW-offW;
       var map = document.getElementById('#{@project.id.to_s}');
       var mapGrid = $('#map-grid table');
       var gridW = parseInt($('#project_sites').css('width'));
       //OverviewGrid
       //console.log('ScreenH: '+winH);
-      var tabsH = (winH-130)+'px';
-      var tabsW = (winW-50)+'px';
-      var mapW = (winW-255)+'px';
-      var gridH = (winH-168)+'px';
+      var tabsH = (winH-offH)+'px';
+      var tabsW = (winW-offW)+'px';
+      var mapW = (winW-offMap)+'px';
       $(tabs.domNode).css('height',tabsH);
       $(tabs.domNode).css('width',tabsW);
       tabs.resize();
       $(map).css('width',mapW);
       setTimeout(function(){
-        setSiteListSize();
+        setSiteListSize(offGrid);
         //console.log('SiteGridW:',gridW);
       },1500);
+      //OTHER TAB SIZES
+      for(resize in global_resize) 
+        if(resize.slice(0,3)!='win') global_resize[resize]();
     };
-    function setSiteListSize() {
+    function setSiteListSize(offGrid) {
       var winH = $(window).height();
       var winW = $(window).width();
       var gridW = parseInt($('#project_sites').css('width'));
-      var gridH = (winH-168)+'px';
+      var gridH = (winH-offGrid)+'px';
       $('#project_sites').css('height',gridH);
       OverviewGrid.set('height',gridH);
       $('#project_sites').css('width',(gridW-50)+'px');
@@ -1760,7 +1824,7 @@
         -#%th{:field=>"latitude", :width=>"100px", :filterable=>true} Lat
         -#%th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
   
-  = clear_break
+  -#= clear_break
   
   -#%table{:id=>'project_sites_test', :dojoType=>"dojox.grid.EnhancedGrid", 
   -#        :jsId=>"OverviewGrid_test", 
@@ -1959,6 +2023,8 @@
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
       var projHistLoad = function(siteId,varName) {
+        //resize tabContainer
+        initTabs();
       };
       openProjTab(tabs, projHistHref, projHistId, projTabTitle, projHistLoad);
       //##
@@ -1970,12 +2036,14 @@
       var projHistHref = "/projects/#{@project.id}/data_values/versions?id="+dataId+"&tab_id="+tabId;
       projHistHref += '#{current_user.nil? ? "" : "&api_key="+current_user.api_key.to_s}';
       // "/projects/#{@project.id}/variables/versions?id="+varId+"&site_id="+siteId;
-      var projHistId = '#{@project.id}--datavalue'+dataId+'-history';
+      var projHistId = 'datavalue'+dataId+'-history';
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
-      var projHistLoad = function(siteId,varName) {
+      var projDataHistLoad = function(siteId,varName) {
+        //resize tabContainer
+        initTabs();
       };
-      openProjTab(tabs, projHistHref, projHistId, tabTitle, projHistLoad);
+      openProjTab(tabs, projHistHref, projHistId, tabTitle, projDataHistLoad);
       //##
     };
 
@@ -1990,6 +2058,8 @@
       //href: voeis.Server.DEFAULT.project_variable_path(projectId,varId)});
       //projectSitePath(this.projectId, this.siteId)
       var projVarHistLoad = function(siteId,varName) {
+        //resize tabContainer
+        initTabs();
       };
       openProjTab(tabs, projVarHistHref, projVarHistId, tabTitle, projVarHistLoad);
       //##
@@ -2052,23 +2122,6 @@
       tabs.selectChild(pane);
     };
 
-    /*** NOT USED!?
-    var openSitesGridTab = function(tabs, projectId) {
-      var sitesGrid = new dojox.grid.EnhancedGrid({
-        title: projectId,
-        closable: true,
-        store: voeis.Server.DEFAULT.projectSitesDataStore(projectId),
-        structure: [
-          {field: 'name', name: "Site", width: "auto"},
-          {field: 'state', name: "State", width: "auto"}
-        ]
-      });
-
-      tabs.addChild(sitesGrid);
-      tabs.selectChild(sitesGrid);
-    };
-    ***/
-
     //#############
 
     dojo.subscribe("voeis/project/map/clear", function(siteId) {
@@ -2127,9 +2180,9 @@
       openSiteTab(tabs, siteId, false);
     });
 
-    dojo.subscribe("voeis/project/site/edit", function(siteId) {
+    dojo.subscribe("voeis/project/site/edit", function(siteId,tabsId) {
       console.log(arguments);
-      var tabs = dijit.byId('tab_browser');    
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
       openSiteTab(tabs, siteId, true);
     });
 
@@ -2205,10 +2258,10 @@
       };
     });
 
-    dojo.subscribe("voeis/project/site/history", function(siteId) {
+    dojo.subscribe("voeis/project/site/history", function(siteId,tabsId) {
       console.log('SITE HISTORY',arguments);
       var projectId = "#{@project.id}";
-      var tabs = dijit.byId('tab_browser');
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
       openHistoryTab(tabs, projectId, siteId);
     });
 
@@ -2258,15 +2311,28 @@
       openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
     });
     
+    dojo.subscribe("voeis/project/sites/manage", function() {
+      console.log('MAN-SITES');
+      var tabs = dijit.byId('tab_browser');
+      var tabHref = '#{project_path(@project)}/sites';
+      tabHref += '#{current_user.nil? ? "" : "?api_key="+current_user.api_key}';
+      var tabId = 'project_sites';
+      var tabTitle = 'Manage Sites';
+      var tabCallback = function() {
+        pageInit();
+      };
+      openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
+    });
+    
     dojo.subscribe("voeis/project/variables", function() {
-      console.log('VARIABLES');
+      console.log('MAN-VARIABLES');
       var tabs = dijit.byId('tab_browser');
       var tabHref = '#{project_path(@project)}/variables';
       tabHref += '#{current_user.nil? ? "" : "?api_key="+current_user.api_key}';
       var tabId = 'project_variables';
       var tabTitle = 'Manage Variables';
       var tabCallback = function() {
-        //pageInit();
+        pageInit();
       };
       openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
     });

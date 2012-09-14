@@ -90,7 +90,7 @@ class SpatialReferencesController < InheritedResources::Base
                   {:field=>"srs_id", :label=>"Source ID", :width=>"80px", :filterable=>true, :formatter=>"", :style=>""},
                   {:field=>"is_geographic", :label=>"GEO", :width=>"40px", :filterable=>true, :formatter=>"trueFalse", :style=>""},
                   {:field=>"notes", :label=>"Notes", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
-                  {:field=>"updated_at", :label=>"Updated", :width=>"80px", :filterable=>true, :formatter=>"dateTime", :style=>""}]
+                  {:field=>"updated_at", :label=>"Updated", :width=>"130px", :filterable=>true, :formatter=>"dateTime", :style=>""}]
     @cv_form = [{:field=>"id", :type=>"-IH", :required=>"", :style=>""},
                   {:field=>"idx", :type=>"-XH", :required=>"", :style=>""},
                   {:field=>"Source ID", :type=>"-LL", :required=>"", :style=>""},

@@ -253,6 +253,7 @@
                   
                   -#= link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
                   = link_to("Add Site", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/site/new');")
+                  -#= link_to("Manage Sites", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/sites/manage');")
                   = link_to("Manage Variables", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/variables');")
                   -#= link_to("Add Variable", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/variable', [0,'',0]);")
                 - else

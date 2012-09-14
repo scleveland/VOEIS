@@ -183,7 +183,7 @@
 - dataSetGrid = "dataSet" + @data_set.id.to_s + "_grid"
 - dataSetStore ="dataSet" + @data_set.id.to_s + "_store"
 -#%h3{:style=>"margin:5px 0;"}
-%h3{:style=>"margin:0 0 10px 0;"}
+%h3{:style=>"margin:8px 0 10px 0;"}
   %span.small{:style=>"font-size:14px;"}
     DATA SET:
   #{@data_set.name}
@@ -207,14 +207,13 @@
 -#%br
 
 %div{:id=>"#{dataSetGrid}", :style=>"width:90%;height:375px;"}
-%br
--if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
-  %button(dojoType="dijit.form.Button" name="remove_data_button" onclick="RemoveSelectedFromDataSet(#{@data_set.id},#{dataSetGrid});") 
-    Remove Selected Data from Data Set
-%button(dojoType="dijit.form.Button" name="export_data_set_button" onclick="ExportDataSet(#{@data_set.id});") 
-  Export Data Set
+-#%br
+-#-if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
+-#  %button(dojoType="dijit.form.Button" name="remove_data_button" onclick="RemoveSelectedFromDataSet(#{@data_set.id},#{dataSetGrid});") 
+-#    Remove Selected Data from Data Set
+-#%button(dojoType="dijit.form.Button" name="export_data_set_button" onclick="ExportDataSet(#{@data_set.id});") 
+-#  Export Data Set
 
-%br
 %br
 
 :javascript

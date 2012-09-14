@@ -91,13 +91,31 @@
     //
   };
   
+  resize_#{tabId} = function(){
+    resizeTabs('#{tabId}_tabs',55,'95%');
+  };
+  
+  function pageInit() {
+    console.log('##### VARS pageInit!');
+    //### Adjust Height of TabContainer
+    console.log('#####>> #{tabId}');
+    mypane = dijit.byId('#{tabId}');
+    global_resize['#{tabId}'] = resize_#{tabId};
+    resize_#{tabId}();
+    mypane.connect(mypane, "onClose", function(){
+      delete global_resize['#{tabId}'];
+    });
+    
+  };
   
   $(window).ready(function(){ 
     //##### 
-    //console.log('READY-load-done-NOW');
+    console.log('##### MAN-VARS-READY-NOW!');
     //FIX datagrid clipping issue...
     //cv_management_grid.sort();
     //cv_management_grid.update();
+    //dijit.byId('#{tabId}_tabs')
+    
   });
     
 
@@ -157,7 +175,7 @@
 -#%br
 
 
-%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:0;padding-top:0;", 
+%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:8px;padding-top:0;", 
   :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"#{tabId}_tabs"}
   -#, :nested=>"true"}
 
@@ -167,11 +185,11 @@
           :store=>"#{dataId}.variable_store", 
           :clientSort=>"true", 
           :sortInfo=>"1",
-          :rowSelect=>"false",
           :style=>"width:90%;margin:0;padding:0;border:#E3EBF2 2px solid;", 
           :style=>"width:99%;height:80%"}
     -#:rowSelector=>"20px", 
     -#:selectionMode=>"none", 
+    -#:rowSelect=>"false",
     %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
       :plain
         //var map = dijit.byId(@project);
@@ -180,7 +198,7 @@
         var projPane = dijit.byId("overview");
         var tabs = dijit.byId('tab_browser');
         console.log('TAB: '+tabs.selectedChildWidget.id);
-        dojo.publish('voeis/project/sample', [parseInt(item.id.toString()),item.lab_sample_code.toString(),#{@site.nil? ? 1 : @site.id}]);
+        //##dojo.publish('voeis/project/sample', [parseInt(item.id.toString()),item.lab_sample_code.toString(),#{@site.nil? ? 1 : @site.id}]);
         //this.selection.clear();
         //if(tabs.selectedChildWidget.id=='overview') return
         //tabs.selectChild(project);
