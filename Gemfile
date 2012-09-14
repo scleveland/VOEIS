@@ -57,6 +57,8 @@ gem 'resque'
 # Rserve client -for 'R' interface
 gem 'rserve-simpler',         :require => 'rserve/simpler'
 gem "test-unit", "~> 1.2.1"  #this is apparently required so it is going here so rack works
+# 
+gem 'rvm-capistrano'
 platforms(:ruby_19) {
   gem "therubyracer", :require => "v8"
 }

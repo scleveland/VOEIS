@@ -1,10 +1,11 @@
-$:.unshift(File.expand_path('./lib', ENV['rvm_path']))
+#$:.unshift(File.expand_path('./lib', ENV['rvm_path']))
 
 require "rvm/capistrano" 
 require "bundler/capistrano"
 
 set :application, "voeis"
 set :rvm_ruby_string, 'ruby-1.9.2-p180@passenger'
+set :rvm_type, :system  
 set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p180/bin/bundle"
 set :scm, :git
 set :repository,  "git://github.com/yogo/VOEIS.git"
