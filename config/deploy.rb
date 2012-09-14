@@ -1,4 +1,5 @@
 $:.unshift(File.expand_path('./lib', ENV['rvm_path']))
+
 require "rvm/capistrano" 
 require "bundler/capistrano"
 
@@ -36,6 +37,16 @@ task :production do
 
 end
 
+desc "Setup Production Settings"
+task :voeis2 do
+  set :rvm_ruby_string, 'ruby-1.9.2-p180@unicorn'
+  set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p180@global/bin/bundle"
+  set :branch, "production"
+  role :web, "voeis2.rcg.montana.edu"
+  role :app, "voeis2.rcg.montana.edu"
+  role :db,  "voeis2.rcg.montana.edu", :primary => true
+
+end
 desc "Setup Production Settings"
 task :production2 do
 
@@ -111,12 +122,14 @@ namespace :assets do
     run "mkdir -p #{deploy_to}/#{shared_dir}/assets/files"
     run "mkdir -p #{deploy_to}/#{shared_dir}/assets/images"
     run "mkdir -p #{deploy_to}/#{shared_dir}/assets/temp_data"
+    run "mkdir -p #{deploy_to}/#{shared_dir}/assets/data"
   end
 
   task :symlink do
     run "ln -nfs #{deploy_to}/#{shared_dir}/assets/files #{release_path}/public/files"
     run "ln -nfs #{deploy_to}/#{shared_dir}/assets/images #{release_path}/public/images"
     run "ln -nfs #{deploy_to}/#{shared_dir}/assets/temp_data #{release_path}/temp_data"
+    run "ln -nfs #{deploy_to}/#{shared_dir}/assets/data #{release_path}/data"
   end
 end
 
