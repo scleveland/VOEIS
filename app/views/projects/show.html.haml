@@ -397,6 +397,7 @@
       //SETUP ONSHOW ON PROJECT OVERVIEW TAB
       overviewTab.connect(overviewTab, 'onShow', function(){
         console.log('overviewTab:onSHOW!')
+        pmap_refresh();
         pmap_redraw();
         OverviewGrid.setQuery({id: '*'});
       });
@@ -2390,8 +2391,14 @@
         // vertical_datum --
         // dataset1 -- NEED TO GET RID OF ProjectID
         var tabs = dijit.byId('tab_browser');
+        var site_count = datastore.count(psites);
+        //psites._arrayOfAllItems.length;
+        var data_btn = dijit.byId('dataButton');
         if(!selected) selected = tabs.selectedChildWidget;
         console.log('PANE:',selected.id,selected.title);
+        console.log('SITES # ',site_count);
+        if(site_count>0) data_btn.set('disabled',false);
+        else data_btn.set('disabled',true);
         if(selected.id=='overview' || selected.id=='SiteDisplayGrid')
           main_menu_ref.set('disabled',true);
         else main_menu_ref.set('disabled',false);

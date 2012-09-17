@@ -174,10 +174,19 @@ var datastore = {
   set_idx: function(item, item_store) {
     var store = item_store || this.store_default;
     if(item.hasOwnProperty('idx') || 
-				store._arrayOfAllItems[0] && 
-				store._arrayOfAllItems[0].hasOwnProperty('idx')) 
+        store._arrayOfAllItems[0] && 
+        store._arrayOfAllItems[0].hasOwnProperty('idx')) 
       item['idx'] =  store._arrayOfAllItems.length;
-		return item;
+    return item;
+  },
+  // COUNT (# Items)
+  count: function(item_store) {
+    var store = item_store || this.store_default;
+    var count = -1;
+    store.fetch({query: {}, onBegin: function(size,request){
+      count = size;
+    }, start: 0, count: 0});
+    return count;
   },
   // DOJO STORE RAW FETCH
   get_raw: function(id, item_store) {
