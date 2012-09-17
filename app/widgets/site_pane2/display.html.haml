@@ -439,7 +439,7 @@
             %td{:colspan=>"2"}
               .from-element{:style=>"cursor:pointer;margin-top:10px;"}
               -#%a{:style=>"cursor:pointer;", :class=>"icon icon-notice", :href=>"javascript:", :onclick=>"site_lat_long_picker.open($$$id$$$);return false;"}
-              %a{:style=>"cursor:pointer;", :class=>"icon icon-notice", :href=>"javascript:", :onclick=>"thisSite='site00';site_lat_long_picker.show();return false;"}
+              %a{:style=>"cursor:pointer;", :class=>"icon icon-notice", :href=>"javascript:", :onclick=>"thisSite='site00';site_lat_long_picker.pop($$$id$$$);return false;"}
                 Select MAP location to populate Latitude & Longitude
               &nbsp;&nbsp;&nbsp;&nbsp;
               -#%br
@@ -612,38 +612,34 @@
                 %script{:type=>"dojo/method", :event=>"startup"}
                   :plain
                     //var form = dijit.byId("site00_vertical_datum_form");
-                    //if('site00'.slice(-2)=='00') {
-                    if($$$id$$$==0) {
-                      console.log('-SITE0-')
-                      var editPane = dijit.byId('edit-site00');
-                      dijit.byId('site00_tabs').selectChild(editPane);
-                      return;
-                    };
                     var SRfrom = '';
-                    var form0 = 'site00-edit-form';
-                    var form = dijit.byId(form0);
-                    console.log('INIT-FORM:',form0,form);
-                    form0 = form.domNode;
+                    var form = window['site00_edit_form'];
+                    var form0 = form.domNode;
+                    console.log('INIT-FORM:',form0.id,form.id);
                     //var pane = dijit.byNode(dojo.byId('site00'));
-                    //eval('var pane = site00ref');
                     var pane = window['site00ref']
                     var site = pane.site;
                     console.log('GO PANE_UPDATE:',pane);
-                    if(site.id==0)
-                    //INITIALIZE PANE: drop-downs, etc...
-                    pane_update(pane);
-                    //INITIALIZE: submit button
-                    if(!pane.newSite) this.attr("disabled", !form.validate());
-                    //this.attr("disabled", !this.isValid());
-                    //form0.elements['site_name'].focus();
-                    dijit.byId('site00_name').focus();
+                    //if('site00'.slice(-2)=='00') {
+                    if(pane.newSite) {
+                      console.log('-SITE0-')
+                      var editPane = dijit.byId('edit-site00');
+                      dijit.byId('site00_tabs').selectChild(editPane);
+                    } else {
+                      //INITIALIZE PANE: drop-downs, etc...
+                      pane_update(pane);
+                      //INITIALIZE: submit button on isValid
+                      this.attr("disabled", !form.validate());
+                    };
                     //IS FORM VALID?
                     console.log('FORM-CONNECT: '+site.id);
                     //###ON-STATE-CHANGE
                     this.connect(form, "onValidStateChange", function(state){
-                      //console.log('formStateChange:',state);
+                      console.log('site00-- formStateChange:',state);
                       this.attr("disabled", !state);
                     });
+                    //form0.elements['site_name'].focus();
+                    dijit.byId('site00_name').focus();
                     //###ON-SUBMIT
                     this.connect(this, "onClick", function(){
                       console.log('CREATE SITE: '+site.id);
@@ -727,6 +723,8 @@
                         pane.siteSave(data['site']);
                         //dojo.publish('voeis/project/siteTables/refresh');
                         dojo.publish('voeis/project/map/clear',[site.id]);
+                        dojo.publish('voeis/project/site/close',[site.id]);
+                        dojo.publish('voeis/project/site/select',[site.id]);
                       };
                       return false;
                     });

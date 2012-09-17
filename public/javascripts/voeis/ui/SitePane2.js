@@ -177,11 +177,11 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		sitePaneContent = sitePaneContent.replace(/\$\$\$site-date-start\$\$\$/, siteDate3);
 		sitePaneContent = sitePaneContent.replace(/\$\$\$site-date-end\$\$\$/, siteDate4);
 		
-
 		//sitePaneContent = sitePaneContent.replace(/dojotype_dialog/g, 'dojoType="dijit.Dialog"');
 
-		this.setEdit(this.editMode);
+		//this.setEdit(this.editMode);
 
+		//NOW PARSE WIDGETS
 		this.purgeContent();
 		this.set('content', sitePaneContent);
 		this.parsedWidgets = dojo.parser.parse(this.domNode);
@@ -201,7 +201,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 				//console.log('SiteGridW:',gridW);
 				var editPane = dijit.byId('edit-'+siteTag);
 				dijit.byId(siteTag+'_tabs').selectChild(editPane);
-			},500);
+			},200);
 			console.log('NewSite:',siteTag);
 			console.log('domNode.id:',this.domNode.id);
 			
@@ -447,13 +447,20 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
     dojo.publish('voeis/project/dataquery/results', [this.site.id, qstring]);
 	},
 	
+	resize: function() {
+		var Hoffset = 80;
+		resizeTabs(this.id+'_tabs',Hoffset,'95%');
+	},
+	
 	purgeContent: function() {
 		//REMOVE dijit widgets
-		if(this.parsedWidgets) 
+		if(this.parsedWidgets) {
+			//for(var i=this.parsedWidgets.length-1;i>=0;i--) {}
 			for(var i=0;i<this.parsedWidgets.length;i++) {
 				//console.log('Wid ID: '+this.parsedWidgets[i].id);
 				this.parsedWidgets[i].destroyRecursive(false);
 			};
+		};
 		//REMOVE any dom nodes left
 		//NOTE: this may not be needed-- DOJO by handle
 		var toDel = this.containerNode.childNodes;
@@ -462,11 +469,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 				//console.log('Node: '+toDel[i].nodeName+' ('+toDel[i].id+')');
 				this.containerNode.removeChild(toDel[i]);
 			};
-	},
-	
-	resize: function() {
-		var Hoffset = 80;
-		resizeTabs(this.id+'_tabs',Hoffset,'95%');
+		//REMOVE resize reference
+		delete global_resize[this.id];
 	},
 	
 	onClose: function() {
@@ -475,7 +479,6 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		delete window[this.id+'ref'];
 		console.log('CLOSE:',this.domNode,this.containerNode)
 		this.purgeContent();
-		delete global_resize[this.id];
 		//dojo.byId(this.id);
 		//dijit.byId(this.id)
 		//this.destroyRecursive();

@@ -1307,17 +1307,17 @@
       :plain
         var siteN = thisSite;
         var me = site_lat_long_picker;
-        //OPEN function -Set Site & Show
-        //site_lat_long_picker.open = function(siteId){
-        //  site_lat_long_picker.siteId = siteId;
-        //  site_lat_long_picker.show();
-        //};
+        //POP function -Set Site & Show
+        site_lat_long_picker.pop = function(siteId){
+          site_lat_long_picker.siteId = siteId;
+          site_lat_long_picker.show();
+        };
         //###ON-SHOW
         this.connect(me, "onShow", function(){
           //var form = dijit.byId("site00_vertical_datum_form");
           //site_lat_long_picker.siteId = 1;
-          //var siteN = 'site'+site_lat_long_picker.siteId;
-          var siteN = thisSite;
+          var siteN = 'site'+site_lat_long_picker.siteId;
+          //var siteN = thisSite;
           var site = window[siteN+'ref'];
           var form = window[siteN+'_edit_form'];
           var me = site_lat_long_picker;
@@ -1414,6 +1414,7 @@
           //var formlat = dijit.byId('site00_latitude');
           var siteN = 'site'+site_lat_long_picker.siteId;
           var formlat = dijit.byId(siteN+'_latitude');
+          console.log('LAT-LONG picker-- siteN:',siteN,formlat);
           formlat.focus();
         });
 
