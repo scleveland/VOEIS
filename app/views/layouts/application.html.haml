@@ -309,7 +309,7 @@
           -#            = render_cell(:data_menu, :display, :current_user => current_user)
 
           - if !request.url.include?("projects/new")
-             #dataButton{:dojoType => "dijit.form.DropDownButton", :disabled=>"#{(!@project.sites.nil? && @project.sites.count>0) ? 'false' : 'disabled'}"}
+            #dataButton{:dojoType => "dijit.form.DropDownButton", :disabled=>"#{(!@project.sites.nil? && @project.sites.count>0) ? 'false' : 'disabled'}"}
               %span
                 Data Tools
               %div{:dojoType => "dijit.Menu"}
