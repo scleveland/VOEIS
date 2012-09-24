@@ -34,12 +34,14 @@
     var id = item.id[0];
     var idx = item._0;
     //console.log('GRID ITEM:',item);
+    var view_icon = '<img src="/images/icons/view.gif" alt="view icon" title="VIEW" style="margin:0;padding:0;height:16px;" />';
     var hist_icon = '<img src="/images/icons/hist-icon16t.png" alt="history icon" title="HISTORY" style="margin:0;padding:0;height:16px;" />';
-    var edit_icon = '<img src="/images/icons/edit.png" alt="history icon" title="EDIT" style="margin:0;padding:0;height:16px;" />';
+    var edit_icon = '<img src="/images/icons/edit.png" alt="edit icon" title="EDIT" style="margin:0;padding:0;height:16px;" />';
     var delete_icon = '<img src="/images/icons/false.png" alt="delete icon" title="DELETE!" style="margin:0;padding:0;height:16px;" />';
     //var hist_link = '<a href="javascript:" onclick="alert(\'HISTORY COMING SOON! --\'+'+id+');return false;">'+hist_icon+'</a>\n';
     //var hist_link = '<a href="javascript:" onclick="confirm_now(\'HISTORY ON TERM: '+item[cv_name].toString()+'\\nCOMING SOON!\');return false;">'+hist_icon+'</a>\n';
     //var hist_link = '<a href="'+versions_url+'/versions?id='+id+'" onclick="window.open(this.href, \'HISTORY\', \'width=950,height=550\');return false;" style="margin:0;padding:0;">'+hist_icon+'</a>\n';
+    var view_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/select\', ['+id+']);return false;">'+view_icon+'</a>\n';
     var hist_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/history\', ['+id+',\'#{tabId}_tabs\']);return false;">'+hist_icon+'</a>\n';
     var edit_link = '<a href="javascript:" onclick="dojo.publish(\'voeis/project/site/edit\', ['+id+',\'#{tabId}_tabs\']);return false;">'+edit_icon+'</a>\n';
     var delete_link = '<a href="javascript:" onclick="delete_site('+id+');return false;" style="margin:0;padding:0;">'+delete_icon+'</a>\n';
@@ -47,12 +49,15 @@
     //if(item.used[0]) return spaces+hist_link;
     //return spaces+hist_link+spaces+delete_link;
     if(!edit_auth) return spaces+hist_link;
-    return spaces+edit_link+spaces+hist_link+spaces+delete_link;
+    return spaces+view_link+spaces+edit_link+spaces+hist_link+spaces+delete_link;
+    
+    //###var img = '<img src="/images/view.gif" alt="SHOW project" title="Project Details" />';
+    //###var link = '<a href="'+href+'" onclick="goto_project=true;console.log(\'>>>DETAILS>>>\');">'+img+'</a>';
   };
   
   
   resize_#{tabId} = function(){
-    resizeTabs('#{tabId}_tabs',60,'95%');
+    resizeTabs('#{tabId}_tabs',60,'90%');
   };
   
   function pageInit() {
@@ -66,6 +71,18 @@
       delete global_resize['#{tabId}'];
     });
     
+    //WORKING!!
+    //EDIT TAB CLICK-OVERRIDE
+    //var tabs = dijit.byId('#{tabId}_tabs');
+    //var cur_pane = tabs.selectedChildWidget;
+    var newpane = dijit.byId('newtab_#{tabId}');
+    var newclick = newpane.controlButton;
+    newclick.onClick = function(mouse_evt) {
+      console.log('SITES-NEWTAB-click!!');
+      //cur_pane.controlButton.focus();
+      dojo.publish('voeis/project/site/new', ['#{tabId}_tabs']);
+      
+    };
   };
   
   $(window).ready(function(){ 
@@ -77,7 +94,7 @@
 
 
 
-%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:0;padding-top:0;", 
+%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:90%;height:400px;margin-top:8px;padding-top:0;", 
   :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"#{tabId}_tabs"}
   -#, :nested=>"true"}
 
@@ -93,42 +110,43 @@
           :style=>"width:99%;height:80%"}
     -#:rowSelector=>"20px", 
     -#:selectionMode=>"none", 
-    %script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
-      :plain
-        //var map = dijit.byId(@project);
-        //var map = getElementById('#{@project.id}');
-        var item = this.getItem(idx);
-        var projPane = dijit.byId("overview");
-        var tabs = dijit.byId('tab_browser');
-        console.log('TAB: '+tabs.selectedChildWidget.id);
-        this.selection.clear();
-        if(tabs.selectedChildWidget.id=='overview') return
-        //tabs.selectChild(project);
-        dojo.publish('voeis/project/site/select', item.id);
-        //tabs.selectChild(project);
-        //pmarkers[item.idx].pop();
-        //pmarkers[item.idx].selsite();
+    -#%script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
+    -#  :plain
+    -#    //var map = dijit.byId(@project);
+    -#    //var map = getElementById('#{@project.id}');
+    -#    var item = this.getItem(idx);
+    -#    var projPane = dijit.byId("overview");
+    -#    var tabs = dijit.byId('tab_browser');
+    -#    console.log('TAB: '+tabs.selectedChildWidget.id);
+    -#    this.selection.clear();
+    -#    if(tabs.selectedChildWidget.id=='overview') return
+    -#    //tabs.selectChild(project);
+    -#    dojo.publish('voeis/project/site/select', item.id);
+    -#    //tabs.selectChild(project);
+    -#    //pmarkers[item.idx].pop();
+    -#    //pmarkers[item.idx].selsite();
     %thead
       %tr
         %th{:field=>"name", :width=>"auto", :filterable=>true} Site Name
         %th{:field=>"id", :width=>"55px", :filterable=>true} ID
         %th{:field=>"code", :width=>"autopx", :filterable=>true} Code
         %th{:field=>"state", :width=>"70px", :filterable=>true} State
-        %th{:field=>"_item", :width=>"75px", :formatter=>"#{dataId}.controls"} - - -
+        %th{:field=>"_item", :width=>"100px", :formatter=>"#{dataId}.controls"} - - -
         
 
-  %div{:dojoType=>"dojox.layout.ContentPane", :title=>"New", :id=>"new_#{tabId}", :executeScripts=>"true", 
-    :style=>"margin:0;padding:8px 0 0 8px;"}
+  %div{:dojoType=>"dojox.layout.ContentPane", :title=>"New", :id=>"newtab_#{tabId}", 
+    :style=>"margin:0;padding:8px 0 0 12px;"}
     -#, :ioArgs=>"{ headers: {'Accept': 'text/html'} }",
     -#:href=>"#{project_path(@project)}/variables/0.html?site_id=0#{url_api_key}"}
-    %script{:type=>"dojo/method", :event=>"onShow"}
-      :plain
-        //NEW SITE PANE
-        #{dataId}.newPane = new voeis.ui.SitePane2();
-        #{dataId}.newPane.setSite(0);
-        $('#new_#{tabId}').append(#{dataId}.newPane.domNode);
-
-    -#%div
+    -##%script{:type=>"dojo/method", :event=>"onShow"}
+    -##  :plain
+    -##    //NEW SITE PANE
+    -##    #{dataId}.newPane = new voeis.ui.SitePane2();
+    -##    #{dataId}.newPane.editMode = true;
+    -##    #{dataId}.newPane.setSite(0);
+    -##    $('##{tabId}_newcontent').append(#{dataId}.newPane.domNode);
+    -##
+    -##%div(id="#{tabId}_newcontent")
 
 -#%br
 -#%br
@@ -165,7 +183,7 @@
 -#:style=>"width:870px;height:400px;margin:0;padding:0;", :selected=>"true"}
 
 
-%br{:style=>'float:none; clear:both;'}
+-#%br{:style=>'float:none; clear:both;'}
 
 
 :javascript

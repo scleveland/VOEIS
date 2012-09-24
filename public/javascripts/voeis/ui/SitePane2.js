@@ -19,8 +19,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	local: {},
 	queryCount: 0,
 	
-	protoDivId: 'site_pane_proto',
-	style: "margin-top:0;padding-top:0;",
+	style: "margin-top:0;padding-top:0;overflow:auto;",
 	test: '',
 	
 	loaded: false,
@@ -37,7 +36,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		title: "dialog title",
 		content: '',
 		style: 'width:400px;'
-		}),
+	}),
 	
 	dialog_vertical_datum: '',
 	dialog_local_projection: '',
@@ -83,7 +82,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		//var sitePane = document.getElementById(this.paneDivId).cloneNode(true);
 		//sitePane = sitePane.nodeValue;
 		//var sitePaneContent = $('#'+this.protoDivId).html();
-		var sitePaneContent = pane_proto00;
+		var sitePaneContent = window.site_pane_proto2;
+		if(this.editMode) sitePaneContent = window.site_pane_proto1;
 		
 		sitePaneContent = sitePaneContent.replace(/site00/g, siteTag);
 		sitePaneContent = sitePaneContent.replace(/\$\$\$site-name\$\$\$/g, sitename);
@@ -185,7 +185,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		this.purgeContent();
 		this.set('content', sitePaneContent);
 		this.parsedWidgets = dojo.parser.parse(this.domNode);
-    if(window.pane_update) pane_update(this);
+    //if(window.pane_update) pane_update(this);
 		
 		if(this.newSite) {
 			//this.set("title", 'NEW SITE');
@@ -285,7 +285,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		this.site_var_stats = [];
 		this.site_samps = [];
 		if(!this.newSite) {
-			this.set('id', 'site'+this.site.id);
+			if(this.editMode) this.set('id', 'site'+this.site.id+'edit');
+			else this.set('id', 'site'+this.site.id);
 
 			if(site_stat_data[this.siteIdx]) this.site_stats = site_stat_data[this.siteIdx];
 			if(site_var_data[this.siteIdx]) this.site_var_stats = site_var_data[this.siteIdx];
