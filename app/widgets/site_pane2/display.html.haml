@@ -624,8 +624,10 @@
                   //if('site00'.slice(-2)=='00') {
                   if(pane.newSite) {
                     console.log('-SITE0-')
-                    var editPane = dijit.byId('edit-site00');
-                    dijit.byId('site00_tabs').selectChild(editPane);
+                    //var editPane = dijit.byId('site0edit');
+                    var editPane = pane;
+                    console.log('NEWSITE PANE:',editPane);
+                    dijit.byId('project_sites_tabs').selectChild(editPane);
                   } else {
                     //INITIALIZE PANE: drop-downs, etc...
                     pane_update(pane);

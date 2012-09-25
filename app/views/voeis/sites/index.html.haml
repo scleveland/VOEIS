@@ -98,7 +98,8 @@
   :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"#{tabId}_tabs"}
   -#, :nested=>"true"}
 
-  %table{:dojoType=>"dojox.grid.EnhancedGrid", :title=>"Sites", 
+  %table{:dojoType=>"dojox.grid.EnhancedGrid", 
+          :title=>"Sites", :id=>"sites_#{tabId}",
           :plugins=> "{nestedSorting:false, filter:true, indirectSelection:false}",  
           :store=>"psites", 
           :clientSort=>"true", 

@@ -197,11 +197,12 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			$(this.domNode).find('#'+siteTag+'-detail-label').hide();
 			$(this.domNode).find('#'+siteTag+'-edit-buttons').hide();
 			$(this.domNode).find('#'+siteTag+'_tabs .dijitTabContainerTop-tabs').hide()
-			setTimeout(function(){
-				//console.log('SiteGridW:',gridW);
-				var editPane = dijit.byId('edit-'+siteTag);
-				dijit.byId(siteTag+'_tabs').selectChild(editPane);
-			},200);
+			//setTimeout(function(){
+			//	//console.log('SiteGridW:',gridW);
+			//	var editPane = dijit.byId('edit-'+siteTag);
+			//	var editPane = window[siteTag+'editref']
+			//	dijit.byId(siteTag+'_tabs').selectChild(editPane);
+			//},200);
 			console.log('NewSite:',siteTag);
 			console.log('domNode.id:',this.domNode.id);
 			
@@ -263,7 +264,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 										data_start:'NA',
 										data_end:'NA'
 										};
-				this.set('id', 'site0');
+				this.set('id', 'site0edit');
 				var this_site = this.site;
 				psites.fetch({sort:[{attribute:'id',descending:true}],onComplete:function(items,request){
 					if(items.length) {
