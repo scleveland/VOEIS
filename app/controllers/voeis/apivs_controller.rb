@@ -1377,7 +1377,7 @@ class Voeis::ApivsController < Voeis::BaseController
             var_hash = var_hash.merge({:time_series_min => repository.adapter.select(sql)})
             sql = "SELECT AVG(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
             var_hash = var_hash.merge({:time_series_avg =>repository.adapter.select(sql)})
-            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            sql = "SELECT local_date_time, data_value, utc_offset FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
             # sample_values = repository.adapter.select(sql)
             # 
             #             values_array = []
