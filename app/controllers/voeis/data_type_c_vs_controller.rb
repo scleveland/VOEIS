@@ -46,7 +46,7 @@ class Voeis::DataTypeCVsController < Voeis::BaseController
       cvparams = params
       cvparams = params[:data_type_c_v] if !params[:data_type_c_v].nil?
       
-      @data_type = Voeis::DataTypeCV.get(cvparams[:id])
+      @data_type = Voeis::DataTypeCV.get(params[:id])
       cvparams.each do |key, value|
         @data_type[key] = value.blank? ? nil : value
       end
