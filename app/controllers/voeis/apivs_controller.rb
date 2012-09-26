@@ -1358,8 +1358,17 @@ class Voeis::ApivsController < Voeis::BaseController
           
           var_hash = var.as_json
           if params[:small_data] == 'true'
-            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            var_hash = var_hash.merge({'time_series_data' => repository.adapter.select(sql)})
+            sql = "SELECT local_date_time, data_value, utc_offset FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            # time_series_values = repository.adapter.select(sql)
+            #             values_array = []
+            #             time_series_values.each do |val|
+            #                tz0 = val['utc_offset'].to_s.split('.');
+            #                tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+tz0[0].to_i.abs.to_s)[-2,2]+':';
+            #                tz += tz0.count>1 ? ('0'+((('.'+tz0[1]).to_f*100).to_i*0.6).to_i.to_s)[-2,2] : '00';
+            #                values_array << [val['local_date_time'].to_datetime.change(:offset => tz).to_time, val["data_value"]]
+            #             end
+            var_hash = var_hash.merge({'time_series_data' => adjust_utc_time(repository.adapter.select(sql))})# repository.adapter.select(sql)})
+
             sql = "SELECT COUNT(*) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
             var_hash = var_hash.merge({:time_series_count => repository.adapter.select(sql)})
             sql = "SELECT MAX(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
@@ -1369,7 +1378,17 @@ class Voeis::ApivsController < Voeis::BaseController
             sql = "SELECT AVG(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
             var_hash = var_hash.merge({:time_series_avg =>repository.adapter.select(sql)})
             sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            var_hash = var_hash.merge({'sample_data' => repository.adapter.select(sql)})
+            # sample_values = repository.adapter.select(sql)
+            # 
+            #             values_array = []
+            #             sample_values.each do |val|
+            #                tz0 = val['utc_offset'].to_s.split('.');
+            #                tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+tz0[0].to_i.abs.to_s)[-2,2]+':';
+            #                tz += tz0.count>1 ? ('0'+((('.'+tz0[1]).to_f*100).to_i*0.6).to_i.to_s)[-2,2] : '00';
+            #                values_array << [val['local_date_time'].to_datetime.change(:offset => tz).to_time, val["data_value"]]
+            #             end
+            var_hash = var_hash.merge({'sample_data' => adjust_utc_time(repository.adapter.select(sql))})
+            
             sql = "SELECT COUNT(*) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
             var_hash = var_hash.merge({:sample_count => repository.adapter.select(sql)})
             sql = "SELECT MAX(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
@@ -1409,7 +1428,7 @@ class Voeis::ApivsController < Voeis::BaseController
       respond_to do |format|
         format.csv do
           data_array = []
-          unless data_values[:data_values].nil?
+          unless data_values[:data_values].nil? 
             data_array = data_values[:data_values][0]["time_series_data"]
             unless data_values[:data_values][0]["sample_data"].empty?
               data_array << data_values[:data_values][0]["sample_data"]
@@ -1418,9 +1437,16 @@ class Voeis::ApivsController < Voeis::BaseController
             csv_string = CSV.generate do |csv|
                 debugger
                 unless data_array.empty?
-                  csv << data_array.first.to_hash.keys
-                  data_array.each do |obj|
-                      csv << obj.values
+                  if params[:small_data]
+                    csv << ["local_date_time", "data_value"]
+                     data_array.each do |obj|
+                          csv << obj
+                      end
+                  else
+                    csv << data_array.first.to_hash.keys
+                    data_array.each do |obj|
+                        csv << obj.values
+                    end
                   end
                 else
                   csv_string = "There are no data values for the given parameters."
@@ -2180,6 +2206,16 @@ class Voeis::ApivsController < Voeis::BaseController
      
     end
   private
+   def adjust_utc_time(results_struct)
+     values_array =[]
+     results_struct.each do |val|
+        tz0 = val['utc_offset'].to_s.split('.');
+        tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+tz0[0].to_i.abs.to_s)[-2,2]+':';
+        tz += tz0.count>1 ? ('0'+((('.'+tz0[1]).to_f*100).to_i*0.6).to_i.to_s)[-2,2] : '00';
+        values_array << [val['local_date_time'].to_datetime.change(:offset => tz).to_time, val["data_value"]]
+     end
+     return values_array
+   end
    def check_authorization
      if parent.nil?
        render text:"Invalid project UID"
