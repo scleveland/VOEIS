@@ -1,0 +1,433 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta name="Content-Type" content="text/html; charset=utf-8" />
+<title>Module: Yogo::Versioned::DataMapper::Resource</title>
+<link rel="stylesheet" href="../../../css/style.css" type="text/css" media="screen" charset="utf-8" />
+<link rel="stylesheet" href="../../../css/common.css" type="text/css" media="screen" charset="utf-8" />
+
+<script type="text/javascript" charset="utf-8">
+  relpath = '../../..';
+  if (relpath != '') relpath += '/';
+</script>
+<script type="text/javascript" charset="utf-8" src="../../../js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="../../../js/app.js"></script>
+
+  </head>
+  <body>
+    <script type="text/javascript" charset="utf-8">
+      if (window.top.frames.main) document.body.className = 'frames';
+    </script>
+    
+    <div id="header">
+      <div id="menu">
+  
+    <a href="../../../_index.html">Index (R)</a> &raquo; 
+    <span class='title'><span class='object_link'><a href="../../../Yogo.html" title="Yogo (module)">Yogo</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../../Versioned.html" title="Yogo::Versioned (module)">Versioned</a></span></span> &raquo; <span class='title'><span class='object_link'><a href="../DataMapper.html" title="Yogo::Versioned::DataMapper (module)">DataMapper</a></span></span>
+     &raquo; 
+    <span class="title">Resource</span>
+  
+  
+  <div class="noframes"><span class="title">(</span><a href="." target="_top">no frames</a><span class="title">)</span></div>
+</div>
+
+      <div id="search">
+  <a id="class_list_link" href="#">Class List</a>
+  <a id="method_list_link" href="#">Method List</a>
+  <a id ="file_list_link" href="#">File List</a>
+</div>
+
+      <div class="clear"></div>
+    </div>
+    
+    <iframe id="search_frame"></iframe>
+    
+    <div id="content"><h1>Module: Yogo::Versioned::DataMapper::Resource
+  
+  
+  
+</h1>
+
+<dl class="box">
+  
+  
+    
+  
+    
+  
+  
+  
+    <dt class="r1 last">Defined in:</dt>
+    <dd class="r1 last">lib/yogo/versioned.rb</dd>
+  
+</dl>
+<div class="clear"></div>
+
+
+
+
+  
+    <h2>
+      Class Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#included-class_method" title="included (class method)">+ (Object) <strong>included</strong>(base) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+    <h2>
+      Instance Method Summary
+      <small>(<a href="#" class="summary_toggle">collapse</a>)</small>
+    </h2>
+
+    <ul class="summary">
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#get_dirty-instance_method" title="#get_dirty (instance method)">- (Object) <strong>get_dirty</strong>(updated_comment = self.updated_comment) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>
+Dirty Field list.
+</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#rollback_version-instance_method" title="#rollback_version (instance method)">- (Object) <strong>rollback_version</strong>(rollback_to = 1) </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'><p>
+# ROLLBACK to version <rollback_to> versions: 1,2,3 &#8230;
+</p>
+</div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#to_hash-instance_method" title="#to_hash (instance method)">- (Object) <strong>to_hash</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+        <li class="public ">
+  <span class="summary_signature">
+    
+      <a href="#versions_array-instance_method" title="#versions_array (instance method)">- (Object) <strong>versions_array</strong> </a>
+    
+
+    
+  </span>
+  
+  
+  
+  
+  
+  
+
+  
+    <span class="summary_desc"><div class='inline'></div></span>
+  
+</li>
+
+      
+    </ul>
+  
+
+
+
+  <div id="class_method_details" class="method_details_list">
+    <h2>Class Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="included-class_method">
+  
+    + (<tt><span class='object_link'><a href="../../../Object.html" title="Object (class)">Object</a></span></tt>) <strong>included</strong>(base) 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+45
+46
+47
+48
+49
+50</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/yogo/versioned.rb', line 45</span>
+
+<span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id included'>included</span><span class='lparen'>(</span><span class='id base'>base</span><span class='rparen'>)</span>
+  <span class='id base'>base</span><span class='period'>.</span><span class='id class_eval'>class_eval</span> <span class='kw'>do</span>
+    <span class='id extend'>extend</span> <span class='const'>Yogo</span><span class='op'>::</span><span class='const'>Versioned</span>
+    <span class='comment'>#include Facet::ResourceSecureMethods
+</span>  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+  <div id="instance_method_details" class="method_details_list">
+    <h2>Instance Method Details</h2>
+    
+    
+      <div class="method_details first">
+  <p class="signature first" id="get_dirty-instance_method">
+  
+    - (<tt><span class='object_link'><a href="../../../Object.html" title="Object (class)">Object</a></span></tt>) <strong>get_dirty</strong>(updated_comment = self.updated_comment) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>
+Dirty Field list
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+53
+54
+55
+56
+57
+58
+59</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/yogo/versioned.rb', line 53</span>
+
+<span class='kw'>def</span> <span class='id get_dirty'>get_dirty</span><span class='lparen'>(</span><span class='id updated_comment'>updated_comment</span><span class='op'>=</span><span class='kw'>self</span><span class='period'>.</span><span class='id updated_comment'>updated_comment</span><span class='rparen'>)</span>
+  <span class='kw'>if</span> <span class='op'>!</span><span class='lparen'>(</span><span class='id dirty_props'>dirty_props</span> <span class='op'>=</span> <span class='tstring'><span class='regexp_beg'>/</span><span class='embexpr_beg'>#{</span><span class='const'>Regexp</span><span class='period'>.</span><span class='id quote'>quote</span><span class='lparen'>(</span><span class='op'>::</span><span class='const'>UPDATED_FIELDS</span><span class='rparen'>)</span><span class='rbrace'>}</span><span class='tstring_content'>(.*)$</span><span class='regexp_end'>/</span></span><span class='period'>.</span><span class='id match'>match</span><span class='lparen'>(</span><span class='id updated_comment'>updated_comment</span><span class='rparen'>)</span><span class='rparen'>)</span><span class='period'>.</span><span class='id blank?'>blank?</span>
+    <span class='kw'>return</span> <span class='id dirty_props'>dirty_props</span><span class='lbracket'>[</span><span class='int'>1</span><span class='rbracket'>]</span><span class='period'>.</span><span class='id split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='regexp_beg'>/</span><span class='tstring_content'>, ?</span><span class='regexp_end'>/</span></span><span class='rparen'>)</span>
+  <span class='kw'>else</span>
+    <span class='kw'>return</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
+  <span class='kw'>end</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="rollback_version-instance_method">
+  
+    - (<tt><span class='object_link'><a href="../../../Object.html" title="Object (class)">Object</a></span></tt>) <strong>rollback_version</strong>(rollback_to = 1) 
+  
+
+  
+</p><div class="docstring">
+  <div class="discussion">
+    <p>
+# ROLLBACK to version <rollback_to> versions: 1,2,3 &#8230; -3,-2,-1
+version 1 = oldest &#8230; version -1 = newest
+</p>
+
+
+  </div>
+</div>
+<div class="tags">
+  
+</div><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/yogo/versioned.rb', line 73</span>
+
+<span class='kw'>def</span> <span class='id rollback_version'>rollback_version</span><span class='lparen'>(</span><span class='id rollback_to'>rollback_to</span><span class='op'>=</span><span class='op'>-</span><span class='int'>1</span><span class='rparen'>)</span>
+  <span class='comment'>##DEFAULT TO LAST (NEWEST)
+</span>  <span class='comment'>#debugger
+</span>  <span class='id vers'>vers</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id versions'>versions</span><span class='period'>.</span><span class='id to_a'>to_a</span><span class='period'>.</span><span class='id reverse'>reverse</span>
+  <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id vers'>vers</span><span class='period'>.</span><span class='id empty?'>empty?</span>
+  <span class='id rollback_to'>rollback_to</span> <span class='op'>=</span> <span class='op'>-</span><span class='int'>1</span> <span class='kw'>if</span> <span class='id rollback_to'>rollback_to</span><span class='op'>==</span><span class='int'>0</span> <span class='kw'>or</span> <span class='id rollback_to'>rollback_to</span><span class='op'>&gt;</span><span class='id vers'>vers</span><span class='period'>.</span><span class='id length'>length</span>
+  <span class='id rollback_to'>rollback_to</span> <span class='op'>=</span> <span class='int'>0</span> <span class='kw'>if</span> <span class='id rollback_to'>rollback_to</span><span class='op'>&lt;</span><span class='op'>-</span><span class='id vers'>vers</span><span class='period'>.</span><span class='id length'>length</span>
+  <span class='id rollback_to'>rollback_to</span> <span class='op'>-=</span> <span class='int'>1</span> <span class='kw'>if</span> <span class='id rollback_to'>rollback_to</span><span class='op'>&gt;</span><span class='int'>0</span>
+  <span class='id new_ver'>new_ver</span> <span class='op'>=</span> <span class='id vers'>vers</span><span class='lbracket'>[</span><span class='id rollback_to'>rollback_to</span><span class='rbracket'>]</span>
+  <span class='id ver_no'>ver_no</span> <span class='op'>=</span> <span class='id rollback_to'>rollback_to</span><span class='op'>+</span><span class='int'>1</span>
+  <span class='id ver_no'>ver_no</span> <span class='op'>=</span> <span class='id vers'>vers</span><span class='period'>.</span><span class='id length'>length</span><span class='op'>+</span><span class='id ver_no'>ver_no</span> <span class='kw'>if</span> <span class='id ver_no'>ver_no</span><span class='op'>&lt;=</span><span class='int'>0</span>
+  <span class='comment'>#debugger
+</span>  <span class='id props'>props</span> <span class='op'>=</span> <span class='kw'>self</span><span class='period'>.</span><span class='id attributes'>attributes</span><span class='period'>.</span><span class='id keys'>keys</span><span class='op'>-</span><span class='lbracket'>[</span><span class='symbol'>:id</span><span class='comma'>,</span><span class='symbol'>:created_at</span><span class='comma'>,</span><span class='symbol'>:deleted_at</span><span class='comma'>,</span><span class='symbol'>:updated_at</span><span class='comma'>,</span><span class='symbol'>:updated_by</span><span class='comma'>,</span><span class='symbol'>:updated_comment</span><span class='comma'>,</span><span class='symbol'>:provenance_comment</span><span class='rbracket'>]</span>
+  <span class='id props'>props</span><span class='period'>.</span><span class='id each'>each</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id p'>p</span><span class='op'>|</span>
+    <span class='kw'>self</span><span class='lbracket'>[</span><span class='id p'>p</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id new_ver'>new_ver</span><span class='lbracket'>[</span><span class='id p'>p</span><span class='rbracket'>]</span> <span class='rbrace'>}</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id provenance_comment'>provenance_comment</span> <span class='op'>=</span> <span class='tstring'><span class='tstring_beg'>'</span><span class='tstring_content'>ROLLBACK VERSION </span><span class='tstring_end'>'</span></span><span class='op'>+</span><span class='id ver_no'>ver_no</span><span class='period'>.</span><span class='id to_s'>to_s</span>
+  <span class='kw'>return</span> <span class='kw'>self</span><span class='period'>.</span><span class='id save'>save</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="to_hash-instance_method">
+  
+    - (<tt><span class='object_link'><a href="../../../Object.html" title="Object (class)">Object</a></span></tt>) <strong>to_hash</strong> 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+61
+62
+63
+64</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/yogo/versioned.rb', line 61</span>
+
+<span class='kw'>def</span> <span class='id to_hash'>to_hash</span>
+  <span class='id hash'>hash</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span><span class='semicolon'>;</span> <span class='kw'>self</span><span class='period'>.</span><span class='id attributes'>attributes</span><span class='period'>.</span><span class='id each'>each</span><span class='lbrace'>{</span> <span class='op'>|</span><span class='id k'>k</span><span class='comma'>,</span><span class='id v'>v</span><span class='op'>|</span> <span class='id hash'>hash</span><span class='lbracket'>[</span><span class='id k'>k</span><span class='rbracket'>]</span> <span class='op'>=</span> <span class='id v'>v</span> <span class='rbrace'>}</span>
+  <span class='kw'>return</span> <span class='id hash'>hash</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+      <div class="method_details ">
+  <p class="signature " id="versions_array-instance_method">
+  
+    - (<tt><span class='object_link'><a href="../../../Object.html" title="Object (class)">Object</a></span></tt>) <strong>versions_array</strong> 
+  
+
+  
+</p><table class="source_code">
+  <tr>
+    <td>
+      <pre class="lines">
+
+
+66
+67
+68</pre>
+    </td>
+    <td>
+      <pre class="code"><span class="info file"># File 'lib/yogo/versioned.rb', line 66</span>
+
+<span class='kw'>def</span> <span class='id versions_array'>versions_array</span>
+  <span class='kw'>self</span><span class='period'>.</span><span class='id versions'>versions</span><span class='period'>.</span><span class='id to_a'>to_a</span>
+<span class='kw'>end</span></pre>
+    </td>
+  </tr>
+</table>
+</div>
+    
+  </div>
+
+</div>
+    
+    <div id="footer">
+  Generated on Thu Sep 27 10:44:27 2012 by 
+  <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
+  0.6.3 (ruby-1.9.2).
+</div>
+
+  </body>
+</html>
