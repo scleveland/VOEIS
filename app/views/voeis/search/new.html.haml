@@ -18,7 +18,7 @@
     identifier: 'id',
     items: #{@sites.to_json} };
   var site_store = new dojo.data.ItemFileWriteStore({data: site_json }); 
-  
+  var api_key = "#{@voeis_api_key.to_s}";
 -#%h3{:style=>"margin:5px 0;"}
 %h3{:style=>"margin:8px 0 10px 0;"}
   Data Search &mdash; Mulitple Sites &amp; Variables
@@ -74,7 +74,7 @@
       site_ids.push(site_var_array[s].id.toString())
     }
     base_url="#{root_url}projects/#{parent.id}/apivs/get_project_site_variables.json?";
-    site_url = base_url + "site_ids[]="+ site_ids.join('&site_ids[]=');
+    site_url = base_url + "api_key=" + api_key + "&site_ids[]="+ site_ids.join('&site_ids[]=');
     $.get(site_url,
       function(data) {
         var variable_json = {
