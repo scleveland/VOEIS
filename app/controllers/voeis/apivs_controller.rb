@@ -32,8 +32,8 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   #
   # @param [Integer] :data_stream_id
-  # @param [DateTime] :start_datetime pull data after this datetime
-  # @param [DateTime] :end_datetime pull date before this datetime
+  # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+  # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
   # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
   #
   #
@@ -696,8 +696,8 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
-  # @param [DateTime] :start_datetime pull data after this datetime
-  # @param [DateTime] :end_datetime pull date before this datetime
+  # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+  # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
   # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
   #
   # @return [JSON] a JSON object with variable, site, time_series_data, time_series_count,time_series_ max, time_series_min, time_series_avg, sample_data, sample_count, sample_max, sample_min and sample_avg fields
@@ -849,8 +849,8 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   # @param [Integer] :site_id the id of the site to pull data for
   # @param [Integer] :variable_id the id of the variable to get sensor values for
-  # @param [DateTime] :start_datetime pull data after this datetime
-  # @param [DateTime] :end_datetime pull date before this datetime
+  # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+  # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
   # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
   #
   # @return [JSON] a JSON object with variable, site, data, count, max, min and avg fields
@@ -915,8 +915,8 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   # @param [Integer] :site_id the id of the site to pull data for
   # @param [Integer] :variable_id the id of the variable to get sensor values for
-  # @param [DateTime] :start_datetime pull data after this datetime
-  # @param [DateTime] :end_datetime pull date before this datetime
+  # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+  # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
   #
   # @return [JSON] a JSON object with variable, site, and time_series_count fields
   #
@@ -957,8 +957,8 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   # @param [Integer] :site_id the id of the site to pull data for
   # @param [Integer] :variable_id the id of the variable to get sensor values for
-  # @param [DateTime] :start_datetime pull data after this datetime
-  # @param [DateTime] :end_datetime pull date before this datetime
+  # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+  # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
   # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
   #
   # @return [JSON] a JSON object with variable, site, data, count, max, min and avg fields
@@ -1021,8 +1021,8 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   # @param [Integer] :site_id the id of the site to pull data for
   # @param [Integer] :variable_id the id of the variable to get sensor values for
-  # @param [DateTime] :start_datetime pull data after this datetime
-  # @param [DateTime] :end_datetime pull date before this datetime
+  # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+  # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
   #
   # @return [JSON] a JSON object with variable, site and data_count fields
   # 
@@ -1194,8 +1194,8 @@ class Voeis::ApivsController < Voeis::BaseController
    #
    #
    # @param [Integer] :variable_id the id of the variable to pull data for
-   # @param [DateTime] :start_datetime pull data after this datetime
-   # @param [DateTime] :end_datetime pull date before this datetime
+   # @param [DateTime] :start_datetime pull data after this datetime - format should be yyyy/mm/dd hh:mm:ss
+   # @param [DateTime] :end_datetime pull date before this datetime  - format should be yyyy/mm/dd hh:mm:ss
    # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
    #
    # @return [JSON] a JSON object with variable, site, project, time_series_count, time_series_max, time_series_min, time_series_avg, sample_count, sample_max, sample_min, sample_avg, times_series_data and sample_data fields
@@ -1287,8 +1287,8 @@ class Voeis::ApivsController < Voeis::BaseController
     #
     #
     # @param [Integer] :variable_id the id of the variable to pull data for
-    # @param [DateTime] :start_datetime pull data after this datetime
-    # @param [DateTime] :end_datetime pull date before this datetime
+    # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+    # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
     #
     # @return [JSON] a JSON object with variable_object, site_object, project_object, time_series_count, and sample_count fields
     # @author Sean Cleveland
@@ -1331,8 +1331,8 @@ class Voeis::ApivsController < Voeis::BaseController
    #
    # @param [Integer] :site_id the id for site to pull data for
    # @param [Integer] :variable_id the id of the variable to pull data for
-   # @param [DateTime] :start_datetime pull data after this datetime
-   # @param [DateTime] :end_datetime pull date before this datetime
+   # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+   # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
    # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
    #
    # @return [JSON] a JSON object with variable, site, project, time_series_count, time_series_max, time_series_min, time_series_avg, sample_count, sample_max, sample_min, sample_avg, times_series_data and sample_data fields
@@ -1482,8 +1482,8 @@ class Voeis::ApivsController < Voeis::BaseController
     #
     # @param [Integer] :site_id the id for site to pull data for
     # @param [Integer] :variable_id the id of the variable to pull data for
-    # @param [DateTime] :start_datetime pull data after this datetime
-    # @param [DateTime] :end_datetime pull date before this datetime
+    # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+    # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
     #
     # @return [JSON] a JSON object with variable_object, site_object, project_object, time_series_count, and sample_count fields
     #
@@ -1816,7 +1816,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # 
   # @param [Integer] id the id of the sample within the project
   # @param [String] sample_type, this is what type of sample this is example "grab"
-  # @param [DateTime] local_date_time, this is the timestamp the sample was taken
+  # @param [DateTime] local_date_time, this is the timestamp the sample was taken- format should be yyyy/mm/dd hh:mm:ss
   # @param [String] material, the type of the material the sample is examples (water, insect)
   # @param [String] lab_sample_code, this it the unique code used to identify the sample example "stream_sample_001"
   # @param [Integer] lab_method_id, this is the id of the method used to collect this sample
