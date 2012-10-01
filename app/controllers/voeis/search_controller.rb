@@ -158,6 +158,30 @@ class Voeis::SearchController < Voeis::BaseController
    end
 
   end
+  def quick_count
+    site_ids    = params[:site_ids].split(',')
+    variable_ids = params[:var_ids].split(',')
+    start_date   = params[:start_date]
+    end_date     = params[:end_date]
+    count_hash =  {:count => 0}
+    parent.managed_repository do
+      count_hash[:count] =Voeis::DataValue.all(:variable_id => variable_ids, 
+                            :site_id => site_ids,
+                            :local_date_time.gte => start_date,
+                            :local_date_time.lte => end_date).count
+   end
+   respond_to do |format|
+      format.json do
+        render :json => count_hash.to_json, :callback => params[:jsoncallback]
+      end
+      format.xml do
+        render :xml => count_hash.to_xml
+      end
+      format.csv do
+        render :text => count_hash.to_csv
+      end
+    end
+  end
   
   def download_deq    
     site_ids    = params[:site_ids].split(',')

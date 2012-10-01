@@ -68,7 +68,8 @@
   Download Search Results Non-CrossTab
 %button(dojoType="dijit.form.Button" name="build_query_button_download_crosstab" id="build_query_button_download_crosstab" onclick="doSearchDownloadCrossTab();" style="margin:10px 0;")
   Download Search Results CrossTab
-  
+%button(dojoType="dijit.form.Button" name="build_query_button_count" id="build_query_button_count" onclick="doSearchCount();" style="margin:10px 0;")
+  Number of Records in Search Results
 #query_string
 :javascript
   function updateVariables(){
@@ -143,12 +144,35 @@
     url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
     $("#query_string").html(url);
   }
-  
+  function BuildCountQuery(){
+    var site_array = siteDataGrid.selection.getSelected();
+    var var_array = varDataGrid.selection.getSelected();
+    site_ids = [];
+    var_ids = [];
+    for (s in site_array){
+      site_ids.push(site_array[s].id.toString())
+    }
+    for (v in var_array){
+      var_ids.push(var_array[v].id.toString())
+    }
+    url = "#{root_url}projects/#{parent.id}/search/quick_count.json?site_ids=" + site_ids.join(',');
+    url += "&var_ids=" + var_ids.join(',');
+    url += "&start_date=" +dijit.byId("start_date").value.format('yyyy-mm-dd')
+    url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
+    $("#query_string").html(url);
+  }
   function doSearch(){
-    BuildQuery();
+    
+    BuildCountQuery()
     //window.location=$("#query_string").html();
-    window.open($("#query_string").html(), "Search Results "+projectSearchCount.toString(),'',false);
-    projectSearchCount = projectSearchCount +1;
+     $.get($("#query_string").html(), function(data){
+        if (confirm("Are you sure you want to get " + data['count'] + " records?")){
+          BuildQuery();
+          window.open($("#query_string").html(), "Search Results "+projectSearchCount.toString(),'',false);
+          projectSearchCount = projectSearchCount +1;
+        }
+      });
+    
     //dojo.publish('voeis/project/search/results', [$("#query_string").html()])
   }
   function doSearch2(){
@@ -159,12 +183,31 @@
   }
   
   function doSearchDownload(){
-    BuildDownloadQuery();
-    window.location = $("#query_string").html();
+    
+    BuildCountQuery()
+    $.get($("#query_string").html(), function(data){
+      if (confirm("Are you sure you want to get " + data['count'] + " records?")){
+        BuildDownloadQuery();
+        window.location = $("#query_string").html();
+      }
+    });
+    
   }
   function doSearchDownloadCrossTab(){
-    BuildDownloadCrosstabQuery();
-    window.location = $("#query_string").html();
+    
+    BuildCountQuery()
+    $.get($("#query_string").html(), function(data){
+      if (confirm("Are you sure you want to get " + data['count'] + " records?")){
+        BuildDownloadCrosstabQuery();
+          window.location = $("#query_string").html();
+      }
+    });
+  }
+  function doSearchCount(){
+    BuildCountQuery()
+    $.get($("#query_string").html(), function(data){
+        alert("This search yields: " + data['count'] + " records");
+    });
   }
   //formatter: 'val_grid_formatter.dateTime',
   // grid formatters
