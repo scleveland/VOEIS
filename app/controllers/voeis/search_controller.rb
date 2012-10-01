@@ -98,7 +98,20 @@ class Voeis::SearchController < Voeis::BaseController
        render :xml => data.sql_to_xml
      end
      format.csv do
-       render :text => data.sql_to_csv.to_s.gsub(/\n\n/, "\n")
+      unless @parallel_results.first.nil?
+        csv_string = CSV.generate do |csv|
+          csv << @parallel_results.first.keys
+          @parallel_results.each do |pr|
+            csv << pr.values
+          end
+        end
+      else
+        csv_string =""
+      end
+      filename ="voeis_data.csv"
+      send_data(csv_string,
+        :type => 'text/csv; charset=utf-8; header=present',
+        :filename => filename)
      end
    end
   end
@@ -146,6 +159,60 @@ class Voeis::SearchController < Voeis::BaseController
 
   end
   
+  def download_deq    
+    site_ids    = params[:site_ids].split(',')
+    variable_ids = params[:var_ids].split(',')
+    start_date   = params[:start_date]
+    end_date     = params[:end_date]
+    @start_date = Date.parse(start_date)
+    @end_date = Date.parse(end_date)
+    @units = Voeis::Unit.all
+    @unit_names = Hash.new
+    @units.map{|u| @unit_names = @unit_names.merge({u.id => u.units_abbreviation})}
+    @sites = ""
+    data = ""
+    @variables = ""
+    parent.managed_repository do
+      @sites = Voeis::Site.all(:id=>site_ids)
+      @variables = Voeis::Variable.all(:id=> variable_ids)
+      if params[:small_data] == true
+        data = DataMapper.raw_select(Voeis::DataValue.all(:variable_id => variable_ids, 
+                              :site_id => site_ids,
+                              :local_date_time.gte => start_date,
+                              :local_date_time.lte => end_date,
+                              :fields=>[:date_time_utc, :data_value,:variable_id, :site_id],
+                              :order=>[:date_time_utc]))
+        data.each do |dv|
+          dv.date_time_utc = adjust_utc_time_gmt(dv)
+        end
+      else
+        data = DataMapper.raw_select(Voeis::DataValue.all(:variable_id => variable_ids, 
+                              :site_id => site_ids,
+                              :local_date_time.gte => start_date,
+                              :local_date_time.lte => end_date,
+                              :order=>[:date_time_utc]))
+        data.each do |dv|
+          dv.local_date_time = adjust_utc_time_local(dv)
+          dv.date_time_utc = adjust_utc_time_gmt(dv)
+        end
+      end
+    end
+    respond_to do |format|
+       format.json do
+         render :json => data.sql_to_json, :callback => params[:jsoncallback]
+       end
+       format.xml do
+         render :xml => data.sql_to_xml
+       end
+       format.csv do
+         filename ="voeis_data.csv"
+         send_data(data.sql_to_csv.to_s.gsub(/\n\n/, "\n"),
+           :type => 'text/csv; charset=utf-8; header=present',
+           :filename => filename)
+       end
+     end
+  end
+  
   #export the results of search/browse to a csv file
   def export
     filename ="voeis_data.csv"
@@ -165,5 +232,14 @@ class Voeis::SearchController < Voeis::BaseController
     end
   end
   
-
+  def adjust_utc_time_local(val)
+      tz0 = val['utc_offset'].to_s.split('.');
+      tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+tz0[0].to_i.abs.to_s)[-2,2]+':';
+      tz += tz0.count>1 ? ('0'+((('.'+tz0[1]).to_f*100).to_i*0.6).to_i.to_s)[-2,2] : '00';
+      return val['local_date_time'].to_datetime.change(:offset => tz).to_time
+  end
+  
+  def adjust_utc_time_gmt(val)
+      return val['date_time_utc'].to_datetime.change(:offset => "+00:00")
+  end
 end

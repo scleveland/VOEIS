@@ -31,6 +31,7 @@ Yogo::Application.routes.draw do
       resources :search do
         collection do
           post :export
+          get :download_deq
         end
       end
       resources :sites do

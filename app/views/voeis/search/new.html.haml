@@ -63,8 +63,12 @@
 -#%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button" onclick="doSearch();") 
 -#  Perform Search
 %button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button2" onclick="doSearch();" style="margin:10px 0;")
-  Perform Search
-
+  Display Search Results
+%button(dojoType="dijit.form.Button" name="build_query_button_download" id="build_query_button_download" onclick="doSearchDownload();" style="margin:10px 0;")
+  Download Search Results Non-CrossTab
+%button(dojoType="dijit.form.Button" name="build_query_button_download_crosstab" id="build_query_button_download_crosstab" onclick="doSearchDownloadCrossTab();" style="margin:10px 0;")
+  Download Search Results CrossTab
+  
 #query_string
 :javascript
   function updateVariables(){
@@ -104,6 +108,42 @@
     $("#query_string").html(url);
   }
   
+  function BuildDownloadCrosstabQuery(){
+    var site_array = siteDataGrid.selection.getSelected();
+    var var_array = varDataGrid.selection.getSelected();
+    site_ids = [];
+    var_ids = [];
+    for (s in site_array){
+      site_ids.push(site_array[s].id.toString())
+    }
+    for (v in var_array){
+      var_ids.push(var_array[v].id.toString())
+    }
+    url = "#{root_url}projects/#{parent.id}/search.csv?site_ids=" + site_ids.join(',');
+    url += "&var_ids=" + var_ids.join(',');
+    url += "&start_date=" +dijit.byId("start_date").value.format('yyyy-mm-dd')
+    url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
+    $("#query_string").html(url);
+  }
+  
+  function BuildDownloadQuery(){
+    var site_array = siteDataGrid.selection.getSelected();
+    var var_array = varDataGrid.selection.getSelected();
+    site_ids = [];
+    var_ids = [];
+    for (s in site_array){
+      site_ids.push(site_array[s].id.toString())
+    }
+    for (v in var_array){
+      var_ids.push(var_array[v].id.toString())
+    }
+    url = "#{root_url}projects/#{parent.id}/search/download_deq.csv?site_ids=" + site_ids.join(',');
+    url += "&var_ids=" + var_ids.join(',');
+    url += "&start_date=" +dijit.byId("start_date").value.format('yyyy-mm-dd')
+    url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
+    $("#query_string").html(url);
+  }
+  
   function doSearch(){
     BuildQuery();
     //window.location=$("#query_string").html();
@@ -116,6 +156,15 @@
     //window.location=$("#query_string").html();
     //window.open($("#query_string").html(), "Search Results",'','false');
     dojo.publish('voeis/project/search/results', [$("#query_string").html()])
+  }
+  
+  function doSearchDownload(){
+    BuildDownloadQuery();
+    window.location = $("#query_string").html();
+  }
+  function doSearchDownloadCrossTab(){
+    BuildDownloadCrosstabQuery();
+    window.location = $("#query_string").html();
   }
   //formatter: 'val_grid_formatter.dateTime',
   // grid formatters
