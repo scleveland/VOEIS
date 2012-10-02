@@ -828,9 +828,12 @@
       -#  (<span id="vars_count">#{@variable_opts_array.count}</span>):
       -#= f.submit('Search', :onclick => "dijit.byId('loading_dialog').show();")
       -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
-      %button(dojoType="dijit.form.Button" type="submit" name="submit_form" value="Search" onclick="site00ref.submitDataQuery();return false;")
-        Search
+      %button(dojoType="dijit.form.Button" name="submit_form" value="Search" onclick='$.get(CountQuery("$$$id$$$","#{project_path(@project)}"), function(data){if (confirm("Are you sure you want to get " + data["count"] + " records?")){site00ref.submitDataQuery();return false;}});')
+        Display Search Results
+      %button(dojoType="dijit.form.Button" name="download_site_site00" value="Download" onclick='RunQuery("$$$id$$$","#{project_path(@project)}");')
+        Download Search Results
 
+            
       -###&nbsp;&nbsp;
       -###%button(dojoType="dijit.form.Button" name="cancel" value="Cancel" onclick="window.location=#{project_path(@project)}") 
       -###  Cancel
@@ -845,7 +848,7 @@
 
   #samples-site00{:dojoType=>"dojox.layout.ContentPane", :title=>"Samples", :executeScripts=>"true", 
     :style=>"margin:0;padding:8px 0 0 8px;", :ioArgs=>"{ headers: {'Accept': 'text/html'} }", 
-    :href=>"#{project_path(@project)}/samples/?site_id=$$$id$$$#{@url_api_key0}"}
+    :href=>"#{project_path(@project)}/samples/?site_id=$$$id$$$"}
     -#:style=>"margin:0;padding:8px 0 0 8px;", :href=>"#{project_path(@project)}/samples/?site_id=$$$id$$$#{@url_api_key0}"}
     %script{:type=>"dojo/method", :event=>"onLoad"}
       :plain
@@ -866,3 +869,5 @@
         //pane.set('href','#{project_path(@project)}/sites/versions?id=$$$id$$$#{@url_api_key0}');
         //pane._load();
 
+
+  

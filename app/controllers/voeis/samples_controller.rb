@@ -304,6 +304,22 @@ class Voeis::SamplesController < Voeis::BaseController
       respond_to do |format|
         format.js if format.json
         format.html if format.html
+        format.csv do
+          # unless @data_structs.first.nil?
+          #           csv_string = CSV.generate do |csv|
+          #             csv <<  @data_structs.first.keys
+          #              @data_structs.each do |pr|
+          #               csv << pr.values
+          #             end
+          #           end
+          #         else
+          #           csv_string =""
+          #end
+          filename = "query.csv"
+          send_data(@data_structs.sql_to_csv.to_s.gsub(/\n\n/, "\n"),
+            :type => 'text/csv; charset=utf-8; header=present',
+            :filename => filename)
+        end
       end#end format
     else
       @var_name = "None"
@@ -372,6 +388,50 @@ class Voeis::SamplesController < Voeis::BaseController
     send_data(csv_string,
       :type => 'text/csv; charset=utf-8; header=present',
       :filename => filename)
+  end
+  
+  def quick_count
+    @tabId = params[:tab_id]
+    @start_date =  Date.parse(params[:start_date])
+    @end_date = Date.parse(params[:end_date])
+    @start_date = @start_date.to_datetime
+    @end_date = @end_date.to_datetime + 23.hour + 59.minute
+    
+    site = parent.managed_repository{Voeis::Site.get(params[:site_select])}
+    variable = parent.managed_repository{Voeis::Variable.get(params[:variable_select])}
+    count_hash ={:count =>  0}
+    if params[:variable] != "None"
+      parent.managed_repository do 
+        standard_query = {:site_id => site.id, :variable_id => variable.id, :local_date_time.gte => @start_date, :local_date_time.lte => @end_date, :order=>[:local_date_time.asc],:fields=>[:id,:data_value,:local_date_time,:string_value,:datatype, :vertical_offset,:quality_control_level, :published, :date_time_utc, :site_id,:variable_id,:utc_offset,:end_vertical_offset, :value_accuracy,:replicate]}      
+        if params[:first_value_select] != "blank"
+            temp_query1 = build_value_query_stmt(params[:first_value_select], params[:first_value_text])
+          if params[:second_value_select] != "blank"
+            temp_query2 = build_value_query_stmt(params[:second_value_select], params[:second_value_text])
+            if params[:and_or_select] == "and"
+              count_hash[:count] = DataMapper.raw_select(Voeis::DataValue.all(standard_query) & (Voeis::DataValue.all(temp_query1) & Voeis::DataValue.all(temp_query2))).count
+            else
+              count_hash[:count] = DataMapper.raw_select(Voeis::DataValue.all(standard_query) & (Voeis::DataValue.all(temp_query1) | Voeis::DataValue.all(temp_query2))).count
+            
+            end
+          else
+            count_hash[:count] = DataMapper.raw_select(Voeis::DataValue.all(standard_query) & Voeis::DataValue.all(temp_query1)).count
+          end
+        else
+          count_hash[:count] = DataMapper.raw_select(Voeis::DataValue.all(standard_query)).count
+        end
+      end
+    end
+    respond_to do |format|
+        format.json do
+          render :json => count_hash.to_json, :callback => params[:jsoncallback]
+        end
+        format.xml do
+          render :xml => count_hash.to_xml
+        end
+        format.csv do
+          render :text => count_hash.to_csv
+        end
+      end
   end
   
   private

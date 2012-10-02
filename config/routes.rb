@@ -198,6 +198,7 @@ Yogo::Application.routes.draw do
           post  :export
           get   :search
           post  :search
+          get   :quick_count
         end
       end
       resources :sample_materials
