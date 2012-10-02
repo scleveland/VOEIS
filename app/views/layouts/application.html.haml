@@ -367,7 +367,8 @@
             %span{:style => "font-weight:bold !important; color:#fff !important;"}
               = current_user.login
             %ul{:dojoType => "dijit.Menu"}
-              = link_to("Account Settings", edit_user_path(current_user.id), :dojoType => "yogo.ui.MenuLink")
+              -unless current_user.login == "guest"
+                = link_to("Account Settings", edit_user_path(current_user.id), :dojoType => "yogo.ui.MenuLink")
               = link_to("Logout", logout_path, :dojoType => "yogo.ui.MenuLink")
           - else
             %span Login
