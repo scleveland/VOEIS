@@ -832,7 +832,8 @@
         Display Search Results
       %button(dojoType="dijit.form.Button" name="download_site_site00" value="Download" onclick='RunQuery("$$$id$$$","#{project_path(@project)}");')
         Download Search Results
-
+      %button(dojoType="dijit.form.Button" name="download_site_site00" value="Download" onclick='$.get(CountQuery("$$$id$$$","#{project_path(@project)}"), function(data){alert("This search yields " + data["count"] + " records.")});')
+        Return Number of Records in Search Results
             
       -###&nbsp;&nbsp;
       -###%button(dojoType="dijit.form.Button" name="cancel" value="Cancel" onclick="window.location=#{project_path(@project)}") 
