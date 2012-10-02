@@ -103,6 +103,30 @@ Yogo::Application.routes.draw do
           get :versions
         end
       end
+      resources :speciation_c_vs do
+        collection do
+          get :list
+          get :versions
+        end
+      end
+      resources :general_category_c_vs do
+        collection do
+          get :list
+          get :versions
+        end
+      end
+      resources :sensor_type_c_vs do
+        collection do
+          get :list
+          get :versions
+        end
+      end
+      resources :logger_type_c_vs do
+        collection do
+          get :list
+          get :versions
+        end
+      end
       resources :variables do
         collection do
           get :list
@@ -274,49 +298,77 @@ Yogo::Application.routes.draw do
   resources :search
   resources :vertical_datum_c_vs do
     collection do
+      get :list
       get :versions
     end
   end
   resources :spatial_references do
     collection do
+      get :list
       get :versions
     end
   end
   resources :variable_name_c_vs do
     collection do
+      get :list
       get :versions
     end
   end
   resources :quality_control_levels do
     collection do
+      get :list
       get :versions
     end
   end
   resources :sample_type_c_vs do
     collection do
+      get :list
       get :versions
     end
   end
   resources :value_type_c_vs do
     collection do
+      get :list
       get :versions
     end
   end
   resources :data_type_c_vs do
     collection do
+      get :list
       get :versions
     end
   end
   resources :sample_medium_c_vs do
     collection do
+      get :list
+      get :versions
+    end
+  end
+  resources :speciation_c_vs do
+    collection do
+      get :list
+      get :versions
+    end
+  end
+  resources :general_category_c_vs do
+    collection do
+      get :list
+      get :versions
+    end
+  end
+  resources :sensor_type_c_vs do
+    collection do
+      get :list
+      get :versions
+    end
+  end
+  resources :logger_type_c_vs do
+    collection do
+      get :list
       get :versions
     end
   end
   resources :sample_materials
-  resources :sensor_type_c_vs
-  resources :logger_type_c_vs
-  resources :speciation_c_vs
-  resources :general_category_c_vs
   resources :labs
   resources :lab_methods
   resources :field_methods

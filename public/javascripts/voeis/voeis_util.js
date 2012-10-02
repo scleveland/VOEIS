@@ -188,26 +188,49 @@ var datastore = {
     }, start: 0, count: 0});
     return count;
   },
-  // DOJO STORE RAW FETCH
-  get_raw: function(id, item_store) {
+  // DOJO STORE RAW FETCH QUERY
+  fetch_raw: function(query, item_store) {
     var store = item_store || this.store_default;
-    var myitem = {};
-    store.fetch({query: {id: parseInt(id.toString())},
-      onItem: function(item) {
-        console.log('FETCH ITEM:',item);
-        myitem = item;
+    var myitems = 0;
+    store.fetch({query: query,
+      onComplete: function(items,request) {
+        console.log('FETCH ITEMS:',items);
+        myitems = items;
       },
       onError: function(error,request) {
-        console.log('ERROR: ',error.message);
+        console.log('STORE ERROR: ',error.message);
       }
     });
-    return myitem;
+    return myitems;
+  },
+  // DOJO STORE FETCH QUERY (no array wrapping)
+  fetch: function(query, item_store) {
+    var store = item_store || this.store_default;
+    var items = this.fetch_raw(query, store);
+    if(items && items.length) {
+      for(var i=0;i<items.length;i++) 
+        items[i] = this.item(items[i]);
+      return items;
+    };
+    console.log('DATASTORE: no items found');
+    return 0;
+  },
+  // DOJO STORE RAW FETCH ID
+  get_raw: function(id, item_store) {
+    var store = item_store || this.store_default;
+    var myid = parseInt(id.toString());
+    var q = {id: myid};
+    var items = this.fetch_raw(q, store);
+    if(items && items.length) return items[0];
+    console.log('DATASTORE: found no item- ID:',myid);
+    return 0;
   },
   // DOJO STORE FETCH (no array wrapping)
   get: function(id, item_store) {
     var store = item_store || this.store_default;
     var item = this.get_raw(id, store);
-    return this.item(item);
+    if(item) return this.item(item);
+    return 0;
   },
   // CREATE NEW ITEM IN DOJO STORE
   new: function(item, item_store) {
@@ -265,6 +288,8 @@ var datastore = {
   // DELETE ITEM IN DOJO STORE
   delete: function(item, item_store) {
     var store = item_store || this.store_default;
+    if(typeof item=='number')
+      item = this.get_raw(item);
     try {
       store.deleteItem(item);
     }

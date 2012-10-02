@@ -356,7 +356,9 @@
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"var_medium"} Sample Medium *
-              %input(name="var_medium" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.sample_medium}" required="true")
+              -#%input(name="var_medium" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.sample_medium}" required="true")
+              %select(name="var_medium" class="medium_select" id="#{varId}_var_medium_sel")
+                = options_for_select(@var_medium.all.map{|v| [v.term,v.term]}, selected=@variable.sample_medium)
           %td
             .from-element
               %span{:class=>'label'}
@@ -382,7 +384,9 @@
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"var_gcat"} General Category *
-              %input(name="var_gcat" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.general_category}" required="true")
+              -#%input(name="var_gcat" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.general_category}" required="true")
+              %select(name="var_gcat" class="gcat_select" id="#{varId}_var_gcat_sel")
+                = options_for_select(@var_gcat.all.map{|v| [v.term,v.term]}, selected=@variable.general_category)
 
         %tr
           %td
@@ -399,7 +403,9 @@
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"var_spec"} Speciation *
-              %input(name="var_spec" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.speciation}" required="true")
+              -#%input(name="var_spec" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.speciation}" required="true")
+              %select(name="var_spec" class="spec_select" id="#{varId}_var_spec_sel")
+                = options_for_select(@var_spec.all.map{|v| [v.term,v.term]}, selected=@variable.speciation)
 
         %tr
           %td
@@ -517,7 +523,9 @@
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"var_log_type"} Logger Type
-              %input(name="var_log_type" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.logger_type}" required="false")
+              -#%input(name="var_log_type" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.logger_type}" required="false")
+              %select(name="var_log_type" class="log_type_select" id="#{varId}_var_log_type_sel")
+                = options_for_select(@var_log_type.all.map{|v| [v.term,v.term]}, selected=@variable.logger_type)
           %td
             .from-element
               %span{:class=>'label'}
@@ -528,7 +536,9 @@
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"var_sens_type"} Sensor Type
-              %input(name="var_sens_type" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.sensor_type}" required="false")
+              -#%input(name="var_sens_type" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.sensor_type}" required="false")
+              %select(name="var_sens_type" class="sens_type_select" id="#{varId}_var_sens_type_sel")
+                = options_for_select(@var_sens_type.all.map{|v| [v.term,v.term]}, selected=@variable.sensor_type)
           %td
             .from-element
               %span{:class=>'label'}
