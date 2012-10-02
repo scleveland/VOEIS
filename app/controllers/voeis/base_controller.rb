@@ -45,7 +45,7 @@ class Voeis::BaseController < InheritedResources::Base
   respond_to :html, :json, :xml, :wml, :csv
 
   responders :rql
-  
+  before_filter :set_api_key
   # Add WML respond support that will work with RQL because we want
   # to be awesome
   require 'action_controller/metal/renderers'
@@ -76,6 +76,16 @@ class Voeis::BaseController < InheritedResources::Base
 
 
   protected
+  
+  def set_api_key
+    
+    if current_user.nil?
+     @voeis_api_key =  User.first(:login => 'guest').api_key
+    else
+      @voeis_api_key = current_user.api_key
+    end
+  end
+  
 
   # Retrieve, caches, and returns the resource indicated by param[:id]
   # The resource returned will be retrieved from the repository managed

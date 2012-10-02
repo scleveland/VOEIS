@@ -1,9 +1,30 @@
-
+function RunQuery(site_id, root_path){
+  form_data = $('#site'+site_id.toString()+'_query').serializeFormJSON()
+  params = $.map(form_data, function(n, i){
+      return  i + "=" + n;
+  }).join("&");
+  url = root_path + "/samples/search.csv?" + params;
+  count_url = root_path + "/samples/quick_count.json?" + params;
+  $.get(count_url, function(data){
+    if (confirm("Are you sure you want to get " + data['count'] + " records?")){
+      window.location = url;
+    }
+  });
+}
+function CountQuery(site_id, root_path){
+  form_data = $('#site'+site_id.toString()+'_query').serializeFormJSON()
+  params = $.map(form_data, function(n, i){
+      return  i + "=" + n;
+  }).join("&");
+  count_url = root_path + "/samples/quick_count.json?" + params;
+  return count_url;
+}
 $(document).ready(function(){
   // show_loader = function(){
   // $('#loader').attr("display", "visible");
   // };
   
+     
   $(".date-picker").datepicker();
   
   //$('#project_model_name').textdropdown();
@@ -577,3 +598,21 @@ jQuery.fn.textdropdown = function() {
   }
 };
 
+(function($) {
+$.fn.serializeFormJSON = function() {
+
+   var o = {};
+   var a = this.serializeArray();
+   $.each(a, function() {
+       if (o[this.name]) {
+           if (!o[this.name].push) {
+               o[this.name] = [o[this.name]];
+           }
+           o[this.name].push(this.value || '');
+       } else {
+           o[this.name] = this.value || '';
+       }
+   });
+   return o;
+};
+})(jQuery);

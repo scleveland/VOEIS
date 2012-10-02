@@ -31,6 +31,8 @@ Yogo::Application.routes.draw do
       resources :search do
         collection do
           post :export
+          get :download_deq
+          get :quick_count
         end
       end
       resources :sites do
@@ -220,6 +222,7 @@ Yogo::Application.routes.draw do
           post  :export
           get   :search
           post  :search
+          get   :quick_count
         end
       end
       resources :sample_materials

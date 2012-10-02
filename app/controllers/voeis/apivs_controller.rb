@@ -32,8 +32,8 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   #
   # @param [Integer] :data_stream_id
-  # @param [DateTime] :start_datetime pull data after this datetime
-  # @param [DateTime] :end_datetime pull date before this datetime
+  # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+  # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
   # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
   #
   #
@@ -696,8 +696,8 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   #
   # @param [Integer] :site_id the id of the site to pull data for
-  # @param [DateTime] :start_datetime pull data after this datetime
-  # @param [DateTime] :end_datetime pull date before this datetime
+  # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+  # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
   # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
   #
   # @return [JSON] a JSON object with variable, site, time_series_data, time_series_count,time_series_ max, time_series_min, time_series_avg, sample_data, sample_count, sample_max, sample_min and sample_avg fields
@@ -849,8 +849,8 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   # @param [Integer] :site_id the id of the site to pull data for
   # @param [Integer] :variable_id the id of the variable to get sensor values for
-  # @param [DateTime] :start_datetime pull data after this datetime
-  # @param [DateTime] :end_datetime pull date before this datetime
+  # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+  # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
   # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
   #
   # @return [JSON] a JSON object with variable, site, data, count, max, min and avg fields
@@ -915,8 +915,8 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   # @param [Integer] :site_id the id of the site to pull data for
   # @param [Integer] :variable_id the id of the variable to get sensor values for
-  # @param [DateTime] :start_datetime pull data after this datetime
-  # @param [DateTime] :end_datetime pull date before this datetime
+  # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+  # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
   #
   # @return [JSON] a JSON object with variable, site, and time_series_count fields
   #
@@ -957,8 +957,8 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   # @param [Integer] :site_id the id of the site to pull data for
   # @param [Integer] :variable_id the id of the variable to get sensor values for
-  # @param [DateTime] :start_datetime pull data after this datetime
-  # @param [DateTime] :end_datetime pull date before this datetime
+  # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+  # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
   # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
   #
   # @return [JSON] a JSON object with variable, site, data, count, max, min and avg fields
@@ -1021,8 +1021,8 @@ class Voeis::ApivsController < Voeis::BaseController
   #
   # @param [Integer] :site_id the id of the site to pull data for
   # @param [Integer] :variable_id the id of the variable to get sensor values for
-  # @param [DateTime] :start_datetime pull data after this datetime
-  # @param [DateTime] :end_datetime pull date before this datetime
+  # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+  # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
   #
   # @return [JSON] a JSON object with variable, site and data_count fields
   # 
@@ -1194,8 +1194,8 @@ class Voeis::ApivsController < Voeis::BaseController
    #
    #
    # @param [Integer] :variable_id the id of the variable to pull data for
-   # @param [DateTime] :start_datetime pull data after this datetime
-   # @param [DateTime] :end_datetime pull date before this datetime
+   # @param [DateTime] :start_datetime pull data after this datetime - format should be yyyy/mm/dd hh:mm:ss
+   # @param [DateTime] :end_datetime pull date before this datetime  - format should be yyyy/mm/dd hh:mm:ss
    # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
    #
    # @return [JSON] a JSON object with variable, site, project, time_series_count, time_series_max, time_series_min, time_series_avg, sample_count, sample_max, sample_min, sample_avg, times_series_data and sample_data fields
@@ -1287,8 +1287,8 @@ class Voeis::ApivsController < Voeis::BaseController
     #
     #
     # @param [Integer] :variable_id the id of the variable to pull data for
-    # @param [DateTime] :start_datetime pull data after this datetime
-    # @param [DateTime] :end_datetime pull date before this datetime
+    # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+    # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
     #
     # @return [JSON] a JSON object with variable_object, site_object, project_object, time_series_count, and sample_count fields
     # @author Sean Cleveland
@@ -1331,8 +1331,8 @@ class Voeis::ApivsController < Voeis::BaseController
    #
    # @param [Integer] :site_id the id for site to pull data for
    # @param [Integer] :variable_id the id of the variable to pull data for
-   # @param [DateTime] :start_datetime pull data after this datetime
-   # @param [DateTime] :end_datetime pull date before this datetime
+   # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+   # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
    # @param [Boolean] :small_data if true this will return only local_date_time and the data_values
    #
    # @return [JSON] a JSON object with variable, site, project, time_series_count, time_series_max, time_series_min, time_series_avg, sample_count, sample_max, sample_min, sample_avg, times_series_data and sample_data fields
@@ -1358,8 +1358,17 @@ class Voeis::ApivsController < Voeis::BaseController
           
           var_hash = var.as_json
           if params[:small_data] == 'true'
-            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            var_hash = var_hash.merge({'time_series_data' => repository.adapter.select(sql)})
+            sql = "SELECT local_date_time, data_value, utc_offset FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            # time_series_values = repository.adapter.select(sql)
+            #             values_array = []
+            #             time_series_values.each do |val|
+            #                tz0 = val['utc_offset'].to_s.split('.');
+            #                tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+tz0[0].to_i.abs.to_s)[-2,2]+':';
+            #                tz += tz0.count>1 ? ('0'+((('.'+tz0[1]).to_f*100).to_i*0.6).to_i.to_s)[-2,2] : '00';
+            #                values_array << [val['local_date_time'].to_datetime.change(:offset => tz).to_time, val["data_value"]]
+            #             end
+            var_hash = var_hash.merge({'time_series_data' => adjust_utc_time(repository.adapter.select(sql))})# repository.adapter.select(sql)})
+
             sql = "SELECT COUNT(*) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
             var_hash = var_hash.merge({:time_series_count => repository.adapter.select(sql)})
             sql = "SELECT MAX(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
@@ -1368,8 +1377,18 @@ class Voeis::ApivsController < Voeis::BaseController
             var_hash = var_hash.merge({:time_series_min => repository.adapter.select(sql)})
             sql = "SELECT AVG(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
             var_hash = var_hash.merge({:time_series_avg =>repository.adapter.select(sql)})
-            sql = "SELECT local_date_time, data_value FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
-            var_hash = var_hash.merge({'sample_data' => repository.adapter.select(sql)})
+            sql = "SELECT local_date_time, data_value, utc_offset FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+            # sample_values = repository.adapter.select(sql)
+            # 
+            #             values_array = []
+            #             sample_values.each do |val|
+            #                tz0 = val['utc_offset'].to_s.split('.');
+            #                tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+tz0[0].to_i.abs.to_s)[-2,2]+':';
+            #                tz += tz0.count>1 ? ('0'+((('.'+tz0[1]).to_f*100).to_i*0.6).to_i.to_s)[-2,2] : '00';
+            #                values_array << [val['local_date_time'].to_datetime.change(:offset => tz).to_time, val["data_value"]]
+            #             end
+            var_hash = var_hash.merge({'sample_data' => adjust_utc_time(repository.adapter.select(sql))})
+            
             sql = "SELECT COUNT(*) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
             var_hash = var_hash.merge({:sample_count => repository.adapter.select(sql)})
             sql = "SELECT MAX(data_value) FROM  voeis_data_values WHERE site_id=#{site.id} AND variable_id=#{var.id} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
@@ -1409,7 +1428,7 @@ class Voeis::ApivsController < Voeis::BaseController
       respond_to do |format|
         format.csv do
           data_array = []
-          unless data_values[:data_values].nil?
+          unless data_values[:data_values].nil? 
             data_array = data_values[:data_values][0]["time_series_data"]
             unless data_values[:data_values][0]["sample_data"].empty?
               data_array << data_values[:data_values][0]["sample_data"]
@@ -1418,9 +1437,16 @@ class Voeis::ApivsController < Voeis::BaseController
             csv_string = CSV.generate do |csv|
                 debugger
                 unless data_array.empty?
-                  csv << data_array.first.to_hash.keys
-                  data_array.each do |obj|
-                      csv << obj.values
+                  if params[:small_data]
+                    csv << ["local_date_time", "data_value"]
+                     data_array.each do |obj|
+                          csv << obj
+                      end
+                  else
+                    csv << data_array.first.to_hash.keys
+                    data_array.each do |obj|
+                        csv << obj.values
+                    end
                   end
                 else
                   csv_string = "There are no data values for the given parameters."
@@ -1456,8 +1482,8 @@ class Voeis::ApivsController < Voeis::BaseController
     #
     # @param [Integer] :site_id the id for site to pull data for
     # @param [Integer] :variable_id the id of the variable to pull data for
-    # @param [DateTime] :start_datetime pull data after this datetime
-    # @param [DateTime] :end_datetime pull date before this datetime
+    # @param [DateTime] :start_datetime pull data after this datetime- format should be yyyy/mm/dd hh:mm:ss
+    # @param [DateTime] :end_datetime pull date before this datetime- format should be yyyy/mm/dd hh:mm:ss
     #
     # @return [JSON] a JSON object with variable_object, site_object, project_object, time_series_count, and sample_count fields
     #
@@ -1790,7 +1816,7 @@ class Voeis::ApivsController < Voeis::BaseController
   # 
   # @param [Integer] id the id of the sample within the project
   # @param [String] sample_type, this is what type of sample this is example "grab"
-  # @param [DateTime] local_date_time, this is the timestamp the sample was taken
+  # @param [DateTime] local_date_time, this is the timestamp the sample was taken- format should be yyyy/mm/dd hh:mm:ss
   # @param [String] material, the type of the material the sample is examples (water, insect)
   # @param [String] lab_sample_code, this it the unique code used to identify the sample example "stream_sample_001"
   # @param [Integer] lab_method_id, this is the id of the method used to collect this sample
@@ -2180,6 +2206,16 @@ class Voeis::ApivsController < Voeis::BaseController
      
     end
   private
+   def adjust_utc_time(results_struct)
+     values_array =[]
+     results_struct.each do |val|
+        tz0 = val['utc_offset'].to_s.split('.');
+        tz = (tz0[0][0]=='-' ? '-' : '+')+('00'+tz0[0].to_i.abs.to_s)[-2,2]+':';
+        tz += tz0.count>1 ? ('0'+((('.'+tz0[1]).to_f*100).to_i*0.6).to_i.to_s)[-2,2] : '00';
+        values_array << [val['local_date_time'].to_datetime.change(:offset => tz).to_time, val["data_value"]]
+     end
+     return values_array
+   end
    def check_authorization
      if parent.nil?
        render text:"Invalid project UID"
