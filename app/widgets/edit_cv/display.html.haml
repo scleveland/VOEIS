@@ -490,6 +490,7 @@
     var newpane = dijit.byId('#{@tabId}_newtab');
     var newclick = newpane.controlButton;
     newclick.onClick = function(mouse_evt) {
+      var cur_pane = tabs.selectedChildWidget;
       console.log('CV-NEW TABclick!!',cur_pane.id);
       cur_pane.controlButton.focus();
       #{@cv_title2}_exec.cv_datum_new()
@@ -778,7 +779,7 @@
             #{@tabId}_cv_dialog_box.show();
         %thead
           %tr
-            %th{:field=>"id", :width=>"25px", :filterable=>false} ID
+            -#%th{:field=>"id", :width=>"25px", :filterable=>false} ID
             - @copy_columns.each do |col|
               %th{:field=>"#{col[:field]}", :filterable=>"#{col[:filterable]}", :width=>"#{col[:width]}", :style=>"#{col[:style]}", 
                   :formatter=>"#{col[:formatter].blank? ? '' : @cv_title2+'_exec.Formatter.'+col[:formatter]}"} #{col[:label]}
