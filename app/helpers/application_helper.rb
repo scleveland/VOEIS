@@ -120,6 +120,27 @@ module ApplicationHelper
     end
   end
 
+  def get_cv_list
+    #### CV (Controlled Vocab) stuff - CV mangement list
+    cv_list = [
+                {:cv_title=>"Spatial Reference", :cv_title2=>"spatial_reference", :cv_url=>list_spatial_references_path},
+                {:cv_title=>"Vertical Datum", :cv_title2=>"vertical_datum", :cv_url=>list_vertical_datum_c_vs_path},
+                {:cv_title=>"Variable Name", :cv_title2=>"variable_name", :cv_url=>list_variable_name_c_vs_path},
+                {:cv_title=>"General Category", :cv_title2=>"general_category", :cv_url=>list_general_category_c_vs_path},
+                {:cv_title=>"Data Type", :cv_title2=>"data_type", :cv_url=>list_data_type_c_vs_path},
+                {:cv_title=>"Value Type", :cv_title2=>"value_type", :cv_url=>list_value_type_c_vs_path},
+                {:cv_title=>"Sample Medium", :cv_title2=>"sample_medium", :cv_url=>list_sample_medium_c_vs_path},
+                ##{:cv_title=>"Sample Material", :cv_title2=>"sample_material", :cv_url=>""},
+                {:cv_title=>"Speciation", :cv_title2=>"speciation", :cv_url=>list_speciation_c_vs_path},
+                {:cv_title=>"Quality Control Level", :cv_title2=>"quality_control_level", :cv_url=>list_quality_control_levels_path},
+                {:cv_title=>"Sample Type", :cv_title2=>"sample_type", :cv_url=>list_sample_type_c_vs_path},
+                {:cv_title=>"Sensor Type", :cv_title2=>"sensor_type", :cv_url=>list_sensor_type_c_vs_path},
+                {:cv_title=>"Logger Type", :cv_title2=>"logger_type", :cv_url=>list_logger_type_c_vs_path}
+                ]
+    cv_list.delete_if{|cv| cv[:cv_url]=="" }
+    return cv_list
+  end
+
   def yogo_button(image, text, link)
     link_to(image_tag(image), link)
   end

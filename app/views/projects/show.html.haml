@@ -469,9 +469,7 @@
           };
         };
         selected.refresh();
-          
       };
-    
     };
     
     // OPEN CV MANAGEMENT TAB
@@ -496,7 +494,7 @@
       var mytab = tabs.selectedChildWidget;
       var loading = dijit.byId('loading_dialog');
       cv_pop(title,title2,href,updElemID,function(){
-        loading.hide()
+        loading.hide();
         window[title2+'_exec'].cv_datum_new();
       });
       tabs.selectChild(mytab);

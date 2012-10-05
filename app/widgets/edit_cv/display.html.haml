@@ -118,7 +118,7 @@
       var edit_link = '<a href="javascript:" onclick="#{@cv_title2}_exec.cv_pop_edit('+id+');return false;">'+edit_icon+'</a>\n';
       var delete_link = '<a href="javascript:" onclick="#{@cv_title2}_exec.cv_delete('+idx+');return false;">'+delete_icon+'</a>\n';
       var spaces = '&nbsp;';
-      if(item.used[0]) return spaces+hist_link;
+      if(item.used[0]) return spaces+edit_link+spaces+hist_link;
       //return spaces+hist_link+spaces+delete_link;
       return spaces+edit_link+spaces+hist_link+spaces+delete_link;
     }

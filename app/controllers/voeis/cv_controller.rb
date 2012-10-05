@@ -27,7 +27,8 @@ class Voeis::CVController < Voeis::BaseController
   CV_MAP_BASE = {
     #:cv_columns => [{:field=>"id", :label=>"ID", :width=>"25px", :filterable=>false, :formatter=>"", :style=>""},
     :cv_columns => [{:field=>"term", :label=>"Term", :width=>"180px", :filterable=>true, :formatter=>"", :style=>""},
-                  {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""}],
+                  {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
+                  {:field=>"used", :label=>"USED", :width=>"30px", :filterable=>true, :formatter=>"trueFalse", :style=>""}],
     #              {:field=>"updated_at", :label=>"Updated", :width=>"130px", :filterable=>true, :formatter=>"dateTime", :style=>""}],
     #:copy_columns => [{:field=>"id", :label=>"ID", :width=>"5%", :filterable=>false, :formatter=>"", :style=>""},
     :copy_columns => [{:field=>"term", :label=>"Term", :width=>"15%", :filterable=>true, :formatter=>"", :style=>""},
@@ -40,10 +41,15 @@ class Voeis::CVController < Voeis::BaseController
                   {:field=>"Definition", :type=>"2B-LL", :required=>"false", :style=>""},
                   {:field=>"definition", :type=>"1B-STA", :required=>"false", :style=>""}],
     :cv_properties => [
-      #{:label=>"Version", :name=>"version"},
-      #{:label=>"ID", :name=>"id"},
-      {:label=>"Term", :name=>"term"},
-      {:label=>"Definition", :name=>"definition"}]
+                  #{:label=>"Version", :name=>"version"},
+                  #{:label=>"ID", :name=>"id"},
+                  {:label=>"Term", :name=>"term"},
+                  {:label=>"Definition", :name=>"definition"}],
+    ###
+    :cv_list_refs => lambda {|item,parent|
+      ### define :used
+      {:used=>(!parent.variables.first(:data_type=>item.term).nil?)}
+    }
   }
   CV_MAP = {
     :data_type => {
@@ -53,12 +59,14 @@ class Voeis::CVController < Voeis::BaseController
       :cv_table => "data_type_cv",
       :cv_id => "id",
       :cv_name => "term",
-      :cv_params => [],
       :cv_columns => CV_MAP_BASE[:cv_columns],
       :copy_columns => CV_MAP_BASE[:copy_columns],
       :cv_form => CV_MAP_BASE[:cv_form],
       :cv_properties => CV_MAP_BASE[:cv_properties],
-      :cv_refs => lambda {|vers| []}
+      :cv_list_refs => lambda {|item,parent|
+        ### define :used
+        {:used=>(!parent.variables.first(:data_type=>item.term).nil?)}
+      }
     },
     :general_category => {
       :cv_title => "General Category",
@@ -66,12 +74,14 @@ class Voeis::CVController < Voeis::BaseController
       :cv_title2cv => "general_category_c_v",
       :cv_id => "id",
       :cv_name => "term",
-      :cv_params => [],
       :cv_columns => CV_MAP_BASE[:cv_columns],
       :copy_columns => CV_MAP_BASE[:copy_columns],
       :cv_form => CV_MAP_BASE[:cv_form],
       :cv_properties => CV_MAP_BASE[:cv_properties],
-      :cv_refs => lambda {|vers| []}
+      :cv_list_refs => lambda {|item,parent|
+        ### define :used
+        {:used=>(!parent.variables.first(:general_category=>item.term).nil?)}
+      }
     },
     :quality_control_level => {
       :cv_title => 'Quality Control Level',
@@ -79,10 +89,10 @@ class Voeis::CVController < Voeis::BaseController
       :cv_title2cv => 'quality_control_level',
       :cv_id => 'id',
       :cv_name => 'quality_control_level_code',
-      :cv_params => [],
       :cv_columns => [{:field=>"quality_control_level_code", :label=>"Quality Control Level", :width=>"150px", :filterable=>true, :formatter=>"", :style=>""},
                     {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
-                    {:field=>"explanation", :label=>"Explanation", :width=>"", :filterable=>true, :formatter=>"", :style=>""}],
+                    {:field=>"explanation", :label=>"Explanation", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
+                    {:field=>"used", :label=>"USED", :width=>"30px", :filterable=>true, :formatter=>"trueFalse", :style=>""}],
       :copy_columns => [{:field=>"quality_control_level_code", :label=>"Quality Control Level", :width=>"150px", :filterable=>true, :formatter=>"", :style=>""},
                     {:field=>"definition", :label=>"Definition", :width=>"", :filterable=>true, :formatter=>"", :style=>""},
                     {:field=>"explanation", :label=>"Explanation", :width=>"", :filterable=>true, :formatter=>"", :style=>""}],
@@ -95,13 +105,15 @@ class Voeis::CVController < Voeis::BaseController
                     {:field=>"Explanation", :type=>"2B-LL", :required=>"false", :style=>""},
                     {:field=>"explanation", :type=>"1B-STA", :required=>"false", :style=>""}],
       :cv_properties => [
-        #{:label=>"Version", :name=>"version"},
-        #{:label=>"ID", :name=>"id"},
-        {:label=>"Quality Control Code", :name=>"quality_control_level_code"},
-        {:label=>"Definition", :name=>"definition"},
-        {:label=>"Explanation", :name=>"explanation"}
-        ],
-      :cv_refs => lambda {|vers| []}
+                    #{:label=>"Version", :name=>"version"},
+                    #{:label=>"ID", :name=>"id"},
+                    {:label=>"Quality Control Code", :name=>"quality_control_level_code"},
+                    {:label=>"Definition", :name=>"definition"},
+                    {:label=>"Explanation", :name=>"explanation"}],
+      :cv_list_refsxx => lambda {|item,parent|
+        ### define :used
+        {:used=>(!parent.managed_repository{ Voeis::DataValue.first(:quality_control_level=>item.quality_control_level_code).nil? })}
+      }
     },
     :sample_medium => {
       :cv_title => 'Sample Medium',
@@ -109,12 +121,14 @@ class Voeis::CVController < Voeis::BaseController
       :cv_title2cv => 'sample_medium_c_v',
       :cv_id => 'id',
       :cv_name => 'term',
-      :cv_params => [],
       :cv_columns => CV_MAP_BASE[:cv_columns],
       :copy_columns => CV_MAP_BASE[:copy_columns],
       :cv_form => CV_MAP_BASE[:cv_form],
       :cv_properties => CV_MAP_BASE[:cv_properties],
-      :cv_refs => lambda {|vers| []}
+      :cv_list_refs => lambda {|item,parent|
+        ### define :used
+        {:used=>(!parent.variables.first(:sample_medium=>item.term).nil?)}
+      }
     },
     :sample_type => {
       :cv_title => 'Sample Type',
@@ -122,12 +136,14 @@ class Voeis::CVController < Voeis::BaseController
       :cv_title2cv => 'sample_type_c_v',
       :cv_id => 'id',
       :cv_name => 'term',
-      :cv_params => [],
       :cv_columns => CV_MAP_BASE[:cv_columns],
       :copy_columns => CV_MAP_BASE[:copy_columns],
       :cv_form => CV_MAP_BASE[:cv_form],
       :cv_properties => CV_MAP_BASE[:cv_properties],
-      :cv_refs => lambda {|vers| []}
+      :cv_list_refsxx => lambda {|item,parent|
+        ### define :used
+        {:used=>(!parent.variables.first(:sample_type=>item.term).nil?)}
+      }
     },
     :spatial_reference => {
       :cv_title => "Spatial Reference",
@@ -136,8 +152,6 @@ class Voeis::CVController < Voeis::BaseController
       :cv_table => "spatial_reference",
       :cv_id => 'id',
       :cv_name => 'srs_name',
-      :cv_params => [
-        {:is_geographic => lambda {|value| value=~(/(true|t|yes|y|1)$/i) ? true : false }}],
       :cv_columns => [{:field=>"srs_name", :label=>"Source Name", :width=>"110px", :filterable=>true, :formatter=>"", :style=>""},
                     {:field=>"srs_id", :label=>"Source ID", :width=>"80px", :filterable=>true, :formatter=>"", :style=>""},
                     {:field=>"is_geographic", :label=>"GEO", :width=>"30px", :filterable=>true, :formatter=>"trueFalse", :style=>""},
@@ -164,10 +178,12 @@ class Voeis::CVController < Voeis::BaseController
                     {:label=>"Source ID", :name=>"srs_id"},
                     {:label=>"Geographic", :name=>"is_geo_string", :contains=>["is_geographic"]},
                     {:label=>"Notes", :name=>"notes"}],
-      :cv_refs => lambda {|versions|
+      :cv_params => [
+        {:is_geographic => lambda {|value| value=~(/(true|t|yes|y|1)$/i) ? true : false }}],
+      :cv_ver_refs => lambda {|item,versions|
         cv_refs = []
         temp = {}
-        temp[:is_geo_string] = @cv_item.is_geographic ? 'True' : 'False'
+        temp[:is_geo_string] = item.is_geographic ? 'True' : 'False'
         cv_refs << temp
         versions.each{|ver| 
           temp = {}
@@ -175,6 +191,11 @@ class Voeis::CVController < Voeis::BaseController
           cv_refs << temp
         }
         cv_refs
+      },
+      :cv_list_refs => lambda {|item,parent|
+        ### define :used
+        {:used=>(!parent.sites.first(:lat_long_datum_id=>item.id).nil? || 
+          !parent.sites.first(:local_projection_id=>item.id).nil?)}
       }
     },
     :speciation => {
@@ -183,12 +204,14 @@ class Voeis::CVController < Voeis::BaseController
       :cv_title2cv => 'speciation_c_v',
       :cv_id => 'id',
       :cv_name => 'term',
-      :cv_params => [],
       :cv_columns => CV_MAP_BASE[:cv_columns],
       :copy_columns => CV_MAP_BASE[:copy_columns],
       :cv_form => CV_MAP_BASE[:cv_form],
       :cv_properties => CV_MAP_BASE[:cv_properties],
-      :cv_refs => lambda {|vers| []}
+      :cv_list_refs => lambda {|item,parent|
+        ### define :used
+        {:used=>(!parent.variables.first(:speciation=>item.term).nil?)}
+      }
     },
     :variable_name => {
       :cv_title => "Variable Name",
@@ -197,12 +220,14 @@ class Voeis::CVController < Voeis::BaseController
       :cv_table => "variable_name_cv",
       :cv_id => "id",
       :cv_name => "term",
-      :cv_params => [],
       :cv_columns => CV_MAP_BASE[:cv_columns],
       :copy_columns => CV_MAP_BASE[:copy_columns],
       :cv_form => CV_MAP_BASE[:cv_form],
       :cv_properties => CV_MAP_BASE[:cv_properties],
-      :cv_refs => lambda {|vers| []}
+      :cv_list_refs => lambda {|item,parent|
+        ### define :used
+        {:used=>(!parent.variables.first(:variable_name=>item.term).nil?)}
+      }
     },
     :value_type => {
       :cv_title => 'Value Type',
@@ -210,12 +235,14 @@ class Voeis::CVController < Voeis::BaseController
       :cv_title2cv => 'value_type_c_v',
       :cv_id => 'id',
       :cv_name => 'term',
-      :cv_params => [],
       :cv_columns => CV_MAP_BASE[:cv_columns],
       :copy_columns => CV_MAP_BASE[:copy_columns],
       :cv_form => CV_MAP_BASE[:cv_form],
       :cv_properties => CV_MAP_BASE[:cv_properties],
-      :cv_refs => lambda {|vers| []}
+      :cv_list_refs => lambda {|item,parent|
+        ### define :used
+        {:used=>(!parent.variables.first(:value_type=>item.term).nil?)}
+      }
     },
     :vertical_datum => {
       :cv_title => 'Vertical Datum',
@@ -223,12 +250,14 @@ class Voeis::CVController < Voeis::BaseController
       :cv_title2cv => 'vertical_datum_c_v',
       :cv_id => 'id',
       :cv_name => 'term',
-      :cv_params => [],
       :cv_columns => CV_MAP_BASE[:cv_columns],
       :copy_columns => CV_MAP_BASE[:copy_columns],
       :cv_form => CV_MAP_BASE[:cv_form],
       :cv_properties => CV_MAP_BASE[:cv_properties],
-      :cv_refs => lambda {|vers| []}
+      :cv_list_refs => lambda {|item,parent|
+        ### define :used
+        {:used=>(!parent.sites.first(:vertical_datum_id=>item.id).nil?)}
+      }
     },
     :sensor_type => {
       :cv_title => 'Sensor Type',
@@ -236,7 +265,6 @@ class Voeis::CVController < Voeis::BaseController
       :cv_title2cv => 'sensor_type_c_v',
       :cv_id => 'id',
       :cv_name => 'term',
-      :cv_params => [],
       :cv_columns => [{:field=>"term", :label=>"Term", :width=>"180px", :filterable=>true, :formatter=>"", :style=>""},
                     {:field=>"description", :label=>"Description", :width=>"", :filterable=>true, :formatter=>"", :style=>""}],
       #:copy_columns => [{:field=>"id", :label=>"ID", :width=>"5%", :filterable=>false, :formatter=>"", :style=>""},
@@ -249,11 +277,10 @@ class Voeis::CVController < Voeis::BaseController
                     {:field=>"Description", :type=>"2B-LL", :required=>"false", :style=>""},
                     {:field=>"description", :type=>"1B-STA", :required=>"false", :style=>""}],
       :cv_properties => [
-        #{:label=>"Version", :name=>"version"},
-        #{:label=>"ID", :name=>"id"},
-        {:label=>"Term", :name=>"term"},
-        {:label=>"Description", :name=>"description"}],
-      :cv_refs => lambda {|vers| []}
+                    #{:label=>"Version", :name=>"version"},
+                    #{:label=>"ID", :name=>"id"},
+                    {:label=>"Term", :name=>"term"},
+                    {:label=>"Description", :name=>"description"}]
     },
     :logger_type => {
       :cv_title => 'Logger Type',
@@ -261,7 +288,6 @@ class Voeis::CVController < Voeis::BaseController
       :cv_title2cv => 'logger_type_c_v',
       :cv_id => 'id',
       :cv_name => 'term',
-      :cv_params => [],
       :cv_columns => [{:field=>"term", :label=>"Term", :width=>"180px", :filterable=>true, :formatter=>"", :style=>""},
                     {:field=>"description", :label=>"Description", :width=>"", :filterable=>true, :formatter=>"", :style=>""}],
       #:copy_columns => [{:field=>"id", :label=>"ID", :width=>"5%", :filterable=>false, :formatter=>"", :style=>""},
@@ -274,11 +300,10 @@ class Voeis::CVController < Voeis::BaseController
                     {:field=>"Description", :type=>"2B-LL", :required=>"false", :style=>""},
                     {:field=>"description", :type=>"1B-STA", :required=>"false", :style=>""}],
       :cv_properties => [
-        #{:label=>"Version", :name=>"version"},
-        #{:label=>"ID", :name=>"id"},
-        {:label=>"Term", :name=>"term"},
-        {:label=>"Description", :name=>"description"}],
-      :cv_refs => lambda {|vers| []}
+                    #{:label=>"Version", :name=>"version"},
+                    #{:label=>"ID", :name=>"id"},
+                    {:label=>"Term", :name=>"term"},
+                    {:label=>"Description", :name=>"description"}]
     }
   }
 
@@ -357,8 +382,10 @@ class Voeis::CVController < Voeis::BaseController
     if @cv_global
       cvparams = params
       cvparams = params[cv_sym] if !params[cv_sym].nil?
-      CV_MAP[@cv_type][:cv_params].each{|key, filter| cvparams[key] = filter.call(cvparams[key])}
-    
+      if !CV_MAP[@cv_type][:cv_params].nil?
+        CV_MAP[@cv_type][:cv_params].each{|key, filter| cvparams[key] = filter.call(cvparams[key])}
+      end
+      
       @cv_item = @cv_class.first(:id=>params[:id])
       cvparams.each do |key, value|
         @data_type[key] = value.blank? ? nil : value
@@ -494,7 +521,7 @@ class Voeis::CVController < Voeis::BaseController
         return
       end
       @cv_data0 = @cv_class.all
-      @cv_data = @cv_data0.map{|d| d.attributes.update({:used=>false})}
+      @cv_data = @cv_data0.map{|d| d.attributes.update({:used=>false}) }
     else
       @project = parent
       if User.current.nil? || 
@@ -505,16 +532,24 @@ class Voeis::CVController < Voeis::BaseController
         redirect_to(project_path(@project))
         return
       end
+      
       @cv_data0 = @project.managed_repository{@cv_class.all}
       #@cv_data = @cv_data0.map{|d| d.attributes.update({:used=>!@project.sites.first(:variable_name_id=>d[:id]).nil?})}
       #@cv_data = @cv_data0.map{|d| 
       #  d.attributes.update({:used=>(!@project.sites.first(:lat_long_datum_id=>d[:id]).nil? || 
       #    !@project.sites.first(:local_projection_id=>d[:id]).nil?)})}
-      @cv_data = @cv_data0.map{|d| d.attributes.update({:used=>false})}
+      if CV_MAP[@cv_type][:cv_list_refs].nil?
+        @cv_data = @cv_data0.map{|d| d.attributes.update({:used=>false}) }
+        @cv_columns = @cv_columns[0..-2] if @cv_columns[-1][:field]=="used"
+      else
+        @cv_data = @cv_data0.map{|d| d.attributes.update(CV_MAP[@cv_type][:cv_list_refs].call(d,@project)) }
+      end
+      
       #@copy_data = @cv_class.all(:id.not=>@cv_data0.collect(&:id)) #, :order=>[:term.asc])
       @copy_data = @cv_class.all #(:id.not=>@cv_data0.collect(&:id)) #, :order=>[:term.asc])
       @copy_columns = CV_MAP[@cv_type][:copy_columns]
     end
+    ### 
     render 'voeis/cv_index.html.haml'
   end
 
@@ -544,7 +579,11 @@ class Voeis::CVController < Voeis::BaseController
       #@cv_versions = @project.managed_repository.adapter.select("SELECT * FROM voeis_#{CV_MAP[@cv_type][:cv_table]}_versions WHERE id=%s ORDER BY updated_at DESC" % @cv_item.id)
       @cv_versions = @project.managed_repository.adapter.select("SELECT * FROM voeis_%s_versions WHERE id=%s ORDER BY updated_at DESC" % [cv_table,@cv_item.id])
     end
-    @cv_refs = CV_MAP[@cv_type][:cv_refs].call(@cv_versions)
+    if CV_MAP[@cv_type][:cv_ver_refs].nil?
+      @cv_refs = []
+    else
+      @cv_refs = CV_MAP[@cv_type][:cv_ver_refs].call(@cv_item,@cv_versions)
+    end
     #render 'spatial_references/versions.html.haml'
     render 'voeis/cv_versions.html.haml'
   end

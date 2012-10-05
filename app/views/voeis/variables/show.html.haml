@@ -338,7 +338,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Variable Name','variable_name','#{project_path(@project)}/variable_name_c_vs','#{varId}_var_qcval_sel');return false;"}
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Variable Name','variable_name','#{project_path(@project)}/variable_name_c_vs/list','#{varId}_var_qcval_sel');return false;"}
                   %label{:for=>"var_name", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Variable Name *
               -#%input(name="var_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.variable_name}" required="true")
@@ -355,7 +355,9 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_medium"} Sample Medium *
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Sample Medium','sample_medium','#{project_path(@project)}/sample_medium_c_vs/list','#{varId}_var_medium_sel');return false;"}
+                  %label{:for=>"var_medium", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
+                    Sample Medium *
               -#%input(name="var_medium" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.sample_medium}" required="true")
               %select(name="var_medium" class="medium_select" id="#{varId}_var_medium_sel")
                 = options_for_select(@var_medium.all.map{|v| [v.term,v.term]}, selected=@variable.sample_medium)
@@ -372,7 +374,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Value Type','value_type','#{project_path(@project)}/value_type_c_vs','#{varId}_var_vtype_sel');return false;"}
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Value Type','value_type','#{project_path(@project)}/value_type_c_vs/list','#{varId}_var_vtype_sel');return false;"}
                   %label{:for=>"var_vtype", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Value Type *
               -#%input(name="var_vtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.value_type}" required="true")
@@ -383,7 +385,9 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_gcat"} General Category *
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('General Category','general_category','#{project_path(@project)}/general_category_c_vs/list','#{varId}_var_gcat_sel');return false;"}
+                  %label{:for=>"var_gcat", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
+                    General Category *
               -#%input(name="var_gcat" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.general_category}" required="true")
               %select(name="var_gcat" class="gcat_select" id="#{varId}_var_gcat_sel")
                 = options_for_select(@var_gcat.all.map{|v| [v.term,v.term]}, selected=@variable.general_category)
@@ -392,7 +396,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Data Type','data_type','#{project_path(@project)}/data_type_c_vs','#{varId}_var_dtype_sel');return false;"}
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Data Type','data_type','#{project_path(@project)}/data_type_c_vs/list','#{varId}_var_dtype_sel');return false;"}
                   %label{:for=>"var_dtype", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Data Type *
               -#%input(name="var_dtype" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.data_type}" required="true")
@@ -402,7 +406,9 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_spec"} Speciation *
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Speciation','speciation','#{project_path(@project)}/speciation_c_vs/list','#{varId}_var_spec_sel');return false;"}
+                  %label{:for=>"var_spec", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
+                    Speciation *
               -#%input(name="var_spec" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.speciation}" required="true")
               %select(name="var_spec" class="spec_select" id="#{varId}_var_spec_sel")
                 = options_for_select(@var_spec.all.map{|v| [v.term,v.term]}, selected=@variable.speciation)
@@ -411,7 +417,7 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Quality Control Level','quality_control_level','#{project_path(@project)}/quality_control_levels','#{varId}_var_qcval_sel');return false;"}
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Quality Control Level','quality_control_level','#{project_path(@project)}/quality_control_levels/list','#{varId}_var_qcval_sel');return false;"}
                   %label{:for=>"var_qcval", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
                     Quality Control *
               -#%input(name="var_qcval" class="TextBox_half" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'########'}" type="text" value="#{@variable.quality_control}" required="true")
