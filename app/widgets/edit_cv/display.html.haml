@@ -1,6 +1,9 @@
 -### EDIT_CV widget view
 
-- edit_auth = !@current_user.nil? && (@current_user.has_role?('Data Manager',@project) || @current_user.has_role?('Principal Investigator',@project))
+- if @project.nil?
+  - edit_auth = @current_user.id==1
+- else
+  - edit_auth = !@current_user.nil? && (@current_user.has_role?('Data Manager',@project) || @current_user.has_role?('Principal Investigator',@project))
 - url_api_key = @current_user.nil? || @current_user.api_key.blank? ? "" : "&api_key=#{@current_user.api_key}"
 
 :javascript
@@ -26,13 +29,12 @@
   
   var #{@cv_title2}_data = {};
   
-  #{@cv_title2}_data.global = #{@project.nil?};
+  #{@cv_title2}_data.global = #{@global ? 'true' : 'false'};
   #{@cv_title2}_data.cv_title = "#{@cv_title}";
   #{@cv_title2}_data.cv_title2 = "#{@cv_title2}";
   #{@cv_title2}_data.global_post_url = "/#{@cv_title2cv}s";
-  #{@cv_title2}_data.post_url = "#{@project.nil? ? '' : '/projects/'+@project.id}"+#{@cv_title2}_data.global_post_url;
-    
-  var #{@tabId}_tab_loaded = true;
+  #{@cv_title2}_data.post_url = "#{@project.nil? ? '' : '/projects/'+@project.id.to_s}"+#{@cv_title2}_data.global_post_url;
+  #{@cv_title2}_data.tab_loaded = false;
   
   //### [field, type(2)] without labels (LL)
   #{@cv_title2}_data.cv_fields = #{@cv_form.map{|x| [x[:field],x[:type].split('-')[-1]] unless x[:type][-2..-1]=='LL'}.compact.to_json};
@@ -116,7 +118,7 @@
       var edit_link = '<a href="javascript:" onclick="#{@cv_title2}_exec.cv_pop_edit('+id+');return false;">'+edit_icon+'</a>\n';
       var delete_link = '<a href="javascript:" onclick="#{@cv_title2}_exec.cv_delete('+idx+');return false;">'+delete_icon+'</a>\n';
       var spaces = '&nbsp;';
-      if(item.used[0]) return spaces+hist_link;
+      if(item.used[0]) return spaces+edit_link+spaces+hist_link;
       //return spaces+hist_link+spaces+delete_link;
       return spaces+edit_link+spaces+hist_link+spaces+delete_link;
     }
@@ -155,7 +157,7 @@
     var hist_url = #{@cv_title2}_data.post_url+'/versions/?api_key=#{@current_user.api_key}&id='+id
     var hist_id = "#{@cv_title2}_"+id+"_history";
     var hist_title = "Hist: "+name+" ["+id+"]";
-    if(#{@tabId}_tab_loaded) {
+    if(#{@cv_title2}_data.tab_loaded) {
       var hist_callback = function(){
         if(window.loaded) window.loaded();
         //resize History tabContainer
@@ -194,6 +196,7 @@
         data: data,
         success: function(dat) {
           console.log('POSTED:', data0, data, dat);
+          data0.id = dat.id;
           #{@cv_title2}_exec.cv_store_new(data0);
           if(call_back) call_back();
         },
@@ -216,8 +219,11 @@
     } else {
       //NEW (id=0)
       var post_type = 'POST';
-      var post_result = #{@cv_title2}_exec.cv_post_local;
-      var post_url = #{@cv_title2}_data.global_post_url+'.json?api_key=#{@current_user.api_key}';
+      //REMOVED GLOBAL SAVE ON NEW!!
+      //var post_result = #{@cv_title2}_exec.cv_post_local;
+      //var post_url = #{@cv_title2}_data.global_post_url+'.json?api_key=#{@current_user.api_key}';
+      var post_result = #{@cv_title2}_exec.cv_store_new;
+      var post_url = #{@cv_title2}_data.post_url+'.json?api_key=#{@current_user.api_key}';
       delete data.id;
       delete data.#{@cv_title2cv}.id;
     };
@@ -460,6 +466,7 @@
   //ON-TAB-LOAD-DONE!
   function initPage() {
     console.log('initPage: NOW!!');
+    #{@cv_title2}_data.tab_loaded = true;
     #{@cv_title2}_data.cv_management_grid.startup();
     
     //RESIZE TABS STUFF
@@ -483,6 +490,7 @@
     var newpane = dijit.byId('#{@tabId}_newtab');
     var newclick = newpane.controlButton;
     newclick.onClick = function(mouse_evt) {
+      var cur_pane = tabs.selectedChildWidget;
       console.log('CV-NEW TABclick!!',cur_pane.id);
       cur_pane.controlButton.focus();
       #{@cv_title2}_exec.cv_datum_new()
@@ -561,6 +569,23 @@
           this.connect(#{@cv_title2}_form, "onValidStateChange", function(state){
             this.attr("disabled", !state);
           });
+          //MAKE COPY GLOBAL
+          #{@tabId}_cv_dialog_box.global_copy = function(item) {
+            //DO COPY
+            delete item.id;   //### DON'T KEEP ID -NO SYNC NEW
+            #{@cv_title2}_exec.cv_post_local(item, function(){
+              //var copy_idx = parseInt(cv_idx.slice(1));
+              //var del_item = #{@cv_title2}_data.copy_data[copy_idx];
+              //datastore.delete(cv_id,#{@cv_title2}_data.copy_store);
+              tabs = dijit.byId('#{@tabId}_tabs');
+              pane = dijit.byId('manage_#{@tabId}');
+              tabs.selectChild(pane);
+              //REFRESH GRID!
+              grid = dijit.byId('#{@cv_title2}_data.cv_management_grid');
+              grid.setQuery({id: '*'});
+              #{@tabId}_cv_dialog_box.hide();
+            });
+          };
           //### ON-CLICK
           this.connect(this, "onClick", function(){
             var form = #{@cv_title2}_form.domNode;
@@ -574,12 +599,19 @@
             if(cv_id && cv_idx[0]=='#') {
               //COPY GLOBAL
               item['provenance_comment'] = 'Copied from GLOBAL';
-              #{@cv_title2}_exec.cv_post_local(item, function(){
-                var copy_idx = parseInt(cv_idx.slice(1));
-                var del_item = #{@cv_title2}_data.copy_data[copy_idx];
-                datastore.delete(del_item,#{@cv_title2}_data.copy_store);
-                #{@tabId}_cv_dialog_box.hide();
-              });
+              var items = datastore.fetch({#{@cv_name}: item['#{@cv_name}'].toString()}, #{@cv_title2}_data.cv_store);
+              if(items.length) {
+                var text = items.length.toString()+' similar #{@cv_name}(s) already exist(s)-- are you sure you want another?';
+                confirmDialog('Please confirm &mdash;', text, 
+                  function(yes) {
+                    console.log('CONFIRM:',yes);
+                    if(yes) {
+                      //DO COPY
+                      #{@tabId}_cv_dialog_box.global_copy(item)
+                    } else #{@tabId}_cv_dialog_box.hide();
+                  }, 
+                  {buttonOk: 'YES', buttonCancel: 'NO'});
+                } else #{@tabId}_cv_dialog_box.global_copy(item);
             } else {
               #{@cv_title2}_exec.cv_save(cv_id, item, function(){
                 #{@tabId}_cv_dialog_box.hide();
@@ -592,36 +624,36 @@
 
 -################# COPY GLOBAL DIALOG
 
-- if !@copy_data.nil? && false
-  %div{:id=>"#{@tabId}_copy_dialog_box", :dojoType=>"dijit.Dialog", :jsId=>"#{@tabId}_copy_dialog_box", :title=>"#{@cv_title}: Copy Global", 
-        :style=>"width:760px;"}
-    * click an entry to save a copy from these GLOBAL #{@cv_title} entries
-    %table{:dojoType=>"dojox.grid.EnhancedGrid", :store=>"#{@cv_title2}_data.copy_store", 
-            :plugins=> "{filter:true}",  
-            :clientSort=>"true", 
-            :sortInfo=>"2",
-            :style=>"width:100%;height:320px;margin:0;padding:0;border:#E3EBF2 2px solid;"}
-      %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
-        :plain
-          //SELECT GLOBAL CV TERM
-          var form = #{@cv_title2}_form.domNode;
-          var item = this.getItem(idx);
-          this.selection.clear();
-          var col = this.layout.cells[1];
-          this.focus.setFocusCell(col,idx);
-          #{@tabId}_copy_dialog_box.hide();
-          #{@cv_title2}_exec.cv_form_populate(item);
-          $('##{@cv_title2}_form #cv_prov_com').hide();
-          //$('##{@cv_title2}_idx').val('#'+item.idx);
-          var cv_idx = dojo.byId('#{@cv_title2}_idx');
-          if(cv_idx) cv_idx.value = '#'+item._0;
-          #{@tabId}_cv_dialog_box.set('title', 'NEW '+#{@cv_title2}_data.cv_title);
-          #{@tabId}_cv_dialog_box.show();
-      %thead
-        %tr
-          - @copy_columns.each do |col|
-            %th{:field=>"#{col[:field]}", :filterable=>"#{col[:filterable]}", :width=>"#{col[:width]}", :style=>"#{col[:style]}", 
-                :formatter=>"#{col[:formatter].blank? ? '' : @cv_title2+'_exec.Formatter.'+col[:formatter]}"} #{col[:label]}
+-#- if !@copy_data.nil? && false
+-#  %div{:id=>"#{@tabId}_copy_dialog_box", :dojoType=>"dijit.Dialog", :jsId=>"#{@tabId}_copy_dialog_box", :title=>"#{@cv_title}: Copy Global", 
+-#        :style=>"width:760px;"}
+-#    * click an entry to save a copy from these GLOBAL #{@cv_title} entries
+-#    %table{:dojoType=>"dojox.grid.EnhancedGrid", :store=>"#{@cv_title2}_data.copy_store", 
+-#            :plugins=> "{filter:true}",  
+-#            :clientSort=>"true", 
+-#            :sortInfo=>"2",
+-#            :style=>"width:100%;height:320px;margin:0;padding:0;border:#E3EBF2 2px solid;"}
+-#      %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
+-#        :plain
+-#          //SELECT GLOBAL CV TERM
+-#          var form = #{@cv_title2}_form.domNode;
+-#          var item = this.getItem(idx);
+-#          this.selection.clear();
+-#          var col = this.layout.cells[1];
+-#          this.focus.setFocusCell(col,idx);
+-#          #{@tabId}_copy_dialog_box.hide();
+-#          #{@cv_title2}_exec.cv_form_populate(item);
+-#          $('##{@cv_title2}_form #cv_prov_com').hide();
+-#          //$('##{@cv_title2}_idx').val('#'+item.idx);
+-#          var cv_idx = dojo.byId('#{@cv_title2}_idx');
+-#          if(cv_idx) cv_idx.value = '#'+item._0;
+-#          #{@tabId}_cv_dialog_box.set('title', 'NEW '+#{@cv_title2}_data.cv_title);
+-#          #{@tabId}_cv_dialog_box.show();
+-#      %thead
+-#        %tr
+-#          - @copy_columns.each do |col|
+-#            %th{:field=>"#{col[:field]}", :filterable=>"#{col[:filterable]}", :width=>"#{col[:width]}", :style=>"#{col[:style]}", 
+-#                :formatter=>"#{col[:formatter].blank? ? '' : @cv_title2+'_exec.Formatter.'+col[:formatter]}"} #{col[:label]}
 
 
 -################# MAIN
@@ -668,14 +700,15 @@
   %div{:id=>"manage_#{@tabId}", :dojoType=>"dijit.layout.ContentPane", :title=>"#{@cv_title}", 
     :jsId=>"#{@tabId}_manage", :style=>"margin-top:10px;"}
       
-    %div{:id=>"#{@tabId}_cv_empty", :style=>"display:#{@cv_data.empty? ? 'block' : 'none'};"}
-      %br
-      %br
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-      %strong.icon.icon-warning
-        %em NO #{@cv_title.upcase}S EXIST!
+    -#%div{:id=>"#{@tabId}_cv_empty", :style=>"display:#{@cv_data.empty? ? 'block' : 'none'};"}
+    -#  %br
+    -#  %br
+    -#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    -#  %strong.icon.icon-warning
+    -#    %em NO #{@cv_title.upcase}S EXIST!
     
-    %div{:id=>"#{@tabId}_cv_main", :style=>"margin:0;padding:0;display:#{@cv_data.empty? ? 'none' : 'block'};height:100%;"}
+    -#%div{:id=>"#{@tabId}_cv_main", :style=>"margin:0;padding:0;display:#{@cv_data.empty? ? 'none' : 'block'};height:100%;"}
+    %div{:id=>"#{@tabId}_cv_main", :style=>"margin:0;padding:0;height:100%;"}
       
       -#%table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=>"{filter:true}",  :store=>"cv_store", :selected=>true, 
       -#    :style=>"width:90%;margin:0;padding:2px;", :jsId=>"cv_management_grid", :id=>"cv_management_grid"}
@@ -704,9 +737,11 @@
             //#{@cv_title2}_exec.cv_datum_edit(item);
         %thead
           %tr
+            %th{:field=>"id", :width=>"25px", :filterable=>false} ID
             - @cv_columns.each do |col|
               %th{:field=>"#{col[:field]}", :filterable=>"#{col[:filterable]}", :width=>"#{col[:width]}", :style=>"#{col[:style]}", 
                   :formatter=>"#{col[:formatter].blank? ? '' : @cv_title2+'_exec.Formatter.'+col[:formatter]}"} #{col[:label]}
+            %th{:field=>"updated_at", :width=>"130px", :filterable=>true, :formatter=>"#{@cv_title2}_exec.Formatter.dateTime"} Updated
             %th{:field=>"_item", :filterable=>false, :width=>"75px", :formatter=>"#{@cv_title2}_exec.Formatter.controls"} - - -
           -#%th{:field=>"srs_id", :filterable=>true, :width=>"10%", :style=>""} Source ID
           -#%th{:field=>"srs_name", :filterable=>true, :width=>"30%", :style=>""} Source Name
@@ -718,9 +753,9 @@
 
   -##### 2ND SUB TAB- COPY GLOBAL
   - if !@copy_data.nil?
-    %div{:id=>"copytab_#{@tabId}", :dojoType=>"dijit.layout.ContentPane", :title=>"Copy Global", 
-      :style=>"width:860px;height:350px;margin-top:10px;display:#{@cv_data.empty? ? 'none' : 'block'}"}
-      * click an entry to save a copy from these GLOBAL #{@cv_title} entries
+    %div{:id=>"copytab_#{@tabId}", :dojoType=>"dijit.layout.ContentPane", :title=>"All Terms", 
+      :style=>"width:860px;height:350px;margin-top:10px;"}
+      * click an entry to create a local copy from these GLOBAL #{@cv_title} entries
       %table{:dojoType=>"dojox.grid.EnhancedGrid", :store=>"#{@cv_title2}_data.copy_store", 
               :plugins=> "{filter:true}",  
               :clientSort=>"true", 
@@ -744,9 +779,11 @@
             #{@tabId}_cv_dialog_box.show();
         %thead
           %tr
+            -#%th{:field=>"id", :width=>"25px", :filterable=>false} ID
             - @copy_columns.each do |col|
               %th{:field=>"#{col[:field]}", :filterable=>"#{col[:filterable]}", :width=>"#{col[:width]}", :style=>"#{col[:style]}", 
                   :formatter=>"#{col[:formatter].blank? ? '' : @cv_title2+'_exec.Formatter.'+col[:formatter]}"} #{col[:label]}
+            %th{:field=>"updated_at", :width=>"130px", :filterable=>true, :formatter=>"#{@cv_title2}_exec.Formatter.dateTime"} Updated
 
 
   -##### SUB TAB- NEW

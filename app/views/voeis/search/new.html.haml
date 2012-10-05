@@ -18,7 +18,7 @@
     identifier: 'id',
     items: #{@sites.to_json} };
   var site_store = new dojo.data.ItemFileWriteStore({data: site_json }); 
-  
+  var api_key = "#{@voeis_api_key.to_s}";
 -#%h3{:style=>"margin:5px 0;"}
 %h3{:style=>"margin:8px 0 10px 0;"}
   Data Search &mdash; Mulitple Sites &amp; Variables
@@ -63,8 +63,14 @@
 -#%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button" onclick="doSearch();") 
 -#  Perform Search
 %button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button2" onclick="doSearch();" style="margin:10px 0;")
-  Perform Search
-
+  Display Search Results
+%button(dojoType="dijit.form.Button" name="build_query_button_download" id="build_query_button_download" onclick="doSearchDownload();" style="margin:10px 0;")
+  Download Search Results Non-CrossTab
+%button(dojoType="dijit.form.Button" name="build_query_button_download_crosstab" id="build_query_button_download_crosstab" onclick="doSearchDownloadCrossTab();" style="margin:10px 0;")
+  Download Search Results CrossTab
+%button(dojoType="dijit.form.Button" name="build_query_button_count" id="build_query_button_count" onclick="doSearchCount();" style="margin:10px 0;")
+  Return Number of Records in Search Results
+<br><b>Query URL</b><br/>
 #query_string
 :javascript
   function updateVariables(){
@@ -74,7 +80,7 @@
       site_ids.push(site_var_array[s].id.toString())
     }
     base_url="#{root_url}projects/#{parent.id}/apivs/get_project_site_variables.json?";
-    site_url = base_url + "site_ids[]="+ site_ids.join('&site_ids[]=');
+    site_url = base_url + "api_key=" + api_key + "&site_ids[]="+ site_ids.join('&site_ids[]=');
     $.get(site_url,
       function(data) {
         var variable_json = {
@@ -104,11 +110,70 @@
     $("#query_string").html(url);
   }
   
+  function BuildDownloadCrosstabQuery(){
+    var site_array = siteDataGrid.selection.getSelected();
+    var var_array = varDataGrid.selection.getSelected();
+    site_ids = [];
+    var_ids = [];
+    for (s in site_array){
+      site_ids.push(site_array[s].id.toString())
+    }
+    for (v in var_array){
+      var_ids.push(var_array[v].id.toString())
+    }
+    url = "#{root_url}projects/#{parent.id}/search.csv?site_ids=" + site_ids.join(',');
+    url += "&var_ids=" + var_ids.join(',');
+    url += "&start_date=" +dijit.byId("start_date").value.format('yyyy-mm-dd')
+    url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
+    $("#query_string").html(url);
+  }
+  
+  function BuildDownloadQuery(){
+    var site_array = siteDataGrid.selection.getSelected();
+    var var_array = varDataGrid.selection.getSelected();
+    site_ids = [];
+    var_ids = [];
+    for (s in site_array){
+      site_ids.push(site_array[s].id.toString())
+    }
+    for (v in var_array){
+      var_ids.push(var_array[v].id.toString())
+    }
+    url = "#{root_url}projects/#{parent.id}/search/download_deq.csv?site_ids=" + site_ids.join(',');
+    url += "&var_ids=" + var_ids.join(',');
+    url += "&start_date=" +dijit.byId("start_date").value.format('yyyy-mm-dd')
+    url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
+    $("#query_string").html(url);
+  }
+  function BuildCountQuery(){
+    var site_array = siteDataGrid.selection.getSelected();
+    var var_array = varDataGrid.selection.getSelected();
+    site_ids = [];
+    var_ids = [];
+    for (s in site_array){
+      site_ids.push(site_array[s].id.toString())
+    }
+    for (v in var_array){
+      var_ids.push(var_array[v].id.toString())
+    }
+    url = "#{root_url}projects/#{parent.id}/search/quick_count.json?site_ids=" + site_ids.join(',');
+    url += "&var_ids=" + var_ids.join(',');
+    url += "&start_date=" +dijit.byId("start_date").value.format('yyyy-mm-dd')
+    url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
+    $("#query_string").html(url);
+  }
   function doSearch(){
-    BuildQuery();
+    
+    BuildCountQuery()
     //window.location=$("#query_string").html();
-    window.open($("#query_string").html(), "Search Results "+projectSearchCount.toString(),'',false);
-    projectSearchCount = projectSearchCount +1;
+     $.get($("#query_string").html(), function(data){
+        if (confirm("Are you sure you want to get " + data['count'] + " records?")){
+          BuildQuery();
+          window.open($("#query_string").html(), "Search Results "+projectSearchCount.toString(),'',false);
+          projectSearchCount = projectSearchCount +1;
+        }
+      });
+    
     //dojo.publish('voeis/project/search/results', [$("#query_string").html()])
   }
   function doSearch2(){
@@ -116,6 +181,34 @@
     //window.location=$("#query_string").html();
     //window.open($("#query_string").html(), "Search Results",'','false');
     dojo.publish('voeis/project/search/results', [$("#query_string").html()])
+  }
+  
+  function doSearchDownload(){
+    
+    BuildCountQuery()
+    $.get($("#query_string").html(), function(data){
+      if (confirm("Are you sure you want to get " + data['count'] + " records?")){
+        BuildDownloadQuery();
+        window.location = $("#query_string").html();
+      }
+    });
+    
+  }
+  function doSearchDownloadCrossTab(){
+    
+    BuildCountQuery()
+    $.get($("#query_string").html(), function(data){
+      if (confirm("Are you sure you want to get " + data['count'] + " records?")){
+        BuildDownloadCrosstabQuery();
+          window.location = $("#query_string").html();
+      }
+    });
+  }
+  function doSearchCount(){
+    BuildCountQuery()
+    $.get($("#query_string").html(), function(data){
+        alert("This search yields: " + data['count'] + " records");
+    });
   }
   //formatter: 'val_grid_formatter.dateTime',
   // grid formatters
