@@ -430,7 +430,7 @@
             %td
               .from-element
                 %span{:class=>'label'}
-                  %label{:for=>"site_code"} Code *
+                  %label{:for=>"site_code"} Code-(This must be unique for each site in this project.)*
                 -#= f.text_field("code", :value=>"$$$code$$$")
                 -#%input(name="site_code"  dojoType="dijit.form.ValidationTextBox"  size="30" type="text" value="$$$code$$$" required="true")
                 -#%input(name="site_code"  type="text" value="$$$code$$$")

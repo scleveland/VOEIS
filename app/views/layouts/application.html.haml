@@ -317,9 +317,9 @@
                 -#= link_to("Browse Data Streams", query_project_data_streams_path(@project), :dojoType => "yogo.ui.MenuLink")
                 -#= link_to("Simple QA/QC", query_project_samples_path(@project), :dojoType => "yogo.ui.MenuLink") 
                 -#= link_to("Search Data",new_project_search_path(@project), :dojoType => "yogo.ui.MenuLink") 
-                
-                = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_sample_menu")
-                = link_to("Add Field Observation Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")
+                -unless current_user.nil? || current_user.login == "guest"
+                  = link_to("Add Sample Data", pre_process_samples_file_upload_project_data_values_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_sample_menu")
+                  = link_to("Add Field Observation Data", pre_process_logger_file_upload_project_logger_imports_path(@project), :dojoType=>"yogo.ui.MenuLink", :jsId=>"add_logger_menu")
                 %div{:dojoType=>"dijit.MenuSeparator"}
                 
                 -#- if !@edit_auth.nil? && @edit_auth
