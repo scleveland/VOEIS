@@ -1,7 +1,7 @@
 -### EDIT_CV widget view
 
 - if @project.nil?
-  - edit_auth = !current_user.nil? && current_user.system_role.name=='Administrator'
+  - edit_auth = !@current_user.nil? && @current_user.system_role.name=='Administrator'
 - else
   - edit_auth = !@current_user.nil? && (@current_user.has_role?('Data Manager',@project) || @current_user.has_role?('Principal Investigator',@project))
 - url_api_key = @current_user.nil? || @current_user.api_key.blank? ? "" : "&api_key=#{@current_user.api_key}"
