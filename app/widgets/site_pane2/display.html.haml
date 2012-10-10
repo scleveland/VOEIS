@@ -642,6 +642,7 @@
                     dijit.byId('site00_name').focus();
                     //###ON-SUBMIT
                     this.connect(this, "onClick", function(){
+                      dijit.byId('loading_dialog').show()
                       console.log('CREATE SITE: '+site.id);
                       //###SCROLL TO TOP
                       //window.scrollTo(0,0);
@@ -680,24 +681,31 @@
                       if(pane.newSite) {
                         //###NEW SITE
                         $.post('/projects/#{@project.id}/sites.json', data, function(newValue) {
-                          var newId = parseInt(newValue.id);
-                          console.log('NEW ID: '+newId, newValue);
-                          data['site']['id'] = newId;
-                          //opt = fld.options[fld.selectedIndex];
-                          data['site']['lat_long_datum'] = pane.local.lat_long_datum_dd.text();
-                          data['site']['vertical_datum'] = pane.local.vertical_datum_dd.text();
-                          data['site']['local_projection'] = pane.local.local_projection_dd.text();
-                          console.log('LatLongDatum ID:',data.site.lat_long_datum_id,data.site.lat_long_datum);
-                          console.log('VerticalDatum ID:',data.site.vertical_datum_id,data.site.vertical_datum);
-                          console.log('LocalProjection ID:',data.site.local_projection_id,data.site.local_projection);
-                          pane.siteSave(data['site']);
-                          //dojo.publish('voeis/project/siteTables/refresh');
-                          dojo.publish('voeis/project/site/close',[0]);
-                          dojo.publish('voeis/project/site/select',[newId]);
-                          //if(add_sample_menu.disabled) add_sample_menu.set('disabled',false);
-                          //if(add_logger_menu.disabled) add_logger_menu.set('disabled',false);
-                          add_sample_menu.set('disabled',false);
-                          add_logger_menu.set('disabled',false);
+                          dijit.byId('loading_dialog').hide();
+                          if(newValue.errors != null)
+                          {
+                            error_dialog.pop(newValue.errors.toString(), 0);
+                          }
+                          else{
+                            var newId = parseInt(newValue.id);
+                            console.log('NEW ID: '+newId, newValue);
+                            data['site']['id'] = newId;
+                            //opt = fld.options[fld.selectedIndex];
+                            data['site']['lat_long_datum'] = pane.local.lat_long_datum_dd.text();
+                            data['site']['vertical_datum'] = pane.local.vertical_datum_dd.text();
+                            data['site']['local_projection'] = pane.local.local_projection_dd.text();
+                            console.log('LatLongDatum ID:',data.site.lat_long_datum_id,data.site.lat_long_datum);
+                            console.log('VerticalDatum ID:',data.site.vertical_datum_id,data.site.vertical_datum);
+                            console.log('LocalProjection ID:',data.site.local_projection_id,data.site.local_projection);
+                            pane.siteSave(data['site']);
+                            //dojo.publish('voeis/project/siteTables/refresh');
+                            dojo.publish('voeis/project/site/close',[0]);
+                            dojo.publish('voeis/project/site/select',[newId]);
+                            //if(add_sample_menu.disabled) add_sample_menu.set('disabled',false);
+                            //if(add_logger_menu.disabled) add_logger_menu.set('disabled',false);
+                            add_sample_menu.set('disabled',false);
+                            add_logger_menu.set('disabled',false);
+                          }
                         });
                       } else {
                         //###UPDATE SITE
