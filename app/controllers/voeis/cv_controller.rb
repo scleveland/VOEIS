@@ -45,7 +45,7 @@ class Voeis::CVController < Voeis::BaseController
                   #{:label=>"ID", :name=>"id"},
                   {:label=>"Term", :name=>"term"},
                   {:label=>"Definition", :name=>"definition"}],
-    ###
+    ###???EXPERIMENTAL???
     :cv_list_refs => lambda {|item,parent|
       ### define :used
       {:used=>(!parent.variables.first(:data_type=>item.term).nil?)}
@@ -383,12 +383,12 @@ class Voeis::CVController < Voeis::BaseController
       cvparams = params
       cvparams = params[cv_sym] if !params[cv_sym].nil?
       if !CV_MAP[@cv_type][:cv_params].nil?
-        CV_MAP[@cv_type][:cv_params].each{|key, filter| cvparams[key] = filter.call(cvparams[key])}
+        CV_MAP[@cv_type][:cv_params].each{|key, filter| cvparams[key] = filter.call(cvparams[key]) if !filter.nil?}
       end
       
       @cv_item = @cv_class.first(:id=>params[:id])
       cvparams.each do |key, value|
-        @data_type[key] = value.blank? ? nil : value
+        @cv_item[key] = value.blank? ? nil : value
       end
       @cv_item.updated_at = Time.now
     
@@ -410,7 +410,9 @@ class Voeis::CVController < Voeis::BaseController
       @project.managed_repository{
         cvparams = params
         cvparams = params[cv_sym] if !params[cv_sym].nil?
-        CV_MAP[@cv_type][:cv_params].each{|key, filter| cvparams[key] = filter.call(cvparams[key])}
+        if !CV_MAP[@cv_type][:cv_params].nil?
+          CV_MAP[@cv_type][:cv_params].each{|key, filter| cvparams[key] = filter.call(cvparams[key]) if !filter.nil?}
+        end
         
         @cv_item = @cv_class.first(:id=>params[:id])
         cvparams.each do |key, value|
