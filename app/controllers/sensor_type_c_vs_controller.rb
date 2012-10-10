@@ -1,36 +1,12 @@
-class SensorTypeCVsController < ApplicationController
+class SensorTypeCVsController < Voeis::CVController
   rescue_from ActionView::MissingTemplate, :with => :invalid_page
 
-
-  # GET /variables/new
-  def new
-    @sensor_type = Voeis::SensorTypeCV.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-    end
+  ###GLOBAL SensorTypeCV controller
+  before_filter do
+    @cv_global = true
+    @cv_class = Voeis::SensorTypeCV
+    @cv_type = :sensor_type
+    init(@cv_type,@cv_class,@cv_global)
   end
   
-  # POST /variables
-  def create
-    @sensor_type = Voeis::SensorTypeCV.new(params[:sensor_type_c_v])
-    respond_to do |format|
-      if @sensor_type.save
-        flash[:notice] = 'Sensor Type was successfully created.'
-        format.html { (redirect_to(new_sensor_type_c_v_path())) }
-        format.json do
-          render :json => @sensor_type.as_json, :callback => params[:jsoncallback]
-        end
-      else
-        format.html { render :action => "new" }
-      end
-    end
-  end
-  def show
-    
-  end
-
-  def invalid_page
-    redirect_to(:back)
-  end
 end

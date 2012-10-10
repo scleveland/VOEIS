@@ -46,7 +46,7 @@
       window.close();
       goto(item, window.location.reload);
       //window.opener.cv_item_restore0(item, window.location.reload);
-    } else if(#{@cv_title2}_tab_loaded) {
+    } else if(#{@cv_title2}_data.tab_loaded) {
       #{@cv_title2}_exec.cv_item_restore(item);
     } else {
       cv_item_restore0(item);
