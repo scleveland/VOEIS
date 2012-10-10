@@ -276,8 +276,10 @@
 -if @auth
   -##edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>'EDIT', :style=>"margin-top:0;padding-top:0;display:none;"}
   -#edit-site00{:class=>"site00-divs", :style=>"margin-top:0;padding-top:0;display:none;"}
-  #edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>"Edit", 
-    :style=>"margin:0;padding:0 0 0 8px;"}
+  
+  -##edit-site00{:dojoType=>"dijit.layout.ContentPane", :title=>"Edit", 
+  -#  :style=>"margin:0;padding:0 0 0 8px;"}
+  #edit-site00(style="margin:0;padding:0 0 0 8px;height:auto;overflow:auto;")
 
     -#%h3{:id=>"site00-name-head", :style=>"margin:10px 0 16px 0;padding:0;"}
     -#  %span.small{:style=>"font-size:14px;", :id=>"site00-detail-label"}
@@ -287,8 +289,8 @@
     -#  %span.small{:style=>"font-size:11px;"}
     -#    (* Required)
 
-    %br
     * Required Fields
+    %br
 
     -#%span(id="site00-edit-buttons")
     -#  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;

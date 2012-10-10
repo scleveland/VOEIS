@@ -81,6 +81,8 @@
       console.log('SITES-NEWTAB-click!!');
       //cur_pane.controlButton.focus();
       dojo.publish('voeis/project/site/new', ['#{tabId}_tabs']);
+      var tabs = dijit.byId('#{tabId}_tabs');
+      tabs.selectedChild(site0editref);
       
     };
   };
