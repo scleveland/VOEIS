@@ -720,21 +720,21 @@
               :style=>"margin:0;padding:0;border:#E3EBF2 2px solid;height:99%", 
               :jsId=>"#{@cv_title2}_data.cv_management_grid", 
               :id=>"#{@cv_title2}_data.cv_management_grid"}
-        %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
-          :plain
-            //SELECT CV TERM
-            var item = this.getItem(idx);
-            this.selection.clear();
-            //$('#cv_management').hide();
-            //$('#cv_management').show();
-            //cv_management_grid.dijit.focus;
-            //console.log('CLICKz', this.focus);
-            var this_col = this.focus.cell.index;
-            var col = this.layout.cells[1];
-            this.focus.setFocusCell(col,idx);
-            if(this_col==this.layout.cellCount-1) return;
-            console.log('CLICK!', item);
-            //#{@cv_title2}_exec.cv_datum_edit(item);
+        -#%script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
+        -#  :plain
+        -#    //SELECT CV TERM
+        -#    var item = this.getItem(idx);
+        -#    this.selection.clear();
+        -#    //$('#cv_management').hide();
+        -#    //$('#cv_management').show();
+        -#    //cv_management_grid.dijit.focus;
+        -#    //console.log('CLICKz', this.focus);
+        -#    var this_col = this.focus.cell.index;
+        -#    var col = this.layout.cells[1];
+        -#    this.focus.setFocusCell(col,idx);
+        -#    if(this_col==this.layout.cellCount-1) return;
+        -#    console.log('CLICK!', item);
+        -#    //#{@cv_title2}_exec.cv_datum_edit(item);
         %thead
           %tr
             %th{:field=>"id", :width=>"25px", :filterable=>false} ID
