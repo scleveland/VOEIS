@@ -328,13 +328,26 @@ class Voeis::SitesController < Voeis::BaseController
       #                                                     :definition=>@local_proj_global.definition)
       # end
       respond_to do |format|
-        if site.save
+        if site.valid?
+          site.save
           format.html{
             flash[:notice] = "New Site was saved successfully."
             redirect_to project_url(parent)
+            return
           }
           format.json{
             render :json => site.as_json, :callback => params[:jsoncallback]
+            return
+          }
+        else
+          format.html{
+            flash[:notice] = "New Site failed to save:  #{site.errors}"
+            redirect_to project_url(parent)
+            return
+          }
+          format.json{
+            render :json => {:errors => site.errors}.to_json, :callback => params[:jsoncallback]
+            return
           }
         end
       end

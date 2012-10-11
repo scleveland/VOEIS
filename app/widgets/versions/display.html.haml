@@ -191,7 +191,7 @@
               %button{:dojoType=>"dijit.form.Button", :onclick=>"versionsTab();return false;"}
                 BACK TO VERSIONS
               &nbsp;&nbsp;
-              -if !@current_user.nil? && (@current_user.has_role?('Data Manager',@project) || @current_user.has_role?('Principal Investigator',@project))
+              -if !@current_user.nil? && (@current_user.system_role.name=='Administrator' || !@project.nil? && (@current_user.has_role?('Data Manager',@project) || @current_user.has_role?('Principal Investigator',@project)))
                 %button{:dojoType=>"dijit.form.Button", :onclick=>"restoreVer(#{(version.reject{|k| @xtra.include?(k)}.merge({:id=>@item[:id]})).to_json});return false;"}
                   ROLLBACK VERSION
                 -#%a{:href=>"javascript:", :onclick=>"versionsTab();return false;"}
