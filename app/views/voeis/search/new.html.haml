@@ -19,60 +19,108 @@
     items: #{@sites.to_json} };
   var site_store = new dojo.data.ItemFileWriteStore({data: site_json }); 
   var api_key = "#{@voeis_api_key.to_s}";
+
+  $(window).ready(function(){ 
+    //##### 
+    console.log('SEARCH READY-load-done-NOW');
+    //BuildQuery();
+  });
+
+
 -#%h3{:style=>"margin:5px 0;"}
 %h3{:style=>"margin:8px 0 10px 0;"}
   Data Search &mdash; Mulitple Sites &amp; Variables
 
-%strong Select Sites:
-#siteGrid{:style=>"width:900px;height:200px;"}
-%button(dojoType="dijit.form.Button" name="search_button" id="update_variable_button" onclick="updateVariables();") 
-  Filter Variables From Selected Sites
-=clear_break
-=clear_break
-%strong Select Variables:
-#varGrid{:style=>"width:900px;height:220px;"}
-=clear_break
-=clear_break
 %p
   %strong
-    Data available for:
-  -if @start_date.nil? && @end_date.nil?
-    &mdash;
-  -else
-    = @start_date.starting_timestamp.strftime("%m/%d/%Y")
-    &ndash;
-    = @end_date.ending_timestamp.strftime("%m/%d/%Y")
-
-%div{:style=>"float: left;"}
-  %label{:for=>"date1"}
-    Start Date Selection:
-  %input{:type=>"text", :name=>"start_date", :id=>"start_date", :value=>"#{@end_date.nil? ? Time.now.strftime("%Y-%m-%d") : @end_date.ending_timestamp.nil? ? Time.now.strftime("%Y-%m-%d") : (@end_date.ending_timestamp-1.day).strftime("%Y-%m-%d")}",
-      :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-%div{:style=>"float: left;"}
-  %label{:for=>"date1"}
-    End Date Selection:
-  %input{:type=>"text", :name=>"end_date", :id=>"end_date", :value=>"#{@end_date.nil? ? Time.now.strftime("%Y-%m-%d") : @end_date.ending_timestamp.nil? ? Time.now.strftime("%Y-%m-%d")  : @end_date.ending_timestamp.strftime("%Y-%m-%d")}",
-      :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
-
-=clear_break
--#%p{:id=>"formatted"}
--#=clear_break
--#%p{:id=>"formatted2"}
--#=clear_break
--#%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button" onclick="doSearch();") 
--#  Perform Search
-%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button2" onclick="doSearch();" style="margin:10px 0;")
-  Display Search Results
-%button(dojoType="dijit.form.Button" name="build_query_button_download" id="build_query_button_download" onclick="doSearchDownload();" style="margin:10px 0;")
-  Download Search Results Non-CrossTab
-%button(dojoType="dijit.form.Button" name="build_query_button_download_crosstab" id="build_query_button_download_crosstab" onclick="doSearchDownloadCrossTab();" style="margin:10px 0;")
-  Download Search Results CrossTab
-%button(dojoType="dijit.form.Button" name="build_query_button_count" id="build_query_button_count" onclick="doSearchCount();" style="margin:10px 0;")
-  Return Search Result Size
-<br><b>Query URL</b><br/>
+    Query URL
 #query_string
+  http:
+
+-### TABS
+%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:90%;height:350px;margin-top:10px;padding-top:0;", 
+  :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"search_tabs"}
+
+  #search-sites{:dojoType=>"dijit.layout.ContentPane", :title=>"Select Sites", 
+    :style=>"margin:0;padding:10px 0 0 8px;", :selected=>"true"}
+    %script{:type=>"dojo/method", :event=>"onShow"}
+      :plain
+        //###
+        BuildQuery()
+
+    #siteGrid{:style=>"width:99%;height:300px;"}
+
+  #search-vars{:dojoType=>"dijit.layout.ContentPane", :title=>"Select Variables", 
+    :style=>"margin:0;padding:10px 0 0 8px;"}
+    %script{:type=>"dojo/method", :event=>"onShow"}
+      :plain
+        //###
+        updateVariables();
+        BuildQuery()
+
+    #varGrid{:style=>"width:99%;height:300px;"}
+
+  #search-dates{:dojoType=>"dijit.layout.ContentPane", :title=>"Select Date Range & Search", 
+    :style=>"margin:0;padding:10px 0 0 28px;"}
+    %script{:type=>"dojo/method", :event=>"onShow"}
+      :plain
+        //###
+        BuildQuery()
+
+    =clear_break
+    %p
+      %strong
+        Data available for:
+      -if @start_date.nil? && @end_date.nil?
+        &mdash;
+      -else
+        = @start_date.starting_timestamp.strftime("%m/%d/%Y")
+        &ndash;
+        = @end_date.ending_timestamp.strftime("%m/%d/%Y")
+    =clear_break
+
+    %div{:style=>"float: left;"}
+      %label{:for=>"date1"}
+        Start Date Selection:
+      %input{:type=>"text", :name=>"start_date", :id=>"start_date", :value=>"#{@end_date.nil? ? Time.now.strftime("%Y-%m-%d") : @end_date.ending_timestamp.nil? ? Time.now.strftime("%Y-%m-%d") : (@end_date.ending_timestamp-1.day).strftime("%Y-%m-%d")}",
+        :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
+        %script{:type=>"dojo/method", :event=>"startup"}
+          this.connect(this, "onClick", function(){ BuildQuery() };
+
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+    
+    %div{:style=>"float: left;"}
+      %label{:for=>"date1"}
+        End Date Selection:
+      %input{:type=>"text", :name=>"end_date", :id=>"end_date", :value=>"#{@end_date.nil? ? Time.now.strftime("%Y-%m-%d") : @end_date.ending_timestamp.nil? ? Time.now.strftime("%Y-%m-%d")  : @end_date.ending_timestamp.strftime("%Y-%m-%d")}",
+        :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
+        %script{:type=>"dojo/method", :event=>"startup"}
+          this.connect(this, "onClick", function(){ BuildQuery() };
+
+    =clear_break
+    =clear_break
+    =clear_break
+    -#%p{:id=>"formatted"}
+    -#=clear_break
+    -#%p{:id=>"formatted2"}
+    -#=clear_break
+    -#%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button" onclick="doSearch();") 
+    -#  Perform Search
+    %button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button2" onclick="doSearch();" style="margin:10px 0;width:200px;")
+      Display Search Results
+    %button(dojoType="dijit.form.Button" name="build_query_button_download" id="build_query_button_download" onclick="doSearchDownload();" style="margin:10px 0;width:300px;")
+      Download Search Results Non-CrossTab
+
+    =clear_break
+
+    %button(dojoType="dijit.form.Button" name="build_query_button_count" id="build_query_button_count" onclick="doSearchCount();" style="margin:10px 0;width:200px;")
+      Return Search Result Size
+    %button(dojoType="dijit.form.Button" name="build_query_button_download_crosstab" id="build_query_button_download_crosstab" onclick="doSearchDownloadCrossTab();" style="margin:10px 0;width:300px;")
+      Download Search Results CrossTab
+
+
 :javascript
+
   function updateVariables(){
     site_var_array = siteDataGrid.selection.getSelected();
     site_ids = [];
@@ -366,6 +414,5 @@
   // append the new grid to the div " ":
   $('#varGrid').append(varDataGrid.domNode);
   varDataGrid.startup();
+  //BuildQuery();
 
-%br
-%br
