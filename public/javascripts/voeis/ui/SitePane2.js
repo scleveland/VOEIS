@@ -433,8 +433,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		this.dialog.attr('title', ttl);
 		this.dialog.show();
 	},
-	
-	submitDataQuery: function() {
+
+  submitDataQuery: function() {
     var qstring = [];
     var form = dojo.byId(this.id+'_query');
     if(!form) return;
@@ -445,7 +445,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
     };
     qstring = qstring.join('&');
     dojo.publish('voeis/project/dataquery/results', [this.site.id, qstring]);
-	},
+  },
 	
 	resize: function() {
 		var Hoffset = 80;

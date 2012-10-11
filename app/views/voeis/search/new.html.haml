@@ -69,7 +69,7 @@
 %button(dojoType="dijit.form.Button" name="build_query_button_download_crosstab" id="build_query_button_download_crosstab" onclick="doSearchDownloadCrossTab();" style="margin:10px 0;")
   Download Search Results CrossTab
 %button(dojoType="dijit.form.Button" name="build_query_button_count" id="build_query_button_count" onclick="doSearchCount();" style="margin:10px 0;")
-  Return Number of Records in Search Results
+  Return Search Result Size
 <br><b>Query URL</b><br/>
 #query_string
 :javascript
@@ -167,11 +167,22 @@
     BuildCountQuery()
     //window.location=$("#query_string").html();
      $.get($("#query_string").html(), function(data){
-        if (confirm("Are you sure you want to get " + data['count'] + " records?")){
-          BuildQuery();
-          window.open($("#query_string").html(), "Search Results "+projectSearchCount.toString(),'',false);
-          projectSearchCount = projectSearchCount +1;
-        }
+        //if (confirm("Are you sure you want to get " + data['count'] + " records?")){
+        //  BuildQuery();
+        //  window.open($("#query_string").html(), "Search Results "+projectSearchCount.toString(),'',false);
+        //  projectSearchCount = projectSearchCount +1;
+        //}
+        confirmDialog(
+          'RUN SEARCH?',
+          "Are you sure you want to get "+data["count"]+" records?",
+          function(yes) {
+            if(yes) {
+              BuildQuery();
+              window.open($("#query_string").html(), "Search Results "+projectSearchCount.toString(),'',false);
+              projectSearchCount = projectSearchCount +1;
+            }},
+          {buttonOk:'YES'});
+
       });
     
     //dojo.publish('voeis/project/search/results', [$("#query_string").html()])
@@ -187,27 +198,47 @@
     
     BuildCountQuery()
     $.get($("#query_string").html(), function(data){
-      if (confirm("Are you sure you want to get " + data['count'] + " records?")){
-        BuildDownloadQuery();
-        window.location = $("#query_string").html();
-      }
+      //if (confirm("Are you sure you want to get " + data['count'] + " records?")){
+      //  BuildDownloadQuery();
+      //  window.location = $("#query_string").html();
+      //}
+      confirmDialog(
+        'DOWNLOAD SEARCH?',
+        "Are you sure you want to get "+data["count"]+" records?",
+        function(yes) {
+          if(yes) {
+            BuildDownloadQuery();
+            window.location = $("#query_string").html();
+          }},
+        {buttonOk:'YES'});
+      
     });
-    
   }
   function doSearchDownloadCrossTab(){
     
     BuildCountQuery()
     $.get($("#query_string").html(), function(data){
-      if (confirm("Are you sure you want to get " + data['count'] + " records?")){
-        BuildDownloadCrosstabQuery();
-          window.location = $("#query_string").html();
-      }
+      //if (confirm("Are you sure you want to get " + data['count'] + " records?")){
+      //  BuildDownloadCrosstabQuery();
+      //    window.location = $("#query_string").html();
+      //}
+      confirmDialog(
+        'DOWNLOAD SEARCH?',
+        "Are you sure you want to get "+data["count"]+" records?",
+        function(yes) {
+          if(yes) {
+            BuildDownloadCrosstabQuery();
+            window.location = $("#query_string").html();
+          }},
+        {buttonOk:'YES'});
+      
     });
   }
   function doSearchCount(){
     BuildCountQuery()
     $.get($("#query_string").html(), function(data){
-        alert("This search yields: " + data['count'] + " records");
+        //alert("This search yields: " + data['count'] + " records");
+        error_dialog.pop("<br/>This search yields: "+data["count"]+" records.<br/><br/>",0,'SEARCH RESULT SIZE');
     });
   }
   //formatter: 'val_grid_formatter.dateTime',

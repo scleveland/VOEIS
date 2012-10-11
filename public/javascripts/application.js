@@ -6,9 +6,14 @@ function RunQuery(site_id, root_path){
   url = root_path + "/samples/search.csv?" + params;
   count_url = root_path + "/samples/quick_count.json?" + params;
   $.get(count_url, function(data){
-    if (confirm("Are you sure you want to get " + data['count'] + " records?")){
-      window.location = url;
-    }
+    confirmDialog(
+      'EXPORT QUERY?',
+      "Are you sure you want to get "+data["count"]+" records?",
+      function(yes) {
+        if(yes) {
+          window.location = url;
+        }},
+      {buttonOk:'YES'});
   });
 }
 function CountQuery(site_id, root_path){
@@ -19,6 +24,7 @@ function CountQuery(site_id, root_path){
   count_url = root_path + "/samples/quick_count.json?" + params;
   return count_url;
 }
+
 $(document).ready(function(){
   // show_loader = function(){
   // $('#loader').attr("display", "visible");
