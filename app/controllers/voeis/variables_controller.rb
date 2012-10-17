@@ -90,19 +90,15 @@ class Voeis::VariablesController < Voeis::BaseController
     @lab_methods = @project.managed_repository{ Voeis::LabMethod.all }
     @field_methods = @project.managed_repository{ Voeis::FieldMethod.all }
     
-    #@var_names = @project.managed_repository{ Voeis::VariableNameCV.all }
-    #@var_vtypes = @project.managed_repository{ Voeis::ValueTypeCV.all }
-    ##@var_dtypes = @project.managed_repository{ Voeis::DataTypeCV.all }
-    #@var_qcvalues = @project.managed_repository{ Voeis::QualityControlLevel.all }
-    @var_names = Voeis::VariableNameCV.all(:order => [:term.asc])
-    @var_medium = Voeis::SampleMediumCV.all(:order => [:term.asc])
-    @var_gcat = Voeis::GeneralCategoryCV.all(:order => [:term.asc])
-    @var_vtypes = Voeis::ValueTypeCV.all(:order => [:term.asc])
-    @var_dtypes = Voeis::DataTypeCV.all(:order => [:term.asc])
-    @var_spec = Voeis::SpeciationCV.all(:order => [:term.asc])
-    @var_qcvalues = Voeis::QualityControlLevel.all(:order => [:quality_control_level_code.asc])
-    @var_sens_type = Voeis::SensorTypeCV.all(:order => [:term.asc])
-    @var_log_type = Voeis::LoggerTypeCV.all(:order => [:term.asc])
+    @var_names = @project.managed_repository{ Voeis::VariableNameCV.all(:order => [:term.asc]) }
+    @var_medium = @project.managed_repository{ Voeis::SampleMediumCV.all(:order => [:term.asc]) }
+    @var_gcat = @project.managed_repository{ Voeis::GeneralCategoryCV.all(:order => [:term.asc]) }
+    @var_vtypes = @project.managed_repository{ Voeis::ValueTypeCV.all(:order => [:term.asc]) }
+    @var_dtypes = @project.managed_repository{ Voeis::DataTypeCV.all(:order => [:term.asc]) }
+    @var_spec = @project.managed_repository{ Voeis::SpeciationCV.all(:order => [:term.asc]) }
+    @var_qcvalues = @project.managed_repository{ Voeis::QualityControlLevel.all(:order => [:quality_control_level_code.asc]) }
+    @var_sens_type = @project.managed_repository{ Voeis::SensorTypeCV.all(:order => [:term.asc]) }
+    @var_log_type = @project.managed_repository{ Voeis::LoggerTypeCV.all(:order => [:term.asc]) }
     
     #logger.debug('>>>> graph_data = '+@graph_data.to_s)
     #logger.debug('>>>> data = '+@data.to_s)

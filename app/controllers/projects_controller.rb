@@ -255,8 +255,8 @@ class ProjectsController < InheritedResources::Base
     end
     
     #### CV stuff - CV drop-down entries
-    @vartical_datum_items = Voeis::VerticalDatumCV.all(:order => [:term.asc])
-    @local_projection_items = Voeis::SpatialReference.all(:order => [:srs_name.asc])
+    @vartical_datum_items = @project.managed_repository{ Voeis::VerticalDatumCV.all(:order => [:term.asc]) }
+    @local_projection_items = @project.managed_repository{ Voeis::SpatialReference.all(:order => [:srs_name.asc]) }
     
     #@cv_data_types0 = @project.managed_repository{ Voeis::DataTypeCV.all(:order => [:term.asc]) }
     #@cv_data_types = Voeis::DataTypeCV.all(:id.not=>@cv_data_types0.collect(&:id), :order=>[:term.asc])
