@@ -71,7 +71,6 @@
       delete global_resize['#{tabId}'];
     });
     
-    //WORKING!!
     //EDIT TAB CLICK-OVERRIDE
     //var tabs = dijit.byId('#{tabId}_tabs');
     //var cur_pane = tabs.selectedChildWidget;
@@ -81,8 +80,11 @@
       console.log('SITES-NEWTAB-click!!');
       //cur_pane.controlButton.focus();
       dojo.publish('voeis/project/site/new', ['#{tabId}_tabs']);
-      var tabs = dijit.byId('#{tabId}_tabs');
-      tabs.selectedChild(site0editref);
+      setTimeout(function(){
+        var tabs = dijit.byId('#{tabId}_tabs');
+        tabs.selectChild(site0editref);
+
+      },300);
       
     };
   };
@@ -96,9 +98,9 @@
 
 
 
-%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:90%;height:400px;margin-top:8px;padding-top:0;", 
-  :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"#{tabId}_tabs"}
-  -#, :nested=>"true"}
+%div(dojoType="dijit.layout.TabContainer" style="width:90%;height:400px;margin-top:8px;padding-top:0;" 
+  prop="parseOnLoad:true;" tabPosition="top" id="#{tabId}_tabs")
+  -#, :nested=>"true"}   doLayout="true"
 
   %table{:dojoType=>"dojox.grid.EnhancedGrid", 
           :title=>"Sites", :id=>"sites_#{tabId}",

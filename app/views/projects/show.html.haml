@@ -1108,12 +1108,43 @@
         -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
         -#%button(dojoType="dijit.form.Button" type="submit" name="submit_form" value="Search" onclick="site00ref.submitDataQuery();return false;")
         -#  Search
-        %button(dojoType="dijit.form.Button" name="submit_form" value="Search" onclick='$.get(CountQuery("$$$id$$$","#{project_path(@project)}"), function(data){if (confirm("Are you sure you want to get " + data["count"] + " records?")){site00ref.submitDataQuery();return false;}});')
-          Display Search Results
+        -#%button(dojoType="dijit.form.Button" name="submit_form" value="Search" onclick='$.get(CountQuery("$$$id$$$","#{project_path(@project)}"), function(data){if (confirm("Are you sure you want to get " + data["count"] + " records?")){site00ref.submitDataQuery();return false;}});')
+        -#  Display Search Results
+        -#%button(dojoType="dijit.form.Button" name="download_site_site00" value="Download" onclick='RunQuery("$$$id$$$","#{project_path(@project)}");')
+        -#  Download Search Results
+        -#%button(dojoType="dijit.form.Button" name="download_site_site00" value="Download" onclick='$.get(CountQuery("$$$id$$$","#{project_path(@project)}"), function(data){alert("This search yields " + data["count"] + " records.")});')
+        -#  Return Number of Records in Search Results
+        %button(dojoType="dijit.form.Button" name="submit_form" value="Search")
+          Display Query Results
+          %script{:type=>"dojo/method", :event=>"onClick"}
+            :plain
+              $.get(
+                CountQuery("$$$id$$$","#{project_path(@project)}"), 
+                function(data){
+                  confirmDialog(
+                    'RUN QUERY?',
+                    "Are you sure you want to get "+data["count"]+" records?",
+                    function(yes) {
+                      if(yes) {
+                        site00ref.submitDataQuery();
+                        //return false;
+                      }},
+                    {buttonOk:'YES'});
+                });
+
         %button(dojoType="dijit.form.Button" name="download_site_site00" value="Download" onclick='RunQuery("$$$id$$$","#{project_path(@project)}");')
-          Download Search Results
-        %button(dojoType="dijit.form.Button" name="download_site_site00" value="Download" onclick='$.get(CountQuery("$$$id$$$","#{project_path(@project)}"), function(data){alert("This search yields " + data["count"] + " records.")});')
-          Return Number of Records in Search Results
+          Download Query Results
+
+        %button(dojoType="dijit.form.Button" name="download_site_site00" value="Download")
+          Return Query Size
+          %script{:type=>"dojo/method", :event=>"onClick"}
+            :plain
+              $.get(
+                CountQuery("$$$id$$$","#{project_path(@project)}"), 
+                function(data){
+                  //alert("This search yields " + data["count"] + " records.");
+                  error_dialog.pop("<br/>This query yields "+data["count"]+" records.<br/><br/>",0,'QUERY SIZE');
+                });
         
         -###&nbsp;&nbsp;
         -###%button(dojoType="dijit.form.Button" name="cancel" value="Cancel" onclick="window.location=#{project_path(@project)}") 

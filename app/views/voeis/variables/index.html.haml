@@ -92,7 +92,7 @@
   };
   
   resize_#{tabId} = function(){
-    resizeTabs('#{tabId}_tabs',55,'95%');
+    resizeTabs('#{tabId}_tabs',55,'90%');
   };
   
   function pageInit() {
@@ -106,6 +106,24 @@
       delete global_resize['#{tabId}'];
     });
     
+    //EDIT TAB CLICK-OVERRIDE
+    //var tabs = dijit.byId('#{tabId}_tabs');
+    //var cur_pane = tabs.selectedChildWidget;
+    var newpane = dijit.byId('newtab_#{tabId}');
+    var newclick = newpane.controlButton;
+    newclick.onClick = function(mouse_evt) {
+      console.log('SITES-NEWTAB-click!!');
+      var href = "#{project_path(@project)}/variables/0.html?site_id=0#{url_api_key}";
+      var new_id = 'newVar0';
+      var new_ttl = 'NEW VARIABLE';
+      var callback = function(){
+        var pane = dijit.byId(new_id);
+        var tabs = dijit.byId('#{tabId}_tabs');
+        if(pane) tabs.selectChild(pane);
+      };
+      dojo.publish('voeis/project/openTab',[href,new_id,new_ttl,callback,'#{tabId}_tabs']);
+      
+    };
   };
   
   $(window).ready(function(){ 
@@ -218,12 +236,13 @@
         -#%th{:field=>"longitude", :width=>"100px", :filterable=>true} Long
 
 
-  %div{:dojoType=>"dojox.layout.ContentPane", :title=>"New", :id=>"new_#{tabId}", :executeScripts=>"true", 
-    :style=>"margin:0;padding:8px 0 0 8px;", :ioArgs=>"{ headers: {'Accept': 'text/html'} }", 
-    :href=>"#{project_path(@project)}/variables/0.html?site_id=0#{url_api_key}"}
-    %script{:type=>"dojo/method", :event=>"onShow"}
-      :plain
-        //var pane = dijit.byId('samples-site00');
+  %div{:dojoType=>"dojox.layout.ContentPane", :title=>"New", :id=>"newtab_#{tabId}", :executeScripts=>"true", 
+    :style=>"margin:0;padding:8px 0 0 8px;"}
+    -#:ioArgs=>"{ headers: {'Accept': 'text/html'} }", 
+    -#:href=>"#{project_path(@project)}/variables/0.html?site_id=0#{url_api_key}"}
+    -#%script{:type=>"dojo/method", :event=>"onShow"}
+    -#  :plain
+    -#    //var pane = dijit.byId('samples-site00');
 
 
 -#%br

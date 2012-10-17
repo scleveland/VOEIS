@@ -14,12 +14,13 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	editMode: false,
 	preload: true,
 	parseOnLoad: false,
+	doLayout: false,
 	cleanContent: true,
 	parsedWidgets: [],
 	local: {},
 	queryCount: 0,
 	
-	style: "margin-top:0;padding-top:0;overflow:auto;",
+	style: "margin-top:0;padding:8px 0 0 10px;overflow:auto;",
 	test: '',
 	
 	loaded: false,
@@ -190,13 +191,13 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		if(this.newSite) {
 			//this.set("title", 'NEW SITE');
 			//$(this.domNode).find('#'+siteTag+'-name-head').text('NEW SITE');
-			$(this.domNode).find('#show-'+siteTag).hide();
-			$(this.domNode).find('#edit-'+siteTag).show();
+			///$(this.domNode).find('#show-'+siteTag).hide();
+			///$(this.domNode).find('#edit-'+siteTag).show();
 			$(this.domNode).find('#'+siteTag+'-provenance-row').hide();
-			$(this.domNode).find('#'+siteTag+'-toolbar').hide();
-			$(this.domNode).find('#'+siteTag+'-detail-label').hide();
-			$(this.domNode).find('#'+siteTag+'-edit-buttons').hide();
-			$(this.domNode).find('#'+siteTag+'_tabs .dijitTabContainerTop-tabs').hide()
+			///$(this.domNode).find('#'+siteTag+'-toolbar').hide();
+			///$(this.domNode).find('#'+siteTag+'-detail-label').hide();
+			///$(this.domNode).find('#'+siteTag+'-edit-buttons').hide();
+			///$(this.domNode).find('#'+siteTag+'_tabs .dijitTabContainerTop-tabs').hide()
 			//setTimeout(function(){
 			//	//console.log('SiteGridW:',gridW);
 			//	var editPane = dijit.byId('edit-'+siteTag);
@@ -451,7 +452,12 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	
 	resize: function() {
 		var Hoffset = 80;
-		resizeTabs(this.id+'_tabs',Hoffset,'95%');
+		var editHoffset = 131;
+		resizeTabs(this.id+'_tabs',Hoffset,'90%');
+		if(this.editMode) {
+			var paneH = (global_resize.winH-editHoffset)+'px';
+			$('#edit-site'+this.site.id+'edit').css('height',paneH);
+		};
 	},
 	
 	purgeContent: function() {
