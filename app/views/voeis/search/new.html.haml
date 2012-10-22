@@ -16,10 +16,10 @@
     identifier: 'id',
     items: #{@variables.to_json} };
   var var_store = new dojo.data.ItemFileWriteStore({data: variable_json });
-  var site_json = {
-    identifier: 'id',
-    items: #{@sites.to_json} };
-  var site_store = new dojo.data.ItemFileWriteStore({data: site_json }); 
+  //var site_json = {
+  //  identifier: 'id',
+  //  items: #{@sites.to_json} };
+  //var site_store = new dojo.data.ItemFileWriteStore({data: site_json }); 
   var api_key = "#{@voeis_api_key.to_s}";
 
   $(window).ready(function(){ 
@@ -416,12 +416,12 @@
     return units[value]
   }
   var site_layout = [
-  {
-     field: '_item',
-     name: '-',
-     formatter: val_grid_formatter.selectItem,
-     width: '24px'
-  },
+  //{
+  //   field: '_item',
+  //   name: '-',
+  //   formatter: val_grid_formatter.selectItem,
+  //   width: '24px'
+  //},
   {
      field: 'id',
      name: 'ID',
@@ -431,15 +431,30 @@
      field: 'name',
      name: 'Name',
      width: 'auto'
+  },
+  {
+     field: 'code',
+     name: 'Code',
+     width: 'auto'
+  },
+  {
+     field: 'data_vars',
+     name: 'Vars',
+     width: '55px'
+  },
+  {
+     field: 'data_count',
+     name: 'Data',
+     width: '65px'
   }
   ];
   var var_layout = [
-  {
-     field: '_item',
-     name: '-',
-     formatter: val_grid_formatter.selectItem,
-     width: '24px'
-  },
+  //{
+  //   field: '_item',
+  //   name: '-',
+  //   formatter: val_grid_formatter.selectItem,
+  //   width: '24px'
+  //},
   {
      field: 'id',
      name: 'ID',
@@ -481,7 +496,7 @@
   
   // create a new site grid:
   siteDataGrid = new dojox.grid.EnhancedGrid({
-     store: site_store,
+     store: psites,
      clientSort: true,
      rowSelector: '0',
      structure: site_layout,
