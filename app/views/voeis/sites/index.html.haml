@@ -79,13 +79,7 @@
     newclick.onClick = function(mouse_evt) {
       console.log('SITES-NEWTAB-click!!');
       //cur_pane.controlButton.focus();
-      dojo.publish('voeis/project/site/new', ['#{tabId}_tabs']);
-      setTimeout(function(){
-        var tabs = dijit.byId('#{tabId}_tabs');
-        tabs.selectChild(site0editref);
-
-      },300);
-      
+      dojo.publish('voeis/project/site/new', ['project_sites_tabs']);
     };
   };
   

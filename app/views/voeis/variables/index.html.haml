@@ -119,9 +119,12 @@
       var callback = function(){
         var pane = dijit.byId(new_id);
         var tabs = dijit.byId('#{tabId}_tabs');
-        if(pane) tabs.selectChild(pane);
+        if(pane) {
+          tabs.selectChild(pane);
+          pane.focus();
+        };
       };
-      dojo.publish('voeis/project/openTab',[href,new_id,new_ttl,callback,'#{tabId}_tabs']);
+      dojo.publish('voeis/project/openTab',[href,new_id,new_ttl,null,callback,'#{tabId}_tabs']);
       
     };
   };

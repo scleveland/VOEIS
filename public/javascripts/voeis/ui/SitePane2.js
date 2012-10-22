@@ -195,7 +195,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			///$(this.domNode).find('#edit-'+siteTag).show();
 			$(this.domNode).find('#'+siteTag+'-provenance-row').hide();
 			///$(this.domNode).find('#'+siteTag+'-toolbar').hide();
-			///$(this.domNode).find('#'+siteTag+'-detail-label').hide();
+			$(this.domNode).find('#'+siteTag+'-detail-label').hide();
 			///$(this.domNode).find('#'+siteTag+'-edit-buttons').hide();
 			///$(this.domNode).find('#'+siteTag+'_tabs .dijitTabContainerTop-tabs').hide()
 			//setTimeout(function(){
