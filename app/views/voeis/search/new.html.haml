@@ -6,7 +6,7 @@
   dojo.require("dojox.grid.enhanced.plugins.Filter");
   dojo.require("dijit.layout.TabContainer");
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
-  dojo.require("dojo.data.ItemFileWriteStore");
+  dojo.require("dojo.data.ItemFileReadStore");
   dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
   
   //GLOBALS
@@ -15,7 +15,7 @@
   var variable_json = {
     identifier: 'id',
     items: #{@variables.to_json} };
-  var var_store = new dojo.data.ItemFileWriteStore({data: variable_json });
+  var var_store = new dojo.data.ItemFileReadStore({data: variable_json });
   //var site_json = {
   //  identifier: 'id',
   //  items: #{@sites.to_json} };
