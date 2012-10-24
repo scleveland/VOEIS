@@ -463,11 +463,10 @@
           var mytabs = dijit.byId(selected.id.slice(0,-2)+'_tabs');
           var myselected = mytabs.selectedChildWidget;
           console.log('REFRESH MANAGE SITEs TAB:',myselected.id);
-          //var mysel = myselected.id.slice(0,6);
-          //if(mysel!='sites_' && mysel!='newtab') {
-          //  myselected.refresh();
-          //  return;
-          //};
+          if(myselected.id.match(/-history/)) {
+            myselected.refresh();
+            return;
+          };
         //###MANAGE-VARS-TAB
         } else if(selected.id=='project_variables') {
           var mytabs = dijit.byId(selected.id+'_tabs');

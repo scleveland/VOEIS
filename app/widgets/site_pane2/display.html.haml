@@ -359,7 +359,7 @@
           $('body #edit-site'+siteId).animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
           if(parseInt(siteId)) {
             //EXISTING SITE
-            var sitePane = window['site'+siteId+'ref'];
+            var sitePane = window['site'+siteId+'editref'];
             window['site'+siteId+'_editbutton'].set('checked',false);
             sitePane.siteUpdate(sitePane.getSite());
             $('#edit-site'+siteId).hide();
@@ -367,7 +367,8 @@
             return
           };
           //NEW SITE
-          dojo.publish('voeis/project/site/close',[0]);
+          //dojo.publish('voeis/project/site/close',[0]);
+          dojo.publish('voeis/project/site/close',[0,'project_sites_tabs']);
         };
         
         function delete_site(site_id){
@@ -631,11 +632,11 @@
                     console.log('NEWSITE PANE:',editPane);
                     //dijit.byId('project_sites_tabs').selectChild(editPane);
                   } else {
-                    //INITIALIZE PANE: drop-downs, etc...
-                    pane_update(pane);
                     //INITIALIZE: submit button on isValid
                     this.attr("disabled", !form.validate());
                   };
+                  //INITIALIZE PANE: drop-downs, etc...
+                  pane_update(pane);
                   //IS FORM VALID?
                   console.log('FORM-CONNECT: '+site.id);
                   //###ON-STATE-CHANGE
@@ -700,6 +701,7 @@
                         //MANAGE_SITES-- dojo.publish('voeis/project/site/close',[0,'project_sites_tabs']);
                         //SWITCH-TABS--
                         dojo.publish('voeis/project/site/select',[newId]);
+                        dojo.publish('voeis/project/site/close',[0,'project_sites_tabs']);
                         //if(add_sample_menu.disabled) add_sample_menu.set('disabled',false);
                         //if(add_logger_menu.disabled) add_logger_menu.set('disabled',false);
                         add_sample_menu.set('disabled',false);
