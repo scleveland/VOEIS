@@ -8,6 +8,7 @@ dojo.require("dijit.layout.ContentPane");
 dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	project: '',
 	site: '',
+	siteName: '',
 	siteIdx: 0,
 	newSite: false,
 	closable: true,
@@ -59,16 +60,21 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			this.set("title", sitename);
 		} else {
 			var sitename = this.site.name.toString();
-			var sitename0 = sitename.slice(0,12);
-			if(sitename.length>12) {
-				sitename0+='...';
-				if(sitename.length>20) sitename0+=sitename.slice(-8);
-				else {
-					sitename0 = sitename.slice(0,8)+'...';
-					sitename0 += sitename.slice(-6);
+			if(this.editMode) {
+				var sitename0 = 'Edit: Site-'+this.site.id;
+				this.set("title", sitename0);
+			} else {
+				var sitename0 = sitename.slice(0,12);
+				if(sitename.length>12) {
+					sitename0+='...';
+					if(sitename.length>20) sitename0+=sitename.slice(-8);
+					else {
+						sitename0 = sitename.slice(0,8)+'...';
+						sitename0 += sitename.slice(-6);
+					};
 				};
+				this.set("title", sitename0);
 			};
-			this.set("title", sitename0);
 		};
 		
 		if(properties) {
