@@ -66,7 +66,7 @@
     dojo.require("voeis.Server");
     dojo.require("voeis.voeis_util");
     dojo.require("voeis.ui.SitePane2");
-    
+    //dojo.require("dojox.widget.Standby");
     
     //#####################
     // GLOBALS & STORES
@@ -81,7 +81,8 @@
     //  dijit.byId('split_map').store.add(item.results[0][0]);
     //});
     
-    var pane_proto00;
+    var site_pane_proto1 = '';
+    var site_pane_proto2 = '';
     var pnow = '#{@today}';
     var puser = '#{@current_user.nil? ? "" : @current_user.name}';
     var thisSite = '';
@@ -364,9 +365,19 @@
     function pre_dojo_parse() {
       //PRE DOJO PARSE STUFF HERE
       console.log('PRE-PARSE!');
-      var content = $('#site_pane_proto');
-      pane_proto00 = content.html();
+      var content = $('#site_pane_proto1');
+      site_pane_proto1 = content.html();
       content.empty();
+      var content = $('#site_pane_proto2');
+      site_pane_proto2 = content.html();
+      content.empty();
+      //$('.site_pane_protos').
+      //var toDel = this.containerNode.childNodes;
+      //if(toDel) 
+      //  for(var i=0;i<toDel.length;i++) {
+      //    //console.log('Node: '+toDel[i].nodeName+' ('+toDel[i].id+')');
+      //    this.containerNode.removeChild(toDel[i]);
+      //  };
       
       //DATA VALUE EDIT -PRE DOJO PARSE
       console.log('DATA-QUERY PRE-PARSE!');
@@ -447,6 +458,15 @@
           };
           //selected.siteUpdate();
           return;
+        //###MANAGE-SITES-TAB
+        } else if(selected.id=='project_sitesxx') {
+          var mytabs = dijit.byId(selected.id.slice(0,-2)+'_tabs');
+          var myselected = mytabs.selectedChildWidget;
+          console.log('REFRESH MANAGE SITEs TAB:',myselected.id);
+          if(myselected.id.match(/-history/)) {
+            myselected.refresh();
+            return;
+          };
         //###MANAGE-VARS-TAB
         } else if(selected.id=='project_variables') {
           var mytabs = dijit.byId(selected.id+'_tabs');
@@ -617,29 +637,6 @@
       //if('#{@tab}'=='newsite')
       //  dojo.publish('voeis/project/site/new');
 
-      //dojo.parser.parse();
-      //dijit.byId('SiteDisplayGrid').canSort = function(col,field){ return (col>1 && field=='name'); };
-      //dijit.byId('SiteDisplayGrid').canSort = function(col,field){ return false; };
-      
-      //### DESTROY DOJO WIDGETS FOR TAB PROTO
-      //var proto = dojo.byId('site_pane_proto');
-      //dojo.forEach(dijit.findWidgets(proto), function(w){
-      //  w.destroyRecursive(true);
-      //});
-      /*### COMMENTED OUT
-      console.log('STILL DONE LOADING!!!');
-      console.log('PURGING WIDGETS??');
-      pane_proto00 = $('#site_pane_proto').html();
-      $('#site_pane_proto').find('*').each(function(idx){
-        console.log('EleID: '+this.id);
-        var wid = dijit.byNode(this);
-        if(wid) wid.destroy();
-        wid = dijit.byId(this.id);
-        if(wid) wid.destroy();
-      });
-      $('#site_pane_proto').find('*').each(function(i){ if(dijit.byNode(this)) console.log('NODE: '+this.id); if(dijit.byId(this.id)) console.log('WIDGET: '+this.id); })
-      */
-
     });
     //%script{:type=>"dojo/method", :event=>"onShow"}
     //  :plain
@@ -661,7 +658,7 @@
           var item = item || this.item;
           if(!item) return;
           var form = dijit.byId('data_value_edit_form');
-          var site0 = window['site'+this.site_id+'ref'].site;
+          var site0 = window['site'+this.site_id+'editref'].site;
           $('#dv_site_name').text(site0.name.toString()+' [Id:'+site0.id.toString()+']');
           var var0 = $('#query-site'+this.site_id+' #variable_select option').filter(':selected');
           var0 = var0.text().split('(')[0]+' [Id:'+var0.val()+']';
@@ -913,13 +910,264 @@
   - else
     = link_to('[Add Project Description]', edit_project_path(@project))
 
-#site_pane_proto{:style=>"display:none;"}
+#site_pane_proto1{:class=>"site_pane_protos", :style=>"display:none;"}
+  -### EDIT 
   = render_widget :site_pane2, :display, :project=>@project, 
                                           :sites=>@sites, 
                                           :projectSite=>@site, 
                                           :siteProperties=>@site_properties,
                                           :user=>current_user,
                                           :root_url=>root_url
+
+#site_pane_proto2{:class=>"site_pane_protos", :style=>"display:none;"}
+  -### VIEW
+  :css
+    #content { margin:10px 50px }
+    #wrapper {
+      padding-bottom: 20px;
+      background-color: #ccb;
+      padding-top: 1px;
+    }
+    #wrapper img { margin-right:12px }
+    #wrapper p { margin:0 20px }
+
+    #site00-sample-table td { text-align:center; }
+    #site00-sample-table td.time0 { text-align:left; }
+
+    .row-lt1 { background-color:#ddd; }
+    .row-gr { background-color: #6AA128; }
+    .row-gr { background-color: #97C253; }
+    .row-gr { background-color: #97D8AB; }
+    .row-gr th { background-color: #97D8AB!important; }
+    .row-gr td { background-color: #97D8AB!important; }
+    .smfont, .smfont * { font-size:10px }
+
+
+  -#- content_for(:javascripts) do
+  -#%script{:type=>"text/javascript"}
+  -#  :plain
+  -#    console.log('DOJO/METHOD');
+
+  -#:href=>"#{project_path(@project)}/samples#{@url_api_key}"}
+  -#:href=>"#{project_path(@project)}/sites/versions?id=#{@site.id.to_s+@url_api_key0}"}
+
+
+  -###%h3{:id=>"site00-name-head", :style=>"margin:0 0 10px 0;padding:0;"}
+  -###  %span.small{:style=>"font-size:14px;", :id=>"site00-detail-label"}
+  -###    SITE$$$id$$$:
+  -###  $$$site-name$$$
+
+  %p(style="margin:8px 0 8px 0;padding:0;")
+    %span{:id=>"site00-detail-label"}  
+      SITE$$$id$$$:
+    %strong
+      $$$site-name$$$
+
+  %div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:10px;padding-top:0;", 
+    :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"site00_tabs"}
+    -#:prop=>"parseOnLoad:true;", :tabPosition=>"top", :useSlider=>"true", :tabStrip=>"true"}
+    -#:prop=>"parseOnLoad:true;", :tabPosition=>"left-h", :tabStrip=>"false", :nested=>"true"}
+
+    -#show-site00{:class=>"site00-divs", :style=>"margin-top:0;padding-top:0;"}
+    #show-site00{:dojoType=>"dijit.layout.ContentPane", :title=>"Details", 
+      :style=>"margin:0;padding:10px 0 0 8px;", :selected=>"true"}
+      -#:style=>"margin:0;padding:0;", :selected=>"true", :useSlider=>"false", :tabStrip=>"false"}
+
+      %br
+
+      %table{:id=>"site00-property-table", :style=>"width:46%;margin-right:20px;margin-bottom:30px;float:left;"}
+        - @site_properties.each do |prop|
+          %tr{:class=>"row#{cycle('1','0')}"}
+            %td{:style=>"text-align:right;width:45%"}
+              %strong
+                #{prop[:label]}
+                &nbsp;&nbsp;&nbsp;
+            %td{:class=>"show_#{prop[:name]}"}
+              $$$#{prop[:name]}$$$
+
+      -#%br{:style=>'float:none; clear:both;'}
+      -#%br
+
+      %h4{:style=>"margin-top:0;"}
+        Sample Data Summary
+
+      %table{:id=>"site00-sample-table", :style=>"width:48%;"} 
+        %tr{:class=>"row-gr"}
+          %th{:width=>"34%", :align=>"left"} &nbsp;
+          %th{:width=>"14%"} Count
+          %th{:width=>"14%"} Start
+          %th{:width=>"14%"} Stop
+        %tr
+          %td{:style=>"width:34%;align:left;", :align=>"left"}
+            &nbsp;
+            -#%strong
+            -#  = link_to('Sample Details', 'javascript:', :onclick=>"dojo.publish('voeis/project/samples', [$$$id$$$]);")
+          %td{:style=>"width:14%;align:left;"}
+            $$$site-sample-count$$$
+          %td{:style=>"width:14%;align:center;"}
+            $$$site-sample-start$$$
+          %td{:style=>"width:14%;align:center;"}
+            $$$site-sample-stop$$$
+      %br
+
+      %h4{:style=>"margin-top:0;"}
+        Variable Data
+        -if @auth && false
+          %span{:style=>"font-size:11px;"}
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            -#= link_to('NEW VARIABLE', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/project/variable', [0,'',$$$id$$$]);")
+            = link_to('MANAGE VARIABLES', 'javascript:', :class=>'icon icon-add', :onclick=>"dojo.publish('voeis/project/variables');")
+
+      %table{:id=>"site00-variable-table", :style=>"width:48%;foat:left;"}
+        %tr{:class=>"row-gr"}
+          %th{:width=>"30%"} Variable
+          %th{:width=>"30%", :align=>"left"} Units / Type
+          %th{:width=>"10%", :align=>"left"} Count
+          %th{:width=>"14%"} Start
+          %th{:width=>"14%"} Stop
+        %tr
+          %td
+            $$$site-variable-data$$$
+
+
+    -#query-site00{:class=>"site00-divs", :style=>"margin-top:0;padding-top:0;display:none;"}
+    #query-site00{:dojoType=>"dijit.layout.ContentPane", :title=>"Data Query#{@edit_auth? ' QA/QC' : ''}", 
+      :style=>"margin:0;padding:12px 0 0 8px;"}
+
+      %br
+
+      -#= form_for(:query, @query, :url => {:controller=>'samples', :action=>'search'}, :remote=>true, :html=>{:id=>tabId+'_query'}) do |f|
+      %form(accept-charset="UTF-8" class="new_voeis_site" data-remote="true" id="site00_query" dojoType="dijit.form.Form")
+        -#%input{:type=>"hidden", :name=>"tab_id", :value=>"#{tabId}"}
+        -#=hidden_field_tag('tab_id', tabId)
+        =hidden_field_tag('site_select', "$$$id$$$")
+        Variable
+        ($$$site-variable-count$$$):
+
+        :plain
+          <select id="variable_select" name="variable_select" style="width:450px;">
+            $$$site-variable-select$$$
+          </select>
+        %br{:style=>'float:none; clear:both;'}
+        %br
+        %br
+
+        %p
+          %strong
+            Data available for:
+          $$$site-data-start$$$
+          &mdash;
+          $$$site-data-end$$$
+
+        Dates After: 
+        -#= date_select('range', 'start_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
+        -#%input(name="start_date" dojoType="dijit.form.DateTextBox" id="start_date00" value="#{@start_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
+        %input(name="start_date" dojoType="dijit.form.DateTextBox" value="$$$site-date-start$$$" style="width:200px!important;")
+        &nbsp;&nbsp;&nbsp;
+        Dates Before: 
+        -#= date_select('range', 'end_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
+        -#%input(name="end_date" dojoType="dijit.form.DateTextBox" id="end_date00" value="#{@end_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
+        %input(name="end_date" dojoType="dijit.form.DateTextBox" value="$$$site-date-end$$$" style="width:200px!important;")
+        %br{:style=>'float:none; clear:both;'}
+        %br
+        %b OPTIONAL:
+        You can Specify some value restrictions:
+        %br
+        Value:
+        %select{:name =>"first_value_select"}
+          %option{:value=>"blank"}
+          %option{:value=>"eql"}
+            Is equal to
+          %option{:value=>"lte"}
+            Is less than or equal to
+          %option{:value=>"gte"}
+            Is greater than or equal to
+        %input{:type=>"text", :name =>"first_value_text"}
+        %select{:name =>"and_or_select"}
+          %option{:value=>"and"}
+            And
+          %option{:value=>"or"}
+            Or
+        %br
+        Value:
+        %select{:name =>"second_value_select"}
+          %option{:value=>"blank"}
+          %option{:value=>"eql"}
+            Is equal to
+          %option{:value=>"lte"}
+            Is less than or equal to
+          %option{:value=>"gte"}
+            Is greater than or equal to
+        %input{:type=>"text", :name =>"second_value_text"}
+
+        %br
+        %br
+        -#  (<span id="vars_count">#{@variable_opts_array.count}</span>):
+        -#= f.submit('Search', :onclick => "dijit.byId('loading_dialog').show();")
+        -#= link_to('Cancel', project_path(@project), :class => 'icon icon-cancel') 
+        -#%button(dojoType="dijit.form.Button" type="submit" name="submit_form" value="Search" onclick="site00ref.submitDataQuery();return false;")
+        -#  Search
+        -#%button(dojoType="dijit.form.Button" name="submit_form" value="Search" onclick='$.get(CountQuery("$$$id$$$","#{project_path(@project)}"), function(data){if (confirm("Are you sure you want to get " + data["count"] + " records?")){site00ref.submitDataQuery();return false;}});')
+        -#  Display Search Results
+        -#%button(dojoType="dijit.form.Button" name="download_site_site00" value="Download" onclick='RunQuery("$$$id$$$","#{project_path(@project)}");')
+        -#  Download Search Results
+        -#%button(dojoType="dijit.form.Button" name="download_site_site00" value="Download" onclick='$.get(CountQuery("$$$id$$$","#{project_path(@project)}"), function(data){alert("This search yields " + data["count"] + " records.")});')
+        -#  Return Number of Records in Search Results
+        %button(dojoType="dijit.form.Button" name="submit_form" value="Search")
+          Display Query Results
+          %script{:type=>"dojo/method", :event=>"onClick"}
+            :plain
+              $.get(
+                CountQuery("$$$id$$$","#{project_path(@project)}"), 
+                function(data){
+                  confirmDialog(
+                    'RUN QUERY?',
+                    "Are you sure you want to get "+data["count"]+" records?",
+                    function(yes) {
+                      if(yes) {
+                        site00ref.submitDataQuery();
+                        //return false;
+                      }},
+                    {buttonOk:'YES'});
+                });
+
+        %button(dojoType="dijit.form.Button" name="download_site_site00" value="Download" onclick='RunQuery("$$$id$$$","#{project_path(@project)}");')
+          Download Query Results
+
+        %button(dojoType="dijit.form.Button" name="download_site_site00" value="Download")
+          Return Query Size
+          %script{:type=>"dojo/method", :event=>"onClick"}
+            :plain
+              $.get(
+                CountQuery("$$$id$$$","#{project_path(@project)}"), 
+                function(data){
+                  //alert("This search yields " + data["count"] + " records.");
+                  error_dialog.pop("<br/>This query yields "+data["count"]+" records.<br/><br/>",0,'QUERY SIZE');
+                });
+        
+        -###&nbsp;&nbsp;
+        -###%button(dojoType="dijit.form.Button" name="cancel" value="Cancel" onclick="window.location=#{project_path(@project)}") 
+        -###  Cancel
+        -###  %script{:type=>"dojo/method", :event=>"onClick"}
+        -###    :plain
+        -###      $('#query-site00').hide();
+        -###      $('#show-site00').show();
+
+      %br{:style=>'float:none; clear:both;'}
+      %br
+
+
+    #samples-site00{:dojoType=>"dojox.layout.ContentPane", :title=>"Samples", :executeScripts=>"true", 
+      :style=>"margin:0;padding:8px 0 0 8px;", :ioArgs=>"{ headers: {'Accept': 'text/html'} }", 
+      :href=>"#{project_path(@project)}/samples/?site_id=$$$id$$$#{@url_api_key0}"}
+      -#:style=>"margin:0;padding:8px 0 0 8px;", :href=>"#{project_path(@project)}/samples/?site_id=$$$id$$$#{@url_api_key0}"}
+      %script{:type=>"dojo/method", :event=>"onLoad"}
+        :plain
+          var pane = dijit.byId('samples-site00');
+          resizeTabs('site00_samples_grid','90%');
+          //pane.set('href','#{project_path(@project)}/samples/?site_id=$$$id$$$#{@url_api_key0}');
+          //pane._load();
+
 
 
 -#site_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"psites", :data=>"psites_json"}
@@ -1317,11 +1565,12 @@
           //site_lat_long_picker.siteId = 1;
           var siteN = 'site'+site_lat_long_picker.siteId;
           //var siteN = thisSite;
-          var site = window[siteN+'ref'];
-          var form = window[siteN+'_edit_form'];
+          var site = window[siteN+'editref'];
+          var form = window[siteN+'edit_edit_form'];
           var me = site_lat_long_picker;
-          var mylat = dijit.byId(siteN+'_latitude').value;
-          var mylong = dijit.byId(siteN+'_longitude').value;
+          var mylat = dijit.byId(siteN+'edit_latitude').value;
+          var mylong = dijit.byId(siteN+'edit_longitude').value;
+          console.log('lat_long_picker:',mylat,mylong);
           //var me = dijit.byId('site_lat_long_picker')
           me.lat_long = {};
           var site_lat_long = {};
@@ -1412,7 +1661,7 @@
           //form.elements['site_lat_long_datum'].focus();
           //var formlat = dijit.byId('site00_latitude');
           var siteN = 'site'+site_lat_long_picker.siteId;
-          var formlat = dijit.byId(siteN+'_latitude');
+          var formlat = dijit.byId(siteN+'edit_latitude');
           console.log('LAT-LONG picker-- siteN:',siteN,formlat);
           formlat.focus();
         });
@@ -1887,15 +2136,17 @@
       $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
       //var sitePane = new voeis.ui.SitePane();
       //console.log('>>>'+is_tab00(siteId));
-      var sitePane = dojo.byId('site'+siteId);
-      console.log('site'+siteId, sitePane);
+      var site_id = 'site'+siteId;
+      if(editMode) site_id += 'edit';
+      var sitePane = dojo.byId(site_id);
+      console.log(site_id, sitePane);
       if(sitePane) {
         sitePane = dijit.byNode(sitePane);
       } else {
         sitePane = new voeis.ui.SitePane2();
         //sitePane.setSite(get_site(siteId));
+        sitePane.editMode = editMode || false;
         sitePane.setSite(siteId);
-        //sitePane.editMode = editMode || false;
         tabs.addChild(sitePane);
         //console.log(sitePane);
       };
@@ -2155,10 +2406,10 @@
       tabs.selectChild(selected);
     });
 
-    dojo.subscribe("voeis/project/site/close", function(siteId) {
+    dojo.subscribe("voeis/project/site/close", function(siteId,tabsId) {
       console.log('CLOSE SITE TAB:',siteId);
-      var tabs = dijit.byId('tab_browser');
-      var sitePane = dojo.byId('site'+siteId);
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
+      var sitePane = dojo.byId('site'+siteId+'edit');
       if(sitePane) {
         sitePane = dijit.byNode(sitePane);
         tabs.removeChild(sitePane);
@@ -2168,15 +2419,15 @@
       };
     });
 
-    dojo.subscribe("voeis/project/site/new", function() {
+    dojo.subscribe("voeis/project/site/new", function(tabsId) {
       console.log('NEW SITE');
-      var tabs = dijit.byId('tab_browser');
-      openSiteTab(tabs, 0, false);
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
+      openSiteTab(tabs, 0, true);
     });
 
-    dojo.subscribe("voeis/project/site/select", function(siteId) {
+    dojo.subscribe("voeis/project/site/select", function(siteId,tabsId) {
       console.log(arguments);
-      var tabs = dijit.byId('tab_browser');
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
       openSiteTab(tabs, siteId, false);
     });
 
@@ -2186,11 +2437,11 @@
       openSiteTab(tabs, siteId, true);
     });
 
-    dojo.subscribe("voeis/project/site/pop", function(siteId) {
+    dojo.subscribe("voeis/project/site/pop", function(siteId,tabsId) {
       console.log('SITE-POP',arguments);
       var site = get_site(siteId);
       var projPane = dijit.byId("overview");
-      var tabs = dijit.byId('tab_browser');
+      var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
       tabs.selectChild(projPane);
       pmarkers[site.idx].pop();
       pmarkers[site.idx].selsite();
@@ -2311,12 +2562,13 @@
       openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
     });
     
-    dojo.subscribe("voeis/project/sites/manage", function() {
+    //MANAGE SITES
+    dojo.subscribe("voeis/project/manage-sites", function() {
       console.log('MAN-SITES');
       var tabs = dijit.byId('tab_browser');
       var tabHref = '#{project_path(@project)}/sites';
       tabHref += '#{current_user.nil? ? "" : "?api_key="+current_user.api_key}';
-      var tabId = 'project_sites';
+      var tabId = 'project_sitesxx';
       var tabTitle = 'Manage Sites';
       var tabCallback = function() {
         pageInit();
@@ -2324,6 +2576,7 @@
       openProjTab(tabs, tabHref, tabId, tabTitle, tabCallback);
     });
     
+    //MANAGE VARIABLES
     dojo.subscribe("voeis/project/variables", function() {
       console.log('MAN-VARIABLES');
       var tabs = dijit.byId('tab_browser');

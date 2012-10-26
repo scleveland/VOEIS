@@ -8,19 +8,20 @@ dojo.require("dijit.layout.ContentPane");
 dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	project: '',
 	site: '',
+	siteName: '',
 	siteIdx: 0,
 	newSite: false,
 	closable: true,
 	editMode: false,
 	preload: true,
 	parseOnLoad: false,
+	doLayout: false,
 	cleanContent: true,
 	parsedWidgets: [],
 	local: {},
 	queryCount: 0,
 	
-	protoDivId: 'site_pane_proto',
-	style: "margin-top:0;padding-top:0;",
+	style: "margin-top:0;padding:8px 0 0 10px;overflow:auto;",
 	test: '',
 	
 	loaded: false,
@@ -37,7 +38,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		title: "dialog title",
 		content: '',
 		style: 'width:400px;'
-		}),
+	}),
 	
 	dialog_vertical_datum: '',
 	dialog_local_projection: '',
@@ -59,16 +60,21 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 			this.set("title", sitename);
 		} else {
 			var sitename = this.site.name.toString();
-			var sitename0 = sitename.slice(0,12);
-			if(sitename.length>12) {
-				sitename0+='...';
-				if(sitename.length>20) sitename0+=sitename.slice(-8);
-				else {
-					sitename0 = sitename.slice(0,8)+'...';
-					sitename0 += sitename.slice(-6);
+			if(this.editMode) {
+				var sitename0 = 'Edit: Site-'+this.site.id;
+				this.set("title", sitename0);
+			} else {
+				var sitename0 = sitename.slice(0,12);
+				if(sitename.length>12) {
+					sitename0+='...';
+					if(sitename.length>20) sitename0+=sitename.slice(-8);
+					else {
+						sitename0 = sitename.slice(0,8)+'...';
+						sitename0 += sitename.slice(-6);
+					};
 				};
+				this.set("title", sitename0);
 			};
-			this.set("title", sitename0);
 		};
 		
 		if(properties) {
@@ -83,7 +89,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		//var sitePane = document.getElementById(this.paneDivId).cloneNode(true);
 		//sitePane = sitePane.nodeValue;
 		//var sitePaneContent = $('#'+this.protoDivId).html();
-		var sitePaneContent = pane_proto00;
+		var sitePaneContent = window.site_pane_proto2;
+		if(this.editMode) sitePaneContent = window.site_pane_proto1;
 		
 		sitePaneContent = sitePaneContent.replace(/site00/g, siteTag);
 		sitePaneContent = sitePaneContent.replace(/\$\$\$site-name\$\$\$/g, sitename);
@@ -185,23 +192,24 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		this.purgeContent();
 		this.set('content', sitePaneContent);
 		this.parsedWidgets = dojo.parser.parse(this.domNode);
-    if(window.pane_update) pane_update(this);
+    //if(window.pane_update) pane_update(this);
 		
 		if(this.newSite) {
 			//this.set("title", 'NEW SITE');
 			//$(this.domNode).find('#'+siteTag+'-name-head').text('NEW SITE');
-			$(this.domNode).find('#show-'+siteTag).hide();
-			$(this.domNode).find('#edit-'+siteTag).show();
+			///$(this.domNode).find('#show-'+siteTag).hide();
+			///$(this.domNode).find('#edit-'+siteTag).show();
 			$(this.domNode).find('#'+siteTag+'-provenance-row').hide();
-			$(this.domNode).find('#'+siteTag+'-toolbar').hide();
+			///$(this.domNode).find('#'+siteTag+'-toolbar').hide();
 			$(this.domNode).find('#'+siteTag+'-detail-label').hide();
-			$(this.domNode).find('#'+siteTag+'-edit-buttons').hide();
-			$(this.domNode).find('#'+siteTag+'_tabs .dijitTabContainerTop-tabs').hide()
-			setTimeout(function(){
-				//console.log('SiteGridW:',gridW);
-				var editPane = dijit.byId('edit-'+siteTag);
-				dijit.byId(siteTag+'_tabs').selectChild(editPane);
-			},200);
+			///$(this.domNode).find('#'+siteTag+'-edit-buttons').hide();
+			///$(this.domNode).find('#'+siteTag+'_tabs .dijitTabContainerTop-tabs').hide()
+			//setTimeout(function(){
+			//	//console.log('SiteGridW:',gridW);
+			//	var editPane = dijit.byId('edit-'+siteTag);
+			//	var editPane = window[siteTag+'editref']
+			//	dijit.byId(siteTag+'_tabs').selectChild(editPane);
+			//},200);
 			console.log('NewSite:',siteTag);
 			console.log('domNode.id:',this.domNode.id);
 			
@@ -263,7 +271,7 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 										data_start:'NA',
 										data_end:'NA'
 										};
-				this.set('id', 'site0');
+				this.set('id', 'site0edit');
 				var this_site = this.site;
 				psites.fetch({sort:[{attribute:'id',descending:true}],onComplete:function(items,request){
 					if(items.length) {
@@ -285,7 +293,8 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		this.site_var_stats = [];
 		this.site_samps = [];
 		if(!this.newSite) {
-			this.set('id', 'site'+this.site.id);
+			if(this.editMode) this.set('id', 'site'+this.site.id+'edit');
+			else this.set('id', 'site'+this.site.id);
 
 			if(site_stat_data[this.siteIdx]) this.site_stats = site_stat_data[this.siteIdx];
 			if(site_var_data[this.siteIdx]) this.site_var_stats = site_var_data[this.siteIdx];
@@ -449,7 +458,12 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 	
 	resize: function() {
 		var Hoffset = 80;
-		resizeTabs(this.id+'_tabs',Hoffset,'95%');
+		var editHoffset = 131;
+		resizeTabs(this.id+'_tabs',Hoffset,'90%');
+		if(this.editMode) {
+			var paneH = (global_resize.winH-editHoffset)+'px';
+			$('#edit-site'+this.site.id+'edit').css('height',paneH);
+		};
 	},
 	
 	purgeContent: function() {

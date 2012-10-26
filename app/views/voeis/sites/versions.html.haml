@@ -92,7 +92,7 @@
   = render_widget :versions, :display, :item=>@site,
                                         :versions=>@versions,
                                         :unique_id=>"site%s"%[@site.id],
-                                        :parent_id=>"history-site%s"%[@site.id],
+                                        :parent_id=>"site%s-history"%[@site.id],
                                         :item_refs=>@site_refs,
                                         :properties=>@ver_properties,
                                         :restore_callback=>"cv_item_restore",

@@ -176,6 +176,41 @@
     var item = datastore.get_raw(item_id, #{@cv_title2}_data.cv_store);
     #{@cv_title2}_exec.cv_datum_edit(item);
   };
+  //###############################
+  // COPY GLOBAL ITEMS (TERMS) TO LOCAL
+  #{@cv_title2}_exec.copy_global = function() {
+    var global_items = global_grid.selection.getSelected();
+    console.log('COPY GLOBAL (items): '+global_items.length);
+    if(global_items.length==0) return;
+    for(var i=0; i<global_items.length; i++) {
+      var item = global_items[i];
+      var items = datastore.fetch({#{@cv_name}: item['#{@cv_name}'].toString()}, #{@cv_title2}_data.cv_store);
+      delete item.id;   //### DON'T KEEP ID -NO SYNC NEW
+      item['provenance_comment'] = 'Copied from GLOBAL';
+      if(items.length) {
+        var text = items.length.toString()+' similar #{@cv_name}(s) already exist(s)-- are you sure you want another?';
+        confirmDialog('Please confirm &mdash;', text, 
+          function(yes) {
+            console.log('CONFIRM:',yes);
+            if(yes) {
+              //DO COPY
+              #{@cv_title2}_exec.cv_post_local(item);
+            };
+          }, 
+          {buttonOk: 'YES', buttonCancel: 'NO'});
+      } else {
+        //DO COPY
+        #{@cv_title2}_exec.cv_post_local(item);
+      };
+    };
+    //SELECT LOCAL PANE
+    var tabs = dijit.byId('#{@tabId}_tabs');
+    var pane = dijit.byId('manage_#{@tabId}');
+    tabs.selectChild(pane);
+    //REFRESH LOCAL GRID!
+    grid = dijit.byId('#{@cv_title2}_data.cv_management_grid');
+    grid.setQuery({id: '*'});
+  };
   
   //###############################
   //######################################
@@ -693,12 +728,14 @@
 -#          //this_pane.
 -#          #{@tabId}_exec.cleanup();
 -#        });
+
 %div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:10px;padding-top:0;", 
   :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"#{@tabId}_tabs"}
 
   -##### MAIN SUB TAB- MANAGEMENT
-  %div{:id=>"manage_#{@tabId}", :dojoType=>"dijit.layout.ContentPane", :title=>"#{@cv_title}", 
+  %div{:id=>"manage_#{@tabId}", :dojoType=>"dijit.layout.ContentPane", :title=>"Local Terms", 
     :jsId=>"#{@tabId}_manage", :style=>"margin-top:10px;"}
+    -# :title=>"#{@cv_title}"
       
     -#%div{:id=>"#{@tabId}_cv_empty", :style=>"display:#{@cv_data.empty? ? 'block' : 'none'};"}
     -#  %br
@@ -750,33 +787,33 @@
           -#- @cv_columns.each do |col|
           -#  %th{:field=>"#{col[:field]}", :filterable=>true, :width=>"#{col[:width]}", :style=>"#{col[:style]}"} #{col[:label]}
 
-
   -##### 2ND SUB TAB- COPY GLOBAL
   - if !@copy_data.nil?
-    %div{:id=>"copytab_#{@tabId}", :dojoType=>"dijit.layout.ContentPane", :title=>"All Terms", 
-      :style=>"width:860px;height:350px;margin-top:10px;"}
-      * click an entry to create a local copy from these GLOBAL #{@cv_title} entries
-      %table{:dojoType=>"dojox.grid.EnhancedGrid", :store=>"#{@cv_title2}_data.copy_store", 
-              :plugins=> "{filter:true}",  
+    %div{:id=>"copytab_#{@tabId}", :dojoType=>"dijit.layout.ContentPane", :title=>"Global Terms", 
+      :style=>"width:860px;height:350px;margin-top:0;"}
+      %button{:dojoType=>"dijit.form.Button", :title=>'Copy', :onClick=>"#{@cv_title2}_exec.copy_global();"} Copy Selected
+      &nbsp; click here to create local copies of selected GLOBAL #{@cv_title} entries
+      %table{:dojoType=>"dojox.grid.EnhancedGrid", :store=>"#{@cv_title2}_data.copy_store", :jsId=>"global_grid", 
+              :plugins=> "{filter:true, indirectSelection:{headerSelector:true,rowSelector:'multi',selectionMode:'extended'}}", 
               :clientSort=>"true", 
-              :sortInfo=>"2",
+              :sortInfo=>"2", 
               :style=>"width:100%;height:320px;margin:0;padding:0;border:#E3EBF2 2px solid;"}
-        %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
-          :plain
-            //SELECT GLOBAL CV TERM
-            var form = #{@cv_title2}_form.domNode;
-            var item = this.getItem(idx);
-            this.selection.clear();
-            var col = this.layout.cells[1];
-            this.focus.setFocusCell(col,idx);
-            //#{@tabId}_copy_dialog_box.hide();
-            #{@cv_title2}_exec.cv_form_populate(item);
-            $('##{@cv_title2}_form #cv_prov_com').hide();
-            //$('##{@cv_title2}_idx').val('#'+item.idx);
-            var cv_idx = dojo.byId('#{@cv_title2}_idx');
-            if(cv_idx) cv_idx.value = '#'+item._0;
-            #{@tabId}_cv_dialog_box.set('title', 'NEW '+#{@cv_title2}_data.cv_title);
-            #{@tabId}_cv_dialog_box.show();
+        -#%script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
+        -#  :plain
+        -#    //SELECT GLOBAL CV TERM
+        -#    var form = #{@cv_title2}_form.domNode;
+        -#    var item = this.getItem(idx);
+        -#    this.selection.clear();
+        -#    var col = this.layout.cells[1];
+        -#    this.focus.setFocusCell(col,idx);
+        -#    //#{@tabId}_copy_dialog_box.hide();
+        -#    #{@cv_title2}_exec.cv_form_populate(item);
+        -#    $('##{@cv_title2}_form #cv_prov_com').hide();
+        -#    //$('##{@cv_title2}_idx').val('#'+item.idx);
+        -#    var cv_idx = dojo.byId('#{@cv_title2}_idx');
+        -#    if(cv_idx) cv_idx.value = '#'+item._0;
+        -#    #{@tabId}_cv_dialog_box.set('title', 'NEW '+#{@cv_title2}_data.cv_title);
+        -#    #{@tabId}_cv_dialog_box.show();
         %thead
           %tr
             -#%th{:field=>"id", :width=>"25px", :filterable=>false} ID
@@ -785,10 +822,9 @@
                   :formatter=>"#{col[:formatter].blank? ? '' : @cv_title2+'_exec.Formatter.'+col[:formatter]}"} #{col[:label]}
             %th{:field=>"updated_at", :width=>"130px", :filterable=>true, :formatter=>"#{@cv_title2}_exec.Formatter.dateTime"} Updated
 
-
   -##### SUB TAB- NEW
   - if edit_auth
-    %div{:id=>"#{@tabId}_newtab", :dojoType=>"dijit.layout.ContentPane", :title=>"NEW", 
+    %div{:id=>"#{@tabId}_newtab", :dojoType=>"dijit.layout.ContentPane", :title=>"Create New Term", 
       :style=>"width:860px;height:350px;margin-top:10px;display:#{@cv_data.empty? ? 'none' : 'block'}"}
       
 

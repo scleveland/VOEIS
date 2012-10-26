@@ -3,6 +3,109 @@ module Odhelper
     :his
   end
   
+  def clear_logger_sensor_types
+    # CLEAR ALL PROJECT LoggerType & SensorType
+    # to fix goof-up
+    User.current = User.first
+    Project.all.each do |project|
+      puts ">>>PROJECT: %s (%s)" % [project.name,project.id]
+      project.managed_repository{
+        #puts '   Voeis-Vars: '+Voeis::Variable.count.to_s
+        puts '   REMOVING ALL LoggerType: '+Voeis::LoggerTypeCV.all.count.to_s
+        puts '   REMOVING ALL SensorType: '+Voeis::SensorTypeCV.all.count.to_s
+
+        Voeis::LoggerTypeCV.all.destroy!
+        Voeis::SensorTypeCV.all.destroy!
+        
+      } ##managed_repository
+    end ##Project.all
+  end
+  
+  def get_global_CVs
+    # GET NEEDED GLOBAL CV TERMS
+    User.current = User.first
+    
+    cv_globals = {
+      :variable_name => Voeis::VariableNameCV.all(:fields=>[:term]),
+      :sample_medium => Voeis::SampleMediumCV.all(:fields=>[:term]),
+      :general_category => Voeis::GeneralCategoryCV.all(:fields=>[:term]),
+      :value_type => Voeis::ValueTypeCV.all(:fields=>[:term]),
+      :data_type => Voeis::DataTypeCV.all(:fields=>[:term]),
+      :speciation => Voeis::SpeciationCV.all(:fields=>[:term]),
+      :logger_type => Voeis::LoggerTypeCV.all(:fields=>[:term]),
+      :sensor_type => Voeis::SensorTypeCV.all(:fields=>[:term]),
+      :quality_control => Voeis::QualityControlLevel.all(:fields=>[:quality_control_level_code])
+    }
+    cv_terms = {
+      :variable_name => Voeis::VariableNameCV,
+      :sample_medium => Voeis::SampleMediumCV,
+      :general_category => Voeis::GeneralCategoryCV,
+      :value_type => Voeis::ValueTypeCV,
+      :data_type => Voeis::DataTypeCV,
+      :speciation => Voeis::SpeciationCV,
+      :logger_type => Voeis::LoggerTypeCV,
+      :sensor_type => Voeis::SensorTypeCV
+    }
+    description = [:logger_type,:sensor_type]
+    
+    Project.all.each do |project|
+      puts ">>>PROJECT: %s (%s)" % [project.name,project.id]
+      
+      project.managed_repository{
+        puts '   Voeis-Vars: '+Voeis::Variable.count.to_s
+        Voeis::Variable.all.each{ |var|
+          if !var.nil?
+            ### CV terms except QC
+            cv_terms.each{ |term,model| 
+              if !var[term].nil? && model.all(:term=>var[term]).count==0
+                puts "   -- %s (%s) == %s == %s" % [var.variable_name,var.id,term.to_s,var[term]]
+                
+                new_term = model.new
+                repository("default") do
+                  if global = model.first(:term=>var[term])
+                    new_term.term = global.term
+                    new_term.definition = global.definition if !description.include?(term)
+                    new_term.description = global.description if description.include?(term)
+                    new_term.provenance_comment = "Copied from GLOBAL"
+                  else
+                    new_term.term = var[term]
+                    new_term.definition = "-" if !description.include?(term)
+                    new_term.description = "-" if description.include?(term)
+                    new_term.provenance_comment = "NEW"
+                  end
+                end
+                puts '   >> SAVE: '+new_term.to_hash.to_s
+                new_term.save
+              end
+            }
+            ### Quality Control
+            if Voeis::QualityControlLevel.all(:quality_control_level_code=>var.quality_control).count==0
+              term = Voeis::QualityControlLevel.new
+              ###if global = cv_globals[:quality_control].first(:quality_control_level_code=>var.quality_control)
+              repository("default") do
+                if global = Voeis::QualityControlLevel.first(:quality_control_level_code=>var.quality_control)
+                  term.quality_control_level_code = global.quality_control_level_code
+                  term.definition = global.definition
+                  term.explanation = global.explanation
+                  term.provenance_comment = "Copied from GLOBAL"
+                else
+                  term.quality_control_level_code = var.quality_control
+                  term.definition = "-"
+                  term.explanation = "-"
+                  term.provenance_comment = "NEW"
+                end
+              end
+              puts '   >> SAVE: '+term.to_hash.to_s
+              term.save
+            end
+            
+          end
+          
+        } ##Variable.all
+      } ##managed_repository
+    end ##Project.all
+  end
+  
   def upgrade_sites_CVzero
     # REPLACE ALL CV REFERENCES: null -> 0
     # Fields ending _id that are NOT references

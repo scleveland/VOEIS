@@ -6,18 +6,20 @@
   dojo.require("dojox.grid.enhanced.plugins.Filter");
   dojo.require("dijit.layout.TabContainer");
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
-  dojo.require("dojo.data.ItemFileWriteStore");
+  dojo.require("dojo.data.ItemFileReadStore");
   dojo.require("dojox.grid.enhanced.plugins.exporter.CSVWriter");
+  
+  //GLOBALS
   var units = #{@unit_names.to_json}
      
   var variable_json = {
     identifier: 'id',
     items: #{@variables.to_json} };
-  var var_store = new dojo.data.ItemFileWriteStore({data: variable_json });
-  var site_json = {
-    identifier: 'id',
-    items: #{@sites.to_json} };
-  var site_store = new dojo.data.ItemFileWriteStore({data: site_json }); 
+  var var_store = new dojo.data.ItemFileReadStore({data: variable_json });
+  //var site_json = {
+  //  identifier: 'id',
+  //  items: #{@sites.to_json} };
+  //var site_store = new dojo.data.ItemFileWriteStore({data: site_json }); 
   var api_key = "#{@voeis_api_key.to_s}";
 
   $(window).ready(function(){ 
@@ -31,42 +33,51 @@
 %h3{:style=>"margin:8px 0 10px 0;"}
   Data Search &mdash; Mulitple Sites &amp; Variables
 
-%p
-  %strong
-    Query URL
-#query_string
-  http:
 
 -### TABS
 %div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:90%;height:350px;margin-top:10px;padding-top:0;", 
-  :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"search_tabs"}
+  :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"search_tabs", :jsId=>"search_tabs"}
 
   #search-sites{:dojoType=>"dijit.layout.ContentPane", :title=>"Select Sites", 
-    :style=>"margin:0;padding:10px 0 0 8px;", :selected=>"true"}
+    :style=>"margin:0;padding:10px 0 0 8px;", :selected=>"true", :jsId=>"search_sites"}
     %script{:type=>"dojo/method", :event=>"onShow"}
       :plain
         //###
-        BuildQuery()
+        updateSearch()
 
-    #siteGrid{:style=>"width:99%;height:300px;"}
+    #siteGrid{:style=>"width:92%;height:300px;float:left;"}
+    
+    %button(dojoType="dijit.form.Button" onclick="search_tabs.selectChild(search_vars);" style="margin:30px 10px;float:left;")
+      NEXT &raquo;
 
   #search-vars{:dojoType=>"dijit.layout.ContentPane", :title=>"Select Variables", 
-    :style=>"margin:0;padding:10px 0 0 8px;"}
+    :style=>"margin:0;padding:10px 0 0 8px;", :jsId=>"search_vars"}
     %script{:type=>"dojo/method", :event=>"onShow"}
       :plain
         //###
         updateVariables();
-        BuildQuery()
+        updateSearch()
 
-    #varGrid{:style=>"width:99%;height:300px;"}
+    #varGrid{:style=>"width:92%;height:300px;float:left;"}
+    
+    %button(dojoType="dijit.form.Button" onclick="search_tabs.selectChild(search_dates);" style="margin:30px 10px;float:left;")
+      NEXT &raquo;
 
   #search-dates{:dojoType=>"dijit.layout.ContentPane", :title=>"Select Date Range & Search", 
-    :style=>"margin:0;padding:10px 0 0 28px;"}
+    :style=>"margin:0;padding:10px 0 0 28px;", :jsId=>"search_dates"}
     %script{:type=>"dojo/method", :event=>"onShow"}
       :plain
         //###
-        BuildQuery()
+        updateSearch()
 
+    =clear_break
+    
+    %p
+      %strong
+        Query URL
+    #query_string
+      http:
+    
     =clear_break
     %p
       %strong
@@ -79,26 +90,49 @@
         = @end_date.ending_timestamp.strftime("%m/%d/%Y")
     =clear_break
 
-    %div{:style=>"float: left;"}
+    %div{:style=>"float:left;"}
       %label{:for=>"date1"}
         Start Date Selection:
-      %input{:type=>"text", :name=>"start_date", :id=>"start_date", :value=>"#{@end_date.nil? ? Time.now.strftime("%Y-%m-%d") : @end_date.ending_timestamp.nil? ? Time.now.strftime("%Y-%m-%d") : (@end_date.ending_timestamp-1.day).strftime("%Y-%m-%d")}",
-        :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
-        %script{:type=>"dojo/method", :event=>"startup"}
-          this.connect(this, "onClick", function(){ BuildQuery() };
+      %input{:type=>"text", :name=>"start_date", :id=>"start_date", 
+        :value=>"#{@end_date.nil? ? Time.now.strftime("%Y-%m-%d") : @end_date.ending_timestamp.nil? ? Time.now.strftime("%Y-%m-%d") : (@end_date.ending_timestamp-1.day).strftime("%Y-%m-%d")}",
+        :dojoType=>"dijit.form.DateTextBox", :required=>"true", :onChange=>"updateSearch()"}
+        -#%script{:type=>"dojo/method", :event=>"startup"}
+        -#  this.connect(this, "onClick", function(){ BuildQuery() };
 
-      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
-    
-    %div{:style=>"float: left;"}
+    %div{:style=>"float:left;margin-left:50px;"}
       %label{:for=>"date1"}
         End Date Selection:
       %input{:type=>"text", :name=>"end_date", :id=>"end_date", :value=>"#{@end_date.nil? ? Time.now.strftime("%Y-%m-%d") : @end_date.ending_timestamp.nil? ? Time.now.strftime("%Y-%m-%d")  : @end_date.ending_timestamp.strftime("%Y-%m-%d")}",
-        :dojoType=>"dijit.form.DateTextBox", :required=>"true"}
-        %script{:type=>"dojo/method", :event=>"startup"}
-          this.connect(this, "onClick", function(){ BuildQuery() };
+        :dojoType=>"dijit.form.DateTextBox", :required=>"true", :onChange=>"updateSearch()"}
+        -#%script{:type=>"dojo/method", :event=>"startup"}
+        -#  this.connect(this, "onClick", function(){ BuildQuery() };
 
     =clear_break
-    =clear_break
+    
+    %p(style="margin:15px 0 0 0;padding:20px 0;")
+      %strong
+        Searching Sites:
+      %span(id="search-sites-value")
+        0
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      %strong
+        Searching Variables:
+      %span(id="search-vars-value")
+        0
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      %strong
+        Search Result Size:
+      %span(id="result-size-value")
+        0
+      &nbsp;&nbsp;
+      %span(id="result-size-wait" style="")
+        %img(src="/images/loading-ani.gif" alt="WAITING..." height="16" style="margin:0;padding:0;height:16px;vertical-align:middle;")
+        %img(src="/images/blank.gif" alt="blank" height="16" width="1" style="margin:0;padding:0;height:16px;vertical-align:middle;")
+    
+    -#%div(jsId="result_size_wait" dojoType="dojox.widget.Standby" target="result-size-value" image="/images/smal_load.gif")
+    -# smal_load.gif
+    -# ajax-loader.gif
+    
     =clear_break
     -#%p{:id=>"formatted"}
     -#=clear_break
@@ -106,24 +140,64 @@
     -#=clear_break
     -#%button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button" onclick="doSearch();") 
     -#  Perform Search
-    %button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button2" onclick="doSearch();" style="margin:10px 0;width:200px;")
+    %button(dojoType="dijit.form.Button" name="build_query_button" id="build_query_button2" 
+      disabled onclick="doSearch();" style="margin:10px 0;")
       Display Search Results
-    %button(dojoType="dijit.form.Button" name="build_query_button_download" id="build_query_button_download" onclick="doSearchDownload();" style="margin:10px 0;width:300px;")
+    &nbsp;&nbsp;
+    %button(dojoType="dijit.form.Button" name="build_query_button_download" id="build_query_button_download" 
+      disabled onclick="doSearchDownload();" style="margin:10px 0;")
       Download Search Results Non-CrossTab
-
-    =clear_break
-
-    %button(dojoType="dijit.form.Button" name="build_query_button_count" id="build_query_button_count" onclick="doSearchCount();" style="margin:10px 0;width:200px;")
-      Return Search Result Size
-    %button(dojoType="dijit.form.Button" name="build_query_button_download_crosstab" id="build_query_button_download_crosstab" onclick="doSearchDownloadCrossTab();" style="margin:10px 0;width:300px;")
+    &nbsp;&nbsp;
+    %button(dojoType="dijit.form.Button" name="build_query_button_download_crosstab" id="build_query_button_download_crosstab" 
+      disabled onclick="doSearchDownloadCrossTab();" style="margin:10px 0;")
       Download Search Results CrossTab
+
+    -#=clear_break
+    -#%button(dojoType="dijit.form.Button" name="build_query_button_count" id="build_query_button_count" onclick="doSearchCount();" style="margin:10px 0;width:200px;")
+    -#  Return Search Result Size
+    -#%button(dojoType="dijit.form.Button" name="build_query_button_download_crosstab" id="build_query_button_download_crosstab" onclick="doSearchDownloadCrossTab();" style="margin:10px 0;width:300px;")
+    -#  Download Search Results CrossTab
 
 
 :javascript
 
+  function updateSearch(){
+    $('#result-size-wait').hide()
+    var search_sites = siteDataGrid.selection.getSelected().length;
+    var search_vars = varDataGrid.selection.getSelected().length;
+    var search_sites_old = parseInt($("#search-sites-value").html());
+    var search_vars_old = parseInt($("#search-vars-value").html());
+    var start_date = dijit.byId('start_date').value.format('yyyy-mm-dd');
+    var end_date = dijit.byId('end_date').value.format('yyyy-mm-dd');
+    var start_date_old = $("#query_string").html().match(/start_date=(\d\d\d\d-\d\d-\d\d)/);
+    if(start_date_old) start_date_old = start_date_old[1];
+    var end_date_old = $("#query_string").html().match(/end_date=(\d\d\d\d-\d\d-\d\d)/);
+    if(end_date_old) end_date_old = end_date_old[1];
+    if(search_sites==search_sites_old && search_vars==search_vars_old && start_date==start_date_old && end_date==end_date_old) return;
+    $("#search-sites-value").html(search_sites);
+    $("#search-vars-value").html(search_vars);
+    console.log('updateSearch-sites:',search_sites);
+    console.log('updateSearch-vars:',search_vars);
+    if(search_sites==0 || search_vars==0) {
+      dijit.byId('build_query_button2').set('disabled',true);
+      dijit.byId('build_query_button_download').set('disabled',true);
+      dijit.byId('build_query_button_download_crosstab').set('disabled',true);
+      $('#result-size-value').html('0');
+    } else {
+      dijit.byId('build_query_button2').set('disabled',false);
+      dijit.byId('build_query_button_download').set('disabled',false);
+      dijit.byId('build_query_button_download_crosstab').set('disabled',false);
+      doSearchCount();
+    };
+    BuildQuery();
+  }
+  
   function updateVariables(){
-    site_var_array = siteDataGrid.selection.getSelected();
-    site_ids = [];
+    var search_sites = siteDataGrid.selection.getSelected().length;
+    var search_vars = varDataGrid.selection.getSelected().length;
+    if(search_sites==0 && search_vars==0) return;
+    var site_var_array = siteDataGrid.selection.getSelected();
+    var site_ids = [];
     for (s in site_var_array){
       site_ids.push(site_var_array[s].id.toString())
     }
@@ -193,6 +267,7 @@
     url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
     $("#query_string").html(url);
   }
+  
   function BuildCountQuery(){
     var site_array = siteDataGrid.selection.getSelected();
     var var_array = varDataGrid.selection.getSelected();
@@ -208,33 +283,39 @@
     url += "&var_ids=" + var_ids.join(',');
     url += "&start_date=" +dijit.byId("start_date").value.format('yyyy-mm-dd')
     url += "&end_date="+dijit.byId("end_date").value.format('yyyy-mm-dd')
-    $("#query_string").html(url);
+    //$("#query_string").html(url);
+    console.log('buildCountQuery:',url);
+    return url;
   }
+  
   function doSearch(){
     
-    BuildCountQuery()
+    //BuildCountQuery()
+    var count = $('#result-size-value').html();
     //window.location=$("#query_string").html();
-     $.get($("#query_string").html(), function(data){
+    confirmDialog(
+      'RUN SEARCH?',
+      "Are you sure you want to get "+count+" records?",
+      function(yes) {
+        if(yes) {
+          BuildQuery();
+          window.open($("#query_string").html(), "Search Results "+projectSearchCount.toString(),'',false);
+          projectSearchCount = projectSearchCount +1;
+        }},
+      {buttonOk:'YES'});
+    
+    //$.get($("#query_string").html(), function(data){
         //if (confirm("Are you sure you want to get " + data['count'] + " records?")){
         //  BuildQuery();
         //  window.open($("#query_string").html(), "Search Results "+projectSearchCount.toString(),'',false);
         //  projectSearchCount = projectSearchCount +1;
         //}
-        confirmDialog(
-          'RUN SEARCH?',
-          "Are you sure you want to get "+data["count"]+" records?",
-          function(yes) {
-            if(yes) {
-              BuildQuery();
-              window.open($("#query_string").html(), "Search Results "+projectSearchCount.toString(),'',false);
-              projectSearchCount = projectSearchCount +1;
-            }},
-          {buttonOk:'YES'});
-
-      });
+        
+    //});
     
     //dojo.publish('voeis/project/search/results', [$("#query_string").html()])
   }
+  
   function doSearch2(){
     BuildQuery();
     //window.location=$("#query_string").html();
@@ -244,51 +325,73 @@
   
   function doSearchDownload(){
     
-    BuildCountQuery()
-    $.get($("#query_string").html(), function(data){
+    //BuildCountQuery()
+    var count = $('#result-size-value').html();
+    confirmDialog(
+      'DOWNLOAD SEARCH?',
+      "Are you sure you want to get "+count+" records?",
+      function(yes) {
+        if(yes) {
+          BuildDownloadQuery();
+          window.location = $("#query_string").html();
+        }},
+      {buttonOk:'YES'});
+    
+    //$.get($("#query_string").html(), function(data){
       //if (confirm("Are you sure you want to get " + data['count'] + " records?")){
       //  BuildDownloadQuery();
       //  window.location = $("#query_string").html();
       //}
-      confirmDialog(
-        'DOWNLOAD SEARCH?',
-        "Are you sure you want to get "+data["count"]+" records?",
-        function(yes) {
-          if(yes) {
-            BuildDownloadQuery();
-            window.location = $("#query_string").html();
-          }},
-        {buttonOk:'YES'});
       
-    });
+    //});
   }
+  
   function doSearchDownloadCrossTab(){
     
-    BuildCountQuery()
-    $.get($("#query_string").html(), function(data){
+    //BuildCountQuery()
+    var count = $('#result-size-value').html();
+    confirmDialog(
+      'DOWNLOAD SEARCH?',
+      "Are you sure you want to get "+count+" records?",
+      function(yes) {
+        if(yes) {
+          BuildDownloadCrosstabQuery();
+          window.location = $("#query_string").html();
+        }},
+      {buttonOk:'YES'});
+    
+    //$.get($("#query_string").html(), function(data){
       //if (confirm("Are you sure you want to get " + data['count'] + " records?")){
       //  BuildDownloadCrosstabQuery();
       //    window.location = $("#query_string").html();
       //}
-      confirmDialog(
-        'DOWNLOAD SEARCH?',
-        "Are you sure you want to get "+data["count"]+" records?",
-        function(yes) {
-          if(yes) {
-            BuildDownloadCrosstabQuery();
-            window.location = $("#query_string").html();
-          }},
-        {buttonOk:'YES'});
       
-    });
+    //});
   }
+  
   function doSearchCount(){
-    BuildCountQuery()
-    $.get($("#query_string").html(), function(data){
-        //alert("This search yields: " + data['count'] + " records");
-        error_dialog.pop("<br/>This search yields: "+data["count"]+" records.<br/><br/>",0,'SEARCH RESULT SIZE');
+    var search_disabled = dijit.byId('build_query_button2').get('disabled');
+    if(!search_disabled) {
+      dijit.byId('build_query_button2').set('disabled',true);
+      dijit.byId('build_query_button_download').set('disabled',true);
+      dijit.byId('build_query_button_download_crosstab').set('disabled',true);
+    };
+    var countUrl = BuildCountQuery();
+    $('#result-size-wait').show();
+    //$.get($("#query_string").html(), function(data){
+    $.get(countUrl, function(data){
+      //alert("This search yields: " + data['count'] + " records");
+      //error_dialog.pop("<br/>This search yields: "+data["count"]+" records.<br/><br/>",0,'SEARCH RESULT SIZE');
+      $('#result-size-wait').hide();
+      $('#result-size-value').html(data['count']);
+      if(!search_disabled) {
+        dijit.byId('build_query_button2').set('disabled',false);
+        dijit.byId('build_query_button_download').set('disabled',false);
+        dijit.byId('build_query_button_download_crosstab').set('disabled',false);
+      };
     });
   }
+  
   //formatter: 'val_grid_formatter.dateTime',
   // grid formatters
   var val_grid_formatter = {};
@@ -313,12 +416,12 @@
     return units[value]
   }
   var site_layout = [
-  {
-     field: '_item',
-     name: '-',
-     formatter: val_grid_formatter.selectItem,
-     width: '24px'
-  },
+  //{
+  //   field: '_item',
+  //   name: '-',
+  //   formatter: val_grid_formatter.selectItem,
+  //   width: '24px'
+  //},
   {
      field: 'id',
      name: 'ID',
@@ -328,15 +431,30 @@
      field: 'name',
      name: 'Name',
      width: 'auto'
+  },
+  {
+     field: 'code',
+     name: 'Code',
+     width: 'auto'
+  },
+  {
+     field: 'data_vars',
+     name: 'Vars',
+     width: '55px'
+  },
+  {
+     field: 'data_count',
+     name: 'Data',
+     width: '65px'
   }
   ];
   var var_layout = [
-  {
-     field: '_item',
-     name: '-',
-     formatter: val_grid_formatter.selectItem,
-     width: '24px'
-  },
+  //{
+  //   field: '_item',
+  //   name: '-',
+  //   formatter: val_grid_formatter.selectItem,
+  //   width: '24px'
+  //},
   {
      field: 'id',
      name: 'ID',
@@ -378,11 +496,11 @@
   
   // create a new site grid:
   siteDataGrid = new dojox.grid.EnhancedGrid({
-     store: site_store,
+     store: psites,
      clientSort: true,
      rowSelector: '0',
      structure: site_layout,
-     style: 'width:95%;',
+     style: 'width:99%;',
      plugins: {filter:true, exporter:true,indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"},
       },
       onClick: function(ev) {
@@ -400,9 +518,10 @@
      store: var_store,
      grid_click: true,
      clientSort: true,
+     sortInfo: 2,
      rowSelector: '0',
      structure: var_layout,
-     style: 'width:95%;',
+     style: 'width:99%;',
      plugins: {filter:true, exporter:true,indirectSelection:{headerSelector:true, width:"40px", styles:"text-align: center;"},
       },
       onClick: function(ev) {

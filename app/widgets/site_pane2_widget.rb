@@ -55,13 +55,13 @@ class SitePane2Widget < Apotomo::Widget
     @vertical_datum_items = [['-none-', nil]]
     @local_projection_items = [['-none-', nil]]
     vertical_datums = @project.managed_repository{Voeis::VerticalDatumCV.all(:order => [:term.asc])}
-    vertical_datums_global = Voeis::VerticalDatumCV.all(:id.not=>vertical_datums.collect(&:id), :order => [:term.asc])
+    ###vertical_datums_global = Voeis::VerticalDatumCV.all(:id.not=>vertical_datums.collect(&:id), :order => [:term.asc])
     spatial_references = @project.managed_repository{Voeis::SpatialReference.all(:order => [:srs_name.asc])}
-    spatial_references_global = Voeis::SpatialReference.all(:id.not=>spatial_references.collect(&:id), :order => [:srs_name.asc])
+    ###spatial_references_global = Voeis::SpatialReference.all(:id.not=>spatial_references.collect(&:id), :order => [:srs_name.asc])
     vertical_datums.each{ |item| @vertical_datum_items << [item.term, item.id.to_s] }
-    vertical_datums_global.each{ |item| @vertical_datum_items << [item.term+' -GLOBAL', item.id.to_s] }
+    ###vertical_datums_global.each{ |item| @vertical_datum_items << [item.term+' -GLOBAL', item.id.to_s] }
     spatial_references.each{ |item| @local_projection_items << ['%s (%s)'%[item.srs_name,item.srs_id], item.id.to_s] }
-    spatial_references_global.each{ |item| @local_projection_items << ['%s (%s) -GLOBAL'%[item.srs_name,item.srs_id], item.id.to_s] }
+    ###spatial_references_global.each{ |item| @local_projection_items << ['%s (%s) -GLOBAL'%[item.srs_name,item.srs_id], item.id.to_s] }
     
     render
   end
