@@ -201,9 +201,9 @@
         %span(data-dojo-type="dijit.ToolbarSeparator")
         %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('ALL');") Select All
         %span(data-dojo-type="dijit.ToolbarSeparator")
-        %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('DEL');") Delete Selected
-        %span(data-dojo-type="dijit.ToolbarSeparator")
         -if !current_user.nil? && current_user.projects.include?(@project)
+          %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('DEL');") Delete Selected
+          %span(data-dojo-type="dijit.ToolbarSeparator")
           %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('NEW');") New Data Set
           %span(data-dojo-type="dijit.ToolbarSeparator")
           -#%span(data-dojo-type="dijit.form.DropDownButton") 
@@ -296,9 +296,9 @@
         %span(data-dojo-type="dijit.ToolbarSeparator")
         %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('ALL');") Select All
         %span(data-dojo-type="dijit.ToolbarSeparator")
-        %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('DEL');") Delete Selected
-        %span(data-dojo-type="dijit.ToolbarSeparator")
         -if !current_user.nil? && current_user.projects.include?(@project)
+          %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('DEL');") Delete Selected
+          %span(data-dojo-type="dijit.ToolbarSeparator")
           %button(dojoType="dijit.form.Button" onclick="#{dataId}.selected_tools('NEW');") New Data Set
           %span(data-dojo-type="dijit.ToolbarSeparator")
           -#%span(data-dojo-type="dijit.form.DropDownButton") 
@@ -736,6 +736,7 @@
           plotutils.highlightItems(val_grid.selection.getSelected(),0,val_plot);
           return;
         case 'DEL':
+          #{(current_user.nil? || !current_user.projects.include?(@project))? "return; //NO AUTH" : "//AUTHENTICATED"}
           //OPEN CONFIRM: DELETE ALL SELECTED??!
           if(sel_data_len==0) return;
           //DELETE SELECTED DataValues
@@ -751,6 +752,7 @@
           });
           return;
         case 'NEW':
+          #{(current_user.nil? || !current_user.projects.include?(@project))? "return; //NO AUTH" : "//AUTHENTICATED"}
           //OPEN NEW DATASET DIALOG
           //new_data_set.setup("#{@tabId}_data_set_select");
           //NEW name_entry_dialog--
@@ -774,6 +776,7 @@
           });
           return;
         default:
+          #{(current_user.nil? || !current_user.projects.include?(@project))? "return; //NO AUTH" : "//AUTHENTICATED"}
           //ADD SELECTED TO DATASET: OPEN CONFIRM
           if(sel_data_len==0) return;
           if(datasetname=='') return;
