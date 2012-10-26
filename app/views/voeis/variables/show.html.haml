@@ -528,9 +528,11 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_log_type"} Logger Type
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Logger Type','logger_type','#{project_path(@project)}/logger_type_c_vs/list','#{varId}_var_log_type_sel');return false;"}
+                  %label{:for=>"var_log_type", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
+                    Logger Type
               -#%input(name="var_log_type" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.logger_type}" required="false")
-              %select(name="var_log_type" class="log_type_select" id="#{varId}_var_log_type_sel")
+              %select(name="var_log_type" class="logger_type_select" id="#{varId}_var_log_type_sel")
                 = options_for_select(@var_log_type.all.map{|v| [v.term,v.term]}, selected=@variable.logger_type)
           %td
             .from-element
@@ -541,9 +543,11 @@
           %td
             .from-element
               %span{:class=>'label'}
-                %label{:for=>"var_sens_type"} Sensor Type
+                %a{:href=>"javascript:", :onclick=>"cv_pop_new('Sensor Type','sensor_type','#{project_path(@project)}/sensor_type_c_vs/list','#{varId}_var_sens_type_sel');return false;"}
+                  %label{:for=>"var_sens_type", :style=>"cursor:pointer;", :class=>"label icon icon-add"}
+                    Sensor Type
               -#%input(name="var_sens_type" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.sensor_type}" required="false")
-              %select(name="var_sens_type" class="sens_type_select" id="#{varId}_var_sens_type_sel")
+              %select(name="var_sens_type" class="sensor_type_select" id="#{varId}_var_sens_type_sel")
                 = options_for_select(@var_sens_type.all.map{|v| [v.term,v.term]}, selected=@variable.sensor_type)
           %td
             .from-element
