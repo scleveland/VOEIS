@@ -243,16 +243,16 @@
                 - atroot = false
                 = link_to("Project Home", project_path(@project), :dojoType => "yogo.ui.MenuLink")
                 
+              = link_to("Refresh Tab", "javascript:", :dojoType=>"yogo.ui.MenuLink", :jsId=>"main_menu_ref", :disabled=>"true", :onclick=>"refresh_tab();")
+              -#= link_to("History", "javascript:", :dojoType=>"yogo.ui.MenuLink", :jsId=>"main_menu_hist", :disabled=>"true", :onclick=>"dojo.publish('voeis/project/variables');")
+              %div{:dojoType=>"dijit.MenuSeparator"}
+                
               -if !current_user.nil? && current_user.projects.include?(@project) && !current_user.has_role?('Observer',@project)
                 - if atroot
                   -#- if !@edit_auth.nil? && @edit_auth
                   -#  = link_to("Edit", "javascript:", :dojoType=>"yogo.ui.MenuLink", :jsId=>"main_menu_edit", :disabled=>"true", :onclick=>"dojo.publish('voeis/project/variables');")
                   -#  = link_to("Delete", "javascript:", :dojoType=>"yogo.ui.MenuLink", :jsId=>"main_menu_del", :onclick=>"dojo.publish('voeis/project/variables');")
                   -#  %div{:dojoType=>"dijit.MenuSeparator"}
-                  
-                  = link_to("Refresh Tab", "javascript:", :dojoType=>"yogo.ui.MenuLink", :jsId=>"main_menu_ref", :disabled=>"true", :onclick=>"refresh_tab();")
-                  -#= link_to("History", "javascript:", :dojoType=>"yogo.ui.MenuLink", :jsId=>"main_menu_hist", :disabled=>"true", :onclick=>"dojo.publish('voeis/project/variables');")
-                  %div{:dojoType=>"dijit.MenuSeparator"}
                   
                   -#= link_to("Add Site", new_project_site_path(@project), :dojoType => "yogo.ui.MenuLink")
                   -###= link_to("Add Site", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"dojo.publish('voeis/project/site/new');")
