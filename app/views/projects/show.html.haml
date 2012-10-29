@@ -70,6 +70,7 @@
     
     //#####################
     // GLOBALS & STORES
+    var root_path = '#{project_path(@project)}';
     var projectSearchCount = 0;
     var update_select_element = false;
     var global_resize = {};
@@ -660,7 +661,7 @@
           var form = dijit.byId('data_value_edit_form');
           var site0 = window['site'+this.site_id+'editref'].site;
           $('#dv_site_name').text(site0.name.toString()+' [Id:'+site0.id.toString()+']');
-          var var0 = $('#query-site'+this.site_id+' #variable_select option').filter(':selected');
+          var var0 = $('#query-site'+this.site_id+' #site00_variable_select option').filter(':selected');
           var0 = var0.text().split('(')[0]+' [Id:'+var0.val()+']';
           console.log('VAR:',var0);
           //$('#dv_var_name').text(item.variable_name.toString()+' [Id:'+item.id.toString()+']');
@@ -1033,6 +1034,18 @@
     -#query-site00{:class=>"site00-divs", :style=>"margin-top:0;padding-top:0;display:none;"}
     #query-site00{:dojoType=>"dijit.layout.ContentPane", :title=>"Data Query#{@edit_auth? ' QA/QC' : ''}", 
       :style=>"margin:0;padding:12px 0 0 8px;"}
+      %script{:type=>"dojo/method", :event=>"startup"}
+        :plain
+          site00ref.updateQuerySize();
+          //###SETUP FORM EVENTS
+          //this.connect(this, "onShow", function(){
+          //  site00ref.updateQuerySize();
+          //});
+          $('#query-site00 select').change(function(){
+            console.log('### QUERY-SELECT-CHANGE!');
+            site00ref.updateQuerySize();
+          });
+          $('#query-site00 #site00_variable_select option').filter(':selected');
 
       %br
 
@@ -1045,62 +1058,70 @@
         ($$$site-variable-count$$$):
 
         :plain
-          <select id="variable_select" name="variable_select" style="width:450px;">
+          <select id="site00_variable_select" name="variable_select" style="width:450px;margin-bottom:10px;">
             $$$site-variable-select$$$
           </select>
         %br{:style=>'float:none; clear:both;'}
-        %br
-        %br
 
-        %p
+        %p(style="margin:10px 0;")
           %strong
             Data available for:
           $$$site-data-start$$$
           &mdash;
           $$$site-data-end$$$
 
-        Dates After: 
-        -#= date_select('range', 'start_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
-        -#%input(name="start_date" dojoType="dijit.form.DateTextBox" id="start_date00" value="#{@start_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
-        %input(name="start_date" dojoType="dijit.form.DateTextBox" value="$$$site-date-start$$$" style="width:200px!important;")
-        &nbsp;&nbsp;&nbsp;
-        Dates Before: 
-        -#= date_select('range', 'end_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
-        -#%input(name="end_date" dojoType="dijit.form.DateTextBox" id="end_date00" value="#{@end_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
-        %input(name="end_date" dojoType="dijit.form.DateTextBox" value="$$$site-date-end$$$" style="width:200px!important;")
+        %p(style="margin:10px 0;")
+          Dates After: 
+          -#= date_select('range', 'start_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
+          -#%input(name="start_date" dojoType="dijit.form.DateTextBox" id="start_date00" value="#{@start_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
+          %input(id="" name="start_date" dojoType="dijit.form.DateTextBox" value="$$$site-date-start$$$" style="width:200px!important;" 
+            onChange="site00ref.updateQuerySize()")
+          &nbsp;&nbsp;&nbsp;
+          Dates Before: 
+          -#= date_select('range', 'end_date', :start_year => @start_year, :end_year => @end_year, :order => [:month, :day, :year])
+          -#%input(name="end_date" dojoType="dijit.form.DateTextBox" id="end_date00" value="#{@end_date}" constraints="{datePattern:'yyyy-MM-dd'}" style="width:200px!important;")
+          %input(id="" name="end_date" dojoType="dijit.form.DateTextBox" value="$$$site-date-end$$$" style="width:200px!important;" 
+            onChange="site00ref.updateQuerySize()")
+        
         %br{:style=>'float:none; clear:both;'}
-        %br
-        %b OPTIONAL:
-        You can Specify some value restrictions:
-        %br
-        Value:
-        %select{:name =>"first_value_select"}
-          %option{:value=>"blank"}
-          %option{:value=>"eql"}
-            Is equal to
-          %option{:value=>"lte"}
-            Is less than or equal to
-          %option{:value=>"gte"}
-            Is greater than or equal to
-        %input{:type=>"text", :name =>"first_value_text"}
-        %select{:name =>"and_or_select"}
-          %option{:value=>"and"}
-            And
-          %option{:value=>"or"}
-            Or
-        %br
-        Value:
-        %select{:name =>"second_value_select"}
-          %option{:value=>"blank"}
-          %option{:value=>"eql"}
-            Is equal to
-          %option{:value=>"lte"}
-            Is less than or equal to
-          %option{:value=>"gte"}
-            Is greater than or equal to
-        %input{:type=>"text", :name =>"second_value_text"}
+        %p(style="margin:0 0 20px 0;")
+          %strong Optional:
+          You can specify some value restrictions:
+          %br
+          Value:
+          %select{:name =>"first_value_select"}
+            %option{:value=>"blank"}
+            %option{:value=>"eql"}
+              Is equal to
+            %option{:value=>"lte"}
+              Is less than or equal to
+            %option{:value=>"gte"}
+              Is greater than or equal to
+          %input{:type=>"text", :name =>"first_value_text"}
+          %select{:name =>"and_or_select"}
+            %option{:value=>"and"}
+              And
+            %option{:value=>"or"}
+              Or
+          %br
+          Value:
+          %select{:name =>"second_value_select"}
+            %option{:value=>"blank"}
+            %option{:value=>"eql"}
+              Is equal to
+            %option{:value=>"lte"}
+              Is less than or equal to
+            %option{:value=>"gte"}
+              Is greater than or equal to
+          %input{:type=>"text", :name =>"second_value_text"}
 
-        %br
+        %p(style="margin:20px 0 10px 0;")
+          %strong Query size (result count):
+          %span(id="site00-query-size") 0
+          &nbsp;&nbsp;
+          %span(id="site00-query-size-wait" style="")
+            %img(src="/images/loading-ani.gif" alt="WAITING..." height="16" style="margin:0;padding:0;height:16px;vertical-align:middle;")
+            %img(src="/images/blank.gif" alt="blank" height="16" width="1" style="margin:0;padding:0;height:16px;vertical-align:middle;")
         %br
         -#  (<span id="vars_count">#{@variable_opts_array.count}</span>):
         -#= f.submit('Search', :onclick => "dijit.byId('loading_dialog').show();")
@@ -1113,37 +1134,52 @@
         -#  Download Search Results
         -#%button(dojoType="dijit.form.Button" name="download_site_site00" value="Download" onclick='$.get(CountQuery("$$$id$$$","#{project_path(@project)}"), function(data){alert("This search yields " + data["count"] + " records.")});')
         -#  Return Number of Records in Search Results
-        %button(dojoType="dijit.form.Button" name="submit_form" value="Search")
+        %button(id="site00-query-submit" dojoType="dijit.form.Button" name="submit_form" value="Search")
           Display Query Results
           %script{:type=>"dojo/method", :event=>"onClick"}
             :plain
-              $.get(
-                CountQuery("$$$id$$$","#{project_path(@project)}"), 
-                function(data){
-                  confirmDialog(
-                    'RUN QUERY?',
-                    "Are you sure you want to get "+data["count"]+" records?",
-                    function(yes) {
-                      if(yes) {
-                        site00ref.submitDataQuery();
-                        //return false;
-                      }},
-                    {buttonOk:'YES'});
-                });
-
-        %button(dojoType="dijit.form.Button" name="download_site_site00" value="Download" onclick='RunQuery("$$$id$$$","#{project_path(@project)}");')
+              var qsize = $('#site00-query-size').text();
+              confirmDialog(
+                'RUN QUERY?',
+                "Are you sure you want to get "+qsize+" records?",
+                function(yes) {
+                  if(yes) {
+                    site00ref.submitDataQuery();
+                    //return false;
+                  }},
+                {buttonOk:'YES'});
+        &nbsp;&nbsp;
+        %button(id="site00-query-export" dojoType="dijit.form.Button" name="download_site_site00" value="Download")
           Download Query Results
-
-        %button(dojoType="dijit.form.Button" name="download_site_site00" value="Download")
-          Return Query Size
           %script{:type=>"dojo/method", :event=>"onClick"}
             :plain
-              $.get(
-                CountQuery("$$$id$$$","#{project_path(@project)}"), 
-                function(data){
-                  //alert("This search yields " + data["count"] + " records.");
-                  error_dialog.pop("<br/>This query yields "+data["count"]+" records.<br/><br/>",0,'QUERY SIZE');
-                });
+              // onclick='RunQuery("$$$id$$$","#{project_path(@project)}");'
+              var qsize = $('#site00-query-size').text();
+              var root_path = '#{project_path(@project)}';
+              var form_data = $('#site00_query').serializeFormJSON()
+              var params = $.map(form_data, function(n, i){
+                  return  i + "=" + n;
+              }).join("&");
+              var url = root_path + "/samples/search.csv?" + params;
+              confirmDialog(
+                'EXPORT QUERY?',
+                "Are you sure you want to get "+qsize+" records?",
+                function(yes) {
+                  if(yes) {
+                    window.location = url;
+                  }},
+                {buttonOk:'YES'});
+
+        -#%button(dojoType="dijit.form.Button" name="download_site_site00" value="Download")
+        -#  Return Query Size
+        -#  %script{:type=>"dojo/method", :event=>"onClick"}
+        -#    :plain
+        -#      $.get(
+        -#        CountQuery("$$$id$$$","#{project_path(@project)}"), 
+        -#        function(data){
+        -#          //alert("This search yields " + data["count"] + " records.");
+        -#          error_dialog.pop("<br/>This query yields "+data["count"]+" records.<br/><br/>",0,'QUERY SIZE');
+        -#        });
         
         -###&nbsp;&nbsp;
         -###%button(dojoType="dijit.form.Button" name="cancel" value="Cancel" onclick="window.location=#{project_path(@project)}") 

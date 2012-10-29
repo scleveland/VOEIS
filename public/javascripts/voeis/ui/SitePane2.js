@@ -455,7 +455,37 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
     qstring = qstring.join('&');
     dojo.publish('voeis/project/dataquery/results', [this.site.id, qstring]);
   },
-	
+
+  updateQuerySize: function() {
+    //
+    var site_id = this.id;
+    $('#'+site_id+'-query-size-wait').show();
+    dijit.byId(site_id+'-query-submit').set('disabled',true);
+    dijit.byId(site_id+'-query-export').set('disabled',true);
+    $('#'+site_id+'-query-size').html('0');
+    var qsize = 0;
+    var form_data = $('#'+site_id+'_query').serializeFormJSON();
+    var params = $.map(form_data, function(n, i){
+        return  i + "=" + n;
+    }).join("&");
+    var query_size_url = root_path + "/samples/quick_count.json?" + params;
+    $.get(query_size_url, function(data){
+        var qsize0 = parseInt(data["count"]);
+        //var qsize0 = data["count"];
+        console.log('QSIZE0 = '+qsize0);
+        if(qsize0) qsize = qsize0;
+        //alert("This search yields " + data["count"] + " records.");
+        //error_dialog.pop("<br/>This query yields "+data["count"]+" records.<br/><br/>",0,'QUERY SIZE');
+        $('#'+site_id+'-query-size').html(qsize.toString());
+        $('#'+site_id+'-query-size-wait').hide();
+        if(qsize>0) {
+          dijit.byId(site_id+'-query-submit').set('disabled',false);
+          dijit.byId(site_id+'-query-export').set('disabled',false);
+        };
+    });
+    return qsize;
+  },
+
 	resize: function() {
 		var Hoffset = 80;
 		var editHoffset = 131;
