@@ -216,6 +216,13 @@
           %span(data-dojo-type="dijit.ToolbarSeparator")
         %button(dojoType="dijit.form.Button" onclick="#{dataId}.export_data();") Export All
         %span(data-dojo-type="dijit.ToolbarSeparator")
+        %button(dojoType="dijit.form.DropDownButton")
+          %span
+            Export Image
+          %div(data-dojo-type="dijit.Menu")
+            = link_to("as JPEG", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"#{dataId}.plot_image('jpeg');") 
+            = link_to("as PNG", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"#{dataId}.plot_image('png');") 
+        %span(data-dojo-type="dijit.ToolbarSeparator")
       
       -#%ul(class="jd_menu" )
       -#  %li
@@ -793,6 +800,18 @@
       };
     };
     
+    
+    //*** EXPORT PLOT IMAGE: type = jpeg/png
+    #{dataId}.plot_image = function(type) {
+      if(type!='jpeg' && type!='png') return; //ERROR!
+      canvas = $('#plot_view_#{@tabId} #plotContainer canvas')[0];
+      imgdata = canvas.toDataURL('image/'+type);
+      features = 'width='+(canvas.width+20);
+      features += ', height='+(canvas.height+20);
+      new_win = window.open('','IMAGE WINDOW',features);
+      new_win.document.writeln('<img alt="exported_plot" />');
+      new_win.document.images[0].src = imgdata;
+    };
     
     //############################## BATCH-STUFF
     //*** SHOW/HIDE BATCH-SCRIPT DIV
