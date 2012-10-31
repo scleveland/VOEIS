@@ -1041,8 +1041,18 @@
           //this.connect(this, "onShow", function(){
           //  site00ref.updateQuerySize();
           //});
-          $('#query-site00 .option-input').change(function(){
+          $('#query-site00 .query-input').change(function(){
             console.log('### QUERY-INPUT-CHANGE!');
+            site00ref.updateQuerySize();
+          });
+          $('#query-site00 .query-option1').change(function(){
+            if ($('#query-site00 [name="first_value_select"]').val()=='blank') return;
+            console.log('### QUERY-OPTION1-CHANGE!');
+            site00ref.updateQuerySize();
+          });
+          $('#query-site00 .query-option2').change(function(){
+            if ($('#query-site00 [name="second_value_select"]').val()=='blank') return;
+            console.log('### QUERY-OPTION2-CHANGE!');
             site00ref.updateQuerySize();
           });
           $('#query-site00 #site00_variable_select option').filter(':selected');
@@ -1058,7 +1068,7 @@
         ($$$site-variable-count$$$):
 
         :plain
-          <select id="site00_variable_select" name="variable_select" style="width:450px;margin-bottom:10px;">
+          <select id="site00_variable_select" name="variable_select" style="width:450px;margin-bottom:10px;" class="query-input">
             $$$site-variable-select$$$
           </select>
         %br{:style=>'float:none; clear:both;'}
@@ -1089,7 +1099,7 @@
           You can specify some value restrictions:
           %br
           Value:
-          %select{:name =>"first_value_select", :class=>"option-input"}
+          %select{:name =>"first_value_select", :class=>"query-input"}
             %option{:value=>"blank"}
             %option{:value=>"eql"}
               Is equal to
@@ -1097,15 +1107,15 @@
               Is less than or equal to
             %option{:value=>"gte"}
               Is greater than or equal to
-          %input{:type=>"text", :name=>"first_value_text", :class=>"option-input"}
-          %select{:name =>"and_or_select", :class=>"option-input"}
+          %input{:type=>"text", :name=>"first_value_text", :class=>"query-option1"}
+          %select{:name =>"and_or_select", :class=>"query-option1"}
             %option{:value=>"and"}
               And
             %option{:value=>"or"}
               Or
           %br
           Value:
-          %select{:name =>"second_value_select", :class=>"option-input"}
+          %select{:name =>"second_value_select", :class=>"query-input"}
             %option{:value=>"blank"}
             %option{:value=>"eql"}
               Is equal to
@@ -1113,7 +1123,7 @@
               Is less than or equal to
             %option{:value=>"gte"}
               Is greater than or equal to
-          %input{:type=>"text", :name=>"second_value_text", :class=>"option-input"}
+          %input{:type=>"text", :name=>"second_value_text", :class=>"query-option2"}
 
         %p(style="margin:20px 0 10px 0;")
           %strong Query size (result count):
