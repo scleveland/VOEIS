@@ -216,13 +216,13 @@
           %span(data-dojo-type="dijit.ToolbarSeparator")
         %button(dojoType="dijit.form.Button" onclick="#{dataId}.export_data();") Export All
         %span(data-dojo-type="dijit.ToolbarSeparator")
-        %button(dojoType="dijit.form.DropDownButton")
-          %span
-            Export Image
-          %div(data-dojo-type="dijit.Menu")
-            = link_to("as JPEG", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"#{dataId}.plot_image('jpeg');") 
-            = link_to("as PNG", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"#{dataId}.plot_image('png');") 
-        %span(data-dojo-type="dijit.ToolbarSeparator")
+        -#%button(dojoType="dijit.form.DropDownButton")
+        -#  %span
+        -#    Export Image
+        -#  %div(data-dojo-type="dijit.Menu")
+        -#    = link_to("as JPEG", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"#{dataId}.plot_image('jpeg');") 
+        -#    = link_to("as PNG", "javascript:", :dojoType=>"yogo.ui.MenuLink", :onclick=>"#{dataId}.plot_image('png');") 
+        -#%span(data-dojo-type="dijit.ToolbarSeparator")
       
       -#%ul(class="jd_menu" )
       -#  %li
@@ -679,6 +679,7 @@
       var val_grid = #{dataId}.val_grid;
       var val_plot = #{dataId}.plot;
       var tabs = dijit.byId('#{@tabId}_tabs');
+      console.log('UPDATE-VIEWS: '+tabs.selectedChildWidget.title);
       if(item) {
         //### Update Grid
         var upd = datastore.update(item,#{dataId}.val_store);
@@ -698,29 +699,28 @@
       if(tabs.selectedChildWidget.title=='Table') {
         //### UPDATE PLOT
         console.log('UPDATE PLOT:',tabs.selectedChildWidget.title);
-        var data_upd = #{dataId}.plot.getData();
-        #{dataId}.plot.setData(data_upd);
+        //var data_upd = #{dataId}.plot.getData();
+        //#{dataId}.plot.setData(data_upd);
+        #{dataId}.plot.setData([#{dataId}.data]);
+        #{dataId}.plot.setupGrid();
         #{dataId}.plot.draw();
         #{dataId}.plot.unhighlight();
-        var val_selected = #{dataId}.val_grid.selection.getSelected();
+        //var val_selected = #{dataId}.val_grid.selection.getSelected();
+        var val_selected = val_grid.selection.getSelected();
         plotutils.highlightItems(val_selected,0,#{dataId}.plot);
       } else if(tabs.selectedChildWidget.title=='Graph') {
         //### UPDATE GRID
         console.log('UPDATE GRID:',tabs.selectedChildWidget.title);
-        //val_grid.render();
-        //val_grid.update();
-        //#{dataId}.val_grid.update();
-        val_grid.resize();
-        //val_grid.setQuery({id: '*'});
         var grid_sel = val_grid.selection.getSelected();
-        if(grid_sel.length) {
-          console.log('SCROLL-TO:',grid_sel[0]._0);
-          setTimeout(function(){
+        dojo.connect(val_grid,"_onFetchComplete",function(){
+          if(grid_sel.length) {
             val_grid.scrollTo(0);
             val_grid.scrollToRow(grid_sel[0]._0);
             val_grid.scrollToRow(grid_sel[0]._0);
-          },600);
-        };
+          };
+        });
+        val_grid.setQuery({id:'*'});
+        //val_grid.resize();
       };
     };
     
