@@ -1041,8 +1041,8 @@
           //this.connect(this, "onShow", function(){
           //  site00ref.updateQuerySize();
           //});
-          $('#query-site00 select').change(function(){
-            console.log('### QUERY-SELECT-CHANGE!');
+          $('#query-site00 .option-input').change(function(){
+            console.log('### QUERY-INPUT-CHANGE!');
             site00ref.updateQuerySize();
           });
           $('#query-site00 #site00_variable_select option').filter(':selected');
@@ -1089,7 +1089,7 @@
           You can specify some value restrictions:
           %br
           Value:
-          %select{:name =>"first_value_select"}
+          %select{:name =>"first_value_select", :class=>"option-input"}
             %option{:value=>"blank"}
             %option{:value=>"eql"}
               Is equal to
@@ -1097,15 +1097,15 @@
               Is less than or equal to
             %option{:value=>"gte"}
               Is greater than or equal to
-          %input{:type=>"text", :name =>"first_value_text"}
-          %select{:name =>"and_or_select"}
+          %input{:type=>"text", :name=>"first_value_text", :class=>"option-input"}
+          %select{:name =>"and_or_select", :class=>"option-input"}
             %option{:value=>"and"}
               And
             %option{:value=>"or"}
               Or
           %br
           Value:
-          %select{:name =>"second_value_select"}
+          %select{:name =>"second_value_select", :class=>"option-input"}
             %option{:value=>"blank"}
             %option{:value=>"eql"}
               Is equal to
@@ -1113,7 +1113,7 @@
               Is less than or equal to
             %option{:value=>"gte"}
               Is greater than or equal to
-          %input{:type=>"text", :name =>"second_value_text"}
+          %input{:type=>"text", :name=>"second_value_text", :class=>"option-input"}
 
         %p(style="margin:20px 0 10px 0;")
           %strong Query size (result count):
