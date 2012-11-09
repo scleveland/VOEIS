@@ -280,6 +280,8 @@ class Voeis::VariablesController < Voeis::BaseController
             render :json => @variable.as_json, :callback => params[:jsoncallback]
           }
         else
+          logger.info '### VARIABLE ERRORS ###'
+          logger.info @variable.errors
           format.html{
             flash[:error] = "Variable was Updated failed: #{@variable.errors}"
             redirect_to project_url(@project)
