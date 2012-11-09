@@ -270,13 +270,23 @@ class Voeis::VariablesController < Voeis::BaseController
       #logger.info @variable.to_hash
       
       respond_to do |format|
-        if @variable.save
+        if @variable.valid?
+          @variable.save
           format.html{
             flash[:notice] = "Variable was Updated successfully."
             redirect_to project_url(@project)
           }
           format.json{
             render :json => @variable.as_json, :callback => params[:jsoncallback]
+          }
+        end
+        else
+          format.html{
+            flash[:error] = "Variable was Updated failed: #{@variable.errors}"
+            redirect_to project_url(@project)
+          }
+          format.json{
+            render :json => {:error => @variable.error}.to_json :callback => params[:jsoncallback]
           }
         end
       end
