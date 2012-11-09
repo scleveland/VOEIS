@@ -33,7 +33,7 @@ class Project
   after :create, :create_data_value_indexes
 
   before :destroy, :destroy_cleanup
-  after :save, :publish_his
+  #after :save, :publish_his
 
 
   def upgrade_global_models
