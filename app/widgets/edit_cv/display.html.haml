@@ -733,7 +733,7 @@
   :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"#{@tabId}_tabs"}
 
   -##### MAIN SUB TAB- MANAGEMENT
-  %div{:id=>"manage_#{@tabId}", :dojoType=>"dijit.layout.ContentPane", :title=>"Local Terms", 
+  %div{:id=>"manage_#{@tabId}", :dojoType=>"dijit.layout.ContentPane", :title=>"#{@global ? 'Global' : 'Local'} Terms", 
     :jsId=>"#{@tabId}_manage", :style=>"margin-top:10px;"}
     -# :title=>"#{@cv_title}"
       

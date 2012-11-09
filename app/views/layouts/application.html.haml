@@ -182,8 +182,9 @@
             -#= link_to("Development Activity", page_url(:activity), :dojoType => "yogo.ui.MenuLink")
             -#= link_to("Development Roadmap", page_url(:roadmap), :dojoType => "yogo.ui.MenuLink")
             = link_to("Developers", "https://voeis.msu.montana.edu/doc/yard/_index.html", :dojoType => "yogo.ui.MenuLinkBlankTarget") 
-            -if !current_user.nil? && current_user.system_role.name=='Administrator'
-              -if !cv_list.nil?
+            -###-if @project.id.to_s==request.fullpath.gsub(/(\?.*$)/,'')[-(@project.id.to_s.length)..-1] && current_user.system_role.name=='Administrator'
+            -if @project && current_user.system_role.name=='Administrator'
+              -if cv_list && !cv_list.nil?
                 %div{:dojoType=>"dijit.MenuSeparator"}
                 %div{:dojoType=>"dijit.PopupMenuItem"}
                   %span Controlled Vocabulary
