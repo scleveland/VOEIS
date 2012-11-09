@@ -516,7 +516,18 @@ dojo.declare("voeis.ui.SitePane2", dijit.layout.ContentPane, {
 		//REMOVE resize reference
 		delete global_resize[this.id];
 	},
-	
+
+	closeTab: function(tabsId) {
+    console.log('CLOSE TAB:',this.id.toString());
+    var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
+    var sitePane = this;
+    if(sitePane) {
+      tabs.removeChild(sitePane);
+      sitePane.onClose();
+      sitePane.destroyRecursive();  
+    };
+	},
+
 	onClose: function() {
 		//REMOVE Global Ref
 		//eval('delete '+this.id+'ref');

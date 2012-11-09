@@ -83,7 +83,9 @@
 -#= link_to('REFRESH', 'javascript:', :class=>'icon icon-cancel', :onclick=>"refreshTab('site#{@site.id}-history');")
 -#%br
 
-%p(style="margin:0 0 8px 0;padding:0;font-weight:bold;") SITE HISTORY
+%p(style="margin:8px 0 8px 0;padding:0;font-weight:bold;")
+  HISTORY:
+  = "%s [Id:%s]"%[@site.name,@site.id]
 -#  = ('%s History: <strong>%s</strong> [Id:%s]'%[@cv_title,@cv_item[@cv_term],@cv_item.id]).html_safe
 
 

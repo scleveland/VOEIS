@@ -253,14 +253,14 @@ class Voeis::VariablesController < Voeis::BaseController
           varparams[prop] = varparams[prop].to_i
         end }
       [:time_support,:detection_limit,:spatial_offset_value].each{|prop| 
-        varparams[prop] = varparams[prop]=='' ? nil : varparams[prop].to_f }
+        varparams[prop] = varparams[prop]==''||varparams[prop].nil? ? nil : varparams[prop].to_f }
       #varparams[:hid_id] = varparams[:his_id]=='' ? nil : varparams[:hid_id].to_i
       varparams[:is_regular] = varparams[:is_regular]=~(/(true|t|yes|y|1)$/i) ? true : false
       
       varparams.each do |key, value|
-        @variable[key] = value.blank? ? nil : value
+        @variable[key] = value.blank? && key.to_s!='is_regular' ? nil : value
       end
-
+      
       #logger.info '### VARPARAMS UPDATED ###'
       #logger.info varparams
       logger.info '### VARIABLE UPDATED ###'

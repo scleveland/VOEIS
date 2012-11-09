@@ -109,6 +109,12 @@
           :style=>"width:99%;height:80%"}
     -#:rowSelector=>"20px", 
     -#:selectionMode=>"none", 
+    %script{:type=>"dojo/method", :event=>"onShow"}
+      :plain
+        //###
+        //dijit.byId('sites_#{tabId}');
+        this.setQuery({id: '*'});
+        
     -#%script{:type => "dojo/method", :event => "onSelected", :args => "idx"}
     -#  :plain
     -#    //var map = dijit.byId(@project);

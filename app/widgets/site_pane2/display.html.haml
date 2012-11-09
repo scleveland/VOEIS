@@ -132,11 +132,11 @@
 -###    SITE$$$id$$$:
 -###  $$$site-name$$$
 
-%p(style="margin:8px 0 8px 0;padding:0;")
+%p(style="margin:0px 0 8px 0;padding:0;")
   %span{:id=>"site00-detail-label"}  
-    EDIT SITE$$$id$$$:
-  %strong
-    $$$site-name$$$
+    %strong
+      EDIT SITE:
+      $$$site-name$$$ [Id:$$$id$$$]
 
 -#%div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:10px;padding-top:0;", 
 -#  :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"site00_tabsxx"}
@@ -621,9 +621,10 @@
                   var form0 = form.domNode;
                   console.log('INIT-FORM:',form0.id,form.id);
                   //var pane = dijit.byNode(dojo.byId('site00'));
-                  var pane = window['site00ref']
+                  var pane = window['site00ref'];
+                  var editpane = window['site00editref'];
                   var site = pane.site;
-                  console.log('GO PANE_UPDATE:',pane);
+                  console.log('GO PANE_UPDATE:',pane,editpane);
                   //if('site00'.slice(-2)=='00') {
                   if(pane.newSite) {
                     console.log('-SITE0-')
@@ -685,28 +686,8 @@
                     //local_projection:local_projection_dd.text
                     if(pane.newSite) {
                       //###NEW SITE
-                      $.post('/projects/#{@project.id}/sites.json', data, function(newValue) {
-                        var newId = parseInt(newValue.id);
-                        console.log('NEW ID: '+newId, newValue);
-                        data['site']['id'] = newId;
-                        //opt = fld.options[fld.selectedIndex];
-                        data['site']['lat_long_datum'] = pane.local.lat_long_datum_dd.text();
-                        data['site']['vertical_datum'] = pane.local.vertical_datum_dd.text();
-                        data['site']['local_projection'] = pane.local.local_projection_dd.text();
-                        console.log('LatLongDatum ID:',data.site.lat_long_datum_id,data.site.lat_long_datum);
-                        console.log('VerticalDatum ID:',data.site.vertical_datum_id,data.site.vertical_datum);
-                        console.log('LocalProjection ID:',data.site.local_projection_id,data.site.local_projection);
-                        pane.siteSave(data['site']);
-                        //dojo.publish('voeis/project/siteTables/refresh');
-                        //MANAGE_SITES-- dojo.publish('voeis/project/site/close',[0,'project_sites_tabs']);
-                        //SWITCH-TABS--
-                        dojo.publish('voeis/project/site/select',[newId]);
-                        dojo.publish('voeis/project/site/close',[0,'project_sites_tabs']);
-                        //if(add_sample_menu.disabled) add_sample_menu.set('disabled',false);
-                        //if(add_logger_menu.disabled) add_logger_menu.set('disabled',false);
-                        add_sample_menu.set('disabled',false);
-                        add_logger_menu.set('disabled',false);
-                      });
+                      var post_type = 'POST';
+                      var post_url = '/projects/#{@project.id}/sites.json';
                     } else {
                       //###UPDATE SITE
                       //data['site']['id'] = siteId;
@@ -714,26 +695,48 @@
                       //save//$.post('#{@root_url}/projects/b6db01d0-e606-11df-863f-6e9ffb75bc80/sites/'+siteId,{site:{id:''+siteId, name:form.elements['site_name'].value, code:form.elements['site_code'].value, latitude:form.elements['site_latitude'].value, longitude:form.elements['site_longitude'].value, lat_long_datum_id:form.elements['site_lat_long_datum_id'].value, elevation_m:form.elements['site_elevation_m'].value, vertical_datum_id:form.elements['site_vertical_datum_id'].value, local_x:form.elements['site_local_x'].value, local_y:form.elements['site_local_y'].value, local_projection_id:form.elements['site_local_projection_id'].value, pos_accuracy_m:form.elements['site_pos_accuracy_m'].value, state:form.elements['site_state'].value, county:form.elements['site_county'].value, comments:form.elements['site_comments'].value, description:form.elements['site_description'].value}});
                       //$.post('#{@root_url}/projects/#{@project.id}/sites/'+siteId, data);
                       //$.post('/projects/#{@project.id}/sites/'+siteId+'.json', data);
-                      $.ajax({
-                        type: 'PUT',
-                        url: '/projects/#{@project.id}/sites/'+site.id,
-                        data: data,
-                        success: '',
-                        dataType: 'json'
-                      });
-                      data['site']['lat_long_datum'] = pane.local.lat_long_datum_dd.text();
-                      data['site']['vertical_datum'] = pane.local.vertical_datum_dd.text();
-                      data['site']['local_projection'] = pane.local.local_projection_dd.text();
-                      console.log('UPDATE>>>',data);
-                      console.log('LatLongDatum ID:',data.site.lat_long_datum_id,pane.local.lat_long_datum_dd);
-                      console.log('VerticalDatum ID:',data.site.vertical_datum_id,pane.local.vertical_datum_dd);
-                      console.log('LocalProjection ID:',data.site.local_projection_id,pane.local.local_projection_dd);
-                      pane.siteSave(data['site']);
-                      //dojo.publish('voeis/project/siteTables/refresh');
-                      dojo.publish('voeis/project/map/clear',[site.id]);
-                      dojo.publish('voeis/project/site/close',[site.id,'project_sites_tabs']);
-                      dojo.publish('voeis/project/site/select',[site.id]);
+                      var post_type = 'PUT';
+                      var post_url = '/projects/#{@project.id}/sites/'+site.id+'.json';
                     };
+                    $.ajax({
+                      type: post_type,
+                      url: post_url,
+                      data: data,
+                      success: function(dat){
+                        if(pane.newSite) {
+                          var siteId = parseInt(dat.id);
+                          console.log('NEW ID: '+siteId, dat);
+                          data['site']['id'] = siteId;
+                        } else {
+                          var siteId = parseInt(site.id.toString());
+                        };
+                        data['site']['lat_long_datum'] = pane.local.lat_long_datum_dd.text();
+                        data['site']['vertical_datum'] = pane.local.vertical_datum_dd.text();
+                        data['site']['local_projection'] = pane.local.local_projection_dd.text();
+                        console.log('LatLongDatum ID:',data.site.lat_long_datum_id,pane.local.lat_long_datum_dd);
+                        console.log('VerticalDatum ID:',data.site.vertical_datum_id,pane.local.vertical_datum_dd);
+                        console.log('LocalProjection ID:',data.site.local_projection_id,pane.local.local_projection_dd);
+                        pane.siteSave(data['site']);
+                        pane.closeTab('project_sites_tabs');
+                        //MANAGE_SITES-- dojo.publish('voeis/project/site/close',[0,'project_sites_tabs']);
+                        //SWITCH-TABS--
+                        //dojo.publish('voeis/project/siteTables/refresh');
+                        //dojo.publish('voeis/project/site/close',[site.id,'project_sites_tabs']);
+                        dojo.publish('voeis/project/site/close',[siteId]);
+                        dojo.publish('voeis/project/site/select',[siteId]);
+                        if(pane.newSite) {
+                          console.log('NEW>>>',data);
+                          //if(add_sample_menu.disabled) add_sample_menu.set('disabled',false);
+                          //if(add_logger_menu.disabled) add_logger_menu.set('disabled',false);
+                          add_sample_menu.set('disabled',false);
+                          add_logger_menu.set('disabled',false);
+                        } else {
+                          console.log('UPDATE>>>',data);
+                          dojo.publish('voeis/project/map/clear',[siteId]);
+                        };
+                      },
+                      dataType: 'json'
+                    });
                     return false;
                   });
               

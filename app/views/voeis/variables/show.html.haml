@@ -435,12 +435,12 @@
                   %br
                   Interval (0 for none) *
               %input(name="var_time_support" class="TextBox_half" dojoType="dijit.form.NumberTextBox" constraints="{pattern:'#######.####'}" type="text" value="#{@variable.time_support}" required="true")
-              &nbsp;&nbsp;&nbsp;
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               -#%input(name="var_reg" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.is_regular}" required="true")
               %input(name="var_regular" dojoType="dijit.form.CheckBox" checked="#{@variable.is_regular}")
               Regular
       
-          %td
+          %td{:style=>"margin-top:20px;"}
             .from-element
               %span{:class=>'label'}
                 %label{:for=>"var_time_units"} Interval Units
@@ -670,6 +670,8 @@
                     //window.scrollTo(0,0);
                     $('html #main_container').animate({scrollTop:0}, 'slow');//IE, FF
                     $('body #main_container').animate({scrollTop:0}, 'slow');//chrome, don't know if safary works
+                    var ckbox0 = $('##{varId}-edit-form .dijitCheckBoxInput')[0];
+                    var ckbox = dijit.byId(ckbox0.id);
                     var data = {variable:{
                       variable_name:form0.elements['var_name'].value, 
                       variable_code:form0.elements['var_code'].value, 
@@ -681,7 +683,7 @@
                       data_type:form0.elements['var_dtype'].value, 
                       quality_control:form0.elements['var_qcval'].value, 
                       time_support:form0.elements['var_time_support'].value, 
-                      is_regular:form0.elements['var_regular'].value=='on' ? 'true' : 'false', 
+                      is_regular:ckbox.get('value')=='on' ? 'true' : 'false', 
                       time_units_id:form0.elements['var_time_units'].value, 
                       lab_id:form0.elements['var_lab'].value, 
                       lab_method_id:form0.elements['var_lab_method'].value, 

@@ -71,14 +71,15 @@
   };
 
   //### RETURN TO VERSIONS TAB
-  function versionsTab(){
-      var tabs = dijit.byId('history-tabs-#{@unique_id}');
-      var pane = dijit.byId('versions-tab-#{@unique_id}');
+  function versionsTab(uniqueID){
+      console.log('RETURN-VERSIONS: history-tabs-'+uniqueID);
+      var tabs = dijit.byId('history-tabs-'+uniqueID);
+      var pane = dijit.byId('versions-tab-'+uniqueID);
       tabs.selectChild(pane);
   };
   
   //### RESTORE VERSION FROM HISTORY
-  function restoreVer(ver_item){
+  function restoreVer(ver_item,restore_callback){
       var item = ver_item;
       //if(!window.confirm('ARE YOU SURE?\nROLLBACK VERSION '+item.version)) return;
       console.log('RAW-ROLLBACK?',item);
@@ -102,7 +103,7 @@
           //delete item.version_ttl;
           //ITEM SAVE CALLBACK
           //var item_json = JSON.stringify(item);
-          window['#{@restore_callback}'](item);
+          window[restore_callback](item);
         }, 
         { buttonOk:'YES', buttonCancel:'Cancel' });
   };
@@ -188,11 +189,11 @@
               = version[:version]
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
               &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-              %button{:dojoType=>"dijit.form.Button", :onclick=>"versionsTab();return false;"}
+              %button{:dojoType=>"dijit.form.Button", :onclick=>"versionsTab('#{@unique_id}');"}
                 BACK TO VERSIONS
               &nbsp;&nbsp;
               -if !@current_user.nil? && (@current_user.system_role.name=='Administrator' || !@project.nil? && (@current_user.has_role?('Data Manager',@project) || @current_user.has_role?('Principal Investigator',@project)))
-                %button{:dojoType=>"dijit.form.Button", :onclick=>"restoreVer(#{(version.reject{|k| @xtra.include?(k)}.merge({:id=>@item[:id]})).to_json});return false;"}
+                %button{:dojoType=>"dijit.form.Button", :onclick=>"restoreVer(#{(version.reject{|k| @xtra.include?(k)}.merge({:id=>@item[:id]})).to_json},'#{@restore_callback}');"}
                   ROLLBACK VERSION
                 -#%a{:href=>"javascript:", :onclick=>"versionsTab();return false;"}
                 -#  [RETRUN TO VERSIONS TAB]

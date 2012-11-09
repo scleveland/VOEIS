@@ -958,11 +958,12 @@
   -###    SITE$$$id$$$:
   -###  $$$site-name$$$
 
-  %p(style="margin:8px 0 8px 0;padding:0;")
+  -###%p(style="margin:8px 0 8px 0;padding:0;")
+  %p(style="margin:0 0 8px 0;padding:0;")
     %span{:id=>"site00-detail-label"}  
-      SITE$$$id$$$:
-    %strong
-      $$$site-name$$$
+      SITE:
+      %strong
+        $$$site-name$$$ [Id:$$$id$$$]
 
   %div{:dojoType=>"dijit.layout.TabContainer", :style=>"width:95%;height:400px;margin-top:10px;padding-top:0;", 
     :prop=>"parseOnLoad:true;", :tabPosition=>"top", :id=>"site00_tabs"}
@@ -2347,7 +2348,7 @@
     //##### VARIABLE HISTORY TAB
     var openVarHistoryTab = function(tabs, projectId, varId, varName, siteId) {
       siteId = parseInt(siteId);
-      var tabTitle = (siteId? 'Variable Hist: ' : 'Hist: ')+varName+' ['+varId+']';
+      var tabTitle = (siteId? 'Variable History: ' : 'History: ')+varName+' ['+varId+']';
       var projVarHistHref = "/projects/#{@project.id}/variables/versions?id="+varId;
       if(siteId) projVarHistHref += "&site_id="+siteId;
       //var projVarHistId = '#{@project.id}-site'+siteId+'-var'+varId+'-history';
@@ -2453,14 +2454,12 @@
     });
 
     dojo.subscribe("voeis/project/site/close", function(siteId,tabsId) {
-      console.log('CLOSE SITE TAB:',siteId);
+      console.log('CLOSE-SITE-TAB:',siteId);
       var tabs = dijit.byId((tabsId)? tabsId : 'tab_browser');
-      var sitePane = dojo.byId('site'+siteId+'edit');
+      var sitePane = dojo.byId('site'+siteId);
       if(sitePane) {
         sitePane = dijit.byNode(sitePane);
-        tabs.removeChild(sitePane);
-        sitePane.onClose();
-        sitePane.destroyRecursive();  
+        sitePane.closeTab(tabsId);
         pmap_clear(siteId);
       };
     });
@@ -2516,7 +2515,7 @@
 
     dojo.subscribe("voeis/project/data/history/update", function(dataId) {
       console.log('DATA-VALUE HISTORY UPDATE:',arguments);
-      var projDataHistId = '#{@project.id}--datavalue'+dataId+'-history';
+      var projDataHistId = 'datavalue'+dataId+'-history';
       var histPane = dojo.byId(projDataHistId);
       if(histPane) {
         histPane = dijit.byNode(histPane);
@@ -2547,7 +2546,7 @@
 
     dojo.subscribe("voeis/project/variable/history/update", function(varId,siteId) {
       console.log('VARIABLE HISTORY UPDATE:',arguments);
-      var projHistId = '#{@project.id}-site'+siteId+'-var'+varId+'-history';
+      var projHistId = 'var'+varId+'-history';
       var histPane = dojo.byId(projHistId);
       if(histPane) {
         histPane = dijit.byNode(histPane);
@@ -2564,7 +2563,7 @@
 
     dojo.subscribe("voeis/project/site/history/update", function(siteId) {
       console.log('SITE HISTORY UPDATE:',arguments);
-      var projHistId = '#{@project.id}-site'+siteId+'-history';
+      var projHistId = 'site'+siteId+'-history';
       var histPane = dojo.byId(projHistId);
       if(histPane) {
         histPane = dijit.byNode(histPane);
