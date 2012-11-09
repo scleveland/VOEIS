@@ -3,21 +3,14 @@ module Odhelper
     :his
   end
   
-  def clear_logger_sensor_types
+  def clear_publish_to_his
     # CLEAR ALL PROJECT LoggerType & SensorType
     # to fix goof-up
     User.current = User.first
     Project.all.each do |project|
       puts ">>>PROJECT: %s (%s)" % [project.name,project.id]
-      project.managed_repository{
-        #puts '   Voeis-Vars: '+Voeis::Variable.count.to_s
-        puts '   REMOVING ALL LoggerType: '+Voeis::LoggerTypeCV.all.count.to_s
-        puts '   REMOVING ALL SensorType: '+Voeis::SensorTypeCV.all.count.to_s
-
-        Voeis::LoggerTypeCV.all.destroy!
-        Voeis::SensorTypeCV.all.destroy!
-        
-      } ##managed_repository
+      project.publish_to_his = false
+      project.save
     end ##Project.all
   end
   
@@ -51,58 +44,62 @@ module Odhelper
     Project.all.each do |project|
       puts ">>>PROJECT: %s (%s)" % [project.name,project.id]
       
-      project.managed_repository{
-        puts '   Voeis-Vars: '+Voeis::Variable.count.to_s
-        Voeis::Variable.all.each{ |var|
-          if !var.nil?
-            ### CV terms except QC
-            cv_terms.each{ |term,model| 
-              if !var[term].nil? && model.all(:term=>var[term]).count==0
-                puts "   -- %s (%s) == %s == %s" % [var.variable_name,var.id,term.to_s,var[term]]
+      if project.publish_to_his==false
+        project.managed_repository{
+          puts '   Voeis-Vars: '+Voeis::Variable.count.to_s
+          Voeis::Variable.all.each{ |var|
+            if !var.nil?
+              ### CV terms except QC
+              cv_terms.each{ |term,model| 
+                if !var[term].nil? && model.all(:term=>var[term]).count==0
+                  puts "   -- %s (%s) == %s == %s" % [var.variable_name,var.id,term.to_s,var[term]]
                 
-                new_term = model.new
+                  new_term = model.new
+                  repository("default") do
+                    if global = model.first(:term=>var[term])
+                      new_term.term = global.term
+                      new_term.definition = global.definition if !description.include?(term)
+                      new_term.description = global.description if description.include?(term)
+                      new_term.provenance_comment = "Copied from GLOBAL"
+                    else
+                      new_term.term = var[term]
+                      new_term.definition = "-" if !description.include?(term)
+                      new_term.description = "-" if description.include?(term)
+                      new_term.provenance_comment = "NEW"
+                    end
+                  end
+                  puts '   >> SAVE: '+new_term.to_hash.to_s
+                  new_term.save
+                end
+              }
+              ### Quality Control
+              if Voeis::QualityControlLevel.all(:quality_control_level_code=>var.quality_control).count==0
+                term = Voeis::QualityControlLevel.new
+                ###if global = cv_globals[:quality_control].first(:quality_control_level_code=>var.quality_control)
                 repository("default") do
-                  if global = model.first(:term=>var[term])
-                    new_term.term = global.term
-                    new_term.definition = global.definition if !description.include?(term)
-                    new_term.description = global.description if description.include?(term)
-                    new_term.provenance_comment = "Copied from GLOBAL"
+                  if global = Voeis::QualityControlLevel.first(:quality_control_level_code=>var.quality_control)
+                    term.quality_control_level_code = global.quality_control_level_code
+                    term.definition = global.definition
+                    term.explanation = global.explanation
+                    term.provenance_comment = "Copied from GLOBAL"
                   else
-                    new_term.term = var[term]
-                    new_term.definition = "-" if !description.include?(term)
-                    new_term.description = "-" if description.include?(term)
-                    new_term.provenance_comment = "NEW"
+                    term.quality_control_level_code = var.quality_control
+                    term.definition = "-"
+                    term.explanation = "-"
+                    term.provenance_comment = "NEW"
                   end
                 end
-                puts '   >> SAVE: '+new_term.to_hash.to_s
-                new_term.save
+                puts '   >> SAVE: '+term.to_hash.to_s
+                term.save
               end
-            }
-            ### Quality Control
-            if Voeis::QualityControlLevel.all(:quality_control_level_code=>var.quality_control).count==0
-              term = Voeis::QualityControlLevel.new
-              ###if global = cv_globals[:quality_control].first(:quality_control_level_code=>var.quality_control)
-              repository("default") do
-                if global = Voeis::QualityControlLevel.first(:quality_control_level_code=>var.quality_control)
-                  term.quality_control_level_code = global.quality_control_level_code
-                  term.definition = global.definition
-                  term.explanation = global.explanation
-                  term.provenance_comment = "Copied from GLOBAL"
-                else
-                  term.quality_control_level_code = var.quality_control
-                  term.definition = "-"
-                  term.explanation = "-"
-                  term.provenance_comment = "NEW"
-                end
-              end
-              puts '   >> SAVE: '+term.to_hash.to_s
-              term.save
-            end
             
-          end
+            end
           
-        } ##Variable.all
-      } ##managed_repository
+          } ##Variable.all
+        } ##managed_repository
+        project.publish_to_his = true
+        project.save
+      end ##if .publish_to_his==false
     end ##Project.all
   end
   
