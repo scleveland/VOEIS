@@ -287,7 +287,7 @@ class Voeis::VariablesController < Voeis::BaseController
             redirect_to project_url(@project)
           }
           format.json{
-            render :json => {:error => @variable.error}.to_json :callback => params[:jsoncallback]
+            render :json => @variable.error.to_json, :callback => params[:jsoncallback]
           }
         end
       end
