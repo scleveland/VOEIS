@@ -99,7 +99,7 @@ module Odhelper
         } ##managed_repository
         #project.publish_to_his = true
         #project.save
-        sleep 2
+        sleep 5
       end ##if .publish_to_his==false
     end ##Project.all
   end
