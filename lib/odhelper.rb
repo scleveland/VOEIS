@@ -44,7 +44,7 @@ module Odhelper
     Project.all.each do |project|
       puts ">>>PROJECT: %s (%s)" % [project.name,project.id]
       
-      if project.publish_to_his==false
+      if true || project.publish_to_his==false
         project.managed_repository{
           puts '   Voeis-Vars: '+Voeis::Variable.count.to_s
           Voeis::Variable.all.each{ |var|
@@ -97,8 +97,9 @@ module Odhelper
           
           } ##Variable.all
         } ##managed_repository
-        project.publish_to_his = true
-        project.save
+        #project.publish_to_his = true
+        #project.save
+        sleep 1
       end ##if .publish_to_his==false
     end ##Project.all
   end
