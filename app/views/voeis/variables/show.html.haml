@@ -344,7 +344,7 @@
               -#%input(name="var_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.variable_name}" required="true")
               -#%select(name="var_name"  dojoType="dijit.form.Select")
               %select(name="var_name" class="variable_name_select" id="#{varId}_var_name_sel")
-                = options_for_select(@var_names.all.map{|v| [v.term, v.term]}, 
+                = options_for_select([["",""]]+(@var_names.all.map{|v| [v.term, v.term]}), 
                       selected=@variable.variable_name.to_s)
           %td{:colspan=>"2"}
             .from-element
@@ -533,7 +533,7 @@
                     Logger Type
               -#%input(name="var_log_type" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.logger_type}" required="false")
               %select(name="var_log_type" class="logger_type_select" id="#{varId}_var_log_type_sel")
-                = options_for_select(@var_log_type.all.map{|v| [v.term,v.term]}, selected=@variable.logger_type)
+                = options_for_select([["-",""]]+(@var_log_type.all.map{|v| [v.term,v.term]}), selected=@variable.logger_type)
           %td
             .from-element
               %span{:class=>'label'}
@@ -548,7 +548,7 @@
                     Sensor Type
               -#%input(name="var_sens_type" class="TextBox_name" dojoType="dijit.form.ValidationTextBox" type="text" value="#{@variable.sensor_type}" required="false")
               %select(name="var_sens_type" class="sensor_type_select" id="#{varId}_var_sens_type_sel")
-                = options_for_select(@var_sens_type.all.map{|v| [v.term,v.term]}, selected=@variable.sensor_type)
+                = options_for_select([["-",""]]+(@var_sens_type.all.map{|v| [v.term,v.term]}), selected=@variable.sensor_type)
           %td
             .from-element
               %span{:class=>'label'}
@@ -586,7 +586,8 @@
                   if(site_id || var_id) {
                     var this_pane_id = 'site#{@site_id}_var'+var_id;
                   } else {
-                    var this_pane_id = 'new_project_variables';
+                    //var this_pane_id = 'new_project_variables';
+                    var this_pane_id = 'newVar0';
                     //$('.#{varId}_cancel_buttons').hide();
                     $('##{varId}-provenance-row').hide();
                     //if(parseInt(#{@var_id})==0) $('##{varId}-provenance-row').hide();
@@ -660,7 +661,7 @@
                   console.log('FORM-CONNECT: '+site_id);
                   //###ON-STATE-CHANGE
                   this.connect(form, "onValidStateChange", function(state){
-                    //console.log('formStateChange:',state);
+                    //console.log('--->formStateChange:',state);
                     this.attr("disabled", !state);
                   });
                   //###ON-SUBMIT: SAVE
@@ -719,6 +720,11 @@
                       data: data,
                       success: function(newValue){
                         //callback
+                        if(newValue.errors){
+                          console.log(newValue.errors);
+                          return false;
+                        };
+                        //no errors
                         if(site_id) {
                           if(var_id) {
                             //###EDIT VAR
