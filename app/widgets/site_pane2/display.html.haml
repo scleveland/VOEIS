@@ -724,6 +724,7 @@
                         //dojo.publish('voeis/project/site/close',[site.id,'project_sites_tabs']);
                         dojo.publish('voeis/project/site/close',[siteId]);
                         dojo.publish('voeis/project/site/select',[siteId]);
+                        dojo.publish('voeis/project/site/history/update',[siteId]);
                         if(pane.newSite) {
                           console.log('NEW>>>',data);
                           //if(add_sample_menu.disabled) add_sample_menu.set('disabled',false);
