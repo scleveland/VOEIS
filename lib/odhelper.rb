@@ -14,7 +14,7 @@ module Odhelper
     end ##Project.all
   end
   
-  def get_global_CVs
+  def get_global_CVs(skip_to=nil)
     # GET NEEDED GLOBAL CV TERMS
     User.current = User.first
     
@@ -43,6 +43,8 @@ module Odhelper
     
     Project.all.each do |project|
       puts ">>>PROJECT: %s (%s)" % [project.name,project.id]
+      next if !skip_to.nil? && project.id.to_s!=skip_to
+      skip_to = nil
       
       if true || project.publish_to_his==false
         project.managed_repository{
@@ -99,7 +101,7 @@ module Odhelper
         } ##managed_repository
         #project.publish_to_his = true
         #project.save
-        sleep 5
+        sleep 7
       end ##if .publish_to_his==false
     end ##Project.all
   end
