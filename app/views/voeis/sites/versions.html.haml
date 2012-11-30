@@ -33,6 +33,8 @@
       success: function(e) {
         console.log('UPDATED>>>',data);
         pane.siteSave(item);
+        dojo.publish('voeis/project/site/close',[item.id]);
+        dojo.publish('voeis/project/site/select',[item.id]);
         dojo.publish('voeis/project/map/clear',[item.id]);
         dojo.publish('voeis/project/site/history/update',[item.id]);
       },

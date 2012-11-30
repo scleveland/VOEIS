@@ -747,8 +747,12 @@
                           console.log('>>>NEW-VAR pane:',this_pane);
                           datastore.new(newValue,store);
                         };
-                        var site_pane = window['#{siteId}ref'];
-                        if(site_pane) site_pane.siteUpdate();
+                        if(site_id) {
+                          //var site_pane = window['#{siteId}ref'];
+                          //if(site_pane) site_pane.siteUpdate();
+                          dojo.publish('voeis/project/site/close',[site_id]);
+                          dojo.publish('voeis/project/site/select',[site_id]);
+                        };
                         //###REFRESH VARS GRID
                         //var vars = dijit.byId('vars_project_variables');
                         //if(vars) vars.setQuery({id: '*'});
