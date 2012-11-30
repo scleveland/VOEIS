@@ -9,8 +9,9 @@
   dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
   
   // SAVE CALLBACK for ITEM ROLLBACK
-  function cv_item_restore(item) {
+  function site_item_restore(item) {
     console.log('ROLLBACK:',item);
+    dojo.publish('voeis/project/site/select',[item.id]);
     var pane = window['site'+item.id+'ref'];
     var data = {site:item};
     delete data.site.lat_long_datum;
@@ -97,7 +98,7 @@
                                         :parent_id=>"site%s-history"%[@site.id],
                                         :item_refs=>@site_refs,
                                         :properties=>@ver_properties,
-                                        :restore_callback=>"cv_item_restore",
+                                        :restore_callback=>"site_item_restore",
                                         :user=>current_user,
                                         :project=>@project
 

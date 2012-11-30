@@ -14,10 +14,9 @@
   function item_restore(item) {
     console.log('ROLLBACK:',item);
     var var_id = item.id;
-    var varPane = window['site'+item.id+'ref'];
+    //var varPane = window['site'+item.id+'ref'];
     var varPaneId = '#{site_id}_var'+var_id;
     var varPane = dojo.byId(varPaneId);
-    
     var data = {variable:item};
     
     delete data.variable.variable_units;
@@ -38,6 +37,12 @@
     data.variable.lab_method_id = parseInt(item.lab_method_id);
     data.variable.field_method_id = parseInt(item.field_method_id);
     data.variable.spatial_units_id = parseInt(item.spatial_units_id);
+    var varUpd = {id:data.variable.id,
+                  variable_name:data.variable.variable_name,
+                  variable_code:data.variable.variable_code,
+                  general_category:data.variable.general_category,
+                  sample_medium:data.variable.sample_medium,
+                  value_type:data.variable.value_type};
     
     for(prop in item)
       if(item[prop]==null) delete data.variable[prop];
@@ -52,6 +57,8 @@
           varPane = dijit.byNode(varPane);
           varPane.refresh();
         };
+        var store = project_variables_data.variable_store;
+        datastore.update(varUpd,store);
         dojo.publish('voeis/project/variable/history/update',[item.id,#{@site.nil? ? 0 : @site.id}]);
       },
       dataType: 'json'
