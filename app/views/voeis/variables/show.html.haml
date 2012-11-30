@@ -719,32 +719,43 @@
                       url: post_url,
                       data: data,
                       success: function(newValue){
+                        console.log('SAVE SUCCESS:',newValue);
                         //callback
                         if(newValue.errors){
-                          console.log(newValue.errors);
+                          console.log('ERROR:',newValue.errors);
                           return false;
                         };
                         //no errors
-                        if(site_id) {
-                          if(var_id) {
-                            //###EDIT VAR
-                            this_pane.refresh();
-                            return;
-                          };
-                          data.variable['id'] = parseInt(newValue.id);
-                          var var_data = {
-                            varname: data.variable.variable_name,
-                            varid: data.variable.id,
-                            varunits: data.variable.variable_units.untis_abbreviation+' ('+data.variable.data_type+')',
-                            count: 0,
-                            first: 'NA',
-                            last: 'NA'};
-                          site_var_data[site_id-1].append(var_data);
-                          var site_pane = window['#{siteId}ref'];
-                          if(site_pane) site_pane.siteUpdate();
+                        var store = project_variables_data.variable_store;
+                        var newVar = {id:newValue.id,
+                                      variable_name:newValue.variable_name,
+                                      variable_code:newValue.variable_code,
+                                      general_category:newValue.general_category,
+                                      sample_medium:newValue.sample_medium,
+                                      value_type:newValue.value_type};
+                        //if(site_id) {
+                        if(var_id) {
+                          //###EDIT VAR
+                          var this_pane = dijit.byId('site'+site_id+'_var'+var_id);
+                          console.log('>>>EDIT-VAR pane:',this_pane);
+                          datastore.update(newValue,store);
+                          //this_pane.refresh();
+                          //return;
+                        } else {
+                          //###NEW VAR
+                          var this_pane = dijit.byId('newVar0');
+                          console.log('>>>NEW-VAR pane:',this_pane);
+                          datastore.new(newValue,store);
                         };
+                        var site_pane = window['#{siteId}ref'];
+                        if(site_pane) site_pane.siteUpdate();
+                        //###REFRESH VARS GRID
+                        //var vars = dijit.byId('vars_project_variables');
+                        //if(vars) vars.setQuery({id: '*'});
                         //#{varId}_cancel_edit();
-                        dijit.byId('#{varId}').cancel_edit();
+                        //dijit.byId('#{varId}').
+                        console.log('close? .cancel_edit:', site_id, var_id);
+                        this_pane.cancel_edit();
                       },
                       dataType: 'json'
                     });

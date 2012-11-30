@@ -19,7 +19,7 @@
   dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
   dojo.require("dojox.grid.enhanced.plugins.Filter");
   dojo.require("dojo.data.ItemFileReadStore");
-  //dojo.require("dojo.data.ItemFileWriteStore");
+  dojo.require("dojo.data.ItemFileWriteStore");
   
   console.log('### VARIABLES -TABID: #{tabId}');
   
@@ -40,7 +40,7 @@
                           }.join(",\n")}
   ];
   
-  #{dataId}.variable_store = new dojo.data.ItemFileReadStore({data: {identifier: 'id', items: #{dataId}.variable_data }});
+  #{dataId}.variable_store = new dojo.data.ItemFileWriteStore({data: {identifier: 'id', items: #{dataId}.variable_data }});
   
   #{dataId}.controls = function(item) {
     if(item==null || item=='') return '-';
@@ -211,6 +211,14 @@
     -#:rowSelector=>"20px", 
     -#:selectionMode=>"none", 
     -#:rowSelect=>"false",
+    %script{:type=>"dojo/method", :event=>"onShow"}
+      :plain
+        //###
+        //### var tabs = dijit.byId('#{tabId}_tabs');
+        //### tabs.selectedChildWidget.id
+        console.log('>>>Variables::show>>> '+this.id,this.class);
+        //dijit.byId('vars_#{tabId}');
+        this.setQuery({id: '*'});
     %script{:type=>"dojo/method", :event=>"onSelected", :args=>"idx"}
       :plain
         //var map = dijit.byId(@project);

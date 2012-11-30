@@ -170,9 +170,21 @@ var datastore = {
       return val[0];
     return val;
   },
+  // SET DEFAULT STORE
+  set_store: function(store) {
+    var this_store = store || this.store_default;
+    var err = 'ERROR:'
+    if(this_store && this_store.setValue) return this_store;
+    if(this_store.setValue) err += ' NO R/W STORE SET!'
+    else err += ' NO STORE SET!'
+    console.log(err);
+    throw err;
+    return;
+  },
   // SET IDX IF THE STORE HAS IT??!
   set_idx: function(item, item_store) {
-    var store = item_store || this.store_default;
+    //var store = item_store || this.store_default;
+    var store = this.set_store(item_store);
     if(item.hasOwnProperty('idx') || 
         store._arrayOfAllItems[0] && 
         store._arrayOfAllItems[0].hasOwnProperty('idx')) 
@@ -181,7 +193,7 @@ var datastore = {
   },
   // COUNT (# Items)
   count: function(item_store) {
-    var store = item_store || this.store_default;
+    var store = this.set_store(item_store);
     var count = -1;
     store.fetch({query: {}, onBegin: function(size,request){
       count = size;
@@ -190,7 +202,7 @@ var datastore = {
   },
   // DOJO STORE RAW FETCH QUERY
   fetch_raw: function(query, item_store) {
-    var store = item_store || this.store_default;
+    var store = this.set_store(item_store);
     var myitems = 0;
     store.fetch({query: query,
       onComplete: function(items,request) {
@@ -205,7 +217,7 @@ var datastore = {
   },
   // DOJO STORE FETCH QUERY (no array wrapping)
   fetch: function(query, item_store) {
-    var store = item_store || this.store_default;
+    var store = this.set_store(item_store);
     var items = this.fetch_raw(query, store);
     if(items && items.length) {
       for(var i=0;i<items.length;i++) 
@@ -217,6 +229,7 @@ var datastore = {
   },
   // DOJO STORE RAW FETCH ID
   get_raw: function(id, item_store) {
+    //var store = this.set_store(item_store);
     var store = item_store || this.store_default;
     var myid = parseInt(id.toString());
     var q = {id: myid};
@@ -227,6 +240,7 @@ var datastore = {
   },
   // DOJO STORE FETCH (no array wrapping)
   get: function(id, item_store) {
+    //var store = this.set_store(item_store);
     var store = item_store || this.store_default;
     var item = this.get_raw(id, store);
     if(item) return this.item(item);
@@ -234,7 +248,7 @@ var datastore = {
   },
   // CREATE NEW ITEM IN DOJO STORE
   new: function(item, item_store) {
-    var store = item_store || this.store_default;
+    var store = this.set_store(item_store);
     item = this.set_idx(item, store);
     //item['used'] = false;
     d = new Date();
@@ -243,8 +257,7 @@ var datastore = {
     try {
       console.log('>>>STORE CREATE NEW:',item);
       store.newItem(item);
-    }
-    catch (e) { 
+    } catch (e) { 
       //console.log('STORE ERROR: DUPLICATE KEY',e);
       console.log('STORE ERROR: '+e.message+' -- args:', e.arguments);
     };
@@ -253,10 +266,10 @@ var datastore = {
   },
   // UPDATE DOJO STORE FROM NEW_ITEM (MUST HAVE ID)
   update: function(new_item, item_store) {
-    var store = item_store || this.store_default;
+    var store = this.set_store(item_store);
     var upd_item;
-    d = new Date();
-    new_item['updated_at'] = d.format(this.date_format);
+    //d = new Date();
+    //new_item['updated_at'] = d.format(this.date_format);
     //item['updated_at'] = dojo.date.locale.format(d,{datePattern:"yyyy-MM-dd", timePattern:"HH:mm:ssZ"});
     store.fetch({query: {id: parseInt(new_item.id.toString())},
       //onComplete: function(items,request) 
@@ -266,6 +279,12 @@ var datastore = {
           if(item.hasOwnProperty(prop) && prop!='id')
             if(new_item[prop]==null) store.setValue(item, prop, null);
             else store.setValue(item, prop, datastore.value(new_item[prop]));
+        upd_item = item;
+        if(item.hasOwnProperty('updated_at')){
+          d = new Date();
+          store.setValue(item, prop, d.format(this.date_format));
+          item['updated_at'] = d.format(this.date_format);
+        };
         upd_item = item;
       },
       onError: function(error,request) {
@@ -277,7 +296,7 @@ var datastore = {
   },
   // NEW OR UPDATE ITEM IN DOJO STORE
   new_upd: function(item, item_store) {
-    var store = item_store || this.store_default;
+    var store = this.set_store(item_store);
     var id = parseInt(item.id.toString());
     console.log('NEW-UPD:',item, store);
     if(store._itemsByIdentity && store._itemsByIdentity[id])
@@ -287,7 +306,7 @@ var datastore = {
   },
   // DELETE ITEM IN DOJO STORE
   delete: function(item, item_store) {
-    var store = item_store || this.store_default;
+    var store = this.set_store(item_store);
     if(typeof item=='number')
       item = this.get_raw(item);
     try {
@@ -299,7 +318,7 @@ var datastore = {
     this.saveDirty('DELETED',store);
   },
   saveDirty: function(mess,item_store) {
-    var store = item_store || this.store_default;
+    var store = this.set_store(item_store);
     if(store.isDirty())
       store.save({
         onComplete: function() { console.log('STORE ITEM '+mess) },

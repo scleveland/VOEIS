@@ -245,15 +245,11 @@ class Voeis::VariablesController < Voeis::BaseController
         v = value.strip
         varparams[prop] = nil if v=='NaN' || v=='null' }
       [:variable_units_id,:time_units_id,:quality_control].each{|prop| 
-        varparams[prop] = varparams[prop].to_i}
+        varparams[prop] = varparams[prop].to_i }
       [:lab_id,:lab_method_id,:field_method_id,:spatial_units_id].each{|prop| 
-        if varparams[prop]=='0' || varparams[prop]==nil
-          varparams[prop] = nil
-        else
-          varparams[prop] = varparams[prop].to_i
-        end }
+        varparams[prop] = (varparams[prop]=='0' || varparams[prop]==nil) ? nil : varparams[prop].to_i }
       [:time_support,:detection_limit,:spatial_offset_value].each{|prop| 
-        varparams[prop] = varparams[prop]==''||varparams[prop].nil? ? nil : varparams[prop].to_f }
+        varparams[prop] = (varparams[prop]=='' || varparams[prop].nil?) ? nil : varparams[prop].to_f }
       #varparams[:hid_id] = varparams[:his_id]=='' ? nil : varparams[:hid_id].to_i
       varparams[:is_regular] = varparams[:is_regular]=~(/(true|t|yes|y|1)$/i) ? true : false
       
@@ -270,8 +266,7 @@ class Voeis::VariablesController < Voeis::BaseController
       #logger.info @variable.to_hash
       
       respond_to do |format|
-        if @variable.valid?
-          @variable.save
+        if @variable.valid? && @variable.save
           format.html{
             flash[:notice] = "Variable was Updated successfully."
             redirect_to project_url(@project)
@@ -280,14 +275,15 @@ class Voeis::VariablesController < Voeis::BaseController
             render :json => @variable.as_json, :callback => params[:jsoncallback]
           }
         else
+          errs = @variable.errors.full_messages
           logger.info '### VARIABLE ERRORS ###'
-          logger.info @variable.errors
+          logger.info errs.join("\n")
           format.html{
-            flash[:error] = "Variable was Updated failed: #{@variable.errors}"
+            flash[:error] = "Variable update failed: "+errs.join(" - ")
             redirect_to project_url(@project)
           }
           format.json{
-            render :json => @variable.errors.to_json, :callback => params[:jsoncallback]
+            render :json => {:errors=>errs.join(' - ')}.to_json, :callback => params[:jsoncallback]
           }
         end
       end
@@ -297,43 +293,45 @@ class Voeis::VariablesController < Voeis::BaseController
   # POST /variables
   def create
     @project = parent
-    varparams = params[:variable]
-    varparams.each{|prop,value| 
-      v = value.strip
-      varparams[prop] = nil if v=='NaN' || v=='null' }
-    [:variable_units_id,:time_units_id,:quality_control].each{|prop| 
-      varparams[prop] = varparams[prop].to_i}
-    [:lab_id,:lab_method_id,:field_method_id,:spatial_units_id].each{|prop| 
-      if varparams[prop]=='0' || varparams[prop]==nil
-        varparams[prop] = nil
-      else
-        varparams[prop] = varparams[prop].to_i
-      end }
-    [:time_support,:detection_limit,:spatial_offset_value].each{|prop| 
-      varparams[prop] = varparams[prop]=='' ? nil : varparams[prop].to_f }
-    #varparams[:hid_id] = varparams[:his_id]=='' ? nil : varparams[:hid_id].to_i
-    varparams[:is_regular] = varparams[:is_regular]=~(/(true|t|yes|y|1)$/i) ? true : false
+    @project.managed_repository{
+      varparams = params[:variable]
+      
+      logger.info '### VARPARAMS ###'
+      logger.info varparams
+      
+      varparams.each{|prop,value| 
+        v = value.strip
+        varparams[prop] = nil if v=='NaN' || v=='null' }
+      [:variable_units_id,:time_units_id,:quality_control].each{|prop| 
+        varparams[prop] = varparams[prop].to_i }
+      [:lab_id,:lab_method_id,:field_method_id,:spatial_units_id].each{|prop| 
+        varparams[prop] = (varparams[prop]=='0' || varparams[prop]==nil) ? nil : varparams[prop].to_i }
+      [:time_support,:detection_limit,:spatial_offset_value].each{|prop| 
+        varparams[prop] = varparams[prop]=='' ? nil : varparams[prop].to_f }
+      #varparams[:hid_id] = varparams[:his_id]=='' ? nil : varparams[:hid_id].to_i
+      varparams[:is_regular] = varparams[:is_regular]=~(/(true|t|yes|y|1)$/i) ? true : false
     
-    varparams.each do |key, value|
-      varparams[key] = value.blank? ? nil : value
-    end
+      varparams.each do |key, value|
+        varparams[key] = value.blank? && key.to_s!='is_regular' ? nil : value
+      end
 
-    @variable = Voeis::Variable.new(varparams)
-    if @variable.variable_code.nil? || @variable_code =="undefined"
-      @variable.variable_code = @variable.id.to_s+@variable.variable_name+@variable.speciation+Voeis::Unit.get(@variable.variable_units_id).units_name
-    end
-    #@variable.detection_limit = nil if params[:variable][:detection_limit].empty?
-    #@variable.field_method_id = nil if params[:variable][:field_method_id].empty?
-    #@variable.lab_id = nil if params[:variable][:lab_id].empty?
-    #@variable.lab_method_id = nil if params[:variable][:lab_method_id].empty?
-    #@variable.spatial_offset_type = nil if params[:variable][:spatial_offset_type].empty?
-    #@variable.valid?
-    puts '### VARIABLE ERRORS ###'
-    puts @variable.errors.inspect()
+      @variable = Voeis::Variable.new(varparams)
+      if @variable.variable_code.nil? || @variable_code =="undefined"
+        @variable.variable_code = @variable.id.to_s+@variable.variable_name+@variable.speciation+Voeis::Unit.get(@variable.variable_units_id).units_name
+      end
+      logger.info '### ORG. VARIABLE ###'
+      logger.info @variable.to_hash
+      
+      #@variable.detection_limit = nil if params[:variable][:detection_limit].empty?
+      #@variable.field_method_id = nil if params[:variable][:field_method_id].empty?
+      #@variable.lab_id = nil if params[:variable][:lab_id].empty?
+      #@variable.lab_method_id = nil if params[:variable][:lab_method_id].empty?
+      #@variable.spatial_offset_type = nil if params[:variable][:spatial_offset_type].empty?
+      #@variable.valid?
+      puts '### VARIABLE ERRORS ###'
+      puts @variable.errors.inspect()
     
-    err_mess = 'VARIABLE SAVE ERROR: '
-    if @variable.save  
-      if @project.managed_repository{ @variable.save  }
+      if @variable.valid? && @variable.save
         respond_to do |format|
           format.html do
             flash[:notice] = 'Variable was successfully created.'
@@ -342,24 +340,23 @@ class Voeis::VariablesController < Voeis::BaseController
           format.json do
              render :json => @variable.as_json, :callback => params[:jsoncallback]
           end
-          return
         end
       else
-        err_mess += 'local SAVE failed.'
+        errs = @variable.errors.full_messages
+        logger.info '### VARIABLE ERRORS ###'
+        logger.info errs.join("\n")
+        respond_to do |format|
+          format.html{
+            flash[:error] = "Variable save failed: "+errs.join(" - ")
+            #redirect_to project_url(@project)
+            redirect_to(new_project_variable_path(parent))
+          }
+          format.json{
+            render :json => {:errors=>errs.join(' - ')}.to_json, :callback => params[:jsoncallback]
+          }
+        end
       end
-    else
-      err_mess += 'global SAVE failed.'
-    end
-    respond_to do |format|
-      format.html do
-        flash[:warning] = err_mess
-        redirect_to(new_project_variable_path(parent))
-      end
-      format.json do
-        render :json => @variable.to_hash.merge!({:error=>err_mess}).to_json, :callback => params[:jsoncallback]
-      end
-      return
-    end
+    }
   end
   
   # DELETE /variables/$ID$

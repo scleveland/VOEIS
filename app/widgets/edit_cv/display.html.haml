@@ -138,9 +138,9 @@
     console.log('STORE_NEW:',item0,item,new_store);
     datastore.new_upd(item,new_store);
     //update selects in forms
-    $('select.#{@cv_title2}_select').append($("<option></option>").attr("value",item0['id']).text(item0['#{@cv_name}']));
+    $('select.#{@cv_title2}_select').append($("<option></option>").attr("value",item0['#{@cv_name}']).text(item0['#{@cv_name}']));
     if(window.update_select_element) {
-      $(window.update_select_element).val(item0['id']);
+      $(window.update_select_element).val(item0['#{@cv_name}']);
       window.update_select_element = false;
     }
   };
