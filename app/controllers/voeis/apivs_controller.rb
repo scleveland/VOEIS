@@ -322,7 +322,7 @@ class Voeis::ApivsController < Voeis::BaseController
               repository("default") do
                 user = current_user
               end
-              if first_row.count == data_stream_template.data_stream_columns.count
+              if first_row && (first_row.count == data_stream_template.data_stream_columns.count)
                 unless params[:queue] == "true"
                   flash_error = flash_error.merge(parent.managed_repository{Voeis::DataValue.parse_logger_csv(@new_file, data_stream_template.id, site.id, start_line,nil,nil,user.id)})
                 else
