@@ -343,7 +343,7 @@ class Voeis::ApivsController < Voeis::BaseController
                 end
               else
                 #the file does not match the data_templates number of columns
-                flash_error[:error] = "File does not match the data_templates number of columns. Columns in First Row:" + first_row.count.to_s +  " Voeis expected:" + data_stream_template.data_stream_columns.count.to_s + " rows."
+                flash_error[:error] = "File does not match the data_templates number of columns. Columns in First Row: #{first_row ? first_row.count : 'nil'} Voeis expected: #{data_stream_template.data_stream_columns.count} rows."
                 logger.info {"File does not match the data_templates number of columns."}
               end
             rescue   Exception => e
