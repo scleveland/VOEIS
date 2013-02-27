@@ -556,6 +556,14 @@
   %form(id="#{@cv_title2}_form" jsId="#{@cv_title2}_form" dojoType="dijit.form.Form" method="post")
     - cv_ta_style = 'width:98%!important;line-height:16px!important;'
     - cv_ta_rows = "3"
+    -### GLOBAL TERMS SELECT
+    - if !@copy_data.nil?
+      - opts_global = "<option value='-'>- GLOBAL TERMS -</option>\n"
+      - @copy_data.each do |row|
+        - opts_global += "<option value='#{row[@cv_id]}'>#{row[@cv_name]}</option>\n"
+      = select_tag("#{@tabId}_global_select", (opts_global).html_safe)
+      %br
+      %br
     - @cv_form.each do |cvinput|
       - cvdelim = cvinput[:type].split('-')
       - cvtype = cvdelim[-1]
@@ -603,6 +611,14 @@
           //### ON-CHANGE
           this.connect(#{@cv_title2}_form, "onValidStateChange", function(state){
             this.attr("disabled", !state);
+          });
+          //### GLOBAL SELECT ON-CHANGE
+          $("##{@tabId}_global_select").change(function(e){
+            console.log('GLOBAL-SELECT-CHANGE:',this.value);
+            var store = #{@cv_title2}_data.copy_store;
+            var global = datastore.get(this.value,store);
+            delete global.id;
+            #{@cv_title2}_exec.cv_form_populate(global);
           });
           //MAKE COPY GLOBAL
           #{@tabId}_cv_dialog_box.global_copy = function(item) {
