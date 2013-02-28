@@ -637,33 +637,29 @@
               #{@tabId}_cv_dialog_box.hide();
             });
           };
-          //### ON-CLICK
+          //### ON-CLICK: SAVE
           this.connect(this, "onClick", function(){
             var form = #{@cv_title2}_form.domNode;
             var cv_id = dojo.byId('#{@cv_title2}_id');
             cv_id = cv_id ? parseInt(cv_id.value) : 0;
-            var cv_idx = dojo.byId('#{@cv_title2}_idx');
-            cv_idx = cv_idx ? cv_idx.value : '';
             var item = #{@cv_title2}_exec.cv_form_fetch();
-            //var data = {#{@cv_title2cv}: item};
             console.log('POST:',item);
-            if(cv_id && cv_idx[0]=='#') {
-              //COPY GLOBAL
-              item['provenance_comment'] = 'Copied from GLOBAL';
-              var items = datastore.fetch({#{@cv_name}: item['#{@cv_name}'].toString()}, #{@cv_title2}_data.cv_store);
-              if(items.length) {
-                var text = items.length.toString()+' similar #{@cv_name}(s) already exist(s)-- are you sure you want another?';
-                confirmDialog('Please confirm &mdash;', text, 
-                  function(yes) {
-                    console.log('CONFIRM:',yes);
-                    if(yes) {
-                      //DO COPY
-                      #{@tabId}_cv_dialog_box.global_copy(item)
-                    } else #{@tabId}_cv_dialog_box.hide();
-                  }, 
-                  {buttonOk: 'YES', buttonCancel: 'NO'});
-                } else #{@tabId}_cv_dialog_box.global_copy(item);
+            var items = datastore.fetch({#{@cv_name}: item['#{@cv_name}'].toString()}, #{@cv_title2}_data.cv_store);
+            if(items.length) {
+              var text = items.length.toString()+' similar #{@cv_name}(s) already exist(s)-- are you sure you want another?';
+              confirmDialog('Please confirm &mdash;', text, 
+                function(yes) {
+                  console.log('CONFIRM:',yes);
+                  if(yes) {
+                    //DO SAVE
+                    #{@cv_title2}_exec.cv_save(cv_id, item, function(){
+                      #{@tabId}_cv_dialog_box.hide();
+                    });
+                  };
+                }, 
+                {buttonOk: 'YES', buttonCancel: 'NO'});
             } else {
+              //DO SAVE
               #{@cv_title2}_exec.cv_save(cv_id, item, function(){
                 #{@tabId}_cv_dialog_box.hide();
               });
