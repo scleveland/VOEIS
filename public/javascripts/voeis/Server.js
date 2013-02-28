@@ -4,7 +4,7 @@ dojo.require("dojo.store.JsonRest");
 dojo.require("dojo.data.ObjectStore");
 dojo.require("voeis.store.Projects");
 dojo.require("voeis.store.Sites");
-
+dojo.require("voeis.store.Variables");
 yogo.xhr.csrf.load(); // ensure CSRF token is in all xhr requests
 
 dojo.declare("voeis.Server", null, {
@@ -27,6 +27,12 @@ dojo.declare("voeis.Server", null, {
     projectMetaTagsPath: function(projectId) {
         return [this.projectPath(projectId), "meta_tags"].join("/");
     },
+    projectVariablesPath: function(projectId) {
+        return [this.projectPath(projectId), "variables"].join("/");
+    },
+    projectVariablePath: function(projectId, variableId) {
+        return [this.projectVariablesPath(projectId), variableId].join("/");
+    },
 
     /** Stores **/
     projects: function() {
@@ -42,8 +48,16 @@ dojo.declare("voeis.Server", null, {
         this._projectSites[projectId] = this._projectSites[projectId] || voeis.store.Sites(new dojo.store.JsonRest({target:this.projectSitesPath(projectId) + "/"}), projectId, this);
         return this._projectSites[projectId];
     },
+    projectVariables: function(projectId) {
+        this._projectVariables = this.projectVariables || {};
+        this._projectVariables[projectId] = this._projectVariables[projectId] || voeis.store.Variables(new dojo.store.JsonRest({target:this.projectVariablesPath(projectId) + "/"}), projectId, this);
+        return this._projectVariables[projectId];
+    },
     projectSitesDataStore: function(projectId) {
         return new dojo.data.ObjectStore({objectStore:this.projectSites(projectId)});
+    },
+    projectVariablesDataStore: function(projectId) {
+        return new dojo.data.ObjectStore({objectStore:this.projectVariables(projectId)});
     },
     
     globalVariablesDataStore: function(){
