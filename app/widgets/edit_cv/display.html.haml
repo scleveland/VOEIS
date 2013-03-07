@@ -194,7 +194,11 @@
             console.log('CONFIRM:',yes);
             if(yes) {
               //DO COPY
-              #{@cv_title2}_exec.cv_post_local(item);
+              #{@cv_title2}_exec.cv_post_local(item, function(){
+                //REFRESH LOCAL GRID!
+                if (i+1==global_items.length)
+                  dijit.byId('#{@cv_title2}_data.cv_management_grid').setQuery({id: '*'});
+              });
             };
           }, 
           {buttonOk: 'YES', buttonCancel: 'NO'});
@@ -208,8 +212,7 @@
     var pane = dijit.byId('manage_#{@tabId}');
     tabs.selectChild(pane);
     //REFRESH LOCAL GRID!
-    grid = dijit.byId('#{@cv_title2}_data.cv_management_grid');
-    grid.setQuery({id: '*'});
+    dijit.byId('#{@cv_title2}_data.cv_management_grid').setQuery({id: '*'});
   };
   
   //###############################
@@ -368,6 +371,8 @@
       };
     };
     if(cv_id) data.id = cv_id;
+    if(data0.hasOwnProperty('provenance_comment') && data0.provenance_comment)
+      data['provenance_comment'] = cleanString(data0.provenance_comment);
     return data;
   };
   

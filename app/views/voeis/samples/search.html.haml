@@ -540,6 +540,7 @@
                               };
                               grid_data.push(item);
                             };
+                            console.log('GRID-DATA:',grid_data,grid_struct);
                             grid_dialog.pop('DRY-RUN SCRIPT RESULTS (first 20)',grid_struct,grid_data);
                           };
                           var elapsed = (new Date().valueOf()-start_time)/1000;
@@ -852,20 +853,20 @@
       if(getSelected || datasource=='SEL') {
         console.log('>>>SEL');
         valdata = #{dataId}.val_grid.selection.getSelected();
-        for(var i=0; i<valdata.length; i++) 
-          data_vals.push(valdata[i].id[0]);
-        batch['data_vals'] = data_vals;
-        //batch['data_vals'] = valdata;
       } else if(datasource=='ALL') {
         valdata = #{dataId}.value_data;
-        for(var i=0; i<valdata.length; i++) 
-          data_vals.push(valdata[i].id[0]);
-        batch['data_vals'] = data_vals;
-        //batch['data_vals'] = valdata;
       } else {
         batch['data_set'] = datasource;
       };
-      console.log('>>>DATA-VALS:',valdata);
+      if(valdata.length) {
+        for(var i=0; i<valdata.length; i++) 
+          if(valdata[i] && valdata[i].id)
+            data_vals.push(valdata[i].id[0]);
+        batch['data_vals'] = data_vals;
+        //batch['data_vals'] = valdata;
+      };
+      
+      console.log('>>>VALDATA:',valdata);
       console.log('>>>DATA-VALS:',data_vals);
       console.log('>>>DATASOUREC:',datasource);
       if(!valdata.length && !parseInt(datasource)) {
@@ -1247,6 +1248,7 @@
        for(var i=data.length-1; i>=0; i--) {
          var item0 = datastore.get_raw(data[i].id,#{dataId}.val_store);
          var item = datastore.item(item0);
+         var upd = {};
          var dateval = new Date(item.local_date_time.toString());
          if(data[i].error) {
            var val_string = ' -- ['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
@@ -1256,9 +1258,20 @@
            //console.log('DELETE-PLOT:',item._0);
            #{dataId}.data.splice(item._0,1);
          } else {
-           datastore.update(item0,#{dataId}.val_store);
            dateval = parseInt(dateval/1000)*1000;
-           #{dataId}.data[item._0] = [dateval,item.data_value]
+           var value = item.data_value;
+           if(data[i].data_value) value = data[i].data_value;
+           #{dataId}.data[item._0] = [dateval, value]
+           for (prop in data[i])
+             if(item.hasOwnProperty(prop))
+               upd[prop] = data[i][prop];
+           datastore.update(upd,#{dataId}.val_store);
+           //var d = new Date(dateval).format('UTC:yyyy-mm-dd HH:MM:ss').replace(' ','T')+'+00:00';
+           //upd['date_time_utc'] = d;
+           //dateval = parseInt((dateval/1000)+item.utc_offset*3600)*1000
+           //d = new Date(dateval).format('UTC:yyyy-mm-dd HH:MM:ss').replace(' ','T');
+           //d += datastore.formats.dataDateTime(item).slice(-6);
+           //upd['local_date_time'] = d;
            //if(data[i].hasOwnProperty('data_value')) {
            //  dateval = parseInt(dateval/1000)*1000;
            //  #{dataId}.data[item._0] = [dateval,data[i].data_value]

@@ -1251,13 +1251,37 @@
   %script{:type=>"dojo/method", :event=>"startup"}
     :plain
       grid_dialog.grid = grid_dialog_grid;
+      grid_dialog.store = new dojo.data.ItemFileReadStore({ items: [] });
+      grid_dialog.store.clearOnClose = true;
+      grid_dialog.grid.set('store',grid_dialog.store);
+      //grid_dialog.grid.startup();
+      grid_dialog.connect(grid_dialog, "onClose", function(){
+        grid_dialog.store.close();
+        
+      });
+      //### ON-SHOW
       grid_dialog.pop = function(ttl,struct,data){
+        //grid_dialog.reset();
         grid_dialog.set('title', ttl);
-        var mystore = new dojo.data.ItemFileWriteStore({data: {identifier: 'id', items: data }});
+        grid_dialog.store.close();
+        grid_dialog.store = new dojo.data.ItemFileReadStore({data: { items: data }});
+        grid_dialog.store.fetch();
+        //var mystore = new dojo.data.ItemFileWriteStore({data: {identifier: 'id', items: data }});
+        //grid_dialog.store.data = {identifier: 'id', items: data };
         grid_dialog.show();
-        grid_dialog.grid.set('store',mystore);
         grid_dialog.grid.set('structure',struct);
+        grid_dialog.grid.set('store',grid_dialog.store);
+        //grid_dialog.grid._refresh();
+        //grid_dialog.grid.setQuery({id: '*'});
         grid_dialog.grid.startup();
+        //###########
+      };
+      grid_dialog.reset = function(){
+        grid_dialog.grid.setQuery({id: '*'});
+        //dojo.destroy(grid_dialog.store);
+        delete grid_dialog.store;
+        grid_dialog.grid.setQuery({id: '*'});
+        
         //###########
       };
   #grid_dialog_grid{:dojoType=>"dojox.grid.EnhancedGrid", :style=>"width:100%;height:350px;", 
