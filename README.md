@@ -2,7 +2,7 @@
 
 
 VOEIS is a Data Management System built on Ruby on Rails, DataMapper, Postgres, Redis and the Yogo Data-Management Framework.  VOEIS has dependencies that need to be installed on your system before you can begin developing or using VOEIS.
-An alternative to all this setup is to contact rcg-support@montana.edu for a kvm virtual machine that has a basic VOEIS instance setup and run it in virtual box locally or deploy it to a virtual host.
+An alternative to all this setup is to contact rcg-support@msu.montana.edu for a kvm virtual machine that has a basic VOEIS instance setup and run it in virtual box locally or deploy it to a virtual host.
   
 1. Ruby must be installed and the latest ruby-1.9.2 release is required - we recommend using rvm http://rvm.io for ruby version management and gemset management combined with bundler.
 2. A PostgreSQL server is required and installation instructions and binaries can be found here: http://www.postgresql.org/download/ -- this does not need to be a local server and our instance is on it's own separate  server
@@ -18,7 +18,7 @@ Once these dependencies are installed you can proceed with the rest of the VOEIS
 4. Setup database.yml in config/:  Edit the database.yml.start to match your postgres instance and rename this file database.yml
 5. Create the database:            `bundle exec rake db:create` NOTE that the user for you database must have db create permissions
 6. Seed the application:           `bundle exec rake db:seed` 
-7. Start the application:           'bundle exec rails s
+7. Start the application:           'bundle exec rails s'
 8. Go to http://localhost:3000/ and get the VOEIS start page!
 
 ### Modify settings for non-local instance
