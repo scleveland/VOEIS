@@ -1,57 +1,35 @@
-# Welcome to Yogo
+# Welcome to VOEIS
 
 
-Yogo is a Data Management System built on Ruby on Rails, DataMapper, and Persevere.
+VOEIS is a Data Management System built on Ruby on Rails, DataMapper, Postgres, Redis and the Yogo Data-Management Framework.  VOEIS has dependencies that need to be installed on your system before you can begin developing or using VOEIS.
+An alternative to all this setup is to contact rcg-support@montana.edu for a kvm virtual machine that has a basic VOEIS instance setup and run it in virtual box locally or deploy it to a virtual host.
+  
+1. Ruby must be installed and the latest ruby-1.9.2 release is required - we recommend using rvm http://rvm.io for ruby version management and gemset management combined with bundler.
+2. A PostgreSQL server is required and installation instructions and binaries can be found here: http://www.postgresql.org/download/ -- this does not need to be a local server and our instance is on it's own separate  server
+3. A Redis http://redis.io instance is required for job queueing, VOEIS uses resque for background jobs-https://github.com/defunkt/resque
 
-## Getting Started with Development
+Once these dependencies are installed you can proceed with the rest of the VOEIS installation.
 
-1. Checkout the project:           `git clone http://github.com/yogo/yogo.git`
-2. Change directories to the code: `cd yogo`
-3. Initialize the environment:     `./setup.sh`
-4. Start persevere:                `rake persvr:start`
-5. Add example data if desired:    `rake yogo:db:example:load`
-6. Start the application:          `script/server`
-7. Go to http://localhost:3000/ and get the Yogo start page
+## Getting Started with Development or a Server after dependencies are installed
 
-### Persevere Tasks
-- Run `rake persvr:setup` to download and install persevere into vendor/persevere.
-- Run `rake persvr:remove` to remove a downloaded and installed persevere from vendor/persevere.
-- Run `rake persvr:start` to create and run a persevere instance for the current rails environment.
-- Run `rake persvr:stop` to stop the persevere instance for the current environment.
-- Run `rake persvr:clear` to reset the persevere instance database to a clean state.
-- Run `rake persvr:drop` to drop and destroy the current persevere instance.
-- Run `rake -T persvr` to see other persevere related tasks.
+1. Checkout the project:           `git clone git@github.com:yogo/VOEIS.git`
+2. Change directories to the code: `cd VOEIS`
+3. Install gems:                   `bundle install` - Note that you can choose to create a gemset and use it prior to this
+4. Setup database.yml in config/:  Edit the database.yml.start to match your postgres instance and rename this file database.yml
+5. Create the database:            `bundle exec rake db:create` NOTE that the user for you database must have db create permissions
+6. Seed the application:           `bundle exec rake db:seed` 
+7. Start the application:           'bundle exec rails s
+8. Go to http://localhost:3000/ and get the VOEIS start page!
 
-### Yogo Tasks
-- Run `rake yogo:start` to start up persevere and a server.
-- Run `rake yogo:stop` to shutdown Yogo and a corresponding persevere adapter.
-- Run `rake yogo:open` to start Yogo and open a web browser.
-- Run `rake yogo:spec` to run all rspec tests.
-- Run `rake yogo:cucumber` to run all feature tests.
+### Modify settings for non-local instance
 
-The 'yogo' rake tasks manage starting, stopping, and resetting persevere for you.
+If you want you VOEIS server to be available to other user across the Web you will need modify your VOEIS settings.  This is simple.  
+1. Login as an administrator. 
+2. Click the 'Datahub' menu item in the upper left corner
+3. Select Administration->Settings
+4. Uncheck the 'Local Only' option.
 
-### Changelog
-0.9.6 2010-10-28
- - Many UI changes
- 
-0.9.5 2010-07-21
- - Many UI updates
- - Updating the search function to search over all fields except dates
- - Fix loading settings from the database
- 
- 
-0.9.4 2010-07-09
- - Added in complete support for projects to have users and groups
- - Updated the look and feel
- - Branched yogo into a stable and development (master) branch
- 
+NOTE you can also set your application to accept API Keys for programmatic access to data at this time as well by checking the 'Allow Api Key' checkbox.
 
-0.9.3 2010-07-02
- - Improved pagination
- - Improved csv downloading
- - Bumped the required dm-persevere gem version
- 
-0.9.2 2010-06-24
- - Bumped the required dm-reflection gem version
+
 
