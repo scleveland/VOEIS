@@ -659,7 +659,8 @@
           var item = item || this.item;
           if(!item) return;
           var form = dijit.byId('data_value_edit_form');
-          var site0 = window['site'+this.site_id+'editref'].site;
+          //### CHANGED 'editref' --> 'ref' 2013-03-07
+          var site0 = window['site'+this.site_id+'ref'].site;
           $('#dv_site_name').text(site0.name.toString()+' [Id:'+site0.id.toString()+']');
           var var0 = $('#query-site'+this.site_id+' #site00_variable_select option').filter(':selected');
           var0 = var0.text().split('(')[0]+' [Id:'+var0.val()+']';
@@ -1479,18 +1480,18 @@
     -#    console.log('STATE-CHANGE:',state);
     -#    saveBtn.attr("disabled", !state);
     %table{:id=>"dv-form-table", :style=>"width:540px;"}
-      %tr
-        %td{:colspan=>"2"}
-          -#%span{:class=>"smfont"} 
-          -#  %strong SITE
-          -#%br
-          %h4{:id=>"dv_site_name", :style=>"margin:4px;"} xxx
-          -#  -if !@site.nil?
-          -#    = '%s [Id:%s]'% [@site.name,@site.id]
-          -#%span{:class=>"smfont"} 
-          -#  %strong VARIABLE
-          -#%br
-          %h4{:id=>"dv_var_name", :style=>"margin:2px;"} xxx
+      -#%tr
+      -#  %td{:colspan=>"2"}
+      -#    -#%span{:class=>"smfont"} 
+      -#    -#  %strong SITE
+      -#    -#%br
+      -#    -#%h4{:id=>"dv_site_name", :style=>"margin:4px;"} xxx
+      -#    -#  -if !@site.nil?
+      -#    -#    = '%s [Id:%s]'% [@site.name,@site.id]
+      -#    -#%span{:class=>"smfont"} 
+      -#    -#  %strong VARIABLE
+      -#    -#%br
+      -#    -#%h4{:id=>"dv_var_name", :style=>"margin:2px;"} xxx
       %tr
         %td
           %label Data Value

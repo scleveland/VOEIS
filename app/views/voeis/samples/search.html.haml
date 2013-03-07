@@ -1221,6 +1221,7 @@
          return;
        };
        var point = #{dataId}.data[item._0];
+       //$("#tooltip").remove();
        //EDIT datavalue
        console.log('EDIT DV:',item);
        data_value_edit.pop(item, function(data) {
@@ -1477,8 +1478,8 @@
            //ALT-CLICK: EDIT DataValue at Point
            data_value_edit.editing = true;
            var val_id = parseInt(val_item.id.toString());
-           val_grid.popEdit(val_id);
            $("#tooltip").remove();
+           val_grid.popEdit(val_id);
            //#{dataId}.toggle_views();
            //val_grid.scrollToRow(val_item._0);
            //val_grid.scrollToRow(val_item._0);
