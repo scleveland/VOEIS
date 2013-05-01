@@ -1,22 +1,26 @@
 - content_for(:javascripts) do
   :javascript
-    dojo.require("dijit.dijit");
-    dojo.require("dijit.Dialog");
-    dojo.require("dijit.form.Form");
-    dojo.require("dijit.form.Button");
-    dojo.require("dijit.form.Select");
-    dojo.require("dojox.form.Uploader");
-    dojo.require("dojox.grid.EnhancedGrid");
-    dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
-    dojo.require("dojox.grid.enhanced.plugins.Filter");
-    dojo.require("dojo.data.ItemFileReadStore");
     dojo.require("dijit.layout.TabContainer");
-    dojo.require("dojo.data.ItemFileReadStore");
-    dojo.require("voeis.Server");
-    dojo.require("dijit.form.DateTextBox");
-    dojo.require("dijit.form.TimeTextBox");
-    dojo.require("dijit.form.ValidationTextBox");
-    variableDataStore = voeis.Server.DEFAULT.globalVariablesDataStore();
+     dojo.require("dijit.layout.AccordionContainer");
+     dojo.require("dijit.layout.ContentPane");
+     dojo.require("dijit.form.Select");
+     dojo.require("dijit.Dialog");
+     dojo.require("dijit.ProgressBar");
+     dojo.require("dojo.data.ItemFileReadStore");
+     dojo.require("dijit.Tree");
+     dojo.require("dijit.TitlePane");
+     dojo.require("dijit.Tooltip");
+     dojo.require("dijit.form.DropDownButton");
+     dojo.require("dijit.TooltipDialog");
+     dojo.require("dojox.grid.DataGrid");
+     dojo.require("dojox.grid.EnhancedGrid");
+     dojo.require("dojox.grid.enhanced.plugins.NestedSorting");
+     dojo.require("dojox.grid.enhanced.plugins.Filter");
+     dojo.require("dojox.grid.enhanced.plugins.IndirectSelection");
+     dojo.require("dijit.form.RadioButton");
+     dojo.require("voeis.Server");
+    variableDataStore = voeis.Server.DEFAULT.projectVariablesDataStore();
+    var var_data = [#{@variables.map{|v| "        "+v.to_json}.join(",\n")}];
     var site_data = [
        #{@sites.map{|site| "        "+site.to_json}.join(",\n")}
      ];
@@ -24,7 +28,11 @@
          identifier: 'id',
          label: 'name',
          items: site_data };
-
+    var pvars_json={
+      identifier: 'id',
+      label: 'name',
+      items: var_data };
+#var_store{:dojoType=>"dojo.data.ItemFileReadStore", :jsId=>"pvars", :data=>"pvars_json"}
 %h2
   = link_to(@project.name, project_path(@project) , :onload=> "$('#loader').toggle();")
 
@@ -71,7 +79,7 @@
     %span
       Select A Variable
     #variable_select
-      %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{filter:true}",  :store=>"variableDataStore", :clientSort=>"true", :style=>"width: 800px; height: 150px;", :rowSelector=>"20px", :jsId=>"Variablegrid", :id=>"Variablegrid"}
+      %table{:dojoType=>"dojox.grid.EnhancedGrid", :plugins=> "{filter:true}",  :store=>"pvars", :clientSort=>"true", :style=>"width: 800px; height: 350px;", :rowSelector=>"20px", :jsId=>"Variablegrid", :id=>"Variablegrid"}
         %thead
           %tr
             -@var_properties.each do |prop|
