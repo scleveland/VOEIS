@@ -558,7 +558,7 @@ Form Progress:
   dojo.require("voeis.Server");
   var current_site_offset = #{@data_template.nil? ? @site.time_zone_offset : @data_template.utc_offset.nil? ? @site.time_zone_offset : @data_template.utc_offset};
   variableDataStore = voeis.Server.DEFAULT.globalVariablesDataStore();
-  localVariableDataStore = voeis.Server.DEFAULT.projectVariablesDataStore();
+  localVariableDataStore = voeis.Server.DEFAULT.projectVariablesDataStore("#{@project.id}");
   var my_store = dojo.data.ItemFileReadStore({data: variable_json_store});
   
   metatagDataStore = voeis.Server.DEFAULT.globalMetaTagDataStore();
