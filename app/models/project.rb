@@ -176,17 +176,32 @@ class Project
   manage Voeis::DataStream
   manage Voeis::DataStreamColumn
   manage Voeis::MetaTag
-  manage Voeis::SensorType
+  manage Voeis::SensorTypeCV
   manage Voeis::SensorValue
+  manage Voeis::LoggerTypeCV
   manage Voeis::Source
   manage Voeis::Unit
   manage Voeis::Variable
   manage Voeis::LabMethod
   manage Voeis::Sample
+  manage Voeis::SampleTypeCV
   manage Voeis::SampleMaterial
   manage Voeis::DataValue
   manage Voeis::Apiv
   manage Voeis::DataSet
+  manage Voeis::Script
+  
+  manage Voeis::SpatialReference
+  manage Voeis::VerticalDatumCV
+  
+  manage Voeis::VariableNameCV
+  manage Voeis::SampleMediumCV
+  manage Voeis::ValueTypeCV
+  manage Voeis::DataTypeCV
+  manage Voeis::GeneralCategoryCV
+  manage Voeis::SpeciationCV
+  manage Voeis::QualityControlLevel
+  
   def sites
     managed_repository{ Voeis::Site.all }
   end

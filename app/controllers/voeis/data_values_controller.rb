@@ -209,7 +209,8 @@ class Voeis::DataValuesController < Voeis::BaseController
   # @params['rollback'] = TRUE = ROLLBACK VERSION on batch (optional, or 'script')
   # @params['delete'] = TRUE = DELETE batch (optional, or 'script')
   # @params['target'] = variable_id ###-OR- target type: 'CSV' / etc.  (optional, or update self)
-  ##def query_script_update
+  ### NOTE(2013-03-06): on LIVE (no DRYRUN) updates-- spits out for every item (??)--
+  ### Error: object 'provenance_comment' not found
   def batch_update
     parent.managed_repository{
       updated = []

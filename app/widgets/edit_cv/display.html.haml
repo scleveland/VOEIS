@@ -194,7 +194,11 @@
             console.log('CONFIRM:',yes);
             if(yes) {
               //DO COPY
-              #{@cv_title2}_exec.cv_post_local(item);
+              #{@cv_title2}_exec.cv_post_local(item, function(){
+                //REFRESH LOCAL GRID!
+                if (i+1==global_items.length)
+                  dijit.byId('#{@cv_title2}_data.cv_management_grid').setQuery({id: '*'});
+              });
             };
           }, 
           {buttonOk: 'YES', buttonCancel: 'NO'});
@@ -208,8 +212,7 @@
     var pane = dijit.byId('manage_#{@tabId}');
     tabs.selectChild(pane);
     //REFRESH LOCAL GRID!
-    grid = dijit.byId('#{@cv_title2}_data.cv_management_grid');
-    grid.setQuery({id: '*'});
+    dijit.byId('#{@cv_title2}_data.cv_management_grid').setQuery({id: '*'});
   };
   
   //###############################
@@ -368,6 +371,8 @@
       };
     };
     if(cv_id) data.id = cv_id;
+    if(data0.hasOwnProperty('provenance_comment') && data0.provenance_comment)
+      data['provenance_comment'] = cleanString(data0.provenance_comment);
     return data;
   };
   
@@ -556,6 +561,14 @@
   %form(id="#{@cv_title2}_form" jsId="#{@cv_title2}_form" dojoType="dijit.form.Form" method="post")
     - cv_ta_style = 'width:98%!important;line-height:16px!important;'
     - cv_ta_rows = "3"
+    -### GLOBAL TERMS SELECT
+    - if !@copy_data.nil?
+      - opts_global = "<option value='-'>- GLOBAL TERMS -</option>\n"
+      - @copy_data.each do |row|
+        - opts_global += "<option value='#{row[@cv_id]}'>#{row[@cv_name]}</option>\n"
+      = select_tag("#{@tabId}_global_select", (opts_global).html_safe)
+      %br
+      %br
     - @cv_form.each do |cvinput|
       - cvdelim = cvinput[:type].split('-')
       - cvtype = cvdelim[-1]
@@ -604,6 +617,14 @@
           this.connect(#{@cv_title2}_form, "onValidStateChange", function(state){
             this.attr("disabled", !state);
           });
+          //### GLOBAL SELECT ON-CHANGE
+          $("##{@tabId}_global_select").change(function(e){
+            console.log('GLOBAL-SELECT-CHANGE:',this.value);
+            var store = #{@cv_title2}_data.copy_store;
+            var global = datastore.get(this.value,store);
+            delete global.id;
+            #{@cv_title2}_exec.cv_form_populate(global);
+          });
           //MAKE COPY GLOBAL
           #{@tabId}_cv_dialog_box.global_copy = function(item) {
             //DO COPY
@@ -621,33 +642,29 @@
               #{@tabId}_cv_dialog_box.hide();
             });
           };
-          //### ON-CLICK
+          //### ON-CLICK: SAVE
           this.connect(this, "onClick", function(){
             var form = #{@cv_title2}_form.domNode;
             var cv_id = dojo.byId('#{@cv_title2}_id');
             cv_id = cv_id ? parseInt(cv_id.value) : 0;
-            var cv_idx = dojo.byId('#{@cv_title2}_idx');
-            cv_idx = cv_idx ? cv_idx.value : '';
             var item = #{@cv_title2}_exec.cv_form_fetch();
-            //var data = {#{@cv_title2cv}: item};
             console.log('POST:',item);
-            if(cv_id && cv_idx[0]=='#') {
-              //COPY GLOBAL
-              item['provenance_comment'] = 'Copied from GLOBAL';
-              var items = datastore.fetch({#{@cv_name}: item['#{@cv_name}'].toString()}, #{@cv_title2}_data.cv_store);
-              if(items.length) {
-                var text = items.length.toString()+' similar #{@cv_name}(s) already exist(s)-- are you sure you want another?';
-                confirmDialog('Please confirm &mdash;', text, 
-                  function(yes) {
-                    console.log('CONFIRM:',yes);
-                    if(yes) {
-                      //DO COPY
-                      #{@tabId}_cv_dialog_box.global_copy(item)
-                    } else #{@tabId}_cv_dialog_box.hide();
-                  }, 
-                  {buttonOk: 'YES', buttonCancel: 'NO'});
-                } else #{@tabId}_cv_dialog_box.global_copy(item);
+            var items = datastore.fetch({#{@cv_name}: item['#{@cv_name}'].toString()}, #{@cv_title2}_data.cv_store);
+            if(items.length) {
+              var text = items.length.toString()+' similar #{@cv_name}(s) already exist(s)-- are you sure you want another?';
+              confirmDialog('Please confirm &mdash;', text, 
+                function(yes) {
+                  console.log('CONFIRM:',yes);
+                  if(yes) {
+                    //DO SAVE
+                    #{@cv_title2}_exec.cv_save(cv_id, item, function(){
+                      #{@tabId}_cv_dialog_box.hide();
+                    });
+                  };
+                }, 
+                {buttonOk: 'YES', buttonCancel: 'NO'});
             } else {
+              //DO SAVE
               #{@cv_title2}_exec.cv_save(cv_id, item, function(){
                 #{@tabId}_cv_dialog_box.hide();
               });

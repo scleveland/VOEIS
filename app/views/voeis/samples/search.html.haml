@@ -189,7 +189,8 @@
           //var tabs = dijit.byId('#{@tabId}_query_tabs');
           //var pane0 = dijit.byId('#{@tabId}_plot_view');
           //tabs.selectChild(pane0);
-          #{dataId}.update_views();
+          console.log('TITLE- GRAPH');
+          #{dataId}.update_views('GRAPH');
       
       %div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
         &nbsp;&nbsp;
@@ -291,7 +292,8 @@
       :style=>"margin:0;padding:0;"}
       %script{:type=>"dojo/method", :event=>"onShow"}
         :plain
-          #{dataId}.update_views();
+          console.log('TITLE- TABLE');
+          #{dataId}.update_views('TABLE');
       
       %div(data-dojo-type="dijit.Toolbar" style="height:25px!important;margin: 0 0 15px 0;")
         &nbsp;&nbsp;
@@ -540,6 +542,7 @@
                               };
                               grid_data.push(item);
                             };
+                            console.log('GRID-DATA:',grid_data,grid_struct);
                             grid_dialog.pop('DRY-RUN SCRIPT RESULTS (first 20)',grid_struct,grid_data);
                           };
                           var elapsed = (new Date().valueOf()-start_time)/1000;
@@ -675,11 +678,21 @@
     };
     //######################################
     //*** UPDATE PLOT / GRID / etc.
-    #{dataId}.update_views = function(item) {
+    #{dataId}.update_views = function() {
+      console.log('update_views:',arguments);
+      var tabs = dijit.byId('#{@tabId}_tabs');
       var val_grid = #{dataId}.val_grid;
       var val_plot = #{dataId}.plot;
-      var tabs = dijit.byId('#{@tabId}_tabs');
-      console.log('UPDATE-VIEWS: '+tabs.selectedChildWidget.title);
+      var ttl = '';
+      var item = 0;
+      var args = Array.prototype.slice.call(arguments);
+      while(args.length>0) {
+        var arg = args.shift();
+        if(typeof arg=='string') ttl = arg.toUpperCase();
+        if(typeof arg=='object' && arg.id) item = arg;
+      };
+      if(!ttl) ttl = tabs.selectedChildWidget.title.toUpperCase();
+      console.log('UPDATE-VIEWS: '+ttl);
       if(item) {
         //### Update Grid
         var upd = datastore.update(item,#{dataId}.val_store);
@@ -690,15 +703,14 @@
         var dateval = item.date_time_utc.toString();
         dateval = new Date(dateval).valueOf();
         dateval = parseInt(dateval/1000)*1000;
-        console.log('UPDATE_VIEWS:',item,upd,dateval);
+        console.log('UPDATE_VIEWS_ITEM:',item,upd,dateval);
         #{dataId}.data[upd._0] = [dateval,item.data_value];
       };
       $('span.#{@tabId}_datacount').text(#{dataId}.data.length);
       $("#tooltip").remove();
-      //if($('##{@tabId}_toggle_view_id').text()=='VIEW TABLE') {
-      if(tabs.selectedChildWidget.title=='Table') {
+      if(ttl=='GRAPH') {
         //### UPDATE PLOT
-        console.log('UPDATE PLOT:',tabs.selectedChildWidget.title);
+        console.log('UPDATE PLOT: '+ttl+' --',tabs.selectedChildWidget.title);
         //var data_upd = #{dataId}.plot.getData();
         //#{dataId}.plot.setData(data_upd);
         #{dataId}.plot.setData([#{dataId}.data]);
@@ -708,9 +720,9 @@
         //var val_selected = #{dataId}.val_grid.selection.getSelected();
         var val_selected = val_grid.selection.getSelected();
         plotutils.highlightItems(val_selected,0,#{dataId}.plot);
-      } else if(tabs.selectedChildWidget.title=='Graph') {
+      } else if(ttl=='TABLE') {
         //### UPDATE GRID
-        console.log('UPDATE GRID:',tabs.selectedChildWidget.title);
+        console.log('UPDATE GRID: '+ttl+' --',tabs.selectedChildWidget.title);
         var grid_sel = val_grid.selection.getSelected();
         dojo.connect(val_grid,"_onFetchComplete",function(){
           if(grid_sel.length) {
@@ -852,20 +864,20 @@
       if(getSelected || datasource=='SEL') {
         console.log('>>>SEL');
         valdata = #{dataId}.val_grid.selection.getSelected();
-        for(var i=0; i<valdata.length; i++) 
-          data_vals.push(valdata[i].id[0]);
-        batch['data_vals'] = data_vals;
-        //batch['data_vals'] = valdata;
       } else if(datasource=='ALL') {
         valdata = #{dataId}.value_data;
-        for(var i=0; i<valdata.length; i++) 
-          data_vals.push(valdata[i].id[0]);
-        batch['data_vals'] = data_vals;
-        //batch['data_vals'] = valdata;
       } else {
         batch['data_set'] = datasource;
       };
-      console.log('>>>DATA-VALS:',valdata);
+      if(valdata.length) {
+        for(var i=0; i<valdata.length; i++) 
+          if(valdata[i] && valdata[i].id)
+            data_vals.push(valdata[i].id[0]);
+        batch['data_vals'] = data_vals;
+        //batch['data_vals'] = valdata;
+      };
+      
+      console.log('>>>VALDATA:',valdata);
       console.log('>>>DATA-VALS:',data_vals);
       console.log('>>>DATASOUREC:',datasource);
       if(!valdata.length && !parseInt(datasource)) {
@@ -1209,6 +1221,7 @@
          return;
        };
        var point = #{dataId}.data[item._0];
+       //$("#tooltip").remove();
        //EDIT datavalue
        console.log('EDIT DV:',item);
        data_value_edit.pop(item, function(data) {
@@ -1247,6 +1260,7 @@
        for(var i=data.length-1; i>=0; i--) {
          var item0 = datastore.get_raw(data[i].id,#{dataId}.val_store);
          var item = datastore.item(item0);
+         var upd = {};
          var dateval = new Date(item.local_date_time.toString());
          if(data[i].error) {
            var val_string = ' -- ['+item.id+'] '+dateval.format(datastore.date_format)+' / '+item.data_value;
@@ -1256,9 +1270,20 @@
            //console.log('DELETE-PLOT:',item._0);
            #{dataId}.data.splice(item._0,1);
          } else {
-           datastore.update(item0,#{dataId}.val_store);
            dateval = parseInt(dateval/1000)*1000;
-           #{dataId}.data[item._0] = [dateval,item.data_value]
+           var value = item.data_value;
+           if(data[i].data_value) value = data[i].data_value;
+           #{dataId}.data[item._0] = [dateval, value]
+           for (prop in data[i])
+             if(item.hasOwnProperty(prop))
+               upd[prop] = data[i][prop];
+           datastore.update(upd,#{dataId}.val_store);
+           //var d = new Date(dateval).format('UTC:yyyy-mm-dd HH:MM:ss').replace(' ','T')+'+00:00';
+           //upd['date_time_utc'] = d;
+           //dateval = parseInt((dateval/1000)+item.utc_offset*3600)*1000
+           //d = new Date(dateval).format('UTC:yyyy-mm-dd HH:MM:ss').replace(' ','T');
+           //d += datastore.formats.dataDateTime(item).slice(-6);
+           //upd['local_date_time'] = d;
            //if(data[i].hasOwnProperty('data_value')) {
            //  dateval = parseInt(dateval/1000)*1000;
            //  #{dataId}.data[item._0] = [dateval,data[i].data_value]
@@ -1453,8 +1478,8 @@
            //ALT-CLICK: EDIT DataValue at Point
            data_value_edit.editing = true;
            var val_id = parseInt(val_item.id.toString());
-           val_grid.popEdit(val_id);
            $("#tooltip").remove();
+           val_grid.popEdit(val_id);
            //#{dataId}.toggle_views();
            //val_grid.scrollToRow(val_item._0);
            //val_grid.scrollToRow(val_item._0);
