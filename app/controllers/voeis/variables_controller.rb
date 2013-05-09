@@ -293,58 +293,79 @@ class Voeis::VariablesController < Voeis::BaseController
   # POST /variables
   def create
     @project = parent
-    @project.managed_repository{
-      varparams = params[:variable]
-      
-      logger.info '### VARPARAMS ###'
-      logger.info varparams
-      
-      varparams.each{|prop,value| 
-        v = value.strip
-        varparams[prop] = nil if v=='NaN' || v=='null' }
-      [:variable_units_id,:time_units_id,:quality_control].each{|prop| 
-        varparams[prop] = varparams[prop].to_i }
-      [:lab_id,:lab_method_id,:field_method_id,:spatial_units_id].each{|prop| 
-        varparams[prop] = (varparams[prop]=='0' || varparams[prop]==nil) ? nil : varparams[prop].to_i }
-      [:time_support,:detection_limit,:spatial_offset_value].each{|prop| 
-        varparams[prop] = varparams[prop]=='' ? nil : varparams[prop].to_f }
-      #varparams[:hid_id] = varparams[:his_id]=='' ? nil : varparams[:hid_id].to_i
-      varparams[:is_regular] = varparams[:is_regular]=~(/(true|t|yes|y|1)$/i) ? true : false
+    varparams = params[:variable]
     
-      varparams.each do |key, value|
-        varparams[key] = value.blank? && key.to_s!='is_regular' ? nil : value
-      end
+    logger.info '### VARPARAMS ###'
+    logger.info varparams
+    
+    varparams.each{|prop,value| 
+      v = value.strip
+      varparams[prop] = nil if v=='NaN' || v=='null' }
+    [:variable_units_id,:time_units_id,:quality_control].each{|prop| 
+      varparams[prop] = varparams[prop].to_i }
+    [:lab_id,:lab_method_id,:field_method_id,:spatial_units_id].each{|prop| 
+      varparams[prop] = (varparams[prop]=='0' || varparams[prop]==nil) ? nil : varparams[prop].to_i }
+    [:time_support,:detection_limit,:spatial_offset_value].each{|prop| 
+      varparams[prop] = varparams[prop]=='' ? nil : varparams[prop].to_f }
+    #varparams[:hid_id] = varparams[:his_id]=='' ? nil : varparams[:hid_id].to_i
+    varparams[:is_regular] = varparams[:is_regular]=~(/(true|t|yes|y|1)$/i) ? true : false
+  
+    varparams.each do |key, value|
+      varparams[key] = value.blank? && key.to_s!='is_regular' ? nil : value
+    end
+    global_variable = Voeis::Variable.new(varparams)
+    if global_variable.variable_code.nil? || @variable_code =="undefined"
+      global_variable.variable_code = global_variable.id.to_s+global_variable.variable_name+global_variable.speciation+Voeis::Unit.get(global_variable.variable_units_id).units_name
+    end
+    if global_variable.valid? && global_variable.save
+      @project.managed_repository{
 
-      @variable = Voeis::Variable.new(varparams)
-      if @variable.variable_code.nil? || @variable_code =="undefined"
-        @variable.variable_code = @variable.id.to_s+@variable.variable_name+@variable.speciation+Voeis::Unit.get(@variable.variable_units_id).units_name
-      end
-      logger.info '### ORG. VARIABLE ###'
-      logger.info @variable.to_hash
+
+        @variable = Voeis::Variable.new(global_variable.attributes)
+        # if @variable.variable_code.nil? || @variable_code =="undefined"
+        #   @variable.variable_code = @variable.id.to_s+@variable.variable_name+@variable.speciation+Voeis::Unit.get(@variable.variable_units_id).units_name
+        # end
+        logger.info '### ORG. VARIABLE ###'
+        logger.info @variable.to_hash
       
-      #@variable.detection_limit = nil if params[:variable][:detection_limit].empty?
-      #@variable.field_method_id = nil if params[:variable][:field_method_id].empty?
-      #@variable.lab_id = nil if params[:variable][:lab_id].empty?
-      #@variable.lab_method_id = nil if params[:variable][:lab_method_id].empty?
-      #@variable.spatial_offset_type = nil if params[:variable][:spatial_offset_type].empty?
-      #@variable.valid?
-      puts '### VARIABLE ERRORS ###'
-      puts @variable.errors.inspect()
+        #@variable.detection_limit = nil if params[:variable][:detection_limit].empty?
+        #@variable.field_method_id = nil if params[:variable][:field_method_id].empty?
+        #@variable.lab_id = nil if params[:variable][:lab_id].empty?
+        #@variable.lab_method_id = nil if params[:variable][:lab_method_id].empty?
+        #@variable.spatial_offset_type = nil if params[:variable][:spatial_offset_type].empty?
+        #@variable.valid?
+        puts '### VARIABLE ERRORS ###'
+        puts @variable.errors.inspect()
     
-      if @variable.valid? && @variable.save
-        respond_to do |format|
-          format.html do
-            flash[:notice] = 'Variable was successfully created.'
-            redirect_to(new_project_variable_path(parent))
+        if @variable.valid? && @variable.save
+          respond_to do |format|
+            format.html do
+              flash[:notice] = 'Variable was successfully created.'
+              redirect_to(new_project_variable_path(parent))
+            end
+            format.json do
+               render :json => @variable.as_json, :callback => params[:jsoncallback]
+            end
           end
-          format.json do
-             render :json => @variable.as_json, :callback => params[:jsoncallback]
+        else
+          errs = @variable.errors.full_messages
+          logger.info '### VARIABLE ERRORS ###'
+          logger.info errs.join("\n")
+          respond_to do |format|
+            format.html{
+              flash[:error] = "Variable save failed: "+errs.join(" - ")
+              #redirect_to project_url(@project)
+              redirect_to(new_project_variable_path(parent))
+            }
+            format.json{
+              render :json => {:errors=>errs.join(' - ')}.to_json, :callback => params[:jsoncallback]
+            }
           end
         end
-      else
-        errs = @variable.errors.full_messages
-        logger.info '### VARIABLE ERRORS ###'
-        logger.info errs.join("\n")
+      }
+    else
+      errs = global_variable.errors.full_messages
+      @project.managed_repository do
         respond_to do |format|
           format.html{
             flash[:error] = "Variable save failed: "+errs.join(" - ")
@@ -356,7 +377,7 @@ class Voeis::VariablesController < Voeis::BaseController
           }
         end
       end
-    }
+    end
   end
   
   # DELETE /variables/$ID$
