@@ -682,7 +682,9 @@ class Voeis::LoggerImportsController < Voeis::BaseController
             flash[:notice] = "File parsed and stored successfully for #{site.name}. #{@results[:total_records_saved]} data values saved and #{@results[:total_rows_parsed]} rows where parsed. "
           else
             flash[:notice] = "File parsed for #{site.name}. #{@results[:total_records_saved]} data values saved and #{@results[:total_rows_parsed]} rows where parsed."
-            flash[:error] = "There were the following errors: #{@results[:errors]}"
+            flash[:error] = "There were the following errors: <br/>"
+            current_user.last_error =  @results[:errors]
+            current_user.save
           end
         end
       end
