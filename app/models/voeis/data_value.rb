@@ -90,7 +90,7 @@ class Voeis::DataValue
      end
   end
   
-  
+  #DataValue.parse_logger_csv('temperature1.csv', 2, 1, 2, "","",)
   # Parses a csv file using an existing data_column template
   # column values are stored in data_values
   #
@@ -396,7 +396,7 @@ class Voeis::DataValue
 
     end
     rescue Exception => e
-      errors = "Row #{row_number}: #{row} - - did not store correclty.  ERROR:  #{e.inspect}"
+      errors = "Row #{row_number}: #{row} - - did not store correclty.  ERROR:  #{e.inspect.gsub('<','').gsub('>','')}"
       puts errors
     end
     return {:result_ids => result_ids, :errors => errors}

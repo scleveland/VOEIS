@@ -678,7 +678,12 @@ class Voeis::LoggerImportsController < Voeis::BaseController
           @results = Voeis::DataValue.parse_logger_csv(params[:datafile], data_stream.id, site.id, params[:start_line].to_i, nil, nil,current_user.id)
           puts "updating the site catalog" 
           Voeis::Site.get(site.id).update_site_data_catalog_variables(@variables)
-          flash[:notice] = "File parsed and stored successfully for #{site.name}. #{@results[:total_records_saved]} data values saved and #{@results[:total_rows_parsed]} rows where parsed. "
+          if @results[:errors].empty?
+            flash[:notice] = "File parsed and stored successfully for #{site.name}. #{@results[:total_records_saved]} data values saved and #{@results[:total_rows_parsed]} rows where parsed. "
+          else
+            flash[:notice] = "File parsed for #{site.name}. #{@results[:total_records_saved]} data values saved and #{@results[:total_rows_parsed]} rows where parsed."
+            flash[:error] = "There were the following errors: #{@results[:errors]}"
+          end
         end
       end
         # parent.publish_his

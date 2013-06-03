@@ -1761,8 +1761,13 @@ class Voeis::DataValuesController < Voeis::BaseController
            puts "updating the site catalog" 
            Voeis::Site.get(site.id).update_site_data_catalog_variables(@variables)
          end #end repo
-         #parent.publish_his
-         flash[:notice] = "File parsed and stored successfully for #{site.name}. #{@results[:total_records_saved]} data values saved and #{@results[:total_rows_parsed]} rows where parsed. "
+         #parent.publish_his         
+         if @results[:errors].empty?
+           flash[:notice] = "File parsed and stored successfully for #{site.name}. #{@results[:total_records_saved]} data values saved and #{@results[:total_rows_parsed]} rows where parsed. "
+         else
+           flash[:notice] = "File parsed for #{site.name}. #{@results[:total_records_saved]} data values saved and #{@results[:total_rows_parsed]} rows where parsed."
+           flash[:error] = "There were the following errors: #{@results[:errors]}"
+         end
          redirect_to project_path(params[:project_id]) and return
          rescue Exception => e  
            email_exception(e,request.env)
