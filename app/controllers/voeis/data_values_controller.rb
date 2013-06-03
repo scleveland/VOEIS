@@ -1767,7 +1767,7 @@ class Voeis::DataValuesController < Voeis::BaseController
          else
            flash[:notice] = "File parsed for #{site.name}. #{@results[:total_records_saved]} data values saved and #{@results[:total_rows_parsed]} rows where parsed."
            flash[:error] = "There were the following errors: <br/>"
-           current_user.last_erro = @results[:errors]
+           current_user.last_error = @results[:errors]
            current_user.save
          end
          redirect_to project_path(params[:project_id]) and return
