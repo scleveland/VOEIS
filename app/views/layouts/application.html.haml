@@ -162,15 +162,17 @@
     -if !flash.empty?
       #flash
         %b{:class=> "error"}
-          - if flash[:error]
+          - if flash[:error] && !current_user.nil? && !current_user.last_error.nil?
             #error_flash_dialog{:dojoType=>"dijit.Dialog", :title=>"ERROR", :style=>"width:800px;", :jsId=>"error_flash_dialog"}
               %script{:type=>"dojo/method"}
                 :plain
-                    error_flash_dialog.show();
+                  error_flash_dialog.show();
               %div.error_message{:style=>"color:#8A1F11;font-weight:bold;"}
                 %strong{:style=>"color:#8A1F11;text-align:center;font-weight:bold;"}
                 :plain
-                  #{flash[:error] + current_user.last_error.gsub("|","<br/>")}  
+                  #{(flash[:error] + current_user.last_error).gsub("|","<br/>")} 
+          - else
+            #{flash[:error].gsub("|","<br/>")} 
         %b{:class=> "warning"}
           = flash[:warning]
         %b{:class=> "alert"}
