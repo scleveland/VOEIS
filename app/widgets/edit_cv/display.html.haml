@@ -126,6 +126,16 @@
   
   
   //###############################
+  // UPDATE GRID ITEM COUNT
+  #{@cv_title2}_exec.cv_update = function() {
+    //console.log('CV_UPDATE NOW!!');
+    var cv_store = #{@cv_title2}_data.cv_store;
+    var copy_store = #{@cv_title2}_data.copy_store;
+    var cv_count = cv_store._arrayOfAllItems.length.toString();
+    console.log('CV_UPDATE: '+cv_count);
+    $('##{@cv_title2}-cv-count').text(cv_count);
+  };
+  //###############################
   // CREATE NEW ITEM IN DOJO STORE
   #{@cv_title2}_exec.cv_store_new = function(item0,store) {
     var new_store = store || #{@cv_title2}_data.cv_store;
@@ -142,12 +152,17 @@
     if(window.update_select_element) {
       $(window.update_select_element).val(item0['#{@cv_name}']);
       window.update_select_element = false;
-    }
+    };
+    #{@cv_title2}_exec.cv_update();
   };
   //###############################
   // UPDATE ITEM IN DOJO STORE
   #{@cv_title2}_exec.cv_store_upd = function(dat,store) {
     var upd_store = store || #{@cv_title2}_data.cv_store;
+    //d = new Date(dat.update_at);
+    //dat.updated_at = d.format(datastore.date_format);
+    dat.updated_at = dat.updated_at.replace('T',' ').slice(0,-6);
+    console.log('STORE_UPD:',dat);
     datastore.update(dat,upd_store);
   };
   
@@ -175,6 +190,46 @@
     console.log('POP EDIT #{@tabId}:',item_id);
     var item = datastore.get_raw(item_id, #{@cv_title2}_data.cv_store);
     #{@cv_title2}_exec.cv_datum_edit(item);
+  };
+  //###############################
+  // COPY -ALL- GLOBAL ITEMS (TERMS) TO LOCAL
+  #{@cv_title2}_exec.copy_global_all = function() {
+    var global_items = datastore.fetch({#{@cv_name}: '*'}, #{@cv_title2}_data.copy_store);
+    var gcount = global_items.length;
+    console.log('COPY GLOBAL ALL: '+gcount);
+    if(global_items.length==0) return;
+    var text = 'Are you sure you want to copy ALL '+gcount+' GLOBAL #{@cv_name}?';
+    confirmDialog('Please confirm &mdash;', text, 
+      function(yes) {
+        console.log('CONFIRM:',yes);
+        if(yes) {
+          //DO COPY ALL
+          for(var i=0; i<global_items.length; i++) {
+            var item = global_items[i];
+            var items = datastore.fetch({#{@cv_name}: item['#{@cv_name}'].toString()}, #{@cv_title2}_data.cv_store);
+            console.log('COPY GLOBAL- ITEMS COUNT: '+items.length);
+            if(!items.length) {
+              //DO COPY --don't have this one
+              delete item.id;   //### DON'T KEEP ID -NO SYNC NEW
+              item['provenance_comment'] = 'Copied from GLOBAL';
+              #{@cv_title2}_exec.cv_post_local(item, function(){
+                console.log('COPY GLOBAL:', item);
+                //REFRESH LOCAL GRID!
+                if (i+1==global_items.length)
+                  dijit.byId('#{@cv_title2}_data.cv_management_grid').setQuery({id: '*'});
+              });
+            };
+          };
+          //SELECT LOCAL PANE
+          var tabs = dijit.byId('#{@tabId}_tabs');
+          var pane = dijit.byId('manage_#{@tabId}');
+          tabs.selectChild(pane);
+          //REFRESH LOCAL GRID!
+          dijit.byId('#{@cv_title2}_data.cv_management_grid').setQuery({id: '*'});
+          #{@cv_title2}_exec.cv_update();
+        };
+      }, 
+      {buttonOk: 'YES', buttonCancel: 'NO'});
   };
   //###############################
   // COPY GLOBAL ITEMS (TERMS) TO LOCAL
@@ -213,6 +268,7 @@
     tabs.selectChild(pane);
     //REFRESH LOCAL GRID!
     dijit.byId('#{@cv_title2}_data.cv_management_grid').setQuery({id: '*'});
+    #{@cv_title2}_exec.cv_update();
   };
   
   //###############################
@@ -242,6 +298,7 @@
       });
       return true;
     };
+    #{@cv_title2}_exec.cv_update();
   };
   
   //###############################
@@ -315,6 +372,7 @@
                   #{@cv_title2}_exec.cv_store_new(item,#{@cv_title2}_data.copy_store);
                 if(call_back) call_back();
               };
+              #{@cv_title2}_exec.cv_update();
           }});
         };
         //#{@tabId}_cv_dialog_box.hide();
@@ -377,24 +435,50 @@
   };
   
   //######################################
+  // GET DIALOG FORM WIDGET
+  #{@cv_title2}_exec.cv_form_widget = function(fname, checkbox, value) {
+    //widg = dijit.byId('#{@cv_title2}_'+fname);
+    //if(!widg) widg = dojo.byId('#{@cv_title2}_'+fname);
+    //widg.set('checked', false);
+    //if(widg.set) widg.set('value', '');
+    //else widg.value = '';
+    //if(widg.set) widg.set('value', '');
+    //else widg.value = '';
+    var widg = $('##{@cv_title2}_'+fname);
+    if (value==undefined) {
+      if (widg)
+        if (checkbox)
+          return widg.attr('checked') ? true : false;
+        else
+          return widg.val();
+      return '';
+    } else {
+      if (checkbox)
+        widg.attr('checked', value ? 'checked' : false);
+      else
+        widg.val(value);
+      return widg;
+    };
+  };
+  //######################################
   // CLEAR DIALOG FORM
   #{@cv_title2}_exec.cv_form_clear = function() {
     var form = #{@cv_title2}_form;
     var fields = #{@cv_title2}_data.cv_fields;
     for(var i=0;i<fields.length;i++) {
       var fname = fields[i][0].toString();
-      var widg = dijit.byId('#{@cv_title2}_'+fname);
-      if(!widg) widg = dojo.byId('#{@cv_title2}_'+fname);
-      if(widg) {
-        if(fields[i][1].slice(1)=='CK')
-          widg.set('checked', false);
-        else
-          if(widg.set) widg.set('value', '');
-          else widg.value = '';
-      };
+      if(fields[i][1].slice(1)=='CK')
+        #{@cv_title2}_exec.cv_form_widget(fname, true, false);
+      else
+        #{@cv_title2}_exec.cv_form_widget(fname, false, '');
     };
-    var widg = dojo.byId('#{@cv_title2}_id');
-    if(widg) widg.value = '0';
+    //var widg = dojo.byId('#{@cv_title2}_id');
+    //if(widg) widg.value = '0';
+    #{@cv_title2}_exec.cv_form_widget('id', false, '0');
+    // RESET GLOBAL SELECT
+    $('##{@tabId}_global_select').val('-');
+    // VALIDATE FORM
+    form.validate();
   };
   //######################################
   // POPULATE DIALOG FORM
@@ -404,18 +488,17 @@
     var fields = #{@cv_title2}_data.cv_fields;
     for(var i=0;i<fields.length;i++) {
       var fname = fields[i][0].toString();
-      var widg = dijit.byId('#{@cv_title2}_'+fname);
-      if(!widg) widg = dojo.byId('#{@cv_title2}_'+fname);
-      if(widg && cv_item.hasOwnProperty(fname)) {
+      if(cv_item.hasOwnProperty(fname))
         if(fields[i][1].slice(1)=='CK')
-          widg.set('checked', cv_item[fname][0]? true : false);
+          #{@cv_title2}_exec.cv_form_widget(fname, true, cv_item[fname][0]? 'checked' : false);
         else
-          if(widg.set) widg.set('value', cv_item[fname].toString());
-          else widg.value = cv_item[fname].toString();
-      };
+          #{@cv_title2}_exec.cv_form_widget(fname, false, cv_item[fname].toString());
     };
-    var widg = dijit.byId('#{@cv_title2}_provenance_comment');
-    if(widg) widg.set('value', '');
+    #{@cv_title2}_exec.cv_form_widget('provenance_comment', false, '');
+    // RESET GLOBAL SELECT
+    $('##{@tabId}_global_select').val('-');
+    // VALIDATE FORM
+    form.validate();
   };
   //######################################
   // FETCH DIALOG FORM DATA
@@ -430,21 +513,17 @@
     var data = {};
     for(var i=0;i<fields.length;i++) {
       var fname = fields[i][0].toString();
-      widg = dijit.byId('#{@cv_title2}_'+fname);
-      if(!widg) widg = dojo.byId('#{@cv_title2}_'+fname);
       //##### SKIP X fields!
-      if(widg && fields[i][1][0]!='X')
+      if(fields[i][1][0]!='X')
         if(fields[i][1].slice(1)=='CK')
-          data[fname] = widg.get('checked');
+          data[fname] = #{@cv_title2}_exec.cv_form_widget(fname, true);
         else
-          data[fname] = widg.value;
+          data[fname] = #{@cv_title2}_exec.cv_form_widget(fname, false);
     };
     //##### ID>0: NOT NEW (UPDATE)
     if(id) {
       data['id'] = id;
-      var widg = dijit.byId('#{@cv_title2}_provenance_comment');
-      if(widg) 
-        data['provenance_comment'] = widg.value;
+      data['provenance_comment'] = #{@cv_title2}_exec.cv_form_widget('provenance_comment', false);
     };
     return data;
   };
@@ -650,7 +729,7 @@
             var item = #{@cv_title2}_exec.cv_form_fetch();
             console.log('POST:',item);
             var items = datastore.fetch({#{@cv_name}: item['#{@cv_name}'].toString()}, #{@cv_title2}_data.cv_store);
-            if(items.length) {
+            if(items.length && cv_id==0) {
               var text = items.length.toString()+' similar #{@cv_name}(s) already exist(s)-- are you sure you want another?';
               confirmDialog('Please confirm &mdash;', text, 
                 function(yes) {
@@ -809,7 +888,9 @@
     %div{:id=>"copytab_#{@tabId}", :dojoType=>"dijit.layout.ContentPane", :title=>"Global Terms", 
       :style=>"width:860px;height:350px;margin-top:0;"}
       %button{:dojoType=>"dijit.form.Button", :title=>'Copy', :onClick=>"#{@cv_title2}_exec.copy_global();"} Copy Selected
-      &nbsp; click here to create local copies of selected GLOBAL #{@cv_title} entries
+      &nbsp;&nbsp;
+      %button{:dojoType=>"dijit.form.Button", :title=>'Copy', :onClick=>"#{@cv_title2}_exec.copy_global_all();"} Copy ALL
+      &nbsp; click to create local copies of GLOBAL #{@cv_title} entries
       %table{:dojoType=>"dojox.grid.EnhancedGrid", :store=>"#{@cv_title2}_data.copy_store", :jsId=>"global_grid", 
               :plugins=> "{filter:true, indirectSelection:{headerSelector:true,rowSelector:'multi',selectionMode:'extended'}}", 
               :clientSort=>"true", 
