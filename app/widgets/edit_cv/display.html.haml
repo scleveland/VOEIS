@@ -159,6 +159,10 @@
   // UPDATE ITEM IN DOJO STORE
   #{@cv_title2}_exec.cv_store_upd = function(dat,store) {
     var upd_store = store || #{@cv_title2}_data.cv_store;
+    //d = new Date(dat.update_at);
+    //dat.updated_at = d.format(datastore.date_format);
+    dat.updated_at = dat.updated_at.replace('T',' ').slice(0,-6);
+    console.log('STORE_UPD:',dat);
     datastore.update(dat,upd_store);
   };
   
@@ -188,7 +192,7 @@
     #{@cv_title2}_exec.cv_datum_edit(item);
   };
   //###############################
-  // COPY GLOBAL ITEMS (TERMS) TO LOCAL
+  // COPY -ALL- GLOBAL ITEMS (TERMS) TO LOCAL
   #{@cv_title2}_exec.copy_global_all = function() {
     var global_items = datastore.fetch({#{@cv_name}: '*'}, #{@cv_title2}_data.copy_store);
     var gcount = global_items.length;
@@ -227,6 +231,8 @@
       }, 
       {buttonOk: 'YES', buttonCancel: 'NO'});
   };
+  //###############################
+  // COPY GLOBAL ITEMS (TERMS) TO LOCAL
   #{@cv_title2}_exec.copy_global = function() {
     var global_items = global_grid.selection.getSelected();
     console.log('COPY GLOBAL (items): '+global_items.length);
@@ -517,7 +523,7 @@
     //##### ID>0: NOT NEW (UPDATE)
     if(id) {
       data['id'] = id;
-      data['provenance_comment'] = #{@cv_title2}_exec.cv_form_widget('provenance_comment', true);
+      data['provenance_comment'] = #{@cv_title2}_exec.cv_form_widget('provenance_comment', false);
     };
     return data;
   };
@@ -723,7 +729,7 @@
             var item = #{@cv_title2}_exec.cv_form_fetch();
             console.log('POST:',item);
             var items = datastore.fetch({#{@cv_name}: item['#{@cv_name}'].toString()}, #{@cv_title2}_data.cv_store);
-            if(items.length) {
+            if(items.length && cv_id==0) {
               var text = items.length.toString()+' similar #{@cv_name}(s) already exist(s)-- are you sure you want another?';
               confirmDialog('Please confirm &mdash;', text, 
                 function(yes) {

@@ -280,7 +280,8 @@ var datastore = {
             if(new_item[prop]==null) store.setValue(item, prop, null);
             else store.setValue(item, prop, datastore.value(new_item[prop]));
         upd_item = item;
-        if(item.hasOwnProperty('updated_at')){
+        //###if-false### SKIP THIS
+        if(false && item.hasOwnProperty('updated_at')){
           d = new Date();
           store.setValue(item, prop, d.format(this.date_format));
           item['updated_at'] = d.format(this.date_format);
