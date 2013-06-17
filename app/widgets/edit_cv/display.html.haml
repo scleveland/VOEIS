@@ -131,7 +131,7 @@
     //console.log('CV_UPDATE NOW!!');
     var cv_store = #{@cv_title2}_data.cv_store;
     var copy_store = #{@cv_title2}_data.copy_store;
-    var cv_count = cv_store._arrayOfAllItems.length.toString();
+    var cv_count = datastore.count(cv_store);
     console.log('CV_UPDATE: '+cv_count);
     $('##{@cv_title2}-cv-count').text(cv_count);
   };
@@ -292,13 +292,13 @@
           console.log('POSTED:', data0, data, dat);
           data0.id = dat.id;
           #{@cv_title2}_exec.cv_store_new(data0);
+          #{@cv_title2}_exec.cv_update();
           if(call_back) call_back();
         },
         dataType: 'json'
       });
       return true;
     };
-    #{@cv_title2}_exec.cv_update();
   };
   
   //###############################
@@ -370,9 +370,9 @@
                 datastore.delete(item,#{@cv_title2}_data.cv_store);
                 if(#{!@copy_data.nil?})
                   #{@cv_title2}_exec.cv_store_new(item,#{@cv_title2}_data.copy_store);
+                #{@cv_title2}_exec.cv_update();
                 if(call_back) call_back();
               };
-              #{@cv_title2}_exec.cv_update();
           }});
         };
         //#{@tabId}_cv_dialog_box.hide();
