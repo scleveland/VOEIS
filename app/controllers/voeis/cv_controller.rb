@@ -110,6 +110,8 @@ class Voeis::CVController < Voeis::BaseController
                     {:label=>"Quality Control Code", :name=>"quality_control_level_code"},
                     {:label=>"Definition", :name=>"definition"},
                     {:label=>"Explanation", :name=>"explanation"}],
+      :cv_paramsxx => {
+                    :quality_control_level_code => lambda {|value| value.to_i }},
       :cv_list_refsxx => lambda {|item,parent|
         ### define :used
         {:used=>(!parent.managed_repository{ Voeis::DataValue.first(:quality_control_level=>item.quality_control_level_code).nil? })}
@@ -178,8 +180,9 @@ class Voeis::CVController < Voeis::BaseController
                     {:label=>"Source ID", :name=>"srs_id"},
                     {:label=>"Geographic", :name=>"is_geo_string", :contains=>["is_geographic"]},
                     {:label=>"Notes", :name=>"notes"}],
-      :cv_params => [
-        {:is_geographic => lambda {|value| value=~(/(true|t|yes|y|1)$/i) ? true : false }}],
+      :cv_params => {
+        :srs_id => lambda {|value| value.to_i },
+        :is_geographic => lambda {|value| value=~(/(true|t|yes|y|1)/i) ? true : false }},
       :cv_ver_refs => lambda {|item,versions|
         cv_refs = []
         temp = {}
@@ -330,12 +333,12 @@ class Voeis::CVController < Voeis::BaseController
     props = CV_MAP[@cv_type][:cv_properties].map{|x| x[:name].to_sym}
     cv_sym = CV_MAP[@cv_type][:cv_title2cv].to_sym
     if @cv_global
-      if params[cv_sym].nil?
-        #@data_type = @cv_class.new(:term=> params[:term], :definition => params[:definition])
-        @cv_item = @cv_class.new(Hash[props.map{|x| [x,params[x]]}])
-      else
-        @cv_item = @cv_class.new(params[cv_sym])
+      cvparams = params[cv_sym]
+      cvparams = Hash[props.map{|x| [x,params[x]]}] if cvparams.nil?
+      if !CV_MAP[@cv_type][:cv_params].nil?
+        CV_MAP[@cv_type][:cv_params].each{|key, filter| cvparams[key.to_s] = filter.call(cvparams[key.to_s]) if !filter.nil?}
       end
+      @cv_item = @cv_class.new(cvparams)
       respond_to do |format|
         if @cv_item.save
           format.html do
@@ -352,12 +355,12 @@ class Voeis::CVController < Voeis::BaseController
     else
       @project = parent
       @project.managed_repository{
-        if params[cv_sym].nil?
-          #@data_type = @cv_class.new(:term=> params[:term], :definition => params[:definition])
-          @cv_item = @cv_class.new(Hash[props.map{|x| [x,params[x]]}])
-        else
-          @cv_item = @cv_class.new(params[cv_sym])
+        cvparams = params[cv_sym]
+        cvparams = Hash[props.map{|x| [x,params[x]]}] if cvparams.nil?
+        if !CV_MAP[@cv_type][:cv_params].nil?
+          CV_MAP[@cv_type][:cv_params].each{|key, filter| cvparams[key.to_s] = filter.call(cvparams[key.to_s]) if !filter.nil?}
         end
+        @cv_item = @cv_class.new(cvparams)
         respond_to do |format|
           if @cv_item.save
             format.html do
@@ -383,7 +386,7 @@ class Voeis::CVController < Voeis::BaseController
       cvparams = params
       cvparams = params[cv_sym] if !params[cv_sym].nil?
       if !CV_MAP[@cv_type][:cv_params].nil?
-        CV_MAP[@cv_type][:cv_params].each{|key, filter| cvparams[key] = filter.call(cvparams[key]) if !filter.nil?}
+        CV_MAP[@cv_type][:cv_params].each{|key, filter| cvparams[key.to_s] = filter.call(cvparams[key.to_s]) if !filter.nil?}
       end
       
       @cv_item = @cv_class.first(:id=>params[:id])
@@ -411,8 +414,10 @@ class Voeis::CVController < Voeis::BaseController
         cvparams = params
         cvparams = params[cv_sym] if !params[cv_sym].nil?
         if !CV_MAP[@cv_type][:cv_params].nil?
-          CV_MAP[@cv_type][:cv_params].each{|key, filter| cvparams[key] = filter.call(cvparams[key]) if !filter.nil?}
+          CV_MAP[@cv_type][:cv_params].each{|key, filter| cvparams[key.to_s] = filter.call(cvparams[key.to_s]) if !filter.nil?}
         end
+        logger.info '### UPDATE cvparams ###'
+        logger.info cvparams.to_hash
         
         @cv_item = @cv_class.first(:id=>params[:id])
         cvparams.each do |key, value|
