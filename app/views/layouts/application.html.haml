@@ -161,7 +161,7 @@
     -##preloader
     -if !flash.empty?
       #flash
-        - if flash[:error]
+        - if !flash[:error].empty!
           %b{:class=> "error"}
             - if !current_user.nil? && !current_user.last_error.nil?
               #error_flash_dialog{:dojoType=>"dijit.Dialog", :title=>"ERROR", :style=>"width:800px;", :jsId=>"error_flash_dialog"}
