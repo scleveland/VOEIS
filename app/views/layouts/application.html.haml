@@ -171,7 +171,6 @@
               %div.error_message{:style=>"color:#8A1F11;font-weight:bold;"}
                 %strong{:style=>"color:#8A1F11;text-align:center;font-weight:bold;"}
                 :plain
-                  -#=flash[:error]
                   =#{(flash[:error] + current_user.last_error).gsub("|","<br/>")} 
             - else
               =flash[:error]
