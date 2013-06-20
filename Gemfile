@@ -61,7 +61,8 @@ gem "test-unit", "~> 1.2.1"  #this is apparently required so it is going here so
 # 
 gem 'capistrano-unicorn'
 platforms(:ruby_19) {
-  gem "therubyracer", '0.10.1', :require => "v8"
+  gem 'libv8'
+  gem "therubyracer", '0.10.1'#, :require => "v8"
 }
 platforms(:jruby) { gem "therubyrhino" }
 
