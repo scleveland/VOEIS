@@ -58,7 +58,7 @@ gem 'resque'
 gem 'rserve-simpler',         :require => 'rserve/simpler'
 gem "test-unit", "~> 1.2.1"  #this is apparently required so it is going here so rack works
 # 
-gem 'rvm-capistrano'
+gem 'capistrano-unicorn'
 platforms(:ruby_19) {
   gem "therubyracer", :require => "v8"
 }
