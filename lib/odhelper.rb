@@ -4,8 +4,9 @@ module Odhelper
   end
   
   # FIX Voeis::DataTypes in Projects
-  def fix_project_data_types
+  def fix_project_data_types(skip_to=nil)
     User.current = User.first
+    
     DataMapper::Model.descendants.each do |model|
       begin
         model::Version
@@ -13,9 +14,11 @@ module Odhelper
       end
     end
     Project.all.each do |project|
+      puts "%s (%s)" % [project.name,project.id]
+      next if !skip_to.nil? && project.id.to_s!=skip_to
+      skip_to = nil
+      
       project.managed_repository do
-        puts project.name
-        
         used = {}
         Voeis::DataTypeCV.all.each do |dt|
           if used[dt.id].nil?
