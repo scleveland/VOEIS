@@ -230,6 +230,7 @@ GEM
       thor (~> 0.14)
     json (1.4.6)
     json (1.4.6-java)
+    libv8 (3.3.10.4)
     linecache19 (0.5.12)
       ruby_core_source (>= 0.1.4)
     log4r (1.1.10)
@@ -346,7 +347,8 @@ GEM
     stringex (1.2.1)
     test-unit (1.2.3)
       hoe (>= 1.5.1)
-    therubyracer (0.8.2)
+    therubyracer (0.10.1)
+      libv8 (~> 3.3.10)
     therubyrhino (2.0.1)
       therubyrhino_jar (>= 1.7.3)
     therubyrhino_jar (1.7.4)
@@ -428,7 +430,7 @@ DEPENDENCIES
   rspec-rails
   ruby-debug19
   test-unit (~> 1.2.1)
-  therubyracer
+  therubyracer (= 0.10.1)
   therubyrhino
   uuidtools
   yard (= 0.6.3)
