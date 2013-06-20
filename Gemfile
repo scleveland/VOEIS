@@ -1,7 +1,7 @@
 source :rubygems
 
 DM_VERSION = "1.1.0"
-
+gem 'unicorn-rails'
 # Once the .freeze fix is integrated we can remove this again - IRJ
 gem "dm-rest-adapter",                          :git => "git://github.com/yogo/dm-rest-adapter.git"
 gem "yogo-framework"                            # The Yogo Framework
@@ -62,7 +62,7 @@ gem "test-unit", "~> 1.2.1"  #this is apparently required so it is going here so
 gem 'capistrano-unicorn'
 platforms(:ruby_19) {
   gem 'libv8'
-  gem "therubyracer", '0.10.1'#, :require => "v8"
+  gem "therubyracer", '0.10.1'# :require => "v8"
 }
 platforms(:jruby) { gem "therubyrhino" }
 
