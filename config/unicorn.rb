@@ -35,7 +35,7 @@ working_directory APP_PATH
 # we use a shorter backlog for quicker failover when busy
 # listen "/path/to/.unicorn.sock", :backlog => 64
 # listen 8080, :tcp_nopush => true
-listen "/var/rails/rails/tmp/sockets/unicorn.sock", :backlog => 64
+listen "/var/rails/current/tmp/sockets/unicorn.sock", :backlog => 64
 
 # nuke workers after 30 seconds instead of 60 seconds (the default)
 timeout 30
