@@ -3,6 +3,38 @@ module Odhelper
     :his
   end
   
+  # FIX Voeis::DataTypes in Projects
+  def fix_project_data_types
+    User.current = User.first
+    DataMapper::Model.descendants.each do |model|
+      begin
+        model::Version
+      rescue
+      end
+    end
+    Project.all.each do |project|
+      project.managed_repository do
+        puts project.name
+        
+        used = {}
+        Voeis::DataTypeCV.all.each do |dt|
+          if used[dt.id].nil?
+              used[dt.id] = true
+          else
+            puts "  DUPE >>> %s :: %s"%[dt.id,dt.term]
+            newdt = Voeis::DataTypeCV.new
+            newdt.term = dt.term
+            newdt.definition = dt.definition
+            newdt.save
+            dt.destroy
+          end
+        end
+        Voeis::DataTypeCV.auto_upgrade!
+      end
+    end
+    DataMapper.auto_upgrade!
+  end
+  
   def clear_publish_to_his
     # CLEAR ALL PROJECT LoggerType & SensorType
     # to fix goof-up
