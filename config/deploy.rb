@@ -4,7 +4,6 @@ require "bundler/capistrano"
 require 'capistrano-unicorn'
 
 set :application, "voeis"
-set :bundle_cmd,  "/usr/local/rvm/gems/ruby-1.9.2-p290/bin/bundle"
 set :scm, :git
 set :repository,  "git://github.com/yogo/VOEIS.git"
 set :shell, "/bin/bash"
@@ -19,8 +18,7 @@ set :workers, { "process_file" => 2 }
 
 
 desc "Setup Production Settings"
-task :unicorn do
-
+task :unicorn_pro do
   set :branch, "unicorn"
   role :web, "voeis1.rcg.montana.edu"
   role :app, "voeis1.rcg.montana.edu"
@@ -162,7 +160,7 @@ after "deploy:setup",       "assets:setup"
 after "deploy:update_code", "db:symlink"
 after "deploy:update_code", "assets:symlink"
 after "deploy:update_code", "docs:publish"
-after "deploy:update_code", "jobs:restart_workers"
-after "deploy:update_code", "jobs:web_stop"
-after "jobs:web_stop", "jobs:web_start"
+# after "deploy:update_code", "jobs:restart_workers"
+# after "deploy:update_code", "jobs:web_stop"
+# after "jobs:web_stop", "jobs:web_start"
 after 'deploy:restart', 'unicorn:reload' # app IS NOT preloaded
