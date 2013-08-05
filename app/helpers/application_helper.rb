@@ -11,6 +11,15 @@ module ApplicationHelper
   # include Google Vis tools
   include GoogleVisualization
 
+
+  def url_for(options = nil)
+    if Hash === options
+      if Rails.env.production?
+        options[:protocol] ||= 'https'
+      end
+    end
+    super(options)
+  end
   # Creates breadcrumbs based on the request query_string
   #
   # @example
