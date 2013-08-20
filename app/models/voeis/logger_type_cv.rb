@@ -9,5 +9,12 @@ class Voeis::LoggerTypeCV
   
   yogo_versioned
 
-  has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
+  has n,  :cv_types,  :model => "Voeis::CVType", :through => Resource
+  
+  def use_count
+    # return use count
+    count = 0
+    count += Voeis::Variable.all(:logger_type=>self.term).count
+    return count
+  end
 end

@@ -34,6 +34,7 @@ class EditCvWidget < Apotomo::Widget
     @copy_columns = options[:copy_columns]
     @cv_form = options[:cv_form]
     @global = options[:global]
+    @cv_types = options[:cv_types]
     
     ####
     @current_user = options[:user]

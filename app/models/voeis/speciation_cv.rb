@@ -16,7 +16,6 @@ class Voeis::SpeciationCV
   
   yogo_versioned
 
-  has n, :variables, :model => "Voeis::Variable", :through => Resource
   has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
   
   def self.load_from_his
@@ -45,5 +44,12 @@ class Voeis::SpeciationCV
     speciation_to_store.his_id = new_his_speciation.id
     speciation_to_store.save
     new_his_speciation
+  end
+  
+  def use_count
+    # return use count
+    count = 0
+    count += Voeis::Variable.all(:speciation=>self.term).count
+    return count
   end
 end

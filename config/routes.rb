@@ -300,6 +300,12 @@ Yogo::Application.routes.draw do
   resources :memberships
   resources :settings
   resources :search
+  resources :cv_types do
+    collection do
+      get :list
+      get :versions
+    end
+  end
   resources :vertical_datum_c_vs do
     collection do
       get :list

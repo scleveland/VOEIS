@@ -685,6 +685,15 @@
     -#%input(name="lab_organization" dojoType="dijit_ext.ValidationTextarea" id="var_lab_organization" required="true" rows="5" 
     -#      style="width:98%!important;line-height:16px!important;")
     
+    -### global Types (cv_type) select
+    - if !@cv_types.nil?
+      %br
+      - opts_types = ""
+      - @cv_types.each do |type|
+        - opts_types += "<option value='#{type.id}'>#{type.name}</option>\n"
+      = select_tag("#{@tabId}_types_select", (opts_types).html_safe, :multiple=>true)
+      %br
+    
     %br{:style=>'float:none; clear:both;'}
     %button{:dojoType=>"dijit.form.Button", :title=>'Create'}
       Save #{@cv_title}

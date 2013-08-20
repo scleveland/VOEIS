@@ -15,7 +15,9 @@ class Voeis::SampleMediumCV
   property :definition, Text
 
   yogo_versioned
-  has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
+
+  has n,  :cv_types,  :model => "Voeis::CVType", :through => Resource
+
   def self.load_from_his
     his_sample_mediums = His::SampleMediumCV.all
 
@@ -40,5 +42,12 @@ class Voeis::SampleMediumCV
     var_to_store.his_id = new_his_samp_med.id
     var_to_store.save
     new_his_samp_med
+  end
+  
+  def use_count
+    # return use count
+    count = 0
+    count += Voeis::Variable.all(:sample_medium=>self.term).count
+    return count
   end
 end

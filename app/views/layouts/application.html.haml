@@ -209,6 +209,7 @@
                     -#= link_to("Vertical Datum", vertical_datum_c_vs_path, :onclick=>"cv_pop('Global Vertical Datums','global_vertical_datums',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
                     - cv_list.each do |cv|
                       = link_to('Global '+cv[:cv_title], cv[:cv_url], :onclick=>"cv_pop('Global #{cv[:cv_title]}','global_#{cv[:cv_title2]}',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
+                    = link_to("Global CV Type", list_cv_types_path, :onclick=>"cv_pop('Global CV Type','global_cv_type',this.href);return false;", :dojoType => "yogo.ui.MenuLink")
               %div{:dojoType=>"dijit.MenuSeparator"}
               %div{:dojoType=>"dijit.PopupMenuItem"}
                 %span Administration

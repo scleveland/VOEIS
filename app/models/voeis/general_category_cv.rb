@@ -14,7 +14,6 @@ class Voeis::GeneralCategoryCV
   
   yogo_versioned
   
-  has n,   :variables, :model => "Variable", :through => Resource
   has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
   
   def self.load_from_his
@@ -42,5 +41,12 @@ class Voeis::GeneralCategoryCV
     gen_cat_to_store.his_id = new_his_gen_cat.id
     gen_cat_to_store.save
     new_his_gen_cat
+  end
+  
+  def use_count
+    # return use count
+    count = 0
+    count += Voeis::Variable.all(:general_category=>self.term).count
+    return count
   end
 end

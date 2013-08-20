@@ -15,8 +15,7 @@ class Voeis::ValueTypeCV
   
   yogo_versioned
 
-  has n, :variables, :model => "Voeis::Variable", :through => Resource  
-  has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
+  has n,  :cv_types,  :model => "Voeis::CVType", :through => Resource
   
   def self.load_from_his
     his_value_types = His::ValueTypeCV.all
@@ -43,6 +42,13 @@ class Voeis::ValueTypeCV
     val_type_to_store.his_id = new_his_val_type.id
     val_type_to_store.save
     new_his_val_type
+  end
+  
+  def use_count
+    # return use count
+    count = 0
+    count += Voeis::Variable.all(:value_type=>self.term).count
+    return count
   end
   
 end

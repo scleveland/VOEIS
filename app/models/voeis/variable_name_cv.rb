@@ -11,11 +11,10 @@ class Voeis::VariableNameCV
   property :id,         Serial
   property :term,       String, :required => true, :index => true, :format => /[^\t|\n|\r]/
   property :definition, Text
-  
+
   yogo_versioned
-  
-  has n, :variables, :model => "Voeis::Variable", :through => Resource
-  has n,   :cv_types,  :model => "Voeis::CVType", :through => Resource
+
+  has n,  :cv_types,  :model => "Voeis::CVType", :through => Resource
   
   def self.load_from_his
     his_variable_names = His::VariableNameCV.all
@@ -48,5 +47,12 @@ class Voeis::VariableNameCV
     var_to_store.his_id = new_his_var_name.id
     var_to_store.save
     new_his_var_name
+  end
+
+  def use_count
+    # return use count
+    count = 0
+    count += Voeis::Variable.all(:variable_name=>self.term).count
+    return count
   end
 end
