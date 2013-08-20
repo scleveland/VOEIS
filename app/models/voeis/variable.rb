@@ -215,8 +215,22 @@ class Voeis::Variable
     end
   end
   
-  def values(site,outcount=12)
-    dresults = Voeis::DataValue.all(:site_id=>site.id, :variable_id=>self.id, :order=>[:local_date_time.desc], :limit=>outcount)
+  def values(site,outcount=12,ignore=false)
+    if ignore==false
+      dresults = Voeis::DataValue.all(:site_id=>site.id, 
+                                      :variable_id=>self.id, 
+                                      :order=>[:local_date_time.desc], 
+                                      :limit=>outcount)
+    else
+      dresults = nil
+      ignore_list = ignore==true ? ['null'] : ignore.split(',')
+      ignore_list.each{|val|
+        dresults += Voeis::DataValue.all(:site_id=>site.id, 
+                                        :variable_id=>self.id, 
+                                        :string_value.not=>val)
+      }
+      dresults = dresults.all(:order=>[:local_date_time.desc],:limit=>outcount)
+    end
   end
   
   def last_days_values(site,outcount=12)
@@ -240,9 +254,9 @@ class Voeis::Variable
     end
   end
   
-  def values_graph(site,outcount=12)
+  def values_graph(site,outcount=12,ignore=false)
     # LAST 12 VALUES / 24 HOURS -or- LAST 12 VALUES
-    dresults = self.values(site,outcount)
+    dresults = self.values(site,outcount,ignore)
     unless dresults.nil?
       dresults.map{|dv| [dv[:local_date_time].to_datetime.to_i*1000, dv[:data_value]]}
     else
