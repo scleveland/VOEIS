@@ -271,7 +271,7 @@ class Voeis::SitesController < Voeis::BaseController
       @variables = Voeis::Variable.all(:id => @site_catalog_items.map{|v| v.variable_id})
       @graph_data = {}
       @variables.each do |var|
-        @graph_data[var.id.to_s] = var.values_graph(@site, params[:number].nil? ? 12 : params[:number].to_i)
+        @graph_data[var.id.to_s] = var.values_graph(@site, params[:number].nil? ? 12 : params[:number].to_i, params[:ignore].nil? ? false : params[:ignore])
       end
       render :layout=>'site'
       # respond_to do |format|
