@@ -1355,43 +1355,50 @@ class Voeis::ApivsController < Voeis::BaseController
            vars = variables.map{|v| v.id}
            if variables.empty?
              data_values[:error] = "There is no variables with the names:" + params[:variable_names].join(',')
-           else
-             
+           else       
              if params[:small_data] == 'true'
                site_hash=Hash.new()
+               site_array=Array.new()
                sites.each do |site|
                  vars_hash = Hash.new()
+                 vars_array = Array.new()
                  vars.each do |var|
                   var_hash = Hash.new()
+                  base_sql_sensor= " FROM  voeis_data_values WHERE site_id IN (#{site}) AND variable_id=#{var} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
+                  base_sql_sample= " FROM  voeis_data_values WHERE site_id IN (#{site}) AND variable_id=#{var} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'"
                   sql_limit = ""
                   if params[:number] 
-                    sql_limit = " GROUP BY voeis_data_values.local_date_time,voeis_data_values.data_value,voeis_data_values.utc_offset ORDER BY local_date_time DESC LIMIT #{params[:number].to_i}"
+                    base_sql_sensor = base_sql_sensor + " GROUP BY voeis_data_values.local_date_time,voeis_data_values.data_value,voeis_data_values.utc_offset ORDER BY local_date_time DESC LIMIT #{params[:number].to_i}"
+                    base_sql_sample= base_sql_sample + " GROUP BY voeis_data_values.local_date_time,voeis_data_values.data_value,voeis_data_values.utc_offset ORDER BY local_date_time DESC LIMIT #{params[:number].to_i}"
                   end
-                  sql = "SELECT local_date_time, data_value, utc_offset FROM  voeis_data_values WHERE site_id IN (#{sites.join(',')}) AND variable_id In (#{vars.join(',')}) AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'" + sql_limit
+                  sql = "SELECT local_date_time, data_value, utc_offset" + base_sql_sensor
                   var_hash = var_hash.merge({'time_series_data' => adjust_utc_time(repository.adapter.select(sql))})# repository.adapter.select(sql)})
-                  sql = "SELECT COUNT(*) FROM  voeis_data_values WHERE site_id IN (#{site}) AND variable_id=#{var} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'" + sql_limit
+                  sql = "SELECT COUNT(*)"  + base_sql_sensor
                   var_hash = var_hash.merge({:time_series_count => repository.adapter.select(sql)})
-                  sql = "SELECT MAX(data_value) FROM  voeis_data_values WHERE site_id IN (#{site}) AND variable_id=#{var} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'" + sql_limit
+                  sql = "SELECT MAX(data_value)" + base_sql_sensor
                   var_hash = var_hash.merge({:time_series_max => repository.adapter.select(sql)})
-                  sql = "SELECT MIN(data_value) FROM  voeis_data_values WHERE site_id IN (#{site}) AND variable_id=#{var} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'" + sql_limit
+                  sql = "SELECT MIN(data_value)" + base_sql_sensor
                   var_hash = var_hash.merge({:time_series_min => repository.adapter.select(sql)})
-                  sql = "SELECT AVG(data_value) FROM  voeis_data_values WHERE site_id IN (#{site}) AND variable_id=#{var} AND datatype = 'Sensor' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'" + sql_limit
+                  sql = "SELECT AVG(data_value)" + base_sql_sensor
                   var_hash = var_hash.merge({:time_series_avg =>repository.adapter.select(sql)})
-                  sql = "SELECT local_date_time, data_value, utc_offset FROM  voeis_data_values WHERE site_id IN (#{site}) AND variable_id=#{var} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'" + sql_limit
+                  sql = "SELECT local_date_time, data_value, utc_offset" + base_sql_sample
                   var_hash = var_hash.merge({'sample_data' => adjust_utc_time(repository.adapter.select(sql))})
-                  sql = "SELECT COUNT(*) FROM  voeis_data_values WHERE site_id IN (#{site}) AND variable_id=#{var} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'" + sql_limit
+                  sql = "SELECT COUNT(*)" + base_sql_sample
                   var_hash = var_hash.merge({:sample_count => repository.adapter.select(sql)})
-                  sql = "SELECT MAX(data_value) FROM  voeis_data_values WHERE site_id IN (#{site}) AND variable_id=#{var} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'" + sql_limit
+                  sql = "SELECT MAX(data_value)" + base_sql_sample
                   var_hash = var_hash.merge({:sample_max => repository.adapter.select(sql)})
-                  sql = "SELECT MIN(data_value) FROM  voeis_data_values WHERE site_id IN (#{site}) AND variable_id=#{var} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'" + sql_limit
+                  sql = "SELECT MIN(data_value)" + base_sql_sample
                   var_hash = var_hash.merge({:sample_min => repository.adapter.select(sql)})
-                  sql = "SELECT AVG(data_value) FROM  voeis_data_values WHERE site_id IN (#{site})AND variable_id=#{var} AND datatype = 'Sample' AND local_date_time >= '#{params[:start_datetime].to_time}' AND local_date_time <= '#{params[:end_datetime].to_time}'" + sql_limit
-                  var_hash = var_hash.merge({:sample_avg =>repository.adapter.select(sql)})              
-                  vars_hash[variables.get(var).variable_name+"_"+var.to_s] = var_hash
+                  sql = "SELECT AVG(data_value)" + base_sql_sample
+                  var_hash = var_hash.merge({:sample_avg =>repository.adapter.select(sql)})  
+                  var_hash = var_hash.merge({:variable => variables.get(var)})            
+                  vars_array << var_hash
                 end #end var each
-                site_hash[vsites.get(site).site_name] = vars_hash
+                vars_hash["site"]=vsites.get(site)
+                vars_hash["data"]=vars_array
+                site_array << vars_hash
               end #end site each
-             data_values[:data_values] = site_hash
+             data_values[:data_values] = site_array #site_hash
             else
               #if !@var.sensor_types.first.nil?
               vars.each do |var|
@@ -1414,9 +1421,11 @@ class Voeis::ApivsController < Voeis::BaseController
                 var_hash[:sample_min] =sseries.min(:data_value)
                 var_hash[:sample_avg]=sseries.avg(:data_value)
                 var_hash[:site]=variables.get(var).sites.first
-                
+              
                 vars_hash[variables.get(var).variable_name+"_"+var.to_s] = var_hash
+                
               end #end each
+              
               data_values[:data_values] = vars_hash
               data_values[:project] = parent.as_json
              end
@@ -2383,4 +2392,5 @@ class Voeis::ApivsController < Voeis::BaseController
      def get_project_data_by_site_and_sensor
       
      end
+     
 end
