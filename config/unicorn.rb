@@ -38,7 +38,7 @@ working_directory APP_PATH
 listen "/var/rails/current/tmp/sockets/unicorn.sock", :backlog => 64
 
 # nuke workers after 30 seconds instead of 60 seconds (the default)
-timeout 30
+timeout 90
 
 # feel free to point this anywhere accessible on the filesystem
 pid "/var/rails/shared/pids/unicorn.pid"
