@@ -216,20 +216,30 @@ class Voeis::Variable
   end
   
   def values(site,outcount=12,ignore=false)
-    if ignore==false
+    if ignore==false || ignore==nil
       dresults = Voeis::DataValue.all(:site_id=>site.id, 
                                       :variable_id=>self.id, 
                                       :order=>[:local_date_time.desc], 
                                       :limit=>outcount)
+    elsif ignore=="-9999"
+      dresults = Voeis::DataValue.all(:site_id=>site.id, 
+                                      :variable_id=>self.id, 
+                                      :data_value.not=>-9999,
+                                      :order=>[:local_date_time.desc], 
+                                      :limit=>outcount)
+      
     else
-      dresults = nil
-      ignore_list = ignore==true ? ['null'] : ignore.split(',')
+      dresults = Voeis::DataValue.all(:site_id=>0)
+      ignore_list = ignore.split(',')
       ignore_list.each{|val|
         dresults += Voeis::DataValue.all(:site_id=>site.id, 
                                         :variable_id=>self.id, 
-                                        :string_value.not=>val)
+                                        :string_value.not=>val,
+                                        :order=>[:local_date_time.desc], 
+                                        :limit=>outcount)
       }
-      dresults = dresults.all(:order=>[:local_date_time.desc],:limit=>outcount)
+      #dresults = dresults.all(:order=>[:local_date_time.desc],:limit=>outcount)
+      dresults
     end
   end
   

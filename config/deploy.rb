@@ -1,76 +1,31 @@
 #$:.unshift(File.expand_path('./lib', ENV['rvm_path']))
 
-#require "rvm/capistrano" 
 require "bundler/capistrano"
+require 'capistrano-unicorn'
 
 set :application, "voeis"
-#set :rvm_ruby_string, 'ruby-1.9.2-p180@passenger'
-#set :rvm_type, :system  
-#set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p180/bin/bundle"
-set :rvm_ruby_string, 'ruby-1.9.2-p320@passenger'
-set :rvm_type, :system  
-set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p320/bin/bundle"
 set :scm, :git
 set :repository,  "git://github.com/yogo/VOEIS.git"
 set :shell, "/bin/bash"
 set :use_sudo,    false
 set :deploy_via, :remote_cache
 set :copy_exclude, [".git"]
-set :user, "root"
-#set :user, "sean.cleveland"
+set :user, "rails"
 set :deploy_to, "/var/rails"
-#set :deploy_to, "/var/voeis"
-
+set :unicorn_env, "Production"
+set :unicorn_user, "rails"
 set :workers, { "process_file" => 2 }
 
-desc "Setup Development Settings"
-task :development do
-  set :branch, "master"
-  role :web, "voeis-dev.rcg.montana.edu"
-  role :app, "voeis-dev.rcg.montana.edu"
-  role :db,  "voeis-dev.rcg.montana.edu", :primary => true
-end
 
 desc "Setup Production Settings"
-task :production do
-
-  set :branch, "production"
-  role :web, "voeis4.rcg.montana.edu"
-  role :app, "voeis4.rcg.montana.edu"
-  role :db,  "voeis4.rcg.montana.edu", :primary => true
-
-end
-
-desc "Setup Production Settings"
-task :voeis2 do
-  set :rvm_ruby_string, 'ruby-1.9.2-p180@unicorn'
-  set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p180@global/bin/bundle"
-  set :branch, "production"
-  role :web, "voeis2.rcg.montana.edu"
-  role :app, "voeis2.rcg.montana.edu"
-  role :db,  "voeis2.rcg.montana.edu", :primary => true
+task :unicorn_pro do
+  set :branch, "unicorn"
+  role :web, "voeis1.rcg.montana.edu"
+  role :app, "voeis1.rcg.montana.edu"
+  role :db,  "voeis1.rcg.montana.edu", :primary => true
 
 end
 
-desc "Setup Production Settings"
-task :voeis4 do
-  set :rvm_ruby_string, 'ruby-1.9.2-p320@unicorn'
-  set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p320@global/bin/bundle"
-  set :branch, "production"
-  role :web, "voeis4.rcg.montana.edu"
-  role :app, "voeis4.rcg.montana.edu"
-  role :db,  "voeis4.rcg.montana.edu", :primary => true
-end
-
-desc "Setup Production Settings"
-task :production2 do
-
-  set :branch, "production"
-  role :web, "voeis2.rcg.montana.edu"
-  role :app, "voeis2.rcg.montana.edu"
-  role :db,  "voeis2.rcg.montana.edu", :primary => true
-
-end
 
 namespace :deploy do
 
@@ -205,6 +160,7 @@ after "deploy:setup",       "assets:setup"
 after "deploy:update_code", "db:symlink"
 after "deploy:update_code", "assets:symlink"
 after "deploy:update_code", "docs:publish"
-#after "deploy:update_code", "jobs:restart_workers"
-#after "deploy:update_code", "jobs:web_stop"
-#after "jobs:web_stop", "jobs:web_start"
+# after "deploy:update_code", "jobs:restart_workers"
+# after "deploy:update_code", "jobs:web_stop"
+# after "jobs:web_stop", "jobs:web_start"
+after 'deploy:restart', 'unicorn:reload' # app IS NOT preloaded
