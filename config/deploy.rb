@@ -1,19 +1,22 @@
 #$:.unshift(File.expand_path('./lib', ENV['rvm_path']))
 
-require "rvm/capistrano" 
+#require "rvm/capistrano" 
 require "bundler/capistrano"
 
 set :application, "voeis"
-set :rvm_ruby_string, 'ruby-1.9.2-p180@passenger'
+#set :rvm_ruby_string, 'ruby-1.9.2-p180@passenger'
+#set :rvm_type, :system  
+#set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p180/bin/bundle"
+set :rvm_ruby_string, 'ruby-1.9.2-p320@passenger'
 set :rvm_type, :system  
-set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p180/bin/bundle"
+set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p320/bin/bundle"
 set :scm, :git
 set :repository,  "git://github.com/yogo/VOEIS.git"
 set :shell, "/bin/bash"
 set :use_sudo,    false
 set :deploy_via, :remote_cache
 set :copy_exclude, [".git"]
-set :user, "rails"
+set :user, "root"
 #set :user, "sean.cleveland"
 set :deploy_to, "/var/rails"
 #set :deploy_to, "/var/voeis"
@@ -32,9 +35,9 @@ desc "Setup Production Settings"
 task :production do
 
   set :branch, "production"
-  role :web, "voeis.rcg.montana.edu"
-  role :app, "voeis.rcg.montana.edu"
-  role :db,  "voeis.rcg.montana.edu", :primary => true
+  role :web, "voeis4.rcg.montana.edu"
+  role :app, "voeis4.rcg.montana.edu"
+  role :db,  "voeis4.rcg.montana.edu", :primary => true
 
 end
 
@@ -48,6 +51,17 @@ task :voeis2 do
   role :db,  "voeis2.rcg.montana.edu", :primary => true
 
 end
+
+desc "Setup Production Settings"
+task :voeis4 do
+  set :rvm_ruby_string, 'ruby-1.9.2-p320@unicorn'
+  set :bundle_cmd,      "/usr/local/rvm/gems/ruby-1.9.2-p320@global/bin/bundle"
+  set :branch, "production"
+  role :web, "voeis4.rcg.montana.edu"
+  role :app, "voeis4.rcg.montana.edu"
+  role :db,  "voeis4.rcg.montana.edu", :primary => true
+end
+
 desc "Setup Production Settings"
 task :production2 do
 
@@ -191,6 +205,6 @@ after "deploy:setup",       "assets:setup"
 after "deploy:update_code", "db:symlink"
 after "deploy:update_code", "assets:symlink"
 after "deploy:update_code", "docs:publish"
-after "deploy:update_code", "jobs:restart_workers"
-after "deploy:update_code", "jobs:web_stop"
-after "jobs:web_stop", "jobs:web_start"
+#after "deploy:update_code", "jobs:restart_workers"
+#after "deploy:update_code", "jobs:web_stop"
+#after "jobs:web_stop", "jobs:web_start"
