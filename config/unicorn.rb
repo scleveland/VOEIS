@@ -112,4 +112,9 @@ after_fork do |server, worker|
   # and Redis.  TokyoCabinet file handles are safe to reuse
   # between any number of forked children (assuming your kernel
   # correctly implements pread()/pwrite() system calls)
+  redis = Redis.new(:host=>'redis.rcg.montana.edu', :port=>6379)
+  voeis_db = redis.hget('select_dbs', 'voeis')
+  redis.select(voeis_db)
+  Resque.redis = redis
+
 end
